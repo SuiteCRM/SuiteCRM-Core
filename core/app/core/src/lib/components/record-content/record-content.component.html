@@ -28,7 +28,7 @@
 <ng-container *ngIf="dataSource">
     <div *ngIf="config && config.layout === 'panels'" class="record-content panel-layout container-fluid pl-0 pr-0">
         <div class="row no-gutters mb-3" *ngFor="let panel of panels">
-            <div class="col">
+            <div class="col" *ngIf="panel.display$ | async">
                 <scrm-panel [title]="panel.label" [isCollapsed$]="(panel.isCollapsed | toObservable)" mode="collapsible">
                     <div panel-body class="panel-{{panel.key}}">
                         <scrm-field-layout [dataSource]="getLayoutDataSource(panel)"></scrm-field-layout>

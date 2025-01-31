@@ -83,7 +83,7 @@ class ParentMapper implements TypeMapperInterface
         }
 
         $relate['id'] = $parentId;
-        $relate[$rName] = $bean->$name ?? '';
+        $relate[$rName] = html_entity_decode($bean->$name ?? '', ENT_QUOTES);
 
         $container[$newName] = $relate;
     }

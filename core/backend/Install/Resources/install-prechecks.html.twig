@@ -79,8 +79,7 @@
                                             <button type="button" class="button-group-button settings-button d-flex
                                             flex-wrap align-content-end"
                                                     onclick="window.location.reload()">
-                                                <label style="cursor: pointer"
-                                                       class="mb-0">{{ mod_strings.LBL_RECHECK }}</label>
+                                                {{ mod_strings.LBL_RECHECK }}
                                             </button>
                                         </div>
                                     {% endif %}
@@ -92,26 +91,21 @@
                                                 <button type="submit" class="button-group-button settings-button d-flex
                                             flex-wrap align-content-end error-warning-action-button"
                                                         >
-                                                    <label style="cursor: pointer"
-                                                           class="mb-0">{{ mod_strings.LBL_PROCEED_WITH_ERRORS_AND_WARNINGS }}
-                                                    </label>
+                                                    {{ mod_strings.LBL_PROCEED_WITH_ERRORS_AND_WARNINGS }}
                                                 </button>
                                             </div>
                                         {% elseif errorsFound == true %}
                                             <div class="action-group-menu float-right install-view-actions">
                                                 <button type="submit" class="button-group-button settings-button d-flex
                                             flex-wrap align-content-end error-action-button">
-                                                    <label style="cursor: pointer"
-                                                           class="mb-0">{{ mod_strings.LBL_PROCEED_WITH_ERRORS }}
-                                                    </label>
+                                                    {{ mod_strings.LBL_PROCEED_WITH_ERRORS }}
                                                 </button>
                                             </div>
                                         {% elseif warningsFound == true %}
                                             <div class="action-group-menu float-right install-view-actions">
                                                 <button type="submit" class="button-group-button settings-button d-flex
                                             flex-wrap align-content-end warning-action-button">
-                                                    <label style="cursor: pointer"
-                                                           class="mb-0">{{ mod_strings.LBL_PROCEED_WITH_WARNINGS }}</label>
+                                                    {{ mod_strings.LBL_PROCEED_WITH_WARNINGS }}
                                                 </button>
                                             </div>
                                         {% endif %}

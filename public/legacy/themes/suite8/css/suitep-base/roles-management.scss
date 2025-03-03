@@ -28,20 +28,19 @@
             &:hover {
                 background: $pale-blue;
             }
-        }     
+        }
     }
     .hidebtn {
         display: none;
     }
-    
+
     .heading-text {
         position: relative;
         top: 3.5em;
         float: left;
     }
     .action_buttons {
-        position: absolute;
-        margin-top: -2em; 
+        position: static;
         bottom: auto;
         .btn {
             background-color: $nepal-grey;
@@ -57,7 +56,7 @@
                 background: $pale-blue;
                 border: none;
             }
-        }      
+        }
     }
     .view {
         border-radius: 10px;

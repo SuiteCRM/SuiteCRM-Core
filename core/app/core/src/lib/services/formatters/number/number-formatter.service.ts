@@ -159,7 +159,7 @@ export class NumberFormatter implements Formatter {
 
         const formattedValue = this.toInternalFormat(value);
 
-        if (decimalSymbol !== '.' && value.includes(decimalSymbol)) {
+        if (decimalSymbol !== '.' && value?.toString()?.includes(decimalSymbol)) {
             value = formattedValue;
         }
 

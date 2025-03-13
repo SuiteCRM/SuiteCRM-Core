@@ -155,6 +155,8 @@ export class NumberFormatter implements Formatter {
     }
 
     replaceSeparatorsToInternalFormat(value: string): string {
+        value = value.toString();
+        
         const decimalSymbol = this.getDecimalsSymbol() || '.';
 
         const formattedValue = this.toInternalFormat(value);

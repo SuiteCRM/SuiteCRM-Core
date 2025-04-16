@@ -48,8 +48,8 @@ export class DateTimeDetailFieldComponent extends BaseDateTimeComponent{
         super(formatter, typeFormatter, logic, logicDisplay);
     }
 
-    getUserTimeZone(): string {
-        return this.formatter.userTimeZone();
+    getUserTimeZone(dateString): string {
+        return this.formatter.userTimeZone(this.formatter.toDateTime(dateString));
     }
 
     toDateTime(dateString: string): Date {

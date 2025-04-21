@@ -12,8 +12,6 @@
    height="28"
    viewBox="0 0 28 28"
    id="svg2">
-  <title
-     id="title4">admin_inbound_email</title>
   <desc
      id="desc6">Created with Sketch.</desc>
   <metadata
@@ -24,7 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title>admin_inbound_email</dc:title>
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>

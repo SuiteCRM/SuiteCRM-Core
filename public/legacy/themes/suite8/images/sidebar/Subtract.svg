@@ -12,8 +12,6 @@
    height="32"
    viewBox="0 0 32 32"
    id="svg2">
-  <title
-     id="title4">sb_add</title>
   <desc
      id="desc6">Created with Sketch.</desc>
   <metadata
@@ -24,7 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title>sb_add</dc:title>
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>

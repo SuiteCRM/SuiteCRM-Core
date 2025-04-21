@@ -13,8 +13,6 @@
    height="30"
    viewBox="0 0 30 30"
    id="svg2">
-  <title
-     id="title4">acc_history</title>
   <desc
      id="desc6">Created with Sketch.</desc>
   <metadata
@@ -25,7 +23,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title>acc_history</dc:title>
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>

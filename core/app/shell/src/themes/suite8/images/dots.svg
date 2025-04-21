@@ -2,7 +2,6 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
      y="0px"
      viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve">
-    <title>Dots Icon</title>
   <g>
 		<path class="st0" d="M11,22C4.9,22,0,17.1,0,11C0,4.9,4.9,0,11,0c6.1,0,11,4.9,11,11C22,17.1,17.1,22,11,22z M11,1
 			C5.5,1,1,5.5,1,11s4.5,10,10,10s10-4.5,10-10S16.5,1,11,1z"/>

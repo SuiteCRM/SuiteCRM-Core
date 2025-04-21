@@ -22,7 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title>sb_add</dc:title>
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -47,8 +47,6 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="sb_add" />
   <!-- Generator: Sketch 3.8.3 (29802) - http://www.bohemiancoding.com/sketch -->
-  <title
-     id="title4">sb_add</title>
   <desc
      id="desc6">Created with Sketch.</desc>
   <defs

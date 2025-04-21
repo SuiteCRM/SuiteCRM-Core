@@ -22,7 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title>admin_role_management</dc:title>
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -47,8 +47,6 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="Page-1" />
   <!-- Generator: Sketch 3.8.3 (29802) - http://www.bohemiancoding.com/sketch -->
-  <title
-     id="title4">admin_role_management</title>
   <desc
      id="desc6">Created with Sketch.</desc>
   <defs

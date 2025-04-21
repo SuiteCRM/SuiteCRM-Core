@@ -22,7 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title>business_hours</dc:title>
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -47,8 +47,6 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
   <!-- Generator: Sketch 39.1 (31720) - http://www.bohemiancoding.com/sketch -->
-  <title
-     id="title4">business_hours</title>
   <desc
      id="desc6">Created with Sketch.</desc>
   <defs

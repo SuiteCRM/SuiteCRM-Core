@@ -159,7 +159,11 @@ class AppLdapUserProvider implements UserProviderInterface, PasswordUpgraderInte
         $userInfo = [];
         foreach ($this->ldapAutoCreateExtraFieldsMap as $ldapKey => $fieldKey) {
             if (isset($extraFields[$ldapKey])) {
-                $userInfo[$fieldKey] = $extraFields[$ldapKey];
+                if(is_array($extraFields[$ldapKey])){
+                    $userInfo[$fieldKey] = $extraFields[$ldapKey][0] ?? '';
+                } else {
+                    $userInfo[$fieldKey] = $extraFields[$ldapKey];
+                }
             }
         }
 

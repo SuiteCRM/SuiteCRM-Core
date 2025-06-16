@@ -163,11 +163,27 @@ export class UpdateValueBackendAction extends FieldLogicActionHandler {
      * @param {string} value
      * @param {object} record
      */
-    protected updateValue(field: Field, value: string, record: Record): void {
-        field.value = value.toString();
-        field.formControl.setValue(value);
+    protected updateValue(field: Field, value: string, record: Record): void {        
+        switch (field.type) {
+            case "relate": 
+                const relateValue = JSON.parse(value);
+
+                // Field that displays the related record 
+                field.value = relateValue.id.toString();
+                field.valueObject = {id: relateValue.id, name: relateValue.name};
+                field.formControl.setValue({...field.valueObject});
+
+                // Field that stores the related record's ID
+                const relateFieldDB = record.fields[field.definition.id_name];
+                relateFieldDB.value = field.value;
+                relateFieldDB.formControl.setValue(field.value);
+
+            default: 
+                field.value = value.toString();
+                field.formControl.setValue(value);
+        }
+
         // re-validate the parent form-control after value update
         record.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
     }
-
 }

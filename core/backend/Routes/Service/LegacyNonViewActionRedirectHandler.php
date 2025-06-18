@@ -84,6 +84,10 @@ class LegacyNonViewActionRedirectHandler extends LegacyRedirectHandler
             return true;
         }
 
+        if ($request->getPathInfo() === '/_fragment') {
+            return false;
+        }
+
         $isRegistered = true;
         try {
             $this->router->matchRequest($request);

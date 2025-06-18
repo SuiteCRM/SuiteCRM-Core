@@ -48,7 +48,7 @@ if (!defined('sugarEntry') || !sugarEntry) {
  */
 ob_start();
 chdir(__DIR__.'/../../');
-require('include/entryPoint.php');
+require_once('include/entryPoint.php');
 require_once('soap/SoapError.php');
 require_once('SoapHelperWebService.php');
 require_once('SugarRestUtils.php');

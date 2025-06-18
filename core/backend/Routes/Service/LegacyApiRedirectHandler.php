@@ -100,7 +100,12 @@ class LegacyApiRedirectHandler extends LegacyRedirectHandler
                 $base = $_SERVER['BASE'] ?? $_SERVER['REDIRECT_BASE'] ?? '';
 
                 $scriptName = $base . '/legacy/' . $info['dir'] . '/' . $info['file'];
-                $requestUri = str_replace($base, $base . '/legacy', $_SERVER['REQUEST_URI']);
+
+                if (!empty($base)) {
+                    $requestUri = str_replace($base, $base . '/legacy', $_SERVER['REQUEST_URI']);
+                } else {
+                    $requestUri = '/legacy' . $_SERVER['REQUEST_URI'];
+                }
 
                 $info['script-name'] = $scriptName;
                 $info['request-uri'] = $requestUri;

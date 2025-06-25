@@ -39,6 +39,7 @@
  */
 
 *}
+{if !empty({{sugarvar objectName='fields' memberName='vardef.type_name' key='value'}})}
 {capture assign='url'}index.php?module={{sugarvar objectName='fields' memberName='vardef.type_name' key='value'}}&action=DetailView&record={{sugarvar key='value' memberName='vardef.id_name'}}{/capture}
 {{if !$nolink}}
 <input type="hidden" class="sugar_field" id="{{sugarvar key='name'}}" value="{{sugarvar key='value'}}">
@@ -50,3 +51,4 @@
 {{sugarvar_connector view='DetailView'}}
 {/if}
 {{/if}}
+{/if}

@@ -2792,22 +2792,20 @@
 
       select = document.getElementById('userFolders');
 
+      var selectedSubscriptions = [];
+      
       for (i = 0; i < select.options.length; i++) {
         var opt = select.options[i];
-        if (opt.selected && opt.value != "") {
-          if (active != "") {
-            active += "::";
+        if (opt.selected && opt.value !== "") {
+          if (!selectedSubscriptions.includes(opt.value)) {
+              selectedSubscriptions.push(opt.value);
           }
-          active += opt.value;
         }
       }
-
-      //Add the group folder ids.
-      var group_folders = SUGAR.email2.folders.retrieveGroupFolderSubscriptions();
-      for (i = 0; i < group_folders.length; i++) {
-        active += ("::" + group_folders[i]);
-      }
-
+      
+    active = selectedSubscriptions.join("::");
+     
+     
       AjaxObject.startRequest(callbackFolderSubscriptions, urlStandard + '&emailUIAction=updateSubscriptions&subscriptions=' + active);
     },
     /**

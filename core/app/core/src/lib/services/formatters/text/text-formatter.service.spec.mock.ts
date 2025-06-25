@@ -24,19 +24,8 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {DataTypeFormatter} from './data-type.formatter.service';
-import {currencyFormatterMock} from './currency/currency-formatter.service.spec.mock';
-import {numberFormatterMock} from './number/number-formatter.spec.mock';
-import {datetimeFormatterMock} from './datetime/datetime-formatter.service.spec.mock';
-import {phoneFormatterMock} from './phone/phone-formatter.spec.mock';
-import {dateFormatterMock} from './datetime/date-formatter.service.spec.mock';
-import {textFormatterMock} from "./text/text-formatter.service.spec.mock";
+import { TextFormatter } from './text-formatter.service';
+import {FormControlUtils} from '../../../services/record/field/form-control.utils';
+import {userPreferenceStoreMock} from '../../../store/user-preference/user-preference.store.spec.mock';
 
-export const dataTypeFormatterMock = new DataTypeFormatter(
-    currencyFormatterMock,
-    numberFormatterMock,
-    dateFormatterMock,
-    datetimeFormatterMock,
-    phoneFormatterMock,
-    textFormatterMock
-);
+export const textFormatterMock = new  TextFormatter(userPreferenceStoreMock,new FormControlUtils(),'en_US');

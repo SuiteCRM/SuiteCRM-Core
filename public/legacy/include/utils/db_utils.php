@@ -72,6 +72,7 @@ $toHTML = array(
     '>' => '&gt;',
     "'" => '&#039;',
 );
+$GLOBALS['toHTML'] = $toHTML;
 $GLOBALS['toHTML_keys'] = array_keys($toHTML);
 $GLOBALS['toHTML_values'] = array_values($toHTML);
 $GLOBALS['toHTML_keys_set'] = implode("", $GLOBALS['toHTML_keys']);

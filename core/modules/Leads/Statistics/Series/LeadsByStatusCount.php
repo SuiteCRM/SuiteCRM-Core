@@ -129,7 +129,25 @@ class LeadsByStatusCount extends LegacyHandler implements StatisticsProviderInte
         $nameField = 'name';
         $valueField = 'value';
 
-        $series = $this->buildSingleSeries($result, $nameField, $valueField);
+        $options = $bean->field_defs['status']['options'];
+        if (gettype($options) == 'array') {
+            $optionsList = $options;
+        } elseif (gettype($options) == 'string') {
+            global $app_list_strings;
+            $optionsList = $app_list_strings[$options];
+        } else {
+            $optionsList = [];
+        }
+        $resultFormatted = [];
+        foreach ($result as $res) {
+            if (isset($optionsList[$res['name']])) {
+                $resultFormatted[] = ['name' => $optionsList[$res['name']], 'value' => $res['value']];
+            } else {
+                $resultFormatted[] = $res;
+            }
+        }
+
+        $series = $this->buildSingleSeries($resultFormatted, $nameField, $valueField);
 
 
         $chartOptions = new ChartOptions();

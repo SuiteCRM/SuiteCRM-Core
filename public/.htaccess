@@ -20,6 +20,12 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Fix #74 Redirect http to https (except when request comes from localhost).
+    # This is the security requirement for login.
+    RewriteCond %{REMOTE_ADDR} !^127\.0\.0\.1
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^/?(.*) https://%{HTTP_HOST}/$1 [R=301,L]
+
     RewriteRule ^index.php.*$ - [L,NC]
 
     # Determine the RewriteBase automatically and set it as environment variable.

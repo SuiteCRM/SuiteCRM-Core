@@ -3930,7 +3930,7 @@ function display_stack_trace($textOnly = false)
     return $out;
 }
 
-function StackTraceErrorHandler($errno, $errstr, $errfile, $errline, $errcontext)
+function StackTraceErrorHandler($errno, $errstr, $errfile, $errline, $errcontext = null)
 {
     $error_msg = " $errstr occurred in <b>$errfile</b> on line $errline [" . date('Y-m-d H:i:s') . ']';
 

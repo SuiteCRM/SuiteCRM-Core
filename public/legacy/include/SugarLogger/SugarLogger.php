@@ -220,6 +220,25 @@ class SugarLogger implements LoggerTemplate
         //if we haven't opened a file pointer yet let's do that
         if (! $this->fp) {
             $this->fp = fopen($this->full_log_file, 'ab');
+
+            // Check if fopen failed and provide clear error message
+            if ($this->fp === false) {
+                // Try to provide a helpful error message
+                $error_msg = "SugarLogger: Unable to open log file '{$this->full_log_file}' for writing. ";
+
+                if (!file_exists(dirname($this->full_log_file))) {
+                    $error_msg .= "Directory '" . dirname($this->full_log_file) . "' does not exist.";
+                } elseif (!is_writable(dirname($this->full_log_file))) {
+                    $error_msg .= "Directory '" . dirname($this->full_log_file) . "' is not writable.";
+                } elseif (file_exists($this->full_log_file) && !is_writable($this->full_log_file)) {
+                    $error_msg .= "Log file exists but is not writable.";
+                } else {
+                    $error_msg .= "Check file permissions and disk space.";
+                }
+
+                // Output error to stderr so it doesn't corrupt web responses
+                error_log($error_msg);
+            }
         }
 
 
@@ -250,10 +269,12 @@ class SugarLogger implements LoggerTemplate
         );
 
         //write out to the file including the time in the dateFormat the process id , the user id , and the log level as well as the message
-        fwrite(
-            $this->fp,
-            $this->formatLog($format, $userID, $level, $message)
-        );
+        if (is_resource($this->fp)) {
+            fwrite(
+                $this->fp,
+                $this->formatLog($format, $userID, $level, $message)
+            );
+        }
     }
 
     /**

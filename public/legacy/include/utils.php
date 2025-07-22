@@ -3869,14 +3869,13 @@ function display_stack_trace($textOnly = false)
 {
     $stack = debug_backtrace();
 
-    echo "\n\n display_stack_trace caller, file: " . $stack[0]['file'] . ' line#: ' . $stack[0]['line'];
+    $out = "\n\n display_stack_trace caller, file: " . $stack[0]['file'] . ' line#: ' . $stack[0]['line'];
 
     if (!$textOnly) {
-        echo '<br>';
+        $out .= '<br>';
     }
 
     $first = true;
-    $out = '';
 
     foreach ($stack as $item) {
         $file = '';
@@ -3926,7 +3925,6 @@ function display_stack_trace($textOnly = false)
         }
     }
 
-    echo $out;
     return $out;
 }
 
@@ -3985,9 +3983,10 @@ function StackTraceErrorHandler($errno, $errstr, $errfile, $errline, $errcontext
             $halt_script = false;
             break;
     }
+
     $error_msg = '<b>[' . $type . ']</b> ' . $error_msg;
-    echo $error_msg;
     $trace = display_stack_trace();
+
     ErrorMessage::log("Catch an error: $error_msg \nTrace info:\n" . $trace);
     if ($halt_script) {
         exit(1);

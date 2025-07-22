@@ -1237,14 +1237,9 @@ class AOR_Report extends Basic
             while ($row = $this->db->fetchByAssoc($result)) {
                 $field = BeanFactory::newBean('AOR_Fields');
                 $field->retrieve($row['id']);
-
                 $field->label = str_replace(' ', '_', (string) $field->label) . $i;
-
                 $path = unserialize(base64_decode($field->module_path));
-
-                $field_module = $module;
-                
-                $data = $field_module->field_defs[$field->field] ?? [];            
+                $field_module = $module;             
                 $table_alias = $field_module->table_name;
                 $oldAlias = $table_alias;
                 if (!empty($path[0]) && $path[0] != $module->module_dir) {
@@ -1266,6 +1261,7 @@ class AOR_Report extends Basic
                     }
                 }
 
+                $data = $field_module->field_defs[$field->field] ?? [];
 
                 if (!empty($data)){
                     if ($data['type'] == 'relate' && isset($data['id_name'])) {

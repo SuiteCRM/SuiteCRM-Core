@@ -71,6 +71,7 @@
                            #username="ngModel"
                            placeholder="{{vm.appStrings['LBL_USER_NAME']}}"
                            aria-label="Username"
+                           autocomplete="username"
                            required>
                     <div *ngIf="username.invalid && username.touched" class="invalid-feedback">
                         {{vm.appStrings['ERR_MISSING_REQUIRED_FIELDS']}}
@@ -86,6 +87,7 @@
                            #password="ngModel"
                            placeholder="{{vm.appStrings['LBL_PASSWORD']}}"
                            aria-label="Password"
+                           autocomplete="current-password"
                            required>
                     <div *ngIf="password.invalid && password.touched" class="invalid-feedback">
                         {{vm.appStrings['ERR_MISSING_REQUIRED_FIELDS']}}
@@ -119,6 +121,7 @@
                            #username="ngModel"
                            placeholder="{{vm.appStrings['LBL_USER_NAME']}}"
                            aria-label="Username"
+                           autocomplete="username"
                            required>
                     <div *ngIf="username.invalid && username.touched" class="invalid-feedback">
                         {{vm.appStrings['ERR_MISSING_REQUIRED_FIELDS']}}
@@ -134,6 +137,7 @@
                            #mail="ngModel"
                            placeholder="{{vm.appStrings['LBL_EMAIL']}}"
                            aria-label="Email"
+                           autocomplete="email"
                            required>
                     <div *ngIf="mail.invalid && mail.touched" class="invalid-feedback">
                         {{vm.appStrings['ERR_MISSING_REQUIRED_FIELDS']}}

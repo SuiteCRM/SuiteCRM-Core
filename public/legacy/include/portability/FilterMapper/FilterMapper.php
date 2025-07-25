@@ -62,7 +62,7 @@ class FilterMapper
         $filters = [];
 
         foreach ($contents as $key => $value) {
-            if (empty($contents[$key])) {
+            if (isEmptyValue($value)) {
                 continue;
             }
 

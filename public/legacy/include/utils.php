@@ -6269,6 +6269,44 @@ function isFalse($value): bool {
 }
 
 /**
+ * Check if a value is empty for data/filter contexts
+ *
+ * Unlike PHP's empty() function, this treats boolean false, 0, and '0' as non-empty values.
+ * This is crucial for properly handling checkbox filters and other boolean/numeric fields
+ * where false/zero are valid, meaningful values that should not be filtered out.
+ *
+ * @param mixed $value The value to check
+ * @return bool True if the value is empty, false otherwise
+ */
+function isEmptyValue(mixed $value): bool
+{
+    // Handle null and undefined values
+    if ($value === null) {
+        return true;
+    }
+
+    // Handle arrays
+    if (is_array($value)) {
+        return count($value) === 0;
+    }
+
+    // Handle objects - objects are considered non-empty values
+    // Objects represent intentional data structures that should be preserved
+    if (is_object($value)) {
+        return false;
+    }
+
+    // Handle strings (trim whitespace)
+    if (is_string($value)) {
+        return trim($value) === '';
+    }
+
+    // Handle boolean, numeric, and other scalar values
+    // Important: '0', 0, false are NOT considered empty for data filtering
+    return false;
+}
+
+/**
  * Get validation pattern
  * @return string
  */

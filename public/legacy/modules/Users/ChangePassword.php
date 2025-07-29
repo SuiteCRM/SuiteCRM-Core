@@ -53,7 +53,10 @@ if (isset($_POST['saveConfig'])) {
     } else {
         $record = $_POST['record'];
         $focus->retrieve($record);
-        if (!$focus->change_password($_POST['old_password'], $_POST['new_password'])) {
+        global $RAW_REQUEST;
+        $oldPassword = $RAW_REQUEST['old_password'] ?? $_POST['old_password'] ?? null;
+        $newPassword = $RAW_REQUEST['new_password'] ?? $_POST['new_password'] ?? null;
+        if (!$focus->change_password($oldPassword, $newPassword)) {
             SugarApplication::appendErrorMessage($focus->error_string);
             SugarApplication::redirect('index.php?action=ChangePassword&module=Users&record=' . $record);
         }

@@ -711,10 +711,14 @@ class User extends Person implements EmailInterface
 
         $this->savePreferencesToDB();
 
-        if ((isset($_POST['old_password']) || $this->portal_only) &&
-            (isset($_POST['new_password']) && !empty($_POST['new_password'])) &&
+        global $RAW_REQUEST;
+        $oldPassword = $RAW_REQUEST['old_password'] ?? $_POST['old_password'] ?? null;
+        $newPassword = $RAW_REQUEST['new_password'] ?? $_POST['new_password'] ?? null;
+
+        if ((isset($oldPassword) || $this->portal_only) &&
+            (isset($newPassword) && !empty($newPassword)) &&
             (isset($_POST['password_change']) && $_POST['password_change'] === 'true')) {
-            if (!$this->change_password($_POST['old_password'], $_POST['new_password'])) {
+            if (!$this->change_password($oldPassword, $newPassword)) {
                 if (isset($_POST['page']) && $_POST['page'] === 'EditView') {
                     SugarApplication::appendErrorMessage($this->error_string);
                     SugarApplication::redirect("Location: index.php?action=EditView&module=Users&record=" . $_POST['record']);

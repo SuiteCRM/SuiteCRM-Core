@@ -35,6 +35,7 @@ use App\Statistics\Entity\Statistic;
 use App\Statistics\Model\ChartOptions;
 use App\Statistics\Service\StatisticsProviderInterface;
 use App\Statistics\StatisticsHandlingTrait;
+use App\Languages\Service\LanguageManagerInterface;
 use BeanFactory;
 use SugarBean;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -46,17 +47,7 @@ class OpportunitiesBySalesStagePipeline extends LegacyHandler implements Statist
     public const KEY = 'opportunities-by-sales-stage-price';
 
     /**
-     * @var ListDataQueryHandler
-     */
-    private $queryHandler;
-
-    /**
-     * @var ModuleNameMapperInterface
-     */
-    private $moduleNameMapper;
-
-    /**
-     * LeadDaysOpen constructor.
+     * OpportunitiesBySalesStagePipeline constructor.
      * @param string $projectDir
      * @param string $legacyDir
      * @param string $legacySessionName
@@ -65,6 +56,7 @@ class OpportunitiesBySalesStagePipeline extends LegacyHandler implements Statist
      * @param ListDataQueryHandler $queryHandler
      * @param ModuleNameMapperInterface $moduleNameMapper
      * @param RequestStack $session
+     * @param LanguageManagerInterface $languageManager
      */
     public function __construct(
         string $projectDir,
@@ -72,13 +64,12 @@ class OpportunitiesBySalesStagePipeline extends LegacyHandler implements Statist
         string $legacySessionName,
         string $defaultSessionName,
         LegacyScopeState $legacyScopeState,
-        ListDataQueryHandler $queryHandler,
-        ModuleNameMapperInterface $moduleNameMapper,
-        RequestStack $session
+        protected ListDataQueryHandler $queryHandler,
+        protected ModuleNameMapperInterface $moduleNameMapper,
+        RequestStack $session,
+        protected LanguageManagerInterface $languageManager
     ) {
         parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState, $session);
-        $this->queryHandler = $queryHandler;
-        $this->moduleNameMapper = $moduleNameMapper;
     }
 
     /**
@@ -124,10 +115,19 @@ class OpportunitiesBySalesStagePipeline extends LegacyHandler implements Statist
 
         $result = $this->runQuery($query, $bean);
 
-        $nameField = 'sales_stage';
-        $valueField = 'amount_usdollar';
+        $series = $this->buildSingleSeries(
+            $result,
+            'sales_stage',
+            'amount_usdollar',
+        );
 
-        $series = $this->buildSingleSeries($result, $nameField, $valueField);
+        foreach ($series->singleSeries as $seriesItem) {
+            $seriesItem->name = $this->languageManager->getListLabel(
+                'opportunities',
+                'sales_stage',
+                $seriesItem->name
+            );
+        }
 
         $chartOptions = new ChartOptions();
         $chartOptions->yAxisTickFormatting = true;

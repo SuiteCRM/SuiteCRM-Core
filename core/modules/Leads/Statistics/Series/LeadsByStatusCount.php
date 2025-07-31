@@ -35,6 +35,7 @@ use App\Statistics\Service\StatisticsProviderInterface;
 use App\Statistics\StatisticsHandlingTrait;
 use App\Statistics\Model\ChartOptions;
 use App\Module\Service\ModuleNameMapperInterface;
+use App\Languages\Service\LanguageManagerInterface;
 use BeanFactory;
 use SugarBean;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -46,17 +47,7 @@ class LeadsByStatusCount extends LegacyHandler implements StatisticsProviderInte
     public const KEY = 'leads-by-status-count';
 
     /**
-     * @var ListDataQueryHandler
-     */
-    private $queryHandler;
-
-    /**
-     * @var ModuleNameMapperInterface
-     */
-    private $moduleNameMapper;
-
-    /**
-     * LeadDaysOpen constructor.
+     * LeadsByStatusCount constructor.
      * @param string $projectDir
      * @param string $legacyDir
      * @param string $legacySessionName
@@ -65,6 +56,7 @@ class LeadsByStatusCount extends LegacyHandler implements StatisticsProviderInte
      * @param ListDataQueryHandler $queryHandler
      * @param ModuleNameMapperInterface $moduleNameMapper
      * @param RequestStack $requestStack
+     * @param LanguageManagerInterface $languageManager
      */
     public function __construct(
         string $projectDir,
@@ -72,13 +64,12 @@ class LeadsByStatusCount extends LegacyHandler implements StatisticsProviderInte
         string $legacySessionName,
         string $defaultSessionName,
         LegacyScopeState $legacyScopeState,
-        ListDataQueryHandler $queryHandler,
-        ModuleNameMapperInterface $moduleNameMapper,
-        RequestStack $requestStack
+        protected ListDataQueryHandler $queryHandler,
+        protected ModuleNameMapperInterface $moduleNameMapper,
+        RequestStack $requestStack,
+        protected LanguageManagerInterface $languageManager
     ) {
         parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState, $requestStack);
-        $this->queryHandler = $queryHandler;
-        $this->moduleNameMapper = $moduleNameMapper;
     }
 
     /**
@@ -120,17 +111,25 @@ class LeadsByStatusCount extends LegacyHandler implements StatisticsProviderInte
         }
 
         $query = $this->queryHandler->getQuery($bean, $criteria, $sort);
-        $query['select'] = 'SELECT leads.status as name, count(*) as value';
+        $query['select'] = 'SELECT leads.status, count(*) as value';
         $query['order_by'] = '';
         $query['group_by'] = ' GROUP BY leads.status ';
 
         $result = $this->runQuery($query, $bean);
 
-        $nameField = 'name';
-        $valueField = 'value';
+        $series = $this->buildSingleSeries(
+            $result,
+            'status',
+            'value',
+        );
 
-        $series = $this->buildSingleSeries($result, $nameField, $valueField);
-
+        foreach ($series->singleSeries as $seriesItem) {
+            $seriesItem->name = $this->languageManager->getListLabel(
+                'leads',
+                'status',
+                $seriesItem->name
+            );
+        }
 
         $chartOptions = new ChartOptions();
 

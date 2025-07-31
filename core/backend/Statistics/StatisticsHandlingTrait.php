@@ -238,11 +238,12 @@ trait StatisticsHandlingTrait
     }
 
     /**
+     * Build single series from query results with raw data (no translation)
      * @param array $result
      * @param string $nameField
      * @param string $valueField
-     * @param $defaultValues
-     * @return Series|SeriesResult
+     * @param array $defaultValues
+     * @return SeriesResult
      */
     protected function buildSingleSeries(
         array $result,

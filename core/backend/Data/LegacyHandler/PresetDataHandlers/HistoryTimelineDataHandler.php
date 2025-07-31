@@ -35,6 +35,7 @@ use App\Engine\LegacyHandler\LegacyScopeState;
 use App\FieldDefinitions\Service\FieldDefinitionsProviderInterface;
 use App\Module\Service\ModuleNameMapperInterface;
 use App\Statistics\StatisticsHandlingTrait;
+use App\Languages\Service\LanguageManagerInterface;
 use BadMethodCallException;
 use BeanFactory;
 use Psr\Log\LoggerAwareInterface;
@@ -54,15 +55,6 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
      * @var LoggerInterface
      */
     private $logger;
-    /**
-     * @var RecordMapper
-     */
-    private $recordMapper;
-
-    /**
-     * @var FieldDefinitionsProviderInterface
-     */
-    private $fieldDefinitionProvider;
 
     /**
      * HistoryTimelineDataHandler constructor.
@@ -73,6 +65,9 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
      * @param LegacyScopeState $legacyScopeState
      * @param ModuleNameMapperInterface $moduleNameMapper
      * @param RequestStack $session
+     * @param RecordMapper $recordMapper
+     * @param FieldDefinitionsProviderInterface $fieldDefinitionProvider
+     * @param LanguageManagerInterface $languageManager
      */
     public function __construct(
         string $projectDir,
@@ -82,13 +77,12 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
         LegacyScopeState $legacyScopeState,
         ModuleNameMapperInterface $moduleNameMapper,
         RequestStack $session,
-        RecordMapper $recordMapper,
-        FieldDefinitionsProviderInterface $fieldDefinitionProvider
+        protected RecordMapper $recordMapper,
+        protected FieldDefinitionsProviderInterface $fieldDefinitionProvider,
+        protected LanguageManagerInterface $languageManager
     ) {
         parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState,
             $moduleNameMapper, $session);
-        $this->recordMapper = $recordMapper;
-        $this->fieldDefinitionProvider = $fieldDefinitionProvider;
     }
 
     /**
@@ -315,6 +309,8 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
                         /** @var User $user */
                         $user = BeanFactory::getBean('Users', $auditFieldValue);
                         $auditFieldValue = $user->user_name ?? '';
+                    } else {
+                        $auditFieldValue = $this->languageManager->getListLabel($legacyParentModule, $field, $auditFieldValue);
                     }
 
                     $auditDescription .= implode(" ", [$auditedFieldLabelKey, $auditFieldValue, '<br/>']);

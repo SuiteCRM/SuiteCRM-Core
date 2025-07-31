@@ -34,6 +34,7 @@ use App\FieldDefinitions\Service\FieldDefinitionsProviderInterface;
 use App\FieldDefinitions\Service\VardefConfigMapperRegistry;
 use App\Module\Service\ModuleNameMapperInterface;
 use Exception;
+use Psr\Log\LoggerInterface;
 use SugarView;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -46,17 +47,7 @@ class FieldDefinitionsHandler extends LegacyHandler implements FieldDefinitionsP
     public const HANDLER_KEY = 'field-definitions';
 
     /**
-     * @var ModuleNameMapperInterface
-     */
-    private $moduleNameMapper;
-
-    /**
-     * @var FieldDefinitionMappers
-     */
-    private $mappers;
-
-    /**
-     * SystemConfigHandler constructor.
+     * FieldDefinitionsHandler constructor.
      * @param string $projectDir
      * @param string $legacyDir
      * @param string $legacySessionName
@@ -65,6 +56,7 @@ class FieldDefinitionsHandler extends LegacyHandler implements FieldDefinitionsP
      * @param ModuleNameMapperInterface $moduleNameMapper
      * @param FieldDefinitionMappers $mappers
      * @param RequestStack $session
+     * @param LoggerInterface $logger
      */
     public function __construct(
         string $projectDir,
@@ -72,15 +64,14 @@ class FieldDefinitionsHandler extends LegacyHandler implements FieldDefinitionsP
         string $legacySessionName,
         string $defaultSessionName,
         LegacyScopeState $legacyScopeState,
-        ModuleNameMapperInterface $moduleNameMapper,
-        FieldDefinitionMappers $mappers,
+        protected ModuleNameMapperInterface $moduleNameMapper,
+        protected FieldDefinitionMappers $mappers,
         RequestStack $session,
+        protected LoggerInterface $logger,
         protected VardefConfigMapperRegistry $vardefConfigMapperRegistry,
     ) {
         parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState,
             $session);
-        $this->moduleNameMapper = $moduleNameMapper;
-        $this->mappers = $mappers;
     }
 
     /**
@@ -120,6 +111,26 @@ class FieldDefinitionsHandler extends LegacyHandler implements FieldDefinitionsP
     /**
      * @inheritDoc
      */
+    public function getOptionsKey(string $module, string $fieldName): ?string
+    {
+        $fieldDefinition = $this->getVardef($module);
+        $fieldDef = $fieldDefinition->getVardef()[$fieldName] ?? null;
+
+        if (!$fieldDef) {
+            return null;
+        }
+
+        $optionsKey = $fieldDef['options'] ?? null;
+        if (!$optionsKey) {
+            return null;
+        }
+
+        return $optionsKey;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getFieldDefinition(string $moduleName, string $field): ?array
     {
         $fieldDefinitions = $this->getVardef($moduleName);
@@ -139,6 +150,7 @@ class FieldDefinitionsHandler extends LegacyHandler implements FieldDefinitionsP
 
         return $fieldDefinition;
     }
+
 
     /**
      * Get legacy definitions

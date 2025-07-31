@@ -1,7 +1,7 @@
 <?php
 /**
  * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
- * Copyright (C) 2021 SuiteCRM Ltd.
+ * Copyright (C) 2025 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -25,38 +25,20 @@
  * the words "Supercharged by SuiteCRM".
  */
 
+namespace App\Languages\Service;
 
-
-namespace App\FieldDefinitions\Service;
-
-
-use App\FieldDefinitions\Entity\FieldDefinition;
-
-interface FieldDefinitionsProviderInterface
+interface LanguageManagerInterface
 {
-    /**
-     * Get all exposed user preferences
-     * @param string $moduleName
-     * @return FieldDefinition
-     */
-    public function getVardef(string $moduleName): FieldDefinition;
-
 
     /**
-     * Retrieves the name of the list options corresponding to a specific field within a module.
-     * Supports enum, multienum, radioenum, and dynamicenum field types.
+     * Translate list value using AppListStrings for current language
+     * Supports enum, multienum, radioenum, and dynamicenum field types
      *
-     * @param string $module The name of the module to search.
-     * @param string $fieldName The name of the field for which to get the list options name.
-     * @return string|null The name of the list options if found, or null if not available.
+     * @param string $module The module name
+     * @param string $fieldName The field name
+     * @param string $value The raw list value to translate
+     * @return string The translated value, or original value if translation fails
      */
-    public function getOptionsKey(string $module, string $fieldName): ?string;
+    public function getListLabel(string $module, string $fieldName, string $value): string;
 
-    /**
-     * Get definition for a single field
-     * @param string $moduleName
-     * @param string $field
-     * @return array|null
-     */
-    public function getFieldDefinition(string $moduleName, string $field): ?array;
 }

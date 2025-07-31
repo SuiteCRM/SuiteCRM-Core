@@ -114,7 +114,7 @@ class Administration extends SugarBean
             return;
         }
 
-        $categoryQuoted = $this->db->quote($category);
+        $categoryQuoted = $this->db->quoted($category);
 
         // declare a cache for all settings
         $settings_cache = sugar_cache_retrieve('admin_settings_cache');
@@ -132,7 +132,7 @@ class Administration extends SugarBean
         }
 
         if (!empty($category)) {
-            $query = "SELECT category, name, value FROM {$this->table_name} WHERE category = '$categoryQuoted'";
+            $query = "SELECT category, name, value FROM {$this->table_name} WHERE category = $categoryQuoted";
         } else {
             $query = "SELECT category, name, value FROM {$this->table_name}";
         }

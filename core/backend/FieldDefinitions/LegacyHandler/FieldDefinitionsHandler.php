@@ -155,14 +155,22 @@ class FieldDefinitionsHandler extends LegacyHandler implements FieldDefinitionsP
     /**
      * Get legacy definitions
      * @param string $legacyModuleName
-     * @return array|mixed
+     * @return array
      */
-    protected function getDefinitions(string $legacyModuleName, string $moduleName)
+    protected function getDefinitions(string $legacyModuleName, string $moduleName): array
     {
         try {
             $sugarView = new SugarView();
             $data = $sugarView->getVardefsData($legacyModuleName);
         } catch (Exception $e) {
+            $this->logger->error(
+                "Failed to get legacy definitions for module {module}: {error}",
+                [
+                    'module' => $legacyModuleName,
+                    'error' => $e->getMessage(),
+                    'exception' => $e
+                ]
+            );
             return [];
         }
 

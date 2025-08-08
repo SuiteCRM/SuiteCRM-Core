@@ -581,18 +581,16 @@ class ApiBeanMapper
         $type = $properties['type'] ?? '';
 
         if ($type === 'relate' && isset($bean->field_defs[$field])) {
-            $idName = $bean->field_defs[$field]['id_name'] ?? '';
+            $fieldDef = $bean->field_defs[$field];
+            $idName = $fieldDef['id_name'] ?? '';
 
-            if ($idName !== $field) {
-
-                $idValue = $values[$field]['id'] ?? '';
-                if (empty($values[$idName]) && !empty($idValue)) {
-                    $values[$idName] = $idValue;
+            if ($field !== $idName) {
+                if (!empty($idName)) {
+                    $values[$idName] = $values[$idName] ?? $values[$field]['id'] ?? '';
                 }
 
-                $rName = $bean->field_defs[$field]['rname'] ?? '';
-                $value = $values[$field][$rName] ?? '';
-                $values[$field] = $value;
+                $rName = $fieldDef['rname'] ?? 'name';
+                $values[$field] = $values[$field][$rName] ?? $values[$field] ?? '';
             }
         }
 

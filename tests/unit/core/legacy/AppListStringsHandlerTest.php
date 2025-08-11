@@ -28,7 +28,7 @@
 
 namespace App\Tests\unit\core\legacy;
 
-use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Exception\ItemNotFoundException;
 use App\Languages\Entity\AppListStrings;
 use App\Languages\LegacyHandler\AppListStringsHandler;
 use App\Tests\UnitTester;

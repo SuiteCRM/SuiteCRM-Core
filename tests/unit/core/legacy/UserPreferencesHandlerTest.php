@@ -28,7 +28,7 @@
 
 namespace App\Tests\unit\core\legacy;
 
-use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Exception\ItemNotFoundException;
 use App\Tests\UnitTester;
 use AspectMock\Test;
 use Codeception\Test\Unit;

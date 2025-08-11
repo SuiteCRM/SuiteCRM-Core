@@ -27,7 +27,7 @@
 
 namespace App\Engine\Service\ActionAvailabilityChecker;
 
-use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Exception\ItemNotFoundException;
 
 class ActionAvailabilityChecker
 {

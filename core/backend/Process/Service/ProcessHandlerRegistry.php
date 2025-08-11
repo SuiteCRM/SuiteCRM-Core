@@ -29,7 +29,7 @@
 
 namespace App\Process\Service;
 
-use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Exception\ItemNotFoundException;
 
 class ProcessHandlerRegistry
 {

@@ -28,7 +28,7 @@
 
 namespace App\Tests\unit\core\legacy\SystemConfig;
 
-use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Exception\ItemNotFoundException;
 use App\Module\LegacyHandler\ModuleNameMapperHandler;
 use App\SystemConfig\LegacyHandler\DefaultModuleConfigMapper;
 use App\SystemConfig\LegacyHandler\SystemConfigMappers;

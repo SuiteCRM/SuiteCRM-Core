@@ -31,6 +31,7 @@ import {FormatOptions, Formatter} from './formatter.model';
 import {CurrencyFormatter} from './currency/currency-formatter.service';
 import {DateFormatter} from './datetime/date-formatter.service';
 import {PhoneFormatter} from './phone/phone-formatter.service';
+import {TextFormatter} from "./text/text-formatter.service";
 
 export interface TypeFormatterMap {
     [key: string]: Formatter;
@@ -49,6 +50,7 @@ export class DataTypeFormatter {
         protected dateFormatter: DateFormatter,
         protected datetimeFormatter: DatetimeFormatter,
         protected phoneFormatter: PhoneFormatter,
+        protected text: TextFormatter,
     ) {
         this.map.int = numberFormatter;
         this.map.float = numberFormatter;
@@ -56,6 +58,7 @@ export class DataTypeFormatter {
         this.map.datetime = datetimeFormatter;
         this.map.currency = currencyFormatter;
         this.map.phone = phoneFormatter;
+        this.map.text = text;
     }
 
     toUserFormat(dataType: string, value: string, options?: FormatOptions): string {

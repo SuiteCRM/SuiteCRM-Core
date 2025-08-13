@@ -911,7 +911,18 @@ class SugarFolder
 
         return $ret;
     }
+    private function getChildFolders($folders, $parentId)
+    {
+    $children = array();
 
+    foreach ($folders as $folder) {
+        if ($folder['parent_folder'] === $parentId) {
+            $children[] = $folder;
+        }
+    }
+
+    return $children;
+    }
     /**
      * Remove folders of deleted inbounds
      *

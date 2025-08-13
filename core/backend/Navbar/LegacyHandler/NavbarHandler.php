@@ -157,7 +157,14 @@ class NavbarHandler extends LegacyHandler implements NavigationProviderInterface
             }
         }
 
-        $navbar->tabs = array_values($displayModulesMameMap);
+        $displayModulesNameMapSorted = [];
+        foreach ($displayModules as $key => $displayModule) {
+            if (isset($displayModulesMameMap[$key])) {
+                $displayModulesNameMapSorted[$key] = $displayModulesMameMap[$key];
+            }
+        }
+        $navbar->tabs = array_values($displayModulesNameMapSorted);
+
         $navbar->groupedTabs = $this->fetchGroupedNavTabs($displayModules, $displayModulesMameMap);
 
         $navbar->modules = $this->buildModuleInfo($sugarView, $accessibleModulesNameMap);

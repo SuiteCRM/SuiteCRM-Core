@@ -322,6 +322,10 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
             $listData[$key]['assigned_user_name']['user_name'] = showFullName() ? $user->full_name : ($user->user_name ?? '');
             $listData[$key]['assigned_user_name']['user_id'] = $record['assigned_user_id'];
             $listData[$key]['module_name'] = $panelToModuleName[$listData[$key]['panel_name']];
+            $listData[$key]['description'] = html_entity_decode($listData[$key]['description']  ?? '', ENT_QUOTES);
+            $listData[$key]['name'] =  html_entity_decode($listData[$key]['name']  ?? '', ENT_QUOTES);
+            $listData[$key]['status'] =  html_entity_decode($listData[$key]['status']  ?? '', ENT_QUOTES);
+
         }
 
         $timelineEntryData = new ListData();

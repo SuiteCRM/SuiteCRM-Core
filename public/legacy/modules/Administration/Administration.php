@@ -185,7 +185,9 @@ class Administration extends SugarBean
         // outbound email settings
         $oe = new OutboundEmail();
 
-        foreach ($_GET as $key => $val) {
+        $request = array_merge($_GET, $_POST);
+
+        foreach ($request as $key => $val) {
             $prefix = $this->get_config_prefix($key);
             if (in_array($prefix[0], $this->config_categories)) {
                 if (is_array($val)) {

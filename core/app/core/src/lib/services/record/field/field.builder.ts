@@ -204,6 +204,10 @@ export class FieldBuilder {
         if (defaultValue) {
             field.default = defaultValue;
         }
+        // issue #542 formmattedValue applied to value (only for text fields?)
+        if(field.type == 'text'){
+            field.value = formattedValue;
+        }
 
         field.defaultValueModes = viewField?.defaultValueModes ?? definition?.defaultValueModes ?? [];
 

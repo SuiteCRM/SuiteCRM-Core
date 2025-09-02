@@ -451,11 +451,15 @@ class Localization
      */
     public function translateCharsetMIME($string, $fromCharset, $toCharset = 'UTF-8', $encoding = "Q")
     {
-        $previousEncoding = mb_internal_encoding();
-        mb_internal_encoding($fromCharset);
-        $result = mb_encode_mimeheader($string, $toCharset, $encoding);
-        mb_internal_encoding($previousEncoding);
-        return $result;
+        $preferences = array(
+            'input-charset' => $fromCharset,
+            'output-charset' => $toCharset,
+            'line-length' => 76,
+            'scheme' => $encoding,
+            'line-break-chars' => "\n"
+        );
+        $result = iconv_mime_encode('', $string, $preferences);
+        return substr($result, 2);
     }
 
     public function normalizeCharset($charset)

@@ -3432,6 +3432,7 @@ class Email extends Basic
                 $query .= " AND contacts.id= '" . $_REQUEST['record'] . "' ";
             }
         }
+        $query .= " LIMIT 1";
         $result = $this->db->query($query, true, " Error filling in additional detail fields: ");
 
         // Get the id and the name.

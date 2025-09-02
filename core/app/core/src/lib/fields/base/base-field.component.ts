@@ -213,7 +213,7 @@ export class BaseFieldComponent implements FieldComponentInterface, OnInit, OnDe
     protected addFieldDependency(fieldKey: string, dependentFields: ObjectMap, dependentAttributes: AttributeDependency[]): void {
         const field = this.record.fields[fieldKey];
         const name = this.field.name || this.field.definition.name || '';
-        if (fieldKey === name || !field) {
+        if (!field) {
             return;
         }
 

@@ -381,16 +381,39 @@ var AjaxObject = {
     //SUGAR.email2.accounts.rebuildFolderList(); // refresh frameFolder
     var ret = YAHOO.lang.JSON.parse(o.responseText);
     var user = document.getElementById('userFolders');
-
+    var userFolders = ret.userFolders;
+    var groupFolders = ret.groupFolders;
+    // Store the currently selected options
+    var selectedOptions = Array.from(user.selectedOptions).map(function(option) {
+    return option.value;
+    });
+    // Clear the select element
     SUGAR.email2.util.emptySelectOptions(user);
 
+    // Process userFolders array
     for (i = 0; i < ret.userFolders.length; i++) {
-      var display = ret.userFolders[i].name;
-      var value = ret.userFolders[i].id;
-      var selected = (ret.userFolders[i].selected != "") ? true : false;
+      var folder = userFolders[i];
+      var display = folder.name;
+      var value = folder.id;
+      var selected = selectedOptions.includes(value);
       var opt = new Option(display, value, selected);
       opt.selected = selected;
       user.options.add(opt);
+    }
+    // Process groupFolders array, excluding the "--None--" option
+    for (var j = 0; j < groupFolders.length; j++) {
+    var groupFolder = groupFolders[j];
+
+    if (groupFolder.name === "--None--") {
+      continue; // Skip the "--None--" option
+    }
+
+    var groupFolderDisplay = groupFolder.name;
+    var groupFolderValue = groupFolder.id;
+    var groupFolderSelected = selectedOptions.includes(groupFolderValue);
+    var groupFolderOpt = new Option(groupFolderDisplay, groupFolderValue, groupFolderSelected);
+    groupFolderOpt.selected = groupFolderSelected;
+    user.options.add(groupFolderOpt);
     }
   },
 

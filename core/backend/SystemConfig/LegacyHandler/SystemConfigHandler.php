@@ -27,7 +27,7 @@
 
 namespace App\SystemConfig\LegacyHandler;
 
-use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Exception\ItemNotFoundException;
 use App\Currency\LegacyHandler\CurrencyHandler;
 use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;

@@ -27,7 +27,7 @@
 
 namespace App\UserPreferences\LegacyHandler;
 
-use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Exception\ItemNotFoundException;
 
 class UserPreferencesMappers
 {

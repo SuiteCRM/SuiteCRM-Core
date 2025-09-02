@@ -28,7 +28,7 @@
 
 namespace App\Statistics\Service;
 
-use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Exception\ItemNotFoundException;
 
 class StatisticsProviderRegistry
 {

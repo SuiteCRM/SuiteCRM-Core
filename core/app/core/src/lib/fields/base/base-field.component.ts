@@ -304,9 +304,7 @@ export class BaseFieldComponent implements FieldComponentInterface, OnInit, OnDe
         if (this.field && this.field.formControl) {
             this.subs.push(this.field.formControl.valueChanges.subscribe(value => {
 
-                if (!isVoid(value)) {
-                    value = value.trim();
-                } else {
+                if (isVoid(value)) {
                     value = '';
                 }
 

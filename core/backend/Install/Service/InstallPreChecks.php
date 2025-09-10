@@ -205,9 +205,24 @@ class InstallPreChecks
             'result' => '',
             'errors' => [],
         ];
+
         if (empty($baseUrl)) {
-            $baseUrl = ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . $_SERVER['HTTP_HOST'] . ($_SERVER['BASE'] ?? '');
+
+            $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '');
+            $https = $_SERVER['HTTPS'] ?? '';
+
+            if (!empty($https) && ($https == 'on' || $https['HTTPS'] == 1) ||
+                !empty($proto) && $proto == 'https') {
+                $protocol = 'https://';
+            } elseif (($_SERVER['REQUEST_SCHEME'] ?? 'https') === 'https') {
+                $protocol = 'https://';
+            } else {
+                $protocol = 'http://';
+            }
+
+            $baseUrl = $protocol . $_SERVER['HTTP_HOST'] . ($_SERVER['BASE'] ?? '');
         }
+
         $baseUrl = rtrim($baseUrl, '/');
         $baseUrl .= '/';
         curl_setopt($ch, CURLOPT_URL, $baseUrl);
@@ -341,8 +356,22 @@ class InstallPreChecks
         ];
 
         if (empty($baseUrl)) {
-            $baseUrl = ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . $_SERVER['HTTP_HOST'] . ($_SERVER['BASE'] ?? '');
+
+            $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '');
+            $https = $_SERVER['HTTPS'] ?? '';
+
+            if (!empty($https) && ($https == 'on' || $https['HTTPS'] == 1) ||
+                !empty($proto) && $proto == 'https') {
+                $protocol = 'https://';
+            } elseif (($_SERVER['REQUEST_SCHEME'] ?? 'https') === 'https') {
+                $protocol = 'https://';
+            } else {
+                $protocol = 'http://';
+            }
+
+            $baseUrl = $protocol . $_SERVER['HTTP_HOST'] . ($_SERVER['BASE'] ?? '');
         }
+
         $baseUrl = rtrim($baseUrl, '/');
         $baseUrl .= '/';
         $apiUrl = $baseUrl . 'api/graphql';

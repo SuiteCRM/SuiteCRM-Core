@@ -325,7 +325,8 @@ class ViewModulefield extends SugarView
         $fv->ss->assign('duplicate_merge_options', $GLOBALS['app_list_strings']['custom_fields_merge_dup_dom'] ?? []);
 
         $triggers = array() ;
-        $existing_field_names = array() ;
+        $existing_field_names = array();
+        $existing_label_names = array();
         foreach ($module->mbvardefs->vardefs['fields'] as $field) {
             if ($field [ 'type' ] == 'enum' || $field [ 'type'] == 'multienum') {
                 $triggers [] = $field [ 'name' ] ;
@@ -336,10 +337,16 @@ class ViewModulefield extends SugarView
                     $existing_field_names [] = strtoupper($matches[1]);
                 }
             }
+
+            if(!empty($field['vname']))
+            {
+                $existing_label_names[] = $field['vname'];
+            }
         }
         
         $fv->ss->assign('triggers', $triggers);
         $fv->ss->assign('existing_field_names', $json->encode($existing_field_names));
+        $fv->ss->assign('existing_label_names', $json->encode($existing_label_names));
         $fv->ss->assign('mod_strings', $GLOBALS['mod_strings']);
 
         // jchi #24880

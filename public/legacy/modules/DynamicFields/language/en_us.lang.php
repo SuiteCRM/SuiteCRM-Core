@@ -90,6 +90,7 @@ $mod_strings = array(
     'ERR_RESERVED_FIELD_NAME' => "Reserved Keyword",
     'ERR_SELECT_FIELD_TYPE' => 'Please Select a Field Type',
     'ERR_FIELD_NAME_ALREADY_EXISTS' => 'Field Name already exists',
+    'ERR_LABEL_NAME_ALREADY_EXISTS' => 'Label already exists',
     'LBL_BTN_ADD' => 'Add',
     'LBL_BTN_EDIT' => 'Edit',
     'LBL_GENERATE_URL' => 'Generate URL',

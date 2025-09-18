@@ -130,7 +130,7 @@ class actionComputeField extends actionBase
             $bean->save($check_notify);
 
             return true;
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             if (isset($GLOBALS['log'])) {
                 $GLOBALS['log']->fatal("Calculated Field Exception: " . $e->getMessage());
             }
@@ -367,7 +367,7 @@ class actionComputeField extends actionBase
 							</thead>
 							<tbody>
 							</tbody>
-						</table>						
+						</table>
 						<select class='parameterSelect' id='parameterSelect$line'>
 							$moduleFieldsDropDown
 						</select>
@@ -409,7 +409,7 @@ class actionComputeField extends actionBase
 							</thead>
 							<tbody>
 							</tbody>
-						</table>						
+						</table>
 						$relationOptions
 						<select class='relationParameterTypeSelect' id='relationParameterTypeSelect$line'>
 							<option value='raw'>" .
@@ -443,7 +443,7 @@ class actionComputeField extends actionBase
 							</thead>
 							<tbody>
 							</tbody>
-						</table>						
+						</table>
 						<select>
 							$moduleFieldsDropDown
 						</select>
@@ -465,32 +465,32 @@ class actionComputeField extends actionBase
             $html .= "
 				<script id ='aow_script$line' type='text/javascript'>
 					computers[$line] = new FieldComputer($line, '$containerName', $parameters, $parameterTypes, $formulas, $formulaContents, $relationParameters, $relationParameterFields, $relationParameterTypes);
-					
+
 					function onRelationParameterSelectChange$line() {
 						$('#$containerName').find('.relationParameterFieldSelect').hide();
 						$('#$containerName').find('select.relationParameterFieldSelect[relation=\"' + $(this).val() + '\"]').show();
 					}
-					
-					$('#relationParameterSelect$line').change(onRelationParameterSelectChange$line);					
+
+					$('#relationParameterSelect$line').change(onRelationParameterSelectChange$line);
 					$('#relationParameterSelect$line').change();
-					
+
 					function onFieldChange$line(dropdown, valueDropdown) {
-                        var value = $(dropdown).find('option:selected').attr('dataType');						
+                        var value = $(dropdown).find('option:selected').attr('dataType');
 						if (value == 'enum' || value == 'multienum' || value == 'dynamicenum') {
 							$(valueDropdown).show();
 						} else {
 							$(valueDropdown).hide();
 						}
 					}
-					
+
 					$('#$containerName .computeFieldParametersContainer').find('.parameterSelect').change(function () {
 						onFieldChange$line(this, $('#$containerName .computeFieldParametersContainer').find('.parameterTypeSelect'));
 					});
-					
+
 					$('#$containerName .computeFieldRelationParametersContainer').find('.relationParameterFieldSelect').change(function () {
 						onFieldChange$line(this, $('#$containerName .computeFieldRelationParametersContainer').find('.relationParameterTypeSelect'));
 					});
-					
+
 					$('#$containerName .computeFieldParametersContainer').find('.parameterSelect').change();
 					$('#$containerName .computeFieldRelationParametersContainer').find('.relationParameterFieldSelect:visible').change();
 				</script>

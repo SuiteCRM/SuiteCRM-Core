@@ -152,6 +152,12 @@ a.clickable.file-field-uploaded-link:hover {
         svg {
           width: 1em;
           height: 1em;
+
+
+          @media (max-width: 480px) {
+            width: 1.15em;
+            height: 1.25em;
+          }
         }
       }
 

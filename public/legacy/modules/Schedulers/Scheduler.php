@@ -1089,7 +1089,8 @@ class Scheduler extends SugarBean
     ///////////////////////////////////////////////////////////////////////////
     public static function getJobsList()
     {
-        global $mod_strings;
+        global $current_language;
+        $modStrings = return_module_language($current_language, 'Schedulers');
 
         if (empty(self::$job_strings)) {
             include_once('modules/Schedulers/_AddJobsHere.php');
@@ -1097,7 +1098,7 @@ class Scheduler extends SugarBean
             // job functions
             self::$job_strings = array('url::' => 'URL');
             foreach ($job_strings as $k => $v) {
-                self::$job_strings['function::' . $v] = $mod_strings['LBL_' . strtoupper($v)];
+                self::$job_strings['function::' . $v] = $modStrings['LBL_' . strtoupper($v)];
             }
         }
 
@@ -1105,7 +1106,7 @@ class Scheduler extends SugarBean
             self::$jobStrings = [];
             foreach($jobStrings as $k => $v) {
                 $label = str_replace('-', '', $v);
-                self::$jobStrings['scheduler::' . $v] = $mod_strings['LBL_' . strtoupper($label)];
+                self::$jobStrings['scheduler::' . $v] = $modStrings['LBL_' . strtoupper($label)];
             }
         }
 

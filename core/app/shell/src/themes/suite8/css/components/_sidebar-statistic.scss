@@ -76,3 +76,24 @@
 .campaign-status-check-row:last-child {
   border-bottom: none;
 }
+
+.cron-code-label {
+  .widget-entry-dynamic-label {
+    font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
+    background: $off-white;
+    color: $less-median-grey;
+    border: 1px solid $slade-grey;
+    border-radius: 4px;
+    padding: 1em;
+    margin: 1em 0;
+    overflow-x: auto;
+    font-size: 1em;
+    white-space: break-spaces;
+  }
+}
+
+.cron-label {
+  .widget-entry-dynamic-label {
+    white-space: break-spaces;
+  }
+}

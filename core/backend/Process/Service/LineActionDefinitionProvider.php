@@ -109,9 +109,15 @@ class LineActionDefinitionProvider implements LineActionDefinitionProviderInterf
         foreach ($defaultActions as $actionKey => $actionDef) {
             switch ($actionKey) {
                 case 'create':
+                    if (isset($this->listViewLineActions[$module]) && in_array($actionKey, $this->listViewLineActions[$module]['exclude'])) {
+                        break;
+                    }
                     $allProcessedActions[] = $this->filterCreateActions($module, $actionDef);
                     break;
                 case 'modal-create':
+                    if (isset($this->listViewLineActions[$module]) && in_array($actionKey, $this->listViewLineActions[$module]['exclude'])) {
+                        break;
+                    }
                     $allProcessedActions[] = $this->filterModalCreateActions($module, $actionDef);
                     break;
             }

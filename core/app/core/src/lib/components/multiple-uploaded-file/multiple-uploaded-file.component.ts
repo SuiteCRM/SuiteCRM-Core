@@ -93,8 +93,7 @@ export class MultipleUploadedFileComponent implements OnInit, OnChanges, AfterVi
 
     ngAfterViewInit() {
         setTimeout(() => {
-
-            this.setPopover();
+            this.popover.set(this.popoverTarget);
         }, 300)
     }
 
@@ -110,9 +109,7 @@ export class MultipleUploadedFileComponent implements OnInit, OnChanges, AfterVi
 
     setPopover(): void {
         setTimeout(() => {
-            const target = this.popoverTarget ? this.popoverTarget : this.popoverDefaultTarget?.nativeElement;
-
-            if (!target){
+            if (!this.popoverDefaultTarget) {
                 return;
             }
 

@@ -225,8 +225,8 @@ parameters:
       list: true
       record: false
     schedulers:
-      index: false
-      list: false
+      index: true
+      list: true
       record: false
     oauth-keys:
       index: false

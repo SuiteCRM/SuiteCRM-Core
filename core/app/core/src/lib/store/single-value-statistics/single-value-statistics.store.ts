@@ -97,8 +97,9 @@ export class SingleValueStatisticsStore extends StatisticsStore implements Singl
         const fields = [];
 
         Object.keys(statistic.data.fields).forEach((key) => {
+            const label = statistic.data.fields[key].labelKey;
             const value = statistic.data.fields[key].value;
-            const builtField = this.fieldManager.buildShallowField(statistic.metadata.dataType, value);
+            const builtField = this.fieldManager.buildShallowField(statistic.metadata.dataType, value, label);
 
             builtField.metadata = {
                 digits: 0

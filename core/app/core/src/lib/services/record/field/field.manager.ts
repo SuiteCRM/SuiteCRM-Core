@@ -60,15 +60,17 @@ export class FieldManager {
      *
      * @param {string} type field type
      * @param {string} value field value
+     * @param labelKey
      * @returns {object} Field
      */
-    public buildShallowField(type: string, value: string): Field {
+    public buildShallowField(type: string, value: string, labelKey: string = ''): Field {
         return {
             type,
             value,
             definition: {
                 type
             },
+            labelKey,
             loading: signal(false),
             display: signal('default')
         } as Field;

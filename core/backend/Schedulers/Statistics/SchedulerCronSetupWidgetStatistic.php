@@ -89,11 +89,11 @@ class SchedulerCronSetupWidgetStatistic extends LegacyHandler implements Statist
         return [
             'fields' => [
                 'type' => ['value' => 'Windows'],
-                'desc1' => ['labelKey' => 'LBL_CRON_WINDOWS_DESC'],
-                'desc2' => ['labelKey' => 'LBL_CRON_WINDOWS_DESC2'],
+                'desc1' => ['labelKey' => 'LBL_CRON_WINDOWS_DESC', 'useLabelAsValue' => true],
+                'desc2' => ['labelKey' => 'LBL_CRON_WINDOWS_DESC2', 'useLabelAsValue' => true],
                 'desc3' => ['value' => 'cd [path\to\suite\instance]'],
                 'desc4' => ['value' => '[path\to\php.exe] [path\to\suite\instance]\bin\console schedulers:run'],
-                'desc5' => ['labelKey' => 'LBL_CRON_WINDOWS_DESC3'],
+                'desc5' => ['labelKey' => 'LBL_CRON_WINDOWS_DESC3', 'useLabelAsValue' => true],
             ]
         ];
     }
@@ -103,14 +103,14 @@ class SchedulerCronSetupWidgetStatistic extends LegacyHandler implements Statist
         return [
             'fields' => [
                 'type' => ['value' => 'Unix'],
-                'desc1' => ['labelKey' => 'LBL_CRON_LINUX_DESC1'],
-                'desc2' => ['labelKey' => 'LBL_CRON_LINUX_DESC2'],
+                'desc1' => ['labelKey' => 'LBL_CRON_LINUX_DESC1', 'useLabelAsValue' => true],
+                'desc2' => ['labelKey' => 'LBL_CRON_LINUX_DESC2', 'useLabelAsValue' => true],
                 'desc3' => ['value' => 'sudo crontab -e -u ' . $runningUser],
-                'desc4' => ['labelKey' => 'LBL_CRON_LINUX_DESC3'],
+                'desc4' => ['labelKey' => 'LBL_CRON_LINUX_DESC3', 'useLabelAsValue' => true],
                 'desc5' => ['value' => "* * * * *; [path/to/php] [path/to/suite/instance]/bin/console schedulers:run > /dev/null 2>&1"],
-                'desc6' => ['labelKey' => 'LBL_CRON_LINUX_DESC5'],
+                'desc6' => ['labelKey' => 'LBL_CRON_LINUX_DESC5', 'useLabelAsValue' => true],
                 'desc7' => ['value' => "* * * * *; [path/to/php] [path/to/suite/instance]/bin/console -e [env] schedulers:run > /dev/null 2>&1"],
-                'desc8' => ['labelKey' => 'LBL_CRON_LINUX_DESC6'],
+                'desc8' => ['labelKey' => 'LBL_CRON_LINUX_DESC6', 'useLabelAsValue' => true],
             ]
         ];
     }

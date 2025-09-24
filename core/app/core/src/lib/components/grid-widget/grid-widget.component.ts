@@ -204,9 +204,6 @@ export class GridWidgetComponent implements OnInit, OnDestroy {
 
             if (statistic?.fields) {
                 Object.entries(statistic.fields).forEach(([key, value]) => {
-                    if (value.labelKey !== '' && !value.value) {
-                        value.value = this.language.getFieldLabel(value.labelKey, this.getContextModule())
-                    }
                     fields[key] = value;
                 });
             }

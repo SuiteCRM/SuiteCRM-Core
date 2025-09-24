@@ -41,6 +41,7 @@ import {
     SingleValueStatisticsState,
     SingleValueStatisticsStoreInterface
 } from '../../common/statistics/statistics-store.model';
+import {LanguageStore} from "../language/language.store";
 
 const initialState = {
     module: '',
@@ -64,7 +65,8 @@ export class SingleValueStatisticsStore extends StatisticsStore implements Singl
 
     constructor(
         protected fetchGQL: StatisticsFetchGQL,
-        protected fieldManager: FieldManager
+        protected fieldManager: FieldManager,
+        protected language: LanguageStore,
     ) {
         super(fetchGQL);
         this.state$ = this.store.asObservable();
@@ -98,7 +100,12 @@ export class SingleValueStatisticsStore extends StatisticsStore implements Singl
 
         Object.keys(statistic.data.fields).forEach((key) => {
             const label = statistic.data.fields[key].labelKey;
-            const value = statistic.data.fields[key].value;
+            let value = statistic.data.fields[key].value;
+
+            if (statistic?.data?.fields[key]?.useLabelAsValue ?? false) {
+                value = this.language.getFieldLabel(label, this.internalState?.module);
+            }
+
             const builtField = this.fieldManager.buildShallowField(statistic.metadata.dataType, value, label);
 
             builtField.metadata = {

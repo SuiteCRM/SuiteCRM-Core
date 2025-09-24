@@ -28,16 +28,17 @@ import {Injectable} from '@angular/core';
 import {StatisticsFetchGQL} from '../statistics/graphql/api.statistics.get';
 import {SingleValueStatisticsStore} from './single-value-statistics.store';
 import {FieldManager} from '../../services/record/field/field.manager';
+import {LanguageStore} from "../language/language.store";
 
 @Injectable({
     providedIn: 'root',
 })
 export class SingleValueStatisticsStoreFactory {
 
-    constructor(protected fetchGQL: StatisticsFetchGQL, protected fieldManager: FieldManager) {
+    constructor(protected fetchGQL: StatisticsFetchGQL, protected fieldManager: FieldManager, protected language: LanguageStore) {
     }
 
     create(): SingleValueStatisticsStore {
-        return new SingleValueStatisticsStore(this.fetchGQL, this.fieldManager);
+        return new SingleValueStatisticsStore(this.fetchGQL, this.fieldManager, this.language);
     }
 }

@@ -72,8 +72,9 @@ class RunSchedulersCommand extends BaseCommand
                 'ERROR: The cron job is being run by an unauthorized user.',
                 'Please ensure that the cron job is run by one of the following users:',
                 implode(', ', $this->cronHandler->getAllowedUsers()),
-                'Current user: ' . $this->cronHandler->getRunningUser(),
-                ''
+                'Current user: ' . $runningUser,
+                '',
+                'You can do this by adding/updating the "allowed_cron_users" array within the "cron" entry in your config.php file.',
             ]);
             return 1;
         }

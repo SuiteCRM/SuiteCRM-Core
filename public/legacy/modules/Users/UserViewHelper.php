@@ -700,7 +700,7 @@ class UserViewHelper
             $this->bean->setPreference('timezone', $userTZ);
         }
 
-        $ut = $this->bean->getPreference('ut');
+        $ut = $this->bean->getPreference('ut') ?? '0';
 
         if ($ut === '0') {
             $this->ss->assign('PROMPTTZ', ' checked');

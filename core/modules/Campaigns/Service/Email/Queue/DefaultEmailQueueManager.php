@@ -131,7 +131,7 @@ class DefaultEmailQueueManager implements EmailQueueManagerInterface
 
         $timedate = $this->dateTimeHandler->getDateTime();
         $now = $timedate->nowDb();
-        $str = strtotime($timedate->fromString("-1 day")?->asDb());
+        $str = $timedate->fromString("-1 day")?->asDb();
 
         $queryBuilder = $this->preparedStatementHandler->createQueryBuilder();
         $queryBuilder->select('*')

@@ -138,8 +138,10 @@ $mod_strings = array(
     'LBL_CRON_LINUX_DESC3' => '2. Then update and add the following line to the crontab file:',
     'LBL_CRON_LINUX_DESC4' => 'You should do this only after the installation is concluded.',
     'LBL_CRON_LINUX_DESC5' => '2(i). To define the environment variables, add the following line:',
+    'LBL_CRON_LINUX_DESC6' => 'Please update [path/to/php] and [path/to/suite/instance] to reflect your environment.',
     'LBL_CRON_WINDOWS_DESC' => 'In order to run the SuiteCRM Schedulers',
     'LBL_CRON_WINDOWS_DESC2' => '1. Create a batch file to run using Windows Scheduled Tasks. The batch file should include the following commands:',
+    'LBL_CRON_WINDOWS_DESC3' => 'Please update [path\to\php.exe] and [path\to\suite\instance] to reflect your environment.',
 // Subpanels
     'LBL_JOBS_SUBPANEL_TITLE' => 'Job Log',
     'LBL_EXECUTE_TIME' => 'Execute Time',

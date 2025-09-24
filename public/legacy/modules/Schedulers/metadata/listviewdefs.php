@@ -184,6 +184,24 @@ $viewdefs['Schedulers'] = [
                                 'justify' => 'start',
                                 'cols' => [
                                     [
+                                        'dynamicLabel' => 'LBL_CRON_LINUX_DESC8_DYNAMIC',
+                                        'hideIfLoading' => true,
+                                        'class' => 'cron-label pt-2',
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Unix',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
                                         'dynamicLabel' => 'LBL_CRON_WIN_DESC1_DYNAMIC',
                                         'hideIfLoading' => true,
                                         'class' => 'cron-label',
@@ -239,7 +257,25 @@ $viewdefs['Schedulers'] = [
                                 'cols' => [
                                     [
                                         'dynamicLabel' => 'LBL_CRON_WIN_DESC4_DYNAMIC',
-                                        'class' => 'cron-code-label pt-1',
+                                        'class' => 'cron-code-label',
+                                        'hideIfLoading' => true,
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Windows',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_WIN_DESC5_DYNAMIC',
+                                        'class' => 'cron-label pt-1',
                                         'hideIfLoading' => true,
                                         'activeOnFields' => [
                                             'type' => [

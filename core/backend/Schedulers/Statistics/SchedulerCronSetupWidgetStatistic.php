@@ -85,23 +85,21 @@ class SchedulerCronSetupWidgetStatistic extends LegacyHandler implements Statist
 
     protected function getWindowsCronInfo(): array
     {
-        $realPath = realpath('./');
 
         return [
             'fields' => [
                 'type' => ['value' => 'Windows'],
                 'desc1' => ['labelKey' => 'LBL_CRON_WINDOWS_DESC'],
                 'desc2' => ['labelKey' => 'LBL_CRON_WINDOWS_DESC2'],
-                'desc3' => ['value' => 'cd ' . $realPath],
-                'desc4' => ['value' => '[path\to\php.exe] ' . $realPath . '\bin\console schedulers:run'],
+                'desc3' => ['value' => 'cd [path\to\suite\instance]'],
+                'desc4' => ['value' => '[path\to\php.exe] [path\to\suite\instance]\bin\console schedulers:run'],
+                'desc5' => ['labelKey' => 'LBL_CRON_WINDOWS_DESC3'],
             ]
         ];
     }
 
     protected function getUnixCronInfo(string $runningUser): array
     {
-        $realPath = realpath('./');
-
         return [
             'fields' => [
                 'type' => ['value' => 'Unix'],
@@ -109,9 +107,10 @@ class SchedulerCronSetupWidgetStatistic extends LegacyHandler implements Statist
                 'desc2' => ['labelKey' => 'LBL_CRON_LINUX_DESC2'],
                 'desc3' => ['value' => 'sudo crontab -e -u ' . $runningUser],
                 'desc4' => ['labelKey' => 'LBL_CRON_LINUX_DESC3'],
-                'desc5' => ['value' => "* * * * *; [path/to/php] {$realPath} /bin/console schedulers:run > /dev/null 2>&1"],
+                'desc5' => ['value' => "* * * * *; [path/to/php] [path/to/suite/instance]/bin/console schedulers:run > /dev/null 2>&1"],
                 'desc6' => ['labelKey' => 'LBL_CRON_LINUX_DESC5'],
-                'desc7' => ['value' => "* * * * *; [path/to/php] {$realPath} /bin/console -e [env] schedulers:run > /dev/null 2>&1"],
+                'desc7' => ['value' => "* * * * *; [path/to/php] [path/to/suite/instance]/bin/console -e [env] schedulers:run > /dev/null 2>&1"],
+                'desc8' => ['labelKey' => 'LBL_CRON_LINUX_DESC6'],
             ]
         ];
     }

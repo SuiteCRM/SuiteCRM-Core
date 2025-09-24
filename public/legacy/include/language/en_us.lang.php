@@ -4279,11 +4279,13 @@ $app_strings['LBL_CRON_LINUX_DESC4_DYNAMIC'] = '{{ fields.desc4.value }}';
 $app_strings['LBL_CRON_LINUX_DESC5_DYNAMIC'] = '{{ fields.desc5.value }}';
 $app_strings['LBL_CRON_LINUX_DESC6_DYNAMIC'] = '{{ fields.desc6.value }}';
 $app_strings['LBL_CRON_LINUX_DESC7_DYNAMIC'] = '{{ fields.desc7.value }}';
+$app_strings['LBL_CRON_LINUX_DESC8_DYNAMIC'] = '{{ fields.desc8.value }}';
 
 $app_strings['LBL_CRON_WIN_DESC1_DYNAMIC'] = '{{ fields.desc1.value }}';
 $app_strings['LBL_CRON_WIN_DESC2_DYNAMIC'] = '{{ fields.desc2.value }}';
 $app_strings['LBL_CRON_WIN_DESC3_DYNAMIC'] = '{{ fields.desc3.value }}';
 $app_strings['LBL_CRON_WIN_DESC4_DYNAMIC'] = '{{ fields.desc4.value }}';
+$app_strings['LBL_CRON_WIN_DESC5_DYNAMIC'] = '{{ fields.desc5.value }}';
 
 $app_strings['LBL_MARKETING_ITEMS_PER_RUN'] = 'Campaign Marketing Items Per Run';
 $app_strings['LBL_EMAILS_PER_RUN'] = 'Campaign Emails Per Run';

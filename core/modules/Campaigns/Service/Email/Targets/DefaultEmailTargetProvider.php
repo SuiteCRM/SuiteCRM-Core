@@ -92,14 +92,14 @@ class DefaultEmailTargetProvider implements EmailTargetProviderInterface
             ->andWhere('empl.email_marketing_id = :id')
             ->andWhere('queue.related_id IS NULL') // filter all that are already on email queue
             ->andWhere('log.target_id IS NULL') // filter all that are already on campaign log, meaning that they were sent or were suppressed
-            ->groupBy('plp.related_type, plp.related_id')
+            ->groupBy('plp.related_type, plp.related_id, empl.email_marketing_id, plp.prospect_list_id')
             ->setMaxResults($batchSize)
             ->setParameter('id', $marketingId);
 
         try {
             $records = $queryBuilder->fetchAllAssociative();
         } catch (Exception $e) {
-            $this->logger->error('AddEmailToQueueScheduler::getTargetsCould not retrieve targets:  | email marketing id - ' . $marketingId . ' | ' . $e->getMessage());
+            $this->logger->error('AddEmailToQueueScheduler::getTargets Could not retrieve targets:  | email marketing id - ' . $marketingId . ' | ' . $e->getMessage());
         }
 
         return $records;

@@ -464,6 +464,7 @@ $viewdefs ['EmailMarketing'] = [
                     'key' => 'edit',
                     'labelKey' => 'LBL_EDIT',
                     'modes' => ['detail'],
+                    'priority' => 100,
                     'params' => [
                         'expanded' => true,
                     ],
@@ -489,21 +490,38 @@ $viewdefs ['EmailMarketing'] = [
                     'labelKey' => 'LBL_SAVE_BUTTON_LABEL',
                     'modes' => ['edit'],
                     'acl' => ['edit'],
+                    'priority' => 100,
                     'params' => [
                         'expanded' => true,
+                        'disableOnRun' => true,
                     ],
                 ],
                 'saveNew' => [
                     'key' => 'saveNew',
                     'labelKey' => 'LBL_SAVE_BUTTON_LABEL',
                     'modes' => ['create'],
+                    'priority' => 100,
                     'acl' => ['edit'],
                     'params' => [
                         'expanded' => true,
+                        'disableOnRun' => true,
+                    ],
+                ],
+                'saveContinue' => [
+                    'key' => 'saveContinue',
+                    'labelKey' => 'LBL_SAVE_CONTINUE_LABEL',
+                    'modes' => ['create'],
+                    'priority' => 150,
+                    'acl' => ['edit'],
+                    'params' => [
+                        'expanded' => true,
+                        'disableOnRun' => true,
+                        'collapsedMobile' => true,
                     ],
                 ],
                 'cancel' => [
                     'key' => 'cancel',
+                    'priority' => 200,
                     'labelKey' => 'LBL_CANCEL',
                     'modes' => ['edit'],
                     'params' => [
@@ -514,6 +532,7 @@ $viewdefs ['EmailMarketing'] = [
                     'key' => 'cancelCreate',
                     'labelKey' => 'LBL_CANCEL',
                     'modes' => ['create'],
+                    'priority' => 200,
                     'params' => [
                         'expanded' => true,
                     ],
@@ -745,6 +764,7 @@ $viewdefs ['EmailMarketing'] = [
                 'toggle-widgets' => [
                     'key' => 'toggle-widgets',
                     'labelKey' => 'LBL_INSIGHTS',
+                    'priority' => 5000,
                     'modes' => ['detail', 'edit'],
                     'params' => [
                         'expanded' => true,
@@ -755,6 +775,7 @@ $viewdefs ['EmailMarketing'] = [
                     'labelKey' => 'LBL_DELETE',
                     'modes' => ['detail'],
                     'asyncProcess' => true,
+                    'priority' => 2000,
                     'params' => [
                         'displayConfirmation' => true,
                         'redirectModule' => 'campaigns',
@@ -781,6 +802,7 @@ $viewdefs ['EmailMarketing'] = [
                     'key' => 'duplicate',
                     'labelKey' => 'LBL_DUPLICATE_BUTTON',
                     'modes' => ['detail'],
+                    'priority' => 1900,
                     'asyncProcess' => true,
                     'params' => [
                         'queryParams' => [

@@ -130,7 +130,11 @@ class UserHandler extends LegacyHandler
      */
     public function getSessionLanguage(): string
     {
-        return $this->requestStack->getMainRequest()?->getSession()?->get('ui_language', '') ?? '';
+        $this->init();
+        global $current_language;
+        $this->close();
+
+        return $current_language;
     }
 
     /**

@@ -6,6 +6,7 @@ parameters:
           edit:
             key: edit
             labelKey: LBL_EDIT
+            priority: 1
             params:
               expanded: true
             acl:

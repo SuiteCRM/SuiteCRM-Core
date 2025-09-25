@@ -54,7 +54,7 @@ trait DefinitionEntryHandlingTrait
         $exclude = $moduleEntryConfig['exclude'] ?? [];
         $moduleEntries = $moduleEntryConfig[$entryName] ?? [];
 
-        $entries = array_replace_recursive($defaultEntries, $moduleEntries);
+        $entries = $this->applyActionOverrides($defaultEntries, $moduleEntries);
         $filteredEntries = [];
         foreach ($entries as $entryKey => $entry) {
             if (in_array($entryKey, $exclude, true)) {
@@ -101,5 +101,42 @@ trait DefinitionEntryHandlingTrait
         }
 
         return true;
+    }
+
+    /**
+     * @param array $defaultEntries
+     * @param array $moduleEntries
+     * @return array
+     */
+    protected function applyActionOverrides(array $defaultEntries, array $moduleEntries): array
+    {
+        $newDefaultEntries = $defaultEntries;
+
+        $entries = [];
+
+        foreach ($moduleEntries as $key => $entry) {
+            if (!empty($newDefaultEntries[$key])) {
+                $newDefaultEntries[$key] = $entry;
+
+                if (!isset($entry['priority'])) {
+                    $newDefaultEntries[$key]['priority'] = $defaultEntries[$key]['priority'] ?? 1000;
+                }
+
+            } else {
+                $entries[$key] = $entry;
+            }
+        }
+
+
+        $unionEntries = $entries + $newDefaultEntries;
+
+
+        uasort($unionEntries, function ($a, $b) {
+            $priorityA = $a['priority'] ?? 1000;
+            $priorityB = $b['priority'] ?? 1000;
+            return $priorityA <=> $priorityB;
+        });
+
+        return $unionEntries;
     }
 }

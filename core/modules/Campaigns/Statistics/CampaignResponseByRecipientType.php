@@ -112,7 +112,7 @@ class CampaignResponseByRecipientType extends LegacyHandler implements Statistic
         $this->init();
         $this->startLegacyApp();
 
-        $allowsDuplicates = false;
+        $allowsDuplicates = true;
 
         if ($module === 'email-marketing') {
             $emailMarketingId = $id;

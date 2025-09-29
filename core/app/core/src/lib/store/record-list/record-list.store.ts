@@ -665,6 +665,7 @@ export class RecordListStore implements StateStore, DataSource<Record>, Selectio
                 all: true,
                 status: SelectionStatus.ALL,
                 selected: {},
+                touched: {},
                 count: total
             }
         });
@@ -672,11 +673,13 @@ export class RecordListStore implements StateStore, DataSource<Record>, Selectio
 
     selectPage(): void {
         const selected = {...this.internalState.selection.selected};
+        const touched = {...this.internalState.selection.touched};
 
         if (this.internalState.records && this.internalState.records.length) {
             this.internalState.records.forEach(value => {
                 if (value && value.id) {
                     selected[value.id] = value.id;
+                    touched[value.id] = value.id;
                 }
             });
         }
@@ -686,6 +689,7 @@ export class RecordListStore implements StateStore, DataSource<Record>, Selectio
             selection: {
                 all: false,
                 status: SelectionStatus.SOME,
+                touched,
                 selected,
                 count: Object.keys(selected).length
             }

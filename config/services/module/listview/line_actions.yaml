@@ -70,3 +70,54 @@ parameters:
       exclude:
         - modal-create
         - create
+    notes:
+      exclude:
+        - modal-create
+    emailman:
+      exclude:
+        - modal-create
+    workflow:
+      exclude:
+        - modal-create
+    campaigns:
+      exclude:
+        - modal-create
+    documents:
+      exclude:
+        - modal-create
+    calls:
+      exclude:
+        - modal-create
+    meetings:
+      exclude:
+        - modal-create
+    prospect-lists:
+      exclude:
+        - modal-create
+    project-templates:
+      exclude:
+        - modal-create
+    events:
+      exclude:
+        - modal-create
+    event-locations:
+      exclude:
+        - modal-create
+    product-categories:
+      exclude:
+        - modal-create
+    pdf-templates:
+      exclude:
+        - modal-create
+    reports:
+      exclude:
+        - modal-create
+    knowledge-base:
+      exclude:
+        - modal-create
+    email-templates:
+      exclude:
+        - modal-create
+    surveys:
+      exclude:
+        - modal-create

@@ -781,18 +781,30 @@ class User extends Person implements EmailInterface
 
             if (isset($_POST['subpanel_pagination_type'])) {
                 $this->setPreference('subpanel_pagination_type', $_POST['subpanel_pagination_type'], 0, 'global');
+            } else {
+                $subpanelPagination = $this->getCurrentPreference('subpanel_pagination_type');
+                $this->setPreference('subpanel_pagination_type', $subpanelPagination ?? $sugar_config['subpanel_pagination_type'], 0, 'global');
             }
 
             if (isset($_POST['listview_pagination_type'])) {
                 $this->setPreference('listview_pagination_type', $_POST['listview_pagination_type'], 0, 'global');
+            } else {
+                $listViewPagination = $this->getCurrentPreference('listview_pagination_type');
+                $this->setPreference('listview_pagination_type', $listViewPagination ?? $sugar_config['listview_pagination_type'], 0, 'global');
             }
 
             if (isset($_POST['record_modal_pagination_type'])) {
                 $this->setPreference('record_modal_pagination_type', $_POST['record_modal_pagination_type'], 0, 'global');
+            } else {
+                $recordModalPagination = $this->getCurrentPreference('record_modal_pagination_type');
+                $this->setPreference('record_modal_pagination_type', $recordModalPagination ?? $sugar_config['record_modal_pagination_type'], 0, 'global');
             }
 
             if (isset($_POST['snooze_alert_timer'])) {
                 $this->setPreference('snooze_alert_timer', $_POST['snooze_alert_timer'], 0, 'global');
+            } else {
+                $snoozeAlertTimer = $this->getCurrentPreference('snooze_alert_timer');
+                $this->setPreference('snooze_alert_timer', $snoozeAlertTimer ?? $sugar_config['snooze_alert_timer'], 0, 'global');
             }
 
             if (isset($_POST['user_swap_last_viewed'])) {
@@ -840,6 +852,10 @@ class User extends Person implements EmailInterface
             if (isset($_POST['user_theme'])) {
                 $this->setPreference('user_theme', $_POST['user_theme'], 0, 'global');
                 $_SESSION['authenticated_user_theme'] = $_POST['user_theme'];
+            } else {
+                $userTheme = $this->getCurrentPreference('user_theme');
+                $this->setPreference('user_theme', $userTheme ?? $sugar_config['default_theme'], 0, 'global');
+                $_SESSION['authenticated_user_theme'] = $userTheme ?? $sugar_config['default_theme'];
             }
 
             if (isset($_POST['user_module_favicon'])) {
@@ -875,15 +891,27 @@ class User extends Person implements EmailInterface
 
             if (isset($_POST['reminder_time'])) {
                 $this->setPreference('reminder_time', $_POST['reminder_time'], 0, 'global');
+            } else {
+                $reminderTime = $this->getCurrentPreference('reminder_time');
+                $this->setPreference('reminder_time', $reminderTime ?? '60', 0, 'global');
             }
             if (isset($_POST['email_reminder_time'])) {
                 $this->setPreference('email_reminder_time', $_POST['email_reminder_time'], 0, 'global');
+            } else {
+                $emailReminderTime = $this->getCurrentPreference('email_reminder_time');
+                $this->setPreference('email_reminder_time', $emailReminderTime ?? '60', 0, 'global');
             }
             if (isset($_POST['reminder_checked'])) {
                 $this->setPreference('reminder_checked', $_POST['reminder_checked'], 0, 'global');
+            } else {
+                $reminderChecked = $this->getCurrentPreference('reminder_checked');
+                $this->setPreference('reminder_checked', $reminderChecked ?? '0', 0, 'global');
             }
             if (isset($_POST['email_reminder_checked'])) {
                 $this->setPreference('email_reminder_checked', $_POST['email_reminder_checked'], 0, 'global');
+            } else {
+                $emailReminderChecked = $this->getCurrentPreference('email_reminder_checked');
+                $this->setPreference('email_reminder_checked', $emailReminderChecked ?? '0', 0, 'global');
             }
 
             if (isset($_POST['timezone'])) {
@@ -904,28 +932,47 @@ class User extends Person implements EmailInterface
             }
             if (isset($_POST['currency'])) {
                 $this->setPreference('currency', $_POST['currency'], 0, 'global');
+            } else {
+                $currency = $this->getCurrentPreference('currency');
+                $this->setPreference('currency', $currency, 0, 'global');
             }
             if (isset($_POST['default_currency_significant_digits'])) {
                 $this->setPreference('default_currency_significant_digits', $_POST['default_currency_significant_digits'], 0, 'global');
+            } else {
+                $currencySignificantDigits = $this->getCurrentPreference('default_currency_significant_digits');
+                $this->setPreference('default_currency_significant_digits', $currencySignificantDigits ?? $sugar_config['default_currency_significant_digits'], 0, 'global');
             }
             if (isset($_POST['num_grp_sep'])) {
                 $this->setPreference('num_grp_sep', $_POST['num_grp_sep'], 0, 'global');
+            } else {
+                $numGrpSep = $this->getCurrentPreference('num_grp_sep');
+                $this->setPreference('num_grp_sep', $numGrpSep, 0, 'global');
             }
             if (isset($_POST['dec_sep'])) {
                 $this->setPreference('dec_sep', $_POST['dec_sep'], 0, 'global');
+            } else {
+                $decSep = $this->getCurrentPreference('dec_sep');
+                $this->setPreference('dec_sep', $decSep ?? $sugar_config['default_decimal_seperator'], 0, 'global');
             }
             if (isset($_POST['fdow'])) {
                 $this->setPreference('fdow', $_POST['fdow'], 0, 'global');
+            } else {
+                $fdow = $this->getCurrentPreference('fdow');
+                $this->setPreference('fdow', $fdow, 0, 'global');
             }
             if (isset($_POST['dateformat'])) {
                 $this->setPreference('datef', $_POST['dateformat'], 0, 'global');
+            } else {
+                $datef = $this->getCurrentPreference('datef');
+                $this->setPreference('datef', $datef ?? $sugar_config['datef'], 0, 'global');
             }
             if (isset($_POST['timeformat'])) {
                 $this->setPreference('timef', $_POST['timeformat'], 0, 'global');
+            } else {
+                $timef = $this->getCurrentPreference('timef');
+                $this->setPreference('timef', $timef ?? $sugar_config['timef'], 0, 'global');
             }
-            if (isset($_POST['timezone'])) {
-                $this->setPreference('timezone', $_POST['timezone'], 0, 'global');
-            }
+
             if (isset($_POST['language'])) {
                 if ($_SESSION['authenticated_user_id'] === $this->id){
                     $_SESSION['authenticated_user_language'] = $_POST['language'];
@@ -958,12 +1005,21 @@ class User extends Person implements EmailInterface
             }
             if (isset($_POST['default_locale_name_format'])) {
                 $this->setPreference('default_locale_name_format', $_POST['default_locale_name_format'], 0, 'global');
+            } else {
+                $nameFormat = $this->getCurrentPreference('default_locale_name_format');
+                $this->setPreference('default_locale_name_format', $nameFormat ?? $sugar_config['default_locale_name_format'], 0, 'global');
             }
             if (isset($_POST['export_delimiter'])) {
                 $this->setPreference('export_delimiter', $_POST['export_delimiter'], 0, 'global');
+            } else {
+                $exportDelimiter = $this->getCurrentPreference('export_delimiter');
+                $this->setPreference('export_delimiter', $exportDelimiter ?? $sugar_config['export_delimiter'], 0, 'global');
             }
             if (isset($_POST['default_export_charset'])) {
                 $this->setPreference('default_export_charset', $_POST['default_export_charset'], 0, 'global');
+            } else {
+                $exportCharset = $this->getCurrentPreference('default_export_charset');
+                $this->setPreference('default_export_charset', $exportCharset ?? $sugar_config['default_export_charset'], 0, 'global');
             }
             if (isset($_POST['use_real_names'])) {
                 $this->setPreference('use_real_names', 'on', 0, 'global');
@@ -1000,10 +1056,16 @@ class User extends Person implements EmailInterface
             ////	SIGNATURES
             if (isset($_POST['signature_id'])) {
                 $this->setPreference('signature_default', $_POST['signature_id'], 0, 'global');
+            } else {
+                $signatureDefault = $this->getCurrentPreference('signature_default');
+                $this->setPreference('signature_default', $signatureDefault ?? '', 0, 'global');
             }
 
             if (isset($_POST['signature_prepend'])) {
                 $this->setPreference('signature_prepend', $_POST['signature_prepend'], 0, 'global');
+            } else {
+                $signaturePrepend = $this->getCurrentPreference('signature_prepend');
+                $this->setPreference('signature_prepend', $signaturePrepend ?? '', 0, 'global');
             }
             ////	END SIGNATURES
             ///////////////////////////////////////////////////////////////////////////
@@ -1011,9 +1073,15 @@ class User extends Person implements EmailInterface
 
             if (isset($_POST['email_link_type'])) {
                 $this->setPreference('email_link_type', $_REQUEST['email_link_type']);
+            } else {
+                $emailLinkType = $this->getCurrentPreference('email_link_type');
+                $this->setPreference('email_link_type', $emailLinkType ?? 'sugar', 0, 'global');
             }
             if (isset($_POST['editor_type'])) {
                 $this->setPreference('editor_type', $_REQUEST['editor_type']);
+            } else {
+                $editorType = $this->getCurrentPreference('editor_type');
+                $this->setPreference('editor_type', $editorType ?? 'html', 0, 'global');
             }
             if (isset($_REQUEST['email_show_counts'])) {
                 $this->setPreference('email_show_counts', $_REQUEST['email_show_counts'], 0, 'global');
@@ -1022,9 +1090,15 @@ class User extends Person implements EmailInterface
             }
             if (isset($_REQUEST['email_editor_option'])) {
                 $this->setPreference('email_editor_option', $_REQUEST['email_editor_option'], 0, 'global');
+            } else {
+                $emailEditorOption = $this->getCurrentPreference('email_editor_option');
+                $this->setPreference('email_editor_option', $emailEditorOption ?? 'html', 0, 'global');
             }
             if (isset($_REQUEST['default_email_charset'])) {
                 $this->setPreference('default_email_charset', $_REQUEST['default_email_charset'], 0, 'global');
+            } else {
+                $defaultEmailCharset = $this->getCurrentPreference('default_email_charset');
+                $this->setPreference('default_email_charset', $defaultEmailCharset ?? 'UTF-8', 0, 'global');
             }
 
             $isValidator = new \SuiteCRM\Utility\SuiteValidator();
@@ -1037,6 +1111,9 @@ class User extends Person implements EmailInterface
 
             if (isset($_POST['subtheme'])) {
                 $this->setPreference('subtheme', $_POST['subtheme'], 0, 'global');
+            } else {
+                $subtheme = $this->getCurrentPreference('subtheme');
+                $this->setPreference('subtheme', $subtheme ?? '', 0, 'global');
             }
             if (isset($_POST['gsync_cal'])) {
                 $this->setPreference('syncGCal', 1, 0, 'GoogleSync');
@@ -2576,7 +2653,12 @@ EOQ;
     }
 
     protected function getCurrentPreference(string $key) {
-        return $_SESSION[$this->user_name.'_PREFERENCES']['global'][$key] ?? $this->getPreference($key);
+        global $current_user;
+        if ($this->user_name === $current_user->user_name && isset($_SESSION[$this->user_name.'_PREFERENCES']['global'][$key])) {
+            return $_SESSION[$this->user_name.'_PREFERENCES']['global'][$key];
+        }
+
+        return $this->getPreference($key);
     }
 
     /**

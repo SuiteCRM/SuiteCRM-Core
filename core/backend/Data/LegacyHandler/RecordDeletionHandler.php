@@ -113,15 +113,10 @@ class RecordDeletionHandler extends LegacyHandler implements RecordDeletionServi
      */
     public function deleteRecord(string $moduleName, string $id): bool
     {
-        $this->init();
-        $this->startLegacyApp();
-
         $success = true;
         if (!$this->internalDelete($moduleName, $id)) {
             $success = false;
         }
-
-        $this->close();
 
         return $success;
     }
@@ -134,6 +129,9 @@ class RecordDeletionHandler extends LegacyHandler implements RecordDeletionServi
     protected function internalDelete(string $legacyModuleName, string $id): bool
     {
         $moduleName = $this->moduleNameMapper->toFrontEnd($legacyModuleName);
+
+        $this->init();
+        $this->startLegacyApp();
 
         // NOTE: Do not use BeanFactory::getBean($moduleName, $id) with mark_deleted
         // may cause errors when there are related records.
@@ -154,6 +152,7 @@ class RecordDeletionHandler extends LegacyHandler implements RecordDeletionServi
             return true;
         }
 
+        $this->close();
         return false;
     }
 
@@ -166,17 +165,12 @@ class RecordDeletionHandler extends LegacyHandler implements RecordDeletionServi
      */
     public function deleteRecords(string $moduleName, array $ids = []): bool
     {
-        $this->init();
-        $this->startLegacyApp();
-
         $success = true;
         foreach ($ids as $id) {
             if (!$this->internalDelete($moduleName, $id)) {
                 $success = false;
             }
         }
-
-        $this->close();
 
         return $success;
     }
@@ -192,8 +186,6 @@ class RecordDeletionHandler extends LegacyHandler implements RecordDeletionServi
         array $criteria,
         array $sort
     ): bool {
-        $this->init();
-        $this->startLegacyApp();
 
         $listView = $this->listViewProvider->getList(
             $this->moduleNameMapper->toFrontEnd($moduleName),
@@ -210,8 +202,6 @@ class RecordDeletionHandler extends LegacyHandler implements RecordDeletionServi
                 $success = false;
             }
         }
-
-        $this->close();
 
         return $success;
     }

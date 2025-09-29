@@ -30,7 +30,7 @@
         <div class="flex-grow-1 w-100 mr-1">
             <p-multiSelect
                 #tag
-                [options]="this.options"
+                [options]="currentOptions()"
                 [(ngModel)]="selectedValues"
                 [optionLabel]="getRelateFieldName()"
                 (onChange)="onAdd()"

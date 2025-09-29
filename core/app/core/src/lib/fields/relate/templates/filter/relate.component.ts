@@ -131,7 +131,7 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
 
         super.ngOnInit();
 
-        this.options = this.options ?? [];
+        this.currentOptions.set(this.options ?? [])
 
         this.getTranslatedLabels();
 
@@ -169,6 +169,7 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
 
     onClear(): void {
         this.options = [];
+        this.currentOptions.set([]);
         this.selectedValues = [];
         this.selectAll = false;
         this.filterValue = '';
@@ -350,6 +351,7 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
 
             this.onAdd();
             this.tag.updateModel(this.selectedValues);
+            this.currentOptions.set(this.selectedValues ?? []);
         });
     }
 
@@ -412,6 +414,8 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
                 this.options.push(selectedValue);
             }
         });
+
+        this.currentOptions.set(this.options ?? []);
     }
 
     protected isInList(filteredOptions: AttributeMap[], selectedValue: AttributeMap): boolean {

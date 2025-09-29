@@ -106,7 +106,7 @@ export class RecordListModalComponent implements OnInit, OnDestroy {
         } as ButtonInterface;
 
         this.subs.push(this.store.recordList.criteria$.pipe(debounceTime(100)).subscribe(() => {
-            if (Object.entries(this.store.recordList.criteria.filters).length < 1) {
+            if ((Object.entries(this?.store?.recordList?.criteria.filters).length ?? 0) < 1) {
                 return;
             }
             this.updateSelection();

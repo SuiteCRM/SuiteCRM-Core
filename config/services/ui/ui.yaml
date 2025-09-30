@@ -40,7 +40,7 @@ parameters:
     record_modal_max_height: 620
     inline_confirmation_loading_delay: 300
     group_field_mobile_breakdown_limit: 350
-    relate_field_debounce_time: 750
+    relate_field_debounce_time: 250
     multiselect_record_breakpoint: 3
     multiselect_max_number:
       XSmall: 20

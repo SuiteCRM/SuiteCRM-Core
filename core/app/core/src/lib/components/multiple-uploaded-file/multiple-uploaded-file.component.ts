@@ -48,13 +48,14 @@ import {BehaviorSubject} from "rxjs";
     templateUrl: './multiple-uploaded-file.component.html',
     styles: [],
 })
-export class MultipleUploadedFileComponent implements OnInit, OnChanges, AfterViewInit {
+export class MultipleUploadedFileComponent implements OnChanges, AfterViewInit {
 
     limitPerRow: number;
     breakpointMax: number;
     chunkedArray: any[][];
     sizeConfig: any = {};
     breakpointConfig: any = {};
+    limitSet: boolean = false;
 
     popover: WritableSignal<HTMLElement> = signal({} as HTMLElement);
 
@@ -85,12 +86,6 @@ export class MultipleUploadedFileComponent implements OnInit, OnChanges, AfterVi
     ) {
     }
 
-    ngOnInit() {
-        this.initLimit();
-        this.chunks = this.getChunks();
-        this.breakpoint = this.getBreakpoint();
-    }
-
     ngAfterViewInit() {
         setTimeout(() => {
             this.popover.set(this.popoverTarget);
@@ -98,6 +93,7 @@ export class MultipleUploadedFileComponent implements OnInit, OnChanges, AfterVi
     }
 
     ngOnChanges(changes: SimpleChanges): void {
+        this.initLimit();
         this.chunkedArray = this.chunkArray(this.files.slice(0, this.breakpoint), this.chunks);
 
         if (this.breakpointMax < this.breakpointConfig[ScreenSize.Large]) {
@@ -127,6 +123,11 @@ export class MultipleUploadedFileComponent implements OnInit, OnChanges, AfterVi
     }
 
     protected initLimit() {
+
+        if (this.limitSet) {
+            return;
+        }
+
         const limit = this.systemConfigStore.getConfigValue('recordview_attachment_limit');
 
         this.sizeConfig = limit.row_default_limit;
@@ -146,6 +147,11 @@ export class MultipleUploadedFileComponent implements OnInit, OnChanges, AfterVi
             this.limitPerRow = this.sizeConfig[size] || this.limitPerRow;
             this.breakpointMax = this.breakpointConfig[size] || this.breakpointMax;
         })
+
+        this.chunks = this.getChunks();
+        this.breakpoint = this.getBreakpoint();
+
+        this.limitSet = true;
     }
 
     clearFiles(event): void {

@@ -30,11 +30,18 @@ import {StandardValidationErrors} from "../../../../common/services/validators/v
 import {AbstractControl, AsyncValidatorFn} from "@angular/forms";
 import {AsyncProcessValidatorInterface} from "../aync-validator.Interface";
 import {Process, ProcessService} from "../../../process/process.service";
-import {map, take} from "rxjs/operators";
-import {Observable} from "rxjs";
+import {map, switchMap, take} from "rxjs/operators";
+import {Observable, of, Subject} from "rxjs";
 import {AsyncValidationDefinition} from "../../../../common/record/field.model";
+import {ConfirmationModalService} from "../../../modals/confirmation-modal.service";
 
-export const asyncValidator = (validator: AsyncValidationDefinition, viewField: ViewFieldDefinition, record: Record, processService: ProcessService): AsyncValidatorFn => (
+export const asyncValidator = (
+    validator: AsyncValidationDefinition,
+    viewField: ViewFieldDefinition,
+    record: Record,
+    processService: ProcessService,
+    confirmationModalService: ConfirmationModalService
+): AsyncValidatorFn => (
     (control: AbstractControl): Promise<StandardValidationErrors | null> | Observable<StandardValidationErrors | null> => {
 
         const processKey = validator.key;
@@ -48,10 +55,67 @@ export const asyncValidator = (validator: AsyncValidationDefinition, viewField: 
             params: validator?.params ?? {}
         };
 
-        return processService.submit(processKey, options).pipe(map((process: Process) => {
+        return processService.submit(processKey, options).pipe(switchMap((process: Process) => {
 
             if (process.status !== 'error') {
-                return null;
+                return of(null);
+            }
+
+            if (process?.data?.displayConfirmation ?? false) {
+                const confirmationSubject = new Subject<boolean>();
+                const confirmation$ = confirmationSubject.asObservable();
+
+                const confirmationLabel = process.data?.confirmationLabel ?? '';
+                const confirmationMessages = process.data?.confirmationMessages ?? [];
+                const confirmation = [confirmationLabel, ...confirmationMessages];
+
+                if (Object.entries(confirmation).length === 0) {
+                    confirmation.push('LBL_GENERIC_CONFIRMATION');
+                }
+
+                confirmationModalService.showModal(
+                    confirmation,
+                    () => confirmationSubject.next(true),
+                    () => confirmationSubject.next(false),
+                    record.fields,
+                    {value: control.value}
+                )
+
+                return confirmation$.pipe(
+                    take(1),
+                    map((confirmed: boolean) => {
+                        if (confirmed) {
+                            return null;
+                        }
+
+                        const error = {
+                            [processKey]: {
+                                message: {
+                                    labels: {
+                                        startLabelKey: '',
+                                        icon: '',
+                                        endLabelKey: '',
+                                    },
+                                    context: {
+                                        value: control.value
+                                    }
+                                }
+                            }
+                        }
+
+                        if (process?.data?.errors ?? false) {
+                            Object.keys(process?.data?.errors).forEach((key) => {
+                                if (error[processKey].message.labels[key] === '') {
+                                    error[processKey].message.labels[key] = process?.data?.errors[key];
+                                }
+                            });
+                        }
+
+                        record.fields[viewField.name].asyncValidationErrors = error;
+
+                        return error;
+                    })
+                );
             }
 
             const error = {
@@ -69,9 +133,9 @@ export const asyncValidator = (validator: AsyncValidationDefinition, viewField: 
                 }
             }
 
-            if (process?.data?.errors ?? false){
+            if (process?.data?.errors ?? false) {
                 Object.keys(process?.data?.errors).forEach((key) => {
-                    if (error[processKey].message.labels[key] === ''){
+                    if (error[processKey].message.labels[key] === '') {
                         error[processKey].message.labels[key] = process?.data?.errors[key];
                     }
                 });
@@ -80,7 +144,7 @@ export const asyncValidator = (validator: AsyncValidationDefinition, viewField: 
 
             record.fields[viewField.name].asyncValidationErrors = error;
 
-            return error;
+            return of(error);
         }), take(1));
     }
 );
@@ -91,7 +155,8 @@ export const asyncValidator = (validator: AsyncValidationDefinition, viewField: 
 export class AsyncProcessValidator implements AsyncProcessValidatorInterface {
 
     constructor(
-        protected processService: ProcessService
+        protected processService: ProcessService,
+        protected confirmationModalService: ConfirmationModalService
     ) {
     }
 
@@ -104,10 +169,10 @@ export class AsyncProcessValidator implements AsyncProcessValidatorInterface {
             return null;
         }
 
-        if (!validator?.key){
+        if (!validator?.key) {
             return null;
         }
 
-        return asyncValidator(validator, viewField, record, this.processService);
+        return asyncValidator(validator, viewField, record, this.processService, this.confirmationModalService);
     }
 }

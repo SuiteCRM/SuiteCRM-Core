@@ -56,7 +56,6 @@ import {FieldLogicDisplayManager} from '../../../field-logic-display/field-logic
 import {debounceTime, map, take} from "rxjs/operators";
 import {Dropdown, DropdownFilterOptions} from "primeng/dropdown";
 import {ConfirmationModalService} from "../../../../services/modals/confirmation-modal.service";
-import {Observable, Subject} from "rxjs";
 import {SystemConfigStore} from "../../../../store/system-config/system-config.store";
 import {SearchCriteria} from "../../../../common/views/list/search-criteria.model";
 import {AppStateStore} from "../../../../store/app-state/app-state.store";
@@ -87,8 +86,6 @@ export class RelateEditFieldComponent extends BaseRelateComponent implements Aft
     emptyFilterLabel: Signal<string> = signal('');
     filterValue: string | undefined = '';
 
-    protected filterInputBuffer = new Subject<any>();
-    protected filterInputBuffer$: Observable<any> = this.filterInputBuffer.asObservable();
 
     /**
      * Constructor
@@ -116,7 +113,7 @@ export class RelateEditFieldComponent extends BaseRelateComponent implements Aft
         protected logicDisplay: FieldLogicDisplayManager,
         protected confirmation: ConfirmationModalService
     ) {
-        super(languages, typeFormatter, relateService, moduleNameMapper, logic, logicDisplay);
+        super(languages, typeFormatter, relateService, moduleNameMapper, logic, logicDisplay, config);
     }
 
     /**
@@ -542,18 +539,7 @@ export class RelateEditFieldComponent extends BaseRelateComponent implements Aft
         };
     }
 
-    /**
-     * Get debounce time
-     * @return number
-     * @protected
-     */
-    protected getDebounceTime(): number {
-        let filterDebounceTime = this.config?.getUi('relate_field_debounce_time') ?? 750;
-        if (!isFinite(filterDebounceTime)) {
-            filterDebounceTime = 750;
-        }
-        return filterDebounceTime;
-    }
+
 
     focusFilterInput() {
         this.dropdownFilterInput.nativeElement.focus();

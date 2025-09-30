@@ -47,6 +47,7 @@ import {ObjectMap} from "../../../../common/types/object-map";
 import {AttributeMap, Record} from "../../../../common/record/record.model";
 import {SearchCriteria} from "../../../../common/views/list/search-criteria.model";
 import {isArray} from "lodash-es";
+import {SystemConfigStore} from "../../../../store/system-config/system-config.store";
 
 @Component({
     selector: 'scrm-multirelate-edit',
@@ -85,6 +86,7 @@ export class MultiRelateEditFieldComponent extends BaseRelateComponent {
      * @param {object} modalService service
      * @param {object} logic
      * @param {object} logicDisplay
+     * @param config
      */
     constructor(
         protected languages: LanguageStore,
@@ -93,9 +95,10 @@ export class MultiRelateEditFieldComponent extends BaseRelateComponent {
         protected moduleNameMapper: ModuleNameMapper,
         protected modalService: NgbModal,
         protected logic: FieldLogicManager,
-        protected logicDisplay: FieldLogicDisplayManager
+        protected logicDisplay: FieldLogicDisplayManager,
+        protected config: SystemConfigStore
     ) {
-        super(languages, typeFormatter, relateService, moduleNameMapper, logic, logicDisplay);
+        super(languages, typeFormatter, relateService, moduleNameMapper, logic, logicDisplay, config);
 
         this.selectButton = {
             klass: ['btn', 'btn-sm', 'btn-outline-secondary', 'm-0', 'border-0'],

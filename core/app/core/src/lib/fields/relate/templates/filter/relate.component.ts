@@ -46,8 +46,9 @@ import {
 import {FieldLogicManager} from '../../../field-logic/field-logic.manager';
 import {SavedFilter} from '../../../../store/saved-filters/saved-filter.model';
 import {FieldLogicDisplayManager} from '../../../field-logic-display/field-logic-display.manager';
-import {map, take} from "rxjs/operators";
+import {debounceTime, map, take} from "rxjs/operators";
 import {MultiSelect} from "primeng/multiselect";
+import {SystemConfigStore} from "../../../../store/system-config/system-config.store";
 
 @Component({
     selector: 'scrm-relate-filter',
@@ -78,6 +79,7 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
      * @param {object} modalService service
      * @param {object} logic
      * @param {object} logicDisplay
+     * @param config
      */
     constructor(
         protected languages: LanguageStore,
@@ -86,9 +88,10 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
         protected moduleNameMapper: ModuleNameMapper,
         protected modalService: NgbModal,
         protected logic: FieldLogicManager,
-        protected logicDisplay: FieldLogicDisplayManager
+        protected logicDisplay: FieldLogicDisplayManager,
+        protected config: SystemConfigStore
     ) {
-        super(languages, typeFormatter, relateService, moduleNameMapper, logic, logicDisplay);
+        super(languages, typeFormatter, relateService, moduleNameMapper, logic, logicDisplay, config);
 
         this.selectButton = {
             klass: ['btn', 'btn-sm', 'btn-outline-secondary', 'm-0', 'border-0'],
@@ -149,6 +152,12 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
                 this.idField.valueList = deepClone(idValues);
             }
         }
+
+        const clickDebounceTime = this.getDebounceTime();
+
+        this.subs.push(this.filterInputBuffer$.pipe(debounceTime(clickDebounceTime)).subscribe(value => {
+            this.filterResults();
+        }));
     }
 
     /**
@@ -215,6 +224,10 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
     }
 
     onFilter(): void {
+        this.filterInputBuffer.next(this.filterValue ?? '');
+    }
+
+    filterResults(): void {
         const relateName = this.getRelateFieldName();
         this.filterValue = this.filterValue ?? '';
         const matches = this.filterValue.match(/^\s*$/g);
@@ -231,6 +244,7 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
             })))
         ).subscribe(filteredOptions => {
             this.options = filteredOptions;
+            this.currentOptions.set(this.options);
             this.addCurrentlySelectedToOptions(filteredOptions);
             this.calculateSelectAll();
         });

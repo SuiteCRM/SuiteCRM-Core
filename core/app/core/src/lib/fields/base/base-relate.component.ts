@@ -25,7 +25,7 @@
  */
 
 import {Component, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
-import {Observable, of} from 'rxjs';
+import {Observable, of, Subject} from 'rxjs';
 import {catchError, map, tap} from 'rxjs/operators';
 import {AttributeMap, Record} from '../../common/record/record.model';
 import {ModuleNameMapper} from '../../services/navigation/module-name-mapper/module-name-mapper.service';
@@ -38,6 +38,7 @@ import {FieldLogicDisplayManager} from '../field-logic-display/field-logic-displ
 import {SearchCriteria} from "../../common/views/list/search-criteria.model";
 import {StringMap} from "../../common/types/string-map";
 import {ObjectMap} from "../../common/types/object-map";
+import {SystemConfigStore} from "../../store/system-config/system-config.store";
 
 @Component({template: ''})
 export class BaseRelateComponent extends BaseFieldComponent implements OnInit, OnDestroy {
@@ -51,6 +52,9 @@ export class BaseRelateComponent extends BaseFieldComponent implements OnInit, O
     dynamicOptionSubLabel: string = '';
     dynamicOptionLabelContext: StringMap = {};
 
+    protected filterInputBuffer = new Subject<any>();
+    protected filterInputBuffer$: Observable<any> = this.filterInputBuffer.asObservable();
+
     status: '' | 'searching' | 'not-found' | 'error' | 'found' | 'no-module' = '';
     initModule: WritableSignal<string> = signal('');
 
@@ -60,7 +64,8 @@ export class BaseRelateComponent extends BaseFieldComponent implements OnInit, O
         protected relateService: RelateService,
         protected moduleNameMapper: ModuleNameMapper,
         protected logic: FieldLogicManager,
-        protected logicDisplay: FieldLogicDisplayManager
+        protected logicDisplay: FieldLogicDisplayManager,
+        protected config: SystemConfigStore
     ) {
         super(typeFormatter, logic, logicDisplay);
     }
@@ -251,6 +256,19 @@ export class BaseRelateComponent extends BaseFieldComponent implements OnInit, O
         }
 
         return relate;
+    }
+
+    /**
+     * Get debounce time
+     * @return number
+     * @protected
+     */
+    protected getDebounceTime(): number {
+        let filterDebounceTime = this.config?.getUi('relate_field_debounce_time') ?? 750;
+        if (!isFinite(filterDebounceTime)) {
+            filterDebounceTime = 750;
+        }
+        return filterDebounceTime;
     }
 
 }

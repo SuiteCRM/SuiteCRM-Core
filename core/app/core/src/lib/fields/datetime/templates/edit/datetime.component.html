@@ -54,6 +54,7 @@
         <div class="d-flex justify-content-center mt-auto">
             <ngb-timepicker name="timepicker"
                             [ngModel]="dateTimeModel.time" (ngModelChange)="onTimeChange($event)"
+                            [meridian]="isMeridian()"
                             [seconds]="dateTimeModel.displaySeconds" [hourStep]="dateTimeModel.hourStep"
                             [minuteStep]="dateTimeModel.minuteStep"
                             [secondStep]="dateTimeModel.secondStep">

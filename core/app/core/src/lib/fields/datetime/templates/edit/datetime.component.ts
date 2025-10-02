@@ -24,7 +24,16 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild,} from '@angular/core';
+import {
+    Component,
+    ElementRef,
+    HostListener,
+    OnDestroy,
+    OnInit,
+    signal,
+    ViewChild,
+    WritableSignal,
+} from '@angular/core';
 import {NgbCalendar, NgbDateStruct, NgbPopover, NgbPopoverConfig, NgbTimeStruct} from '@ng-bootstrap/ng-bootstrap';
 import {isVoid, isEmptyString} from '../../../../common/utils/value-utils';
 import {ButtonInterface} from '../../../../common/components/button/button.model';
@@ -35,6 +44,7 @@ import {DateTimeModel} from "../../datetime.model";
 import {PlacementArray} from "@ng-bootstrap/ng-bootstrap/util/positioning";
 import {FieldLogicManager} from '../../../field-logic/field-logic.manager';
 import {FieldLogicDisplayManager} from '../../../field-logic-display/field-logic-display.manager';
+import {UserPreferenceStore} from "../../../../store/user-preference/user-preference.store";
 
 @Component({
     selector: 'scrm-datetime-edit',
@@ -56,6 +66,7 @@ export class DateTimeEditFieldComponent extends BaseDateTimeComponent implements
 
 
     dateTimeModel: DateTimeModel = new DateTimeModel();
+    isMeridian: WritableSignal<boolean> = signal(false);
 
     constructor(
         protected formatter: DatetimeFormatter,
@@ -63,7 +74,8 @@ export class DateTimeEditFieldComponent extends BaseDateTimeComponent implements
         protected calendar: NgbCalendar,
         protected config: NgbPopoverConfig,
         protected logic: FieldLogicManager,
-        protected logicDisplay: FieldLogicDisplayManager
+        protected logicDisplay: FieldLogicDisplayManager,
+        protected userPreferences: UserPreferenceStore,
     ) {
         super(formatter, typeFormatter, logic, logicDisplay);
         config.autoClose = "outside";
@@ -90,6 +102,10 @@ export class DateTimeEditFieldComponent extends BaseDateTimeComponent implements
         // enable seconds in timepicker
         if (this.formatter.getTimeFormat().includes('ss')) {
             this.dateTimeModel.displaySeconds = true;
+        }
+
+        if ((this.userPreferences.getUserPreference('time_format') ?? '').includes('a')) {
+            this.isMeridian.set(true);
         }
 
         this.subscribeValueChanges();

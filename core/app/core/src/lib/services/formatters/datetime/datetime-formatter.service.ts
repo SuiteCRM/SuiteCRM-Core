@@ -138,7 +138,7 @@ export class DatetimeFormatter implements Formatter {
             if (!dateTime.isValid) {
                 return dateString;
             }
-            return formatDate(dateTime.toJSDate(), toFormat, this.locale, this.userTimeZone());
+            return  DateTime.fromJSDate(dateTime.toJSDate(), {zone: this.preferences.getUserPreference('timezone')}).toFormat(toFormat, {locale: this.locale})
         }
         return '';
     }
@@ -157,7 +157,7 @@ export class DatetimeFormatter implements Formatter {
                 zone: this.preferences.getUserPreference('timezone')
             });
 
-            return formatDate(date.toJSDate(), this.getInternalFormat(), this.locale, 'GMT');
+            return  DateTime.fromJSDate(date.toJSDate(), {zone: 'GMT'}).toFormat(this.getInternalFormat(), {locale: this.locale})
         }
         return '';
     }

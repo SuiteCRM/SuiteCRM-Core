@@ -33,6 +33,7 @@ use App\Install\Command\BaseCommand;
 use App\Schedulers\LegacyHandler\SchedulerHandler;
 use App\SystemConfig\LegacyHandler\SystemConfigHandler;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -86,7 +87,7 @@ class RunSchedulersCommand extends BaseCommand
                 '',
                 'You can do this by adding/updating the "allowed_cron_users" array within the "cron" entry in your config.php file.',
             ]);
-            return 1;
+            return Command::FAILURE;
         }
 
         $this->lastRun->setLastRun($this->getName(), $runningUser);
@@ -98,7 +99,7 @@ class RunSchedulersCommand extends BaseCommand
 
         $this->runSchedulers($output);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
 

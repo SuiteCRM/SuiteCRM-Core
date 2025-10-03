@@ -31,6 +31,7 @@ use App\Data\LegacyHandler\PreparedStatementHandler;
 use App\Install\Command\BaseCommand;
 use Doctrine\DBAL\Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -81,7 +82,7 @@ class ShowSchedulersCommand extends BaseCommand {
         } catch (Exception $e) {
             $output->writeln($e->getMessage());
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $output->writeln([
@@ -105,6 +106,6 @@ class ShowSchedulersCommand extends BaseCommand {
 
         $output->writeln("");
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

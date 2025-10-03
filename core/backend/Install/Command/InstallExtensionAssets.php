@@ -64,7 +64,7 @@ class InstallExtensionAssets extends Command
     {
         $this->copy->copyAssets();
 
-        return 0;
+        return Command::SUCCESS;
     }
 
 }

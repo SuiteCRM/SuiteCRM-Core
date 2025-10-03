@@ -37,6 +37,7 @@ import {FieldHandlerRegistry} from "./field/handler/field-handler.registry";
 import {ActionDataSourceBuilderFunction} from "../../common/actions/action.model";
 import {ObjectMap} from "../../common/types/object-map";
 import {deepClone} from "../../common/utils/object-utils";
+import {FieldMapper} from "./field/field.mapper";
 
 @Injectable({
     providedIn: 'root'
@@ -46,7 +47,8 @@ export class RecordManager {
     constructor(
         protected fieldManager: FieldManager,
         protected language: LanguageStore,
-        protected fieldHandlerRegistry: FieldHandlerRegistry
+        protected fieldHandlerRegistry: FieldHandlerRegistry,
+        protected fieldMapper: FieldMapper
     ) {
     }
 
@@ -67,6 +69,35 @@ export class RecordManager {
             formGroup: new UntypedFormGroup({}),
         } as Record;
     }
+
+    /**
+     * Get base record
+     *
+     * @param {object} record to use
+     * @param {object} options to use
+     * @returns {object} baseRecord
+     */
+    public getBaseRecord(record: Record, options: ObjectMap = {updateAttributes: true}): Record {
+        if (!record) {
+            return null;
+        }
+
+        let attributes = record?.attributes ?? {};
+        if (options?.updateAttributes ?? false) {
+            attributes = this.fieldMapper.getAttributesMappedFromFields(record);
+        }
+
+        const baseRecord = {
+            id: record?.id ?? '',
+            type: record?.type ?? '',
+            module: record?.module ?? '',
+            attributes: attributes ?? {},
+            acls: record?.acls ?? []
+        } as Record;
+
+        return deepClone(baseRecord);
+    }
+
 
     /**
      * Init Fields
@@ -90,7 +121,7 @@ export class RecordManager {
                 return;
             }
 
-            if(record.fields[viewField.name]) {
+            if (record.fields[viewField.name]) {
                 return;
             }
 
@@ -153,7 +184,7 @@ export class RecordManager {
                     const groupField = vardefs[groupFieldKey] ?? {};
                     const parentName = groupField.groupFields[paramKey];
 
-                    if(parentName  && parentName.rname) {
+                    if (parentName && parentName.rname) {
                         rname = parentName.rname;
                     }
 

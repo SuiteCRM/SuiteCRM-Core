@@ -30,17 +30,13 @@ import {AsyncActionInput, AsyncActionService} from "../../../../services/process
 import {ActiveFieldsChecker} from "../../../../services/condition-operators/active-fields-checker.service";
 import {MessageService} from "../../../../services/message/message.service";
 import {ProcessService} from "../../../../services/process/process.service";
-import {BaseSaveRecordMapper} from "../../../../store/record/record-mappers/base-save.record-mapper";
 import {take} from "rxjs/operators";
 import {ViewMode} from "../../../../common/views/view.model";
-import {RecordMapperRegistry} from "../../../../common/record/record-mappers/record-mapper.registry";
 import {StringArrayMap} from "../../../../common/types/string-map";
 import {StringArrayMatrix} from "../../../../common/types/string-matrix";
 import {Record} from "../../../../common/record/record.model";
-import {deepClone} from "../../../../common/utils/object-utils";
-import {MapEntry} from "../../../../common/types/overridable-map";
-import {RecordMapper} from "../../../../common/record/record-mappers/record-mapper.model";
 import {Field} from "../../../../common/record/field.model";
+import {RecordManager} from "../../../../services/record/record.manager";
 
 
 @Injectable({
@@ -55,12 +51,10 @@ export class CalculateValueBackendAction extends FieldActionHandler {
         protected asyncActionService: AsyncActionService,
         protected processService: ProcessService,
         protected messages: MessageService,
-        protected recordMappers: RecordMapperRegistry,
-        protected baseMapper: BaseSaveRecordMapper,
+        protected recordManager: RecordManager,
         protected activeFieldsChecker: ActiveFieldsChecker
     ) {
         super();
-        recordMappers.register('default', baseMapper.getKey(), baseMapper);
     }
 
     run(data: FieldActionData): void {
@@ -90,7 +84,7 @@ export class CalculateValueBackendAction extends FieldActionHandler {
         if (isActive) {
             const processType = process;
 
-            const baseRecord = this.getBaseRecord(record);
+            const baseRecord = this.recordManager.getBaseRecord(record);
 
             const options = {
                 action: processType,
@@ -116,36 +110,6 @@ export class CalculateValueBackendAction extends FieldActionHandler {
                 this.messages.addDangerMessageByKey("ERR_FIELD_LOGIC_BACKEND_CALCULATION");
             });
         }
-    }
-
-    getBaseRecord(record: Record): Record {
-        if (!record) {
-            return null;
-        }
-
-        this.mapRecordFields(record);
-
-        const baseRecord = {
-            id: record.id,
-            type: record.type,
-            module: record.module,
-            attributes: record.attributes,
-            acls: record.acls
-        } as Record;
-
-        return deepClone(baseRecord);
-    }
-
-    /**
-     * Map staging fields
-     */
-    protected mapRecordFields(record: Record): void {
-        const mappers: MapEntry<RecordMapper> = this.recordMappers.get(record.module);
-
-        Object.keys(mappers).forEach(key => {
-            const mapper = mappers[key];
-            mapper.map(record);
-        });
     }
 
     /**

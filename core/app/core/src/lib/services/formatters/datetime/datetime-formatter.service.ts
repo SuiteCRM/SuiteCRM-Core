@@ -177,6 +177,7 @@ export class DatetimeFormatter implements Formatter {
         }
 
         if (fromFormat) {
+            fromFormat = fromFormat.replace('aaaaa\'m\'', 'a');
             return DateTime.fromFormat(datetimeString, fromFormat, options);
         }
 

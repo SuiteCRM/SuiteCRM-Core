@@ -111,6 +111,21 @@ class UserHandler extends LegacyHandler
     }
 
     /**
+     * Is this the current user a system wide admin
+     */
+    public function isCurrentUserAdmin(): bool
+    {
+        /** @var \User $currentUser */
+        $currentUser = $this->getCurrentUser();
+
+        if (empty($currentUser)) {
+            return false;
+        }
+
+        return $currentUser->isAdmin();
+    }
+
+    /**
      * Get current language
      * @return string
      */

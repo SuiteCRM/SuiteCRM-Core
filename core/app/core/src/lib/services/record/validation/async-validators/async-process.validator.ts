@@ -34,24 +34,34 @@ import {map, switchMap, take} from "rxjs/operators";
 import {Observable, of, Subject} from "rxjs";
 import {AsyncValidationDefinition} from "../../../../common/record/field.model";
 import {ConfirmationModalService} from "../../../modals/confirmation-modal.service";
+import {FieldMapper} from "../../field/field.mapper";
+import {DataTypeFormatter} from "../../../formatters/data-type.formatter.service";
 
 export const asyncValidator = (
     validator: AsyncValidationDefinition,
     viewField: ViewFieldDefinition,
     record: Record,
     processService: ProcessService,
-    confirmationModalService: ConfirmationModalService
+    confirmationModalService: ConfirmationModalService,
+    fieldMapper: FieldMapper,
+    formatter: DataTypeFormatter
 ): AsyncValidatorFn => (
     (control: AbstractControl): Promise<StandardValidationErrors | null> | Observable<StandardValidationErrors | null> => {
 
         const processKey = validator.key;
 
-        const value = control.value;
+        const fieldType = viewField?.type ?? viewField.fieldDefinition?.type ?? '';
+
+        const value = formatter.toInternalFormat(fieldType, control.value ?? '');
+
+        const attributes = fieldMapper.getAttributesMappedFromFields(record);
 
         const options = {
             value: value,
+            inputValue: control.value ?? '',
             definition: viewField,
-            attributes: record.attributes,
+            attributes: attributes,
+            originalAttributes: record?.attributes ?? {},
             params: validator?.params ?? {}
         };
 
@@ -156,7 +166,9 @@ export class AsyncProcessValidator implements AsyncProcessValidatorInterface {
 
     constructor(
         protected processService: ProcessService,
-        protected confirmationModalService: ConfirmationModalService
+        protected confirmationModalService: ConfirmationModalService,
+        protected fieldMapper: FieldMapper,
+        protected formatter: DataTypeFormatter
     ) {
     }
 
@@ -173,6 +185,6 @@ export class AsyncProcessValidator implements AsyncProcessValidatorInterface {
             return null;
         }
 
-        return asyncValidator(validator, viewField, record, this.processService, this.confirmationModalService);
+        return asyncValidator(validator, viewField, record, this.processService, this.confirmationModalService, this.fieldMapper, this.formatter);
     }
 }

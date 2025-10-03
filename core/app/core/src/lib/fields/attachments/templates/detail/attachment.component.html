@@ -27,7 +27,7 @@
 -->
 <div class="attachments attachments-detail-mode">
     <div [class.d-none]="!uploadedFiles()" class="uploaded-files">
-        <scrm-multiple-uploaded-files
+        <scrm-multiple-uploaded-files class="d-flex flex-column"
                 [files]="uploadedFiles()"
                 [breakpoint]="breakpoint"
                 [chunks]="chunks"

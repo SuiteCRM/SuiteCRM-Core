@@ -30,7 +30,8 @@
         <div class="file-group">
             <ng-container *ngIf="displayType === 'button'">
                 <ng-container *ngFor="let file of group">
-                    <a [href]="file?.contentUrl" download class="clickable pl-1 field-link d-inline-block file-field-uploaded-link" target="_blank">
+                    <a [href]="file?.contentUrl" download
+                       class="clickable pl-1 field-link d-inline-block file-field-uploaded-link" target="_blank">
                         <scrm-uploaded-file
                                 class="file"
                                 [file]="file"
@@ -47,7 +48,8 @@
             <ng-container *ngIf="displayType === 'link'">
 
                 <ng-container *ngFor="let file of group">
-                    <a [href]="file?.contentUrl" download class="clickable pl-1 field-link d-inline-block file-field-uploaded-link" target="_blank">
+                    <a [href]="file?.contentUrl" download
+                       class="clickable pl-1 field-link d-inline-block file-field-uploaded-link" target="_blank">
                         <scrm-uploaded-file
                                 class="file"
                                 [file]="file"
@@ -75,12 +77,14 @@
     </ng-container>
 </ng-container>
 <div class="d-flex" #popoverDefaultTarget *ngIf="files && files.length > breakpoint">
-    <ng-container *ngFor="let chunk of chunkedArray">
-        <div class="file-group">
-            <ng-container *ngFor="let file of chunk">
+    <div class="d-flex flex-column">
+        <ng-container *ngFor="let chunk of chunkedArray">
+            <div class="file-group">
+                <ng-container *ngFor="let file of chunk">
 
-                <ng-container *ngIf="displayType === 'button'">
-                        <a [href]="file?.contentUrl" download class="clickable pl-1 field-link d-inline-block file-field-uploaded-link" target="_blank">
+                    <ng-container *ngIf="displayType === 'button'">
+                        <a [href]="file?.contentUrl" download
+                           class="clickable pl-1 field-link d-inline-block file-field-uploaded-link" target="_blank">
                             <scrm-uploaded-file
                                     class="file"
                                     [file]="file"
@@ -91,9 +95,10 @@
                             >
                             </scrm-uploaded-file>
                         </a>
-                </ng-container>
-                <ng-container *ngIf="displayType === 'link'">
-                        <a [href]="file?.contentUrl" download class="clickable pl-1 field-link d-inline-block file-field-uploaded-link" target="_blank">
+                    </ng-container>
+                    <ng-container *ngIf="displayType === 'link'">
+                        <a [href]="file?.contentUrl" download
+                           class="clickable pl-1 field-link d-inline-block file-field-uploaded-link" target="_blank">
                             <scrm-uploaded-file
                                     class="file"
                                     [file]="file"
@@ -106,17 +111,18 @@
                             >
                             </scrm-uploaded-file>
                         </a>
+                    </ng-container>
+                    <ng-container *ngIf="displayType !== 'link' && displayType !== 'button'">
+                        <scrm-uploaded-file class="pl-1 file" [file]="file" [compact]="compact" [minWidth]="minWidth"
+                                            [allowClear]="allowClear"
+                                            [maxTextWidth]="maxTextWidth"
+                                            (clear)="clearFiles($event)">
+                        </scrm-uploaded-file>
+                    </ng-container>
                 </ng-container>
-                <ng-container *ngIf="displayType !== 'link' && displayType !== 'button'">
-                    <scrm-uploaded-file class="pl-1 file" [file]="file" [compact]="compact" [minWidth]="minWidth"
-                                        [allowClear]="allowClear"
-                                        [maxTextWidth]="maxTextWidth"
-                                        (clear)="clearFiles($event)">
-                    </scrm-uploaded-file>
-                </ng-container>
-            </ng-container>
-        </div>
-    </ng-container>
+            </div>
+        </ng-container>
+    </div>
 
     <ng-template #popContent>
         <ul class="mt-1 mb-1 popover-content scrollbar-thin">
@@ -130,8 +136,9 @@
             </div>
         </ul>
     </ng-template>
-    <a class="pl-1 clickable attachments-more-link align-content-end" [ngbPopover]="popContent"  [positionTarget]="popover()" [autoClose]="'outside'"
-    [placement]="'bottom-left'">
+    <a class="pl-1 clickable attachments-more-link align-content-end" [ngbPopover]="popContent"
+       [positionTarget]="popover()" [autoClose]="'outside'"
+       [placement]="'bottom-left'">
         <div [class.small-font]="breakpoint < 2" class="pr-1 align-content-center"> +{{ files.length - breakpoint }}
             <scrm-label [labelKey]="'LBL_MORE'"></scrm-label>
         </div>

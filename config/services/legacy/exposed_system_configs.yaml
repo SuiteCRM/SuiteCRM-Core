@@ -16,6 +16,9 @@ parameters:
     default_decimal_seperator: true
     default_number_grouping_seperator: true
     default_currency_significant_digits: true
+    default_locale_name_format: true
+    default_export_charset: true
+    export_delimiter: true
     datef: true
     timef: true
     snooze_alert_timer: true

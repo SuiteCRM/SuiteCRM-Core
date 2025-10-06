@@ -47,6 +47,7 @@ export class AttachmentEditFieldComponent extends BaseAttachmentComponent implem
 
     @ViewChild('uploadArea') uploadArea: FileUploadAreaComponent;
     @ViewChild('dropdownButtonComponent') dropdownButtonComponent: DropdownButtonComponent;
+    @ViewChild('wrapper') wrapper: HTMLElement;
 
     dropdownButton: DropdownButtonInterface;
     dropdownButtonEl: HTMLElement;

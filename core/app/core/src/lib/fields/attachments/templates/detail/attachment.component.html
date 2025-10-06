@@ -26,22 +26,21 @@
 */
 -->
 <div class="attachments attachments-detail-mode">
-    <div [class.d-none]="!uploadedFiles()" class="uploaded-files">
+    <div [class.d-none]="!uploadedFiles()" class="uploaded-files" #wrapper>
         <scrm-multiple-uploaded-files class="d-flex flex-column"
-                [files]="uploadedFiles()"
-                [breakpoint]="breakpoint"
-                [chunks]="chunks"
-                [popoverMaxTextLength]="popoverMaxTextLength"
-                [popoverMinWidth]="popoverMinWidth"
-                [compact]="compact"
-                [maxTextWidth]="maxTextWidth"
-                [minWidth]="minWidth"
-                [limitConfigKey]="limitConfigKey"
-                [ignoreRowLimit]="ignoreRowLimit"
-                [ignoreBreakpointLimit]="ignoreBreakpointLimit"
-                [allowClear]="false"
-                [displayType]="'button'"
-                (clear)="clearFile($event)"
+                                      [files]="uploadedFiles()"
+                                      [breakpoint]="breakpoint"
+                                      [ancestorSelector]="'scrm-attachments-detail'"
+                                      [wrapper]="wrapper"
+                                      [chunks]="chunks"
+                                      [popoverMaxTextLength]="popoverMaxTextLength"
+                                      [popoverMinWidth]="popoverMinWidth"
+                                      [compact]="compact"
+                                      [maxTextWidth]="maxTextWidth"
+                                      [minWidth]="minWidth"
+                                      [allowClear]="false"
+                                      [displayType]="'button'"
+                                      (clear)="clearFile($event)"
         ></scrm-multiple-uploaded-files>
     </div>
 </div>

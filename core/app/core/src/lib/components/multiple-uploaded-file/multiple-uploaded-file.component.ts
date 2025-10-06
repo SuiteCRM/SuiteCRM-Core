@@ -28,89 +28,124 @@ import {
     AfterViewInit,
     Component,
     ElementRef,
-    EventEmitter,
+    EventEmitter, HostListener,
     Input,
-    OnChanges,
-    OnInit,
+    OnChanges, OnDestroy,
     Output, signal, SimpleChanges,
     ViewChild, WritableSignal
 } from "@angular/core";
 import {UploadedFile} from "../uploaded-file/uploaded-file.model";
-import {
-    ScreenSize,
-    ScreenSizeObserverService
-} from "../../services/ui/screen-size-observer/screen-size-observer.service";
 import {SystemConfigStore} from "../../store/system-config/system-config.store";
-import {BehaviorSubject} from "rxjs";
+import {Subscription} from "rxjs";
+import {RecordViewStore} from "../../views/record/store/record-view/record-view.store";
 
 @Component({
     selector: 'scrm-multiple-uploaded-files',
     templateUrl: './multiple-uploaded-file.component.html',
     styles: [],
 })
-export class MultipleUploadedFileComponent implements OnChanges, AfterViewInit {
+export class MultipleUploadedFileComponent implements OnChanges, AfterViewInit, OnDestroy {
 
-    limitPerRow: number;
-    breakpointMax: number;
-    chunkedArray: any[][];
-    sizeConfig: any = {};
-    breakpointConfig: any = {};
-    limitSet: boolean = false;
+    maxPerRow: number;
+    maxPerRowWidth: number;
+    chunkedArray: WritableSignal<any[][]> = signal([]);
 
     popover: WritableSignal<HTMLElement> = signal({} as HTMLElement);
+    loading: WritableSignal<boolean> = signal(true);
+    protected subs: Subscription[] = [];
 
     @Input() files: UploadedFile[] = [];
     @Input() allowClear: boolean = true;
     @Input() compact: boolean = false;
-    @Input() chunks: number = 3;
-    @Input() breakpoint: number = 3;
+    @Input() chunks: number;
+    @Input() breakpoint: number;
     @Input() maxTextWidth: string;
-    @Input() minWidth: string;
+    @Input() wrapper: HTMLElement = {} as HTMLElement;
+    @Input() ancestorSelector: string;
+    @Input() minWidth: string = '185px';
     @Input() popoverMinWidth: string = '355px';
     @Input() popoverMaxTextLength: string = '250px';
-    @Input() popoverTarget: HTMLElement = {} as HTMLElement;
+    @Input() popoverTarget: HTMLElement;
     @Input() clickable: boolean = false;
-    @Input() ignoreRowLimit: boolean = false;
-    @Input() ignoreBreakpointLimit: boolean = false;
-    @Input() limitConfigKey: string = 'recordview_attachment_limit';
     @Input() displayType: string = 'default';
     @ViewChild('popoverDefaultTarget') popoverDefaultTarget: ElementRef;
     @Output('clear') clear: EventEmitter<UploadedFile> = new EventEmitter<UploadedFile>();
 
-    protected screen: ScreenSize = ScreenSize.Medium;
-    protected screenSizeState: BehaviorSubject<ScreenSize>;
-
     constructor(
-        protected screenSize: ScreenSizeObserverService,
-        protected systemConfigStore: SystemConfigStore
+        public recordViewStore: RecordViewStore,
+        protected systemConfigStore: SystemConfigStore,
     ) {
     }
 
-    ngAfterViewInit() {
-        setTimeout(() => {
-            this.popover.set(this.popoverTarget);
-        }, 300)
+    @HostListener('window:resize', ['$event'])
+    onResize(): void {
+        this.recalculateWithLoading();
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        this.initLimit();
-        this.chunkedArray = this.chunkArray(this.files.slice(0, this.breakpoint), this.chunks);
+    calculateDynamicMaxPerRow(): void {
 
-        if (this.breakpointMax < this.breakpointConfig[ScreenSize.Large]) {
+        const ancestorSelector = this.ancestorSelector ?? 'scrm-attachments-edit';
+        const ancestor = this.findAncestor(this.wrapper, ancestorSelector);
+
+        if (!ancestor) {
             return;
         }
 
-        this.setPopover();
+        const offset = ancestor.offsetWidth;
+        const parentWidth = offset - 115;
+
+        if (parentWidth > 0 || !this.maxPerRowWidth) {
+            this.maxPerRowWidth = parentWidth;
+        }
+
+        if (this.maxPerRowWidth < 0) {
+            return;
+        }
+
+        const itemMinWidth = parseInt(this.minWidth, 10);
+        const gap = 10;
+        const calculatedChunks = Math.floor((this.maxPerRowWidth - gap) / (itemMinWidth + gap));
+        const maxCalculated = Math.max(1, calculatedChunks);
+        const maxAllowed = this.chunks ?? 100;
+
+        this.maxPerRow = Math.min(maxCalculated, maxAllowed);
+
+        const visibleFiles = this.files.slice(0, this.breakpoint);
+        this.chunkedArray.set(this.chunkArray(visibleFiles, this.maxPerRow));
+    }
+
+    ngAfterViewInit() {
+        this.subs.push(this.recordViewStore.showSidebarWidgets$.subscribe((value) => {
+            this.recalculateWithLoading();
+        }));
+
+        setTimeout(() => {
+            this.loading.set(true);
+        }, 200);
+        setTimeout(() => {
+            this.calculateDynamicMaxPerRow();
+
+            this.setPopover();
+            this.loading.set(false);
+        }, 500)
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        this.calculateDynamicMaxPerRow();
+        setTimeout(() => {
+            this.setPopover();
+            this.loading.set(false);
+        }, 200)
     }
 
     setPopover(): void {
-        setTimeout(() => {
-            if (!this.popoverDefaultTarget) {
-                return;
-            }
+        let target = this.popoverDefaultTarget?.nativeElement;
 
-            this.popover.set(this.popoverDefaultTarget.nativeElement);
-        }, 300)
+        if (this?.popoverTarget ?? false) {
+            target = this.popoverTarget;
+        }
+
+        this.popover.set(target);
     }
 
     chunkArray<T>(arr: T[], chunkSize: number): T[][] {
@@ -122,63 +157,44 @@ export class MultipleUploadedFileComponent implements OnChanges, AfterViewInit {
         return out;
     }
 
-    protected initLimit() {
-
-        if (this.limitSet) {
-            return;
-        }
-
-        const limit = this.systemConfigStore.getConfigValue('recordview_attachment_limit');
-
-        this.sizeConfig = limit.row_default_limit;
-        this.breakpointConfig = limit.breakpoints_default_limit
-
-        if (this.compact) {
-            this.sizeConfig = limit.row_compact_limit;
-            this.breakpointConfig = limit.breakpoints_compact_limit
-        }
-
-        this.screenSizeState = this.screenSize.screenSize;
-
-        this.limitPerRow = this.sizeConfig[this.screenSizeState.value];
-        this.breakpointMax = this.breakpointConfig[this.screenSizeState.value];
-
-        this.screenSize.screenSize$.subscribe((size) => {
-            this.limitPerRow = this.sizeConfig[size] || this.limitPerRow;
-            this.breakpointMax = this.breakpointConfig[size] || this.breakpointMax;
-        })
-
-        this.chunks = this.getChunks();
-        this.breakpoint = this.getBreakpoint();
-
-        this.limitSet = true;
-    }
-
     clearFiles(event): void {
         this.clear.emit(event)
     }
 
-    getChunks(): number {
-        if (this.ignoreRowLimit){
-            return this.chunks;
+    protected findAncestor(el: HTMLElement, selector: string) {
+        let found = false;
+        let iterations = 0;
+
+        while (!found || iterations > 50) {
+            el = el?.parentElement ?? null;
+            if (!el) {
+                found = true;
+                break;
+            }
+
+            if (el.matches(selector)) {
+                found = true;
+            }
+            iterations++;
         }
 
-        if (this.chunks > this.limitPerRow){
-            return this.limitPerRow;
+        if (!found) {
+            el = null;
         }
 
-        return this.chunks;
+        return el;
     }
 
-    getBreakpoint(): number {
-        if (this.ignoreBreakpointLimit){
-            return this.breakpoint;
-        }
-
-        if (this.breakpoint > this.breakpointMax){
-            return this.breakpointMax;
-        }
-
-        return this.breakpoint;
+    protected recalculateWithLoading(): void {
+        this.loading.set(true);
+        setTimeout(() => {
+            this.calculateDynamicMaxPerRow();
+            this.loading.set(false);
+        }, 150);
     }
+
+    ngOnDestroy() {
+        this.subs.forEach(sub => sub.unsubscribe());
+    }
+
 }

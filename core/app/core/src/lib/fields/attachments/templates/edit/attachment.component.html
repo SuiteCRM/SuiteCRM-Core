@@ -34,7 +34,7 @@
 </ng-container>
 
 <div *ngIf="storageType && isValidStorageType" class="attachments attachments-edit-mode" (dragover)="displayUploadArea.set(true)"
-     (dragleave)="displayUploadArea.set(false)">
+     (dragleave)="displayUploadArea.set(false)" #wrapper>
 
     <scrm-dropdown-button [class.d-none]="displayUploadArea()" #dropdownButtonComponent [config]="dropdownButton"></scrm-dropdown-button>
 
@@ -43,15 +43,12 @@
                                       [files]="uploadedFiles()"
                                       [breakpoint]="breakpoint"
                                       [chunks]="chunks"
-                                      [popoverTarget]="dropdownButtonEl"
+                                      [wrapper]="wrapper"
                                       [popoverMaxTextLength]="popoverMaxTextLength"
                                       [popoverMinWidth]="popoverMinWidth"
                                       [compact]="compact"
                                       [maxTextWidth]="maxTextWidth"
                                       [minWidth]="minWidth"
-                                      [limitConfigKey]="limitConfigKey"
-                                      [ignoreRowLimit]="ignoreRowLimit"
-                                      [ignoreBreakpointLimit]="ignoreBreakpointLimit"
                                       (clear)="clearFile($event)"
         ></scrm-multiple-uploaded-files>
     </div>

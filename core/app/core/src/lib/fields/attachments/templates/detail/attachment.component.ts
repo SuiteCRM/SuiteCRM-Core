@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, ViewChild} from "@angular/core";
 import {BaseAttachmentComponent} from "../../../base/base-attachment.component";
 import {DataTypeFormatter} from "../../../../services/formatters/data-type.formatter.service";
 import {FieldLogicManager} from "../../../field-logic/field-logic.manager";
@@ -40,6 +40,8 @@ import {
     styles: [],
 })
 export class AttachmentDetailFieldComponent extends BaseAttachmentComponent implements OnInit {
+
+    @ViewChild('wrapper') wrapper: HTMLElement;
 
     constructor(
         protected typeFormatter: DataTypeFormatter,
@@ -60,8 +62,8 @@ export class AttachmentDetailFieldComponent extends BaseAttachmentComponent impl
     protected getValuesFromMetadata(): void {
         super.getValuesFromMetadata();
         const metadata = this.field.metadata ?? {};
-        this.breakpoint = metadata?.breakpoint ?? 1;
-        this.chunks = metadata?.maxPerRow ?? 1;
+        this.breakpoint = metadata?.breakpoint ?? null;
+        this.chunks = metadata?.maxPerRow ?? null;
         this.popoverMaxTextLength = metadata?.popoverMaxTextLength ?? '248px';
     }
 }

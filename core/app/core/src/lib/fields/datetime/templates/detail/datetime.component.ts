@@ -30,6 +30,7 @@ import {DataTypeFormatter} from '../../../../services/formatters/data-type.forma
 import {DatetimeFormatter} from '../../../../services/formatters/datetime/datetime-formatter.service';
 import {FieldLogicManager} from '../../../field-logic/field-logic.manager';
 import {FieldLogicDisplayManager} from '../../../field-logic-display/field-logic-display.manager';
+import {UserPreferenceStore} from "../../../../store/user-preference/user-preference.store";
 
 @Component({
     selector: 'scrm-datetime-detail',
@@ -43,7 +44,8 @@ export class DateTimeDetailFieldComponent extends BaseDateTimeComponent{
         protected formatter: DatetimeFormatter,
         protected typeFormatter: DataTypeFormatter,
         protected logic: FieldLogicManager,
-        protected logicDisplay: FieldLogicDisplayManager
+        protected logicDisplay: FieldLogicDisplayManager,
+        protected preferences: UserPreferenceStore
     ) {
         super(formatter, typeFormatter, logic, logicDisplay);
     }
@@ -52,9 +54,18 @@ export class DateTimeDetailFieldComponent extends BaseDateTimeComponent{
         return this.formatter.userTimeZone();
     }
 
-    toDateTime(dateString: string): Date {
-        return this.formatter.toDateTime(dateString, this.formatter.getInternalFormat(), {
-            zone: 'GMT'
-        }).toJSDate();
+    getLocale(): string {
+        return this.formatter.locale;
     }
+
+    toDateTime(dateString: string) {
+        const options = {
+            fromFormat: this.formatter.getInternalFormat(),
+            toFormat: this.formatter.getUserFormat()
+        }
+
+        return this.formatter.toUserFormat(dateString, options);
+    }
+
+
 }

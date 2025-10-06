@@ -27,6 +27,6 @@
 -->
 <ng-container *ngIf="(vm$ | async) as vm">
     <span *ngIf="field.value">
-    {{toDateTime(field.value) | date:getDateTimeFormat():getUserTimeZone()}}
+    {{toDateTime(field.value)}}
     </span>
 </ng-container>

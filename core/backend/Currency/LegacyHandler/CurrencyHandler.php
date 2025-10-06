@@ -98,6 +98,9 @@ class CurrencyHandler extends LegacyHandler
 
         if (!empty($list)) {
             foreach ($list as $item) {
+                if (!$item->id){
+                    continue;
+                }
                 $currencies[$item->id] = [
                     'id' => $item->id,
                     'name' => $item->name,

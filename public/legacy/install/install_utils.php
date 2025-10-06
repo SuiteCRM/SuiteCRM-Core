@@ -981,6 +981,8 @@ function handleSugarConfigSilent(): array
         }
     }
 
+    setRunningUser();
+
     ksort($sugar_config);
     $sugar_config_string = "<?php\n" .
         '// created: ' . date('Y-m-d H:i:s') . "\n" .
@@ -1121,7 +1123,7 @@ EOQ;
     RewriteBase {$basePath}
     RewriteRule ^cache/jsLanguage/(.._..).js$ index.php?entryPoint=jslang&modulename=app_strings&lang=$1 [L,QSA]
     RewriteRule ^cache/jsLanguage/(\w*)/(.._..).js$ index.php?entryPoint=jslang&modulename=$1&lang=$2 [L,QSA]
-    
+
     RewriteRule ^ep/(.*?)$ index.php?entryPoint=$1 [L,QSA]
 
     # --------- DEPRECATED --------
@@ -1412,6 +1414,38 @@ function create_table_if_not_exist(&$focus)
         $table_created = true;
     }
     return $table_created;
+}
+
+function setRunningUser(): void {
+    global $sugar_config;
+    $user = getRunningUser();
+    if ($user === '') {
+        return;
+    }
+
+    if (is_windows() || !isset($sugar_config)) {
+        return;
+    }
+
+    if (!array_key_exists('cron', $sugar_config)) {
+        $sugar_config['cron'] = [];
+    }
+
+    if (!array_key_exists('allowed_cron_users', $sugar_config['cron'])) {
+        $sugar_config['cron']['allowed_cron_users'] = [];
+    }
+
+    if ($user === 'root') {
+        $user = 'root_REMOVE_THIS_NOTICE_IF_YOU_REALLY_WANT_TO_ALLOW_ROOT';
+    }
+
+    if (in_array($user, $sugar_config['cron']['allowed_cron_users'])) {
+        return;
+    }
+
+    if (!in_array($user, $sugar_config['cron']['allowed_cron_users'])) {
+        $sugar_config['cron']['allowed_cron_users'][] = $user;
+    }
 }
 
 

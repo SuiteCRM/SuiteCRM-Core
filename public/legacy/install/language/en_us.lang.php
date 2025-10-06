@@ -659,5 +659,6 @@ $contact_user_link_guid',
     'LBL_VIEW_FULL_ERROR' => 'View Full Error',
     'LBL_CLOSE_DESCRIPTION' => 'Close Description',
     'LBL_CONFIG' => 'CONFIGURATION',
-    'LBL_VALIDATION_ERRORS' => 'There are validation errors, unable to perform action.'
+    'LBL_VALIDATION_ERRORS' => 'There are validation errors, unable to perform action.',
+    'LBL_CRON_UNRECOMMENDED_USER' => 'You are currently running as root, this is NOT recommended, would you like to continue (y,n)? '
 );

@@ -30,7 +30,6 @@ namespace App\Schedulers\Command;
 use App\Authentication\LegacyHandler\Authentication;
 use App\Engine\LegacyHandler\DefaultLegacyHandler;
 use App\Install\Command\BaseCommand;
-use App\Schedulers\LegacyHandler\CronHandler;
 use App\Schedulers\LegacyHandler\SchedulerHandler;
 use App\SystemConfig\LegacyHandler\SystemConfigHandler;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -45,7 +44,6 @@ class RunSchedulersCommand extends BaseCommand
         protected Authentication $authentication,
         protected DefaultLegacyHandler $legacyHandler,
         protected SystemConfigHandler $systemConfigHandler,
-        protected CronHandler $cronHandler,
         ?string          $name = null
     )
     {
@@ -63,6 +61,15 @@ class RunSchedulersCommand extends BaseCommand
     protected function executeCommand(InputInterface $input, OutputInterface $output, array $inputs): int
     {
         $this->authentication->initLegacySystemSession();
+
+        if ($this->checkRunningUser($input, $output) === 1) {
+            $output->writeln([
+                '',
+                'Exiting as requested',
+                '========================='
+            ]);
+            return 1;
+        }
 
         $allowed = $this->cronHandler->isAllowedCronUser();
 

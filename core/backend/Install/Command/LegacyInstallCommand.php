@@ -43,25 +43,19 @@ use Symfony\Component\Console\Question\Question;
 class LegacyInstallCommand extends BaseStepExecutorCommand
 {
     /**
-     * @var InstallHandler
-     */
-    protected $installHandler;
-
-    /**
      * @var array
      */
     protected $inputs = [];
-    /**
-     * @var InstallStepHandler
-     */
-    private $handler;
 
     /**
      * LegacyInstallCommand constructor.
      * @param InstallHandler $installHandler
      * @param InstallStepHandler $handler
      */
-    public function __construct(InstallHandler $installHandler, InstallStepHandler $handler)
+    public function __construct(
+        protected InstallHandler $installHandler,
+        protected InstallStepHandler $handler,
+    )
     {
         $this->inputConfig['db_username'] = [
             'question' => new Question('Please enter the db username: '),
@@ -184,8 +178,6 @@ class LegacyInstallCommand extends BaseStepExecutorCommand
         ];
 
         parent::__construct();
-        $this->installHandler = $installHandler;
-        $this->handler = $handler;
     }
 
     protected function configure(): void

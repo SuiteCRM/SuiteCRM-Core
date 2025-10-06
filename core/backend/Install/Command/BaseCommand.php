@@ -30,9 +30,11 @@ namespace App\Install\Command;
 use App\Engine\LegacyHandler\DefaultLegacyHandler;
 use App\Engine\Model\Feedback;
 use App\Languages\LegacyHandler\AppStringsHandler;
+use App\Schedulers\LegacyHandler\CronHandler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 abstract class BaseCommand extends Command
@@ -66,6 +68,11 @@ abstract class BaseCommand extends Command
      * @var AppStringsHandler
      */
     protected $appStringsHandler;
+
+    /**
+     * @var CronHandler
+     */
+    protected $cronHandler;
 
     /**
      * @var DefaultLegacyHandler
@@ -106,6 +113,14 @@ abstract class BaseCommand extends Command
     public function setAppStringsHandler(AppStringsHandler $appStringsHandler): void
     {
         $this->appStringsHandler = $appStringsHandler;
+    }
+    /**
+     * @required
+     * @param CronHandler $cronHandler
+     */
+    public function setCronHandler(CronHandler $cronHandler): void
+    {
+        $this->cronHandler = $cronHandler;
     }
 
     /**
@@ -310,6 +325,31 @@ abstract class BaseCommand extends Command
     {
         return implode('', ["<fg=$color>", $message, "</>"]);
     }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
+    public function checkRunningUser(InputInterface $input, OutputInterface $output): int
+    {
+        if ($this->cronHandler->getRunningUser() === 'root') {
+            $helper = $this->getHelper('question');
+            $question = $this->getAppStrings()['LBL_CRON_UNRECOMMENDED_USER'];
+            $output->writeln([
+                'Checking Running User',
+                '=========================',
+            ]);
+            $question = new ConfirmationQuestion($question, false);
+            $answer = $helper->ask($input, $output, $question);
+            if ($answer === false) {
+                return 1;
+            }
+        }
+
+        return 0;
+    }
+
 
     /**
      * @return array|null

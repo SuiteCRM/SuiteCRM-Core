@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-.campaign-sidebar-header {
+.campaign-sidebar-header, .scheduler-sidebar-header {
   color: $bright-purple;
   padding-right: .2rem;
   padding-top: .15rem;
@@ -63,7 +63,7 @@
     padding-bottom: 0!important;
   }
 
-  .campaign-status-check-row-value {
+  .campaign-status-check-row-value, .scheduler-status-row-value {
     font-size: 1.05em;
     overflow: hidden;
     display: inline-block;
@@ -78,7 +78,7 @@
 }
 
 .cron-code-label {
-  .widget-entry-dynamic-label {
+  .widget-entry-dynamic-label, .widget-entry-label {
     font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
     background: $off-white;
     color: $less-median-grey;
@@ -95,5 +95,9 @@
 .cron-label {
   .widget-entry-dynamic-label {
     white-space: break-spaces;
+  }
+
+  .widget-entry-label {
+    white-space: normal;
   }
 }

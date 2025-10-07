@@ -44,11 +44,112 @@ if (!defined('sugarEntry') || !sugarEntry) {
 $viewdefs['Schedulers'] = [
     'ListView' =>  [
         'sidebarWidgets' => [
+            'scheduler-info' => [
+                'type' => 'statistics',
+                'modes' => ['detail'],
+                'allowCollapse' => true,
+                'labelKey' => 'LBL_SCHEDULERS_INFO',
+                'options' => [
+                    'sidebarStatistic' => [
+                        'rows' => [
+                            [
+                                'display' => 'none',
+                                'cols' => [
+                                    [
+                                        'statistic' => 'scheduler-cron-last-run',
+                                    ]
+                                ]
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'labelKey' => 'LBL_CRON_LAST_USER_TO_RUN',
+                                        'hideIfLoading' => true,
+                                        'class' => 'scheduler-sidebar-header',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'class' => 'scheduler-status-row-value',
+                                        'dynamicLabel' => 'LBL_LAST_USER_RUN_VALUE',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'labelKey' => 'LBL_CRON_LAST_RUN',
+                                        'hideIfLoading' => true,
+                                        'class' => 'scheduler-sidebar-header',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'labelKey' => 'LBL_RUN_USER_INVALID',
+                                        'hideIfLoading' => true,
+                                        'class' => 'cron-label',
+                                        'activeOnFields' => [
+                                            'validUser' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'false',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_LAST_RUN_VALUE',
+                                        'class' => 'scheduler-status-row-value',
+                                        'activeOnFields' => [
+                                            'validUser' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'true',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'class' => 'cron-label pt-1',
+                                        'dynamicLabel' => 'LBL_LAST_RUN_VALUE',
+                                        'activeOnFields' => [
+                                            'validUser' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'noUser',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                        ]
+                    ]
+                ],
+            ],
             'scheduler-widget' => [
                 'type' => 'statistics',
                 'modes' => ['detail'],
                 'allowCollapse' => true,
-                'labelKey' => 'LBL_CRON_INFO',
+                'labelKey' => 'LBL_CRON_SETUP',
                 'options' => [
                     'sidebarStatistic' => [
                         'rows' => [

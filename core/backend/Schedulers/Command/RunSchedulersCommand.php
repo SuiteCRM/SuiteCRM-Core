@@ -60,9 +60,11 @@ class RunSchedulersCommand extends BaseCommand
 
     protected function executeCommand(InputInterface $input, OutputInterface $output, array $inputs): int
     {
+        $runningUser = $this->cronHandler->getRunningUser();
         $this->authentication->initLegacySystemSession();
 
         if ($this->checkRunningUser($input, $output) === 1) {
+            $this->lastRun->setLastRun($this->getName(), $runningUser);
             $output->writeln([
                 '',
                 'Exiting as requested',
@@ -74,6 +76,7 @@ class RunSchedulersCommand extends BaseCommand
         $allowed = $this->cronHandler->isAllowedCronUser();
 
         if (!$allowed) {
+            $this->lastRun->setLastRun($this->getName(), $runningUser);
             $output->writeln([
                 '',
                 'ERROR: The cron job is being run by an unauthorized user.',
@@ -85,6 +88,9 @@ class RunSchedulersCommand extends BaseCommand
             ]);
             return 1;
         }
+
+        $this->lastRun->setLastRun($this->getName(), $runningUser);
+
 
         $appStrings = $this->getAppStrings();
 

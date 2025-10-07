@@ -129,7 +129,7 @@ $mod_strings = array(
     'LNK_NEW_SCHEDULER' => 'Create Scheduler',
 // Cron
     'ERR_CRON_SYNTAX' => 'Invalid Cron syntax',
-    'LBL_CRON_SETUP' => 'Setup Cron',
+    'LBL_CRON_SETUP' => 'Setup Schedulers',
     'NTC_LIST_ORDER' => 'Set the order this schedule will appear in the Scheduler dropdown lists',
     'LBL_CRON_INSTRUCTIONS_WINDOWS' => 'To Setup Windows Scheduler',
     'LBL_CRON_INSTRUCTIONS_LINUX' => 'To Setup Crontab',
@@ -142,8 +142,9 @@ $mod_strings = array(
     'LBL_CRON_WINDOWS_DESC' => 'In order to run the SuiteCRM Schedulers',
     'LBL_CRON_WINDOWS_DESC2' => '1. Create a batch file to run using Windows Scheduled Tasks. The batch file should include the following commands:',
     'LBL_CRON_WINDOWS_DESC3' => 'Please update [path\to\php.exe] and [path\to\suite\instance] to reflect your environment.',
-    'LBL_CRON_INFO' => 'Cron Information',
-// Subpanels
+    'LBL_SCHEDULERS_INFO' => 'Scheduler Information',
+    'LBL_SCHEDULERS_NEVER_RUN' => 'Schedulers have never been run.',
+    // Subpanels
     'LBL_JOBS_SUBPANEL_TITLE' => 'Job Log',
     'LBL_EXECUTE_TIME' => 'Execute Time',
 

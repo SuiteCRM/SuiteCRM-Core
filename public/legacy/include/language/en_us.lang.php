@@ -4287,6 +4287,12 @@ $app_strings['LBL_CRON_WIN_DESC3_DYNAMIC'] = '{{ fields.desc3.value }}';
 $app_strings['LBL_CRON_WIN_DESC4_DYNAMIC'] = '{{ fields.desc4.value }}';
 $app_strings['LBL_CRON_WIN_DESC5_DYNAMIC'] = '{{ fields.desc5.value }}';
 
+$app_strings['LBL_CRON_LAST_RUN'] = 'Last successful run';
+$app_strings['LBL_CRON_LAST_USER_TO_RUN'] = 'Last user to run schedulers';
+$app_strings['LBL_LAST_RUN_VALUE'] = '{{ fields.lastRun.value }}';
+$app_strings['LBL_LAST_USER_RUN_VALUE'] = '{{ fields.user.value }}';
+$app_strings['LBL_RUN_USER_INVALID'] = 'This user is not part of `allowed_cron_users` config setting. Therefore the last run was not successful';
+$app_strings['LBL_SCHEDULERS_NEVER_RUN'] = 'Schedulers have never been run.';
 $app_strings['LBL_MARKETING_ITEMS_PER_RUN'] = 'Campaign Marketing Items Per Run';
 $app_strings['LBL_EMAILS_PER_RUN'] = 'Campaign Emails Per Run';
 $app_strings['LBL_TRACKERS_ENABLED'] = 'Trackers Enabled';

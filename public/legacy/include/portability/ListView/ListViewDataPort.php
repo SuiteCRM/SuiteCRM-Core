@@ -323,6 +323,14 @@ class ListViewDataPort extends ListViewData
      */
     public function getOrderBy($orderBy = '', $direction = ''): array
     {
+        if (empty($orderBy)){
+            $orderBy = 'date_entered';
+        }
+
+        if (empty($direction)) {
+            $direction = 'DESC';
+        }
+
         return ['orderBy' => $orderBy, 'sortOrder' => $direction];
     }
 

@@ -29,6 +29,7 @@ namespace App\Install\Command;
 
 use App\Engine\LegacyHandler\DefaultLegacyHandler;
 use App\Engine\Model\Feedback;
+use App\Install\Service\CommandLastRunTracker;
 use App\Languages\LegacyHandler\AppStringsHandler;
 use App\Schedulers\LegacyHandler\CronHandler;
 use Symfony\Component\Console\Command\Command;
@@ -58,6 +59,11 @@ abstract class BaseCommand extends Command
      * @var RequestStack
      */
     protected $requestStack;
+
+    /**
+     * @var CommandLastRunTracker
+     */
+    protected $lastRun;
 
     /**
      * @var string
@@ -121,6 +127,14 @@ abstract class BaseCommand extends Command
     public function setCronHandler(CronHandler $cronHandler): void
     {
         $this->cronHandler = $cronHandler;
+    }
+    /**
+     * @required
+     * @param CommandLastRunTracker $lastRun
+     */
+    public function setLastRunTracker(CommandLastRunTracker $lastRun): void
+    {
+        $this->lastRun = $lastRun;
     }
 
     /**

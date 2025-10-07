@@ -86,9 +86,12 @@ class CronHandler extends LegacyHandler
         return $this->systemConfigHandler->getSystemConfig('cron')?->getItems()['allowed_cron_users'] ?? [];
     }
 
-    public function isAllowedCronUser(): bool
+    public function isAllowedCronUser(string $user = null): bool
     {
-        $user = $this->getRunningUser();
+        if ($user === null){
+            $user = $this->getRunningUser();
+        }
+
         if ($user === null) {
             return false;
         }

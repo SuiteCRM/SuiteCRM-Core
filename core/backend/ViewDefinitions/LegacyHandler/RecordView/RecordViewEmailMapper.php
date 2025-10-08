@@ -118,6 +118,21 @@ class RecordViewEmailMapper implements ViewDefinitionMapperInterface
                             'required' => $isRequired,
                             'valueParent' => 'record',
                             'showLabel' => ['*'],
+                            'metadata' => [
+                                'attributeMapping' => [
+                                    'field' => 'email1',
+                                    'activeOnAttributes' => [
+                                        'email-fields' => [
+                                            'primary_address' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'values' => ['true']
+                                                ]
+                                            ]
+                                        ]
+                                    ],
+                                ]
+                            ],
                         ],
                         'primary_address' => [
                             'name' => 'primary_address',

@@ -29,11 +29,27 @@ import {Record} from '../../../common/record/record.model';
 import {deepClone} from '../../../common/utils/object-utils';
 import {Injectable} from '@angular/core';
 import {isNil} from "lodash-es";
+import {FieldDefinition, FieldDefinitionMap} from "../../../common/record/field.model";
+import {ActiveFieldsChecker} from "../../../services/condition-operators/active-fields-checker.service";
+import {ObjectArrayMatrix} from "../../../common/types/object-map";
+import {StringArrayMap} from "../../../common/types/string-map";
+
+interface AttributeOverrides {
+    [key: string]: any;
+}
+
+interface LineItemMappingOverrides {
+    recordOverrides: AttributeOverrides;
+    itemOverrides: AttributeOverrides;
+}
 
 @Injectable({
     providedIn: 'root'
 })
 export class BaseSaveRecordMapper implements RecordMapper {
+
+    constructor(protected activeFieldsChecker: ActiveFieldsChecker) {
+    }
 
     getKey(): string {
         return 'base';
@@ -45,6 +61,8 @@ export class BaseSaveRecordMapper implements RecordMapper {
             return;
         }
 
+        let attributeOverrides = {} as AttributeOverrides;
+
         Object.keys(record.fields).forEach(fieldName => {
             const field = record.fields[fieldName];
 
@@ -54,6 +72,9 @@ export class BaseSaveRecordMapper implements RecordMapper {
             const idName = field.definition.id_name || '';
 
             if (type === 'relate' && source === 'non-db' && idName === fieldName) {
+                const overrides = this.conditionalAttributeMapping(field.value, field.definition, record);
+                attributeOverrides = {...attributeOverrides, ...overrides};
+
                 record.attributes[fieldName] = field.value;
                 return;
             }
@@ -72,35 +93,62 @@ export class BaseSaveRecordMapper implements RecordMapper {
 
             if (field.valueObject) {
                 record.attributes[fieldName] = field.valueObject;
+
+                const overrides = this.conditionalAttributeMapping(field.valueObject, field.definition, record);
+                attributeOverrides = {...attributeOverrides, ...overrides};
+
                 return;
             }
 
             if (field.items) {
+                const itemDefinition = field.definition.lineItems ?? null;
+                const attributeFieldsDefinition = itemDefinition?.definition?.attributeFields || {} as FieldDefinitionMap;
+
                 record.attributes[fieldName] = [];
                 field.items.forEach(item => {
-                    if(!item?.id && item?.attributes?.deleted){
+                    if (!item?.id && item?.attributes?.deleted) {
                         return;
                     }
+                    const {
+                        recordOverrides,
+                        itemOverrides
+                    } = this.lineItemConditionalAttributeMapping(attributeFieldsDefinition, record, item);
+
+                    attributeOverrides = {...attributeOverrides, ...recordOverrides};
+
+                    Object.keys(itemOverrides).forEach(attrKey => {
+                        item.attributes[attrKey] = itemOverrides[attrKey];
+                    });
+
                     record.attributes[fieldName].push({
                         id: item.id,
                         module: item.module,
                         attributes: deepClone(item.attributes)
                     } as Record)
                 });
+
                 return;
             }
 
             if (field.valueObjectArray) {
                 record.attributes[fieldName] = field.valueObjectArray;
+
+                const overrides = this.conditionalAttributeMapping(field.valueObjectArray, field.definition, record);
+                attributeOverrides = {...attributeOverrides, ...overrides};
+
                 return;
             }
 
             if (field.valueList) {
                 record.attributes[fieldName] = field.valueList;
+
+                const overrides = this.conditionalAttributeMapping(field.valueList, field.definition, record);
+                attributeOverrides = {...attributeOverrides, ...overrides};
+
                 return;
             }
 
-            if (field.vardefBased && (isNil(field.value) || field.value === '') ) {
+            if (field.vardefBased && (isNil(field.value) || field.value === '')) {
 
                 if (!isNil(record.attributes[fieldName])) {
                     delete record.attributes[fieldName];
@@ -108,7 +156,115 @@ export class BaseSaveRecordMapper implements RecordMapper {
                 return;
             }
 
+            const overrides = this.conditionalAttributeMapping(field.value, field.definition, record);
+            attributeOverrides = {...attributeOverrides, ...overrides};
+
             record.attributes[fieldName] = field.value;
         });
+
+        Object.keys(attributeOverrides).forEach(attrKey => {
+            record.attributes[attrKey] = attributeOverrides[attrKey];
+        });
     }
+
+    protected conditionalAttributeMapping(value: any, fieldDefinition: FieldDefinition, record: Record): AttributeOverrides {
+
+        const mappingField = fieldDefinition?.metadata?.attributeMapping?.field ?? ''
+        const activeOnAttributes = fieldDefinition?.metadata?.attributeMapping?.activeOnAttributes ?? null
+        const activeOnFields = fieldDefinition?.metadata?.attributeMapping?.activeOnFields ?? null;
+
+        const overrides = {} as AttributeOverrides;
+
+        if (!mappingField) {
+            return overrides;
+        }
+
+        if (!activeOnAttributes && !activeOnFields) {
+            overrides[mappingField] = value;
+            return overrides;
+        }
+
+        const isActive = this.isConditionActive(activeOnFields, activeOnAttributes, record);
+
+        if (isActive) {
+            overrides[mappingField] = value;
+        }
+
+        return overrides;
+    }
+
+    protected lineItemConditionalAttributeMapping(attributeFieldsDefinition: FieldDefinitionMap, record: Record, item: Record): LineItemMappingOverrides {
+
+        const overrides = {recordOverrides: {}, itemOverrides: {}};
+        if (!attributeFieldsDefinition || !Object.keys(attributeFieldsDefinition).length) {
+            return overrides;
+        }
+
+        Object.keys(attributeFieldsDefinition).forEach(attrFieldName => {
+            const attrFieldDef = attributeFieldsDefinition[attrFieldName];
+
+            const mappingField = attrFieldDef?.metadata?.attributeMapping?.field ?? ''
+            const mappingAttribute = attrFieldDef?.metadata?.attributeMapping?.attribute ?? ''
+            const activeOnAttributes = attrFieldDef?.metadata?.attributeMapping?.activeOnAttributes ?? null
+            const activeOnFields = attrFieldDef?.metadata?.attributeMapping?.activeOnFields ?? null;
+
+            if (!mappingField && !mappingAttribute) {
+                return;
+            }
+
+            if (!activeOnAttributes && !activeOnFields) {
+                if (mappingAttribute) {
+                    overrides.itemOverrides[mappingAttribute] = item.attributes[attrFieldName] ?? null;
+                    return;
+                }
+
+                if (mappingField) {
+                    overrides.recordOverrides[mappingField] = item.attributes[attrFieldName] ?? null;
+                }
+                return;
+            }
+            const isActive = this.isLineItemConditionActive(activeOnFields, activeOnAttributes, record, item);
+
+            if (isActive) {
+                if (mappingAttribute) {
+                    overrides.itemOverrides[mappingAttribute] = item.attributes[attrFieldName] ?? null;
+                    return;
+                }
+
+                if (mappingField) {
+                    overrides.recordOverrides[mappingField] = item.attributes[attrFieldName] ?? null;
+                }
+            }
+        });
+
+        return overrides;
+    }
+
+    protected isConditionActive(activeOnFields: StringArrayMap, activeOnAttributes: ObjectArrayMatrix, record: Record): boolean {
+        const relatedFields = Object.keys(activeOnFields ?? {}) ?? [];
+        const relatedAttributesFields = Object.keys(activeOnAttributes ?? {}) ?? [];
+
+        if (relatedFields.length) {
+            return this.activeFieldsChecker.isActive(relatedFields, record, activeOnFields, [], {});
+        }
+
+        if (relatedAttributesFields.length) {
+            return this.activeFieldsChecker.isActive([], record, {}, relatedAttributesFields, activeOnAttributes);
+        }
+    }
+
+    protected isLineItemConditionActive(activeOnFields: StringArrayMap, activeOnAttributes: ObjectArrayMatrix, record: Record, item: Record): boolean {
+        const relatedFields = Object.keys(activeOnFields ?? {}) ?? [];
+        const relatedAttributesFields = Object.keys(activeOnAttributes ?? {}) ?? [];
+
+        if (relatedFields.length) {
+            return this.activeFieldsChecker.isActive(relatedFields, record, activeOnFields, [], {});
+        }
+
+        if (relatedAttributesFields.length) {
+            const attributeFields = Object.keys(item.fields ?? {}) ?? [];
+            return this.activeFieldsChecker.isActive([], item, {}, attributeFields, activeOnAttributes);
+        }
+    }
+
 }

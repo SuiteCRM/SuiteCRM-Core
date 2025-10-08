@@ -27,3 +27,11 @@
 export interface ObjectMap {
     [key: string]: any;
 }
+
+export interface ObjectArrayMap {
+    [key: string]: ObjectMap[];
+}
+
+export interface ObjectArrayMatrix {
+    [key: string]: ObjectArrayMap;
+}

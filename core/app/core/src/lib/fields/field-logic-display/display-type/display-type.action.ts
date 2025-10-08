@@ -28,9 +28,9 @@ import {Injectable} from '@angular/core';
 import {FieldLogicDisplayActionData, FieldLogicDisplayActionHandler} from '../field-logic-display.action';
 import {Action} from '../../../common/actions/action.model';
 import {StringArrayMap} from '../../../common/types/string-map';
-import {StringArrayMatrix} from '../../../common/types/string-matrix';
 import {ViewMode} from '../../../common/views/view.model';
 import {ActiveFieldsChecker} from "../../../services/condition-operators/active-fields-checker.service";
+import {ObjectArrayMatrix} from "../../../common/types/object-map";
 
 
 @Injectable({
@@ -56,7 +56,7 @@ export class DisplayTypeAction extends FieldLogicDisplayActionHandler {
         const activeOnFields: StringArrayMap = (action.params && action.params.activeOnFields) || {} as StringArrayMap;
         const relatedFields: string[] = Object.keys(activeOnFields);
 
-        const activeOnAttributes: StringArrayMatrix = (action.params && action.params.activeOnAttributes) || {} as StringArrayMatrix;
+        const activeOnAttributes: ObjectArrayMatrix = (action.params && action.params.activeOnAttributes) || {} as ObjectArrayMatrix;
         const relatedAttributesFields: string[] = Object.keys(activeOnAttributes);
 
         if (!relatedFields.length && !relatedAttributesFields.length) {

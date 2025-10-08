@@ -31,7 +31,7 @@ import {ActiveFieldsChecker} from "../../../../../../services/condition-operator
 import {LogicDefinitions} from "../../../../../../common/metadata/metadata.model";
 import {Action} from "../../../../../../common/actions/action.model";
 import {StringArrayMap} from "../../../../../../common/types/string-map";
-import {StringArrayMatrix} from "../../../../../../common/types/string-matrix";
+import {ObjectArrayMatrix} from "../../../../../../common/types/object-map";
 
 
 @Injectable({
@@ -85,7 +85,7 @@ export class RecordSectionTabActionDisplayTypeLogic extends ActionLogicHandler<R
         const activeOnFields: StringArrayMap = (logic.params && logic.params.activeOnFields) || {} as StringArrayMap;
         const relatedFields: string[] = Object.keys(activeOnFields);
 
-        const activeOnAttributes: StringArrayMatrix = (logic.params && logic.params.activeOnAttributes) || {} as StringArrayMatrix;
+        const activeOnAttributes: ObjectArrayMatrix = (logic.params && logic.params.activeOnAttributes) || {} as ObjectArrayMatrix;
         const relatedAttributesFields: string[] = Object.keys(activeOnAttributes);
 
         if (!relatedFields.length && !relatedAttributesFields.length) {

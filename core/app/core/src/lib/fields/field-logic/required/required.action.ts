@@ -27,12 +27,12 @@
 import {Injectable} from '@angular/core';
 import {Action} from '../../../common/actions/action.model';
 import {StringArrayMap} from '../../../common/types/string-map';
-import {StringArrayMatrix} from '../../../common/types/string-matrix';
 import {ViewMode} from '../../../common/views/view.model';
 import {FieldLogicActionData, FieldLogicActionHandler} from '../field-logic.action';
 import {RequiredValidator} from '../../../services/record/validation/validators/required.validator';
 import {ActiveFieldsChecker} from "../../../services/condition-operators/active-fields-checker.service";
 import {ViewFieldDefinition} from "../../../common/metadata/metadata.model";
+import {ObjectArrayMatrix} from "../../../common/types/object-map";
 
 @Injectable({
     providedIn: 'root'
@@ -60,7 +60,7 @@ export class RequiredAction extends FieldLogicActionHandler {
         const activeOnFields: StringArrayMap = (action.params && action.params.activeOnFields) || {} as StringArrayMap;
         const relatedFields: string[] = Object.keys(activeOnFields);
 
-        const activeOnAttributes: StringArrayMatrix = (action.params && action.params.activeOnAttributes) || {} as StringArrayMatrix;
+        const activeOnAttributes: ObjectArrayMatrix = (action.params && action.params.activeOnAttributes) || {} as ObjectArrayMatrix;
         const relatedAttributesFields: string[] = Object.keys(activeOnAttributes);
 
         if (!relatedFields.length && !relatedAttributesFields.length) {

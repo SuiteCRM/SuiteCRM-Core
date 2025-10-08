@@ -33,10 +33,10 @@ import {ProcessService} from "../../../../services/process/process.service";
 import {take} from "rxjs/operators";
 import {ViewMode} from "../../../../common/views/view.model";
 import {StringArrayMap} from "../../../../common/types/string-map";
-import {StringArrayMatrix} from "../../../../common/types/string-matrix";
 import {Record} from "../../../../common/record/record.model";
 import {Field} from "../../../../common/record/field.model";
 import {RecordManager} from "../../../../services/record/record.manager";
+import {ObjectArrayMatrix} from "../../../../common/types/object-map";
 
 
 @Injectable({
@@ -69,7 +69,7 @@ export class CalculateValueBackendAction extends FieldActionHandler {
         const activeOnFields: StringArrayMap = (action.params && action.params.activeOnFields) || {} as StringArrayMap;
         const relatedFields: string[] = Object.keys(activeOnFields);
 
-        const activeOnAttributes: StringArrayMatrix = (action.params && action.params.activeOnAttributes) || {} as StringArrayMatrix;
+        const activeOnAttributes: ObjectArrayMatrix = (action.params && action.params.activeOnAttributes) || {} as ObjectArrayMatrix;
         const relatedAttributesFields: string[] = Object.keys(activeOnAttributes);
 
 

@@ -30,10 +30,10 @@ import {Action} from '../../../common/actions/action.model';
 import {Record} from '../../../common/record/record.model';
 import {Field} from '../../../common/record/field.model';
 import {StringArrayMap} from '../../../common/types/string-map';
-import {StringArrayMatrix} from '../../../common/types/string-matrix';
 import {ViewMode} from '../../../common/views/view.model';
 import {ActiveFieldsChecker} from "../../../services/condition-operators/active-fields-checker.service";
 import {CurrencyFormatter} from "../../../services/formatters/currency/currency-formatter.service";
+import {ObjectArrayMatrix} from "../../../common/types/object-map";
 
 @Injectable({
     providedIn: 'root'
@@ -43,7 +43,7 @@ export class UpdateValueAction extends FieldLogicActionHandler {
     key = 'updateValue';
     modes = ['edit', 'detail', 'list', 'create', 'massupdate', 'filter'] as ViewMode[];
 
-    constructor(protected activeFieldsChecker: ActiveFieldsChecker,  protected currencyFormatter: CurrencyFormatter) {
+    constructor(protected activeFieldsChecker: ActiveFieldsChecker, protected currencyFormatter: CurrencyFormatter) {
         super();
     }
 
@@ -58,7 +58,7 @@ export class UpdateValueAction extends FieldLogicActionHandler {
         const activeOnFields: StringArrayMap = (action.params && action.params.activeOnFields) || {} as StringArrayMap;
         const relatedFields: string[] = Object.keys(activeOnFields);
 
-        const activeOnAttributes: StringArrayMatrix = (action.params && action.params.activeOnAttributes) || {} as StringArrayMatrix;
+        const activeOnAttributes: ObjectArrayMatrix = (action.params && action.params.activeOnAttributes) || {} as ObjectArrayMatrix;
         const relatedAttributesFields: string[] = Object.keys(activeOnAttributes);
 
         if (!relatedFields.length && !relatedAttributesFields.length) {

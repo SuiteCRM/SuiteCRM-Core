@@ -29,7 +29,6 @@ import {Action} from '../../../common/actions/action.model';
 import {Field} from '../../../common/record/field.model';
 import {Record} from '../../../common/record/record.model';
 import {StringArrayMap} from '../../../common/types/string-map';
-import {StringArrayMatrix} from '../../../common/types/string-matrix';
 import {ViewMode} from '../../../common/views/view.model';
 import {FieldLogicActionData, FieldLogicActionHandler} from '../field-logic.action';
 import {AsyncActionInput, AsyncActionService} from '../../../services/process/processes/async-action/async-action';
@@ -38,6 +37,7 @@ import {MessageService} from '../../../services/message/message.service';
 import {take} from 'rxjs/operators';
 import {ActiveFieldsChecker} from "../../../services/condition-operators/active-fields-checker.service";
 import {RecordManager} from "../../../services/record/record.manager";
+import {ObjectArrayMatrix} from "../../../common/types/object-map";
 
 @Injectable({
     providedIn: 'root'
@@ -68,7 +68,7 @@ export class UpdateValueBackendAction extends FieldLogicActionHandler {
         const activeOnFields: StringArrayMap = (action.params && action.params.activeOnFields) || {} as StringArrayMap;
         const relatedFields: string[] = Object.keys(activeOnFields);
 
-        const activeOnAttributes: StringArrayMatrix = (action.params && action.params.activeOnAttributes) || {} as StringArrayMatrix;
+        const activeOnAttributes: ObjectArrayMatrix = (action.params && action.params.activeOnAttributes) || {} as ObjectArrayMatrix;
         const relatedAttributesFields: string[] = Object.keys(activeOnAttributes);
 
         if (!relatedFields.length && !relatedAttributesFields.length) {

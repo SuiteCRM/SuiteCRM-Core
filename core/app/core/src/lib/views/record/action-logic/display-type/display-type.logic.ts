@@ -27,12 +27,12 @@
 import {LogicDefinitions} from '../../../../common/metadata/metadata.model';
 import {Action, ActionData} from '../../../../common/actions/action.model';
 import {StringArrayMap} from '../../../../common/types/string-map';
-import {StringArrayMatrix} from '../../../../common/types/string-matrix';
 import {ViewMode} from '../../../../common/views/view.model';
 import {Injectable} from '@angular/core';
 import {RecordActionData} from '../../actions/record.action';
 import {ActionLogicHandler} from '../../../../services/actions/action-logic-handler';
 import {ActiveFieldsChecker} from "../../../../services/condition-operators/active-fields-checker.service";
+import {ObjectArrayMatrix} from "../../../../common/types/object-map";
 
 @Injectable({
     providedIn: 'root'
@@ -85,7 +85,7 @@ export class RecordActionDisplayTypeLogic extends ActionLogicHandler<RecordActio
         const activeOnFields: StringArrayMap = (logic.params && logic.params.activeOnFields) || {} as StringArrayMap;
         const relatedFields: string[] = Object.keys(activeOnFields);
 
-        const activeOnAttributes: StringArrayMatrix = (logic.params && logic.params.activeOnAttributes) || {} as StringArrayMatrix;
+        const activeOnAttributes: ObjectArrayMatrix = (logic.params && logic.params.activeOnAttributes) || {} as ObjectArrayMatrix;
         const relatedAttributesFields: string[] = Object.keys(activeOnAttributes);
 
         if (!relatedFields.length && !relatedAttributesFields.length) {

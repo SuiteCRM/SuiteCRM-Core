@@ -153,6 +153,9 @@ $dictionary['ProspectList'] = array(
                 'name' => 'prospects',
                 'vname' => 'LBL_PROSPECTS',
                 'type' => 'link',
+                'metadata' => [
+                    'member' => true
+                ],
                 'relationship' => 'prospect_list_prospects',
                 'source' => 'non-db',
             ),
@@ -161,6 +164,9 @@ $dictionary['ProspectList'] = array(
                 'name' => 'contacts',
                 'vname' => 'LBL_CONTACTS',
                 'type' => 'link',
+                'metadata' => [
+                    'member' => true
+                ],
                 'relationship' => 'prospect_list_contacts',
                 'source' => 'non-db',
             ),
@@ -169,6 +175,9 @@ $dictionary['ProspectList'] = array(
                 'name' => 'leads',
                 'vname' => 'LBL_LEADS',
                 'type' => 'link',
+                'metadata' => [
+                    'member' => true
+                ],
                 'relationship' => 'prospect_list_leads',
                 'source' => 'non-db',
             ),
@@ -177,6 +186,9 @@ $dictionary['ProspectList'] = array(
                 'name' => 'accounts',
                 'vname' => 'LBL_ACCOUNTS',
                 'type' => 'link',
+                'metadata' => [
+                    'member' => true
+                ],
                 'relationship' => 'prospect_list_accounts',
                 'source' => 'non-db',
             ),
@@ -192,6 +204,9 @@ $dictionary['ProspectList'] = array(
                 'name' => 'users',
                 'vname' => 'LBL_USERS',
                 'type' => 'link',
+                'metadata' => [
+                    'member' => true
+                ],
                 'relationship' => 'prospect_list_users',
                 'source' => 'non-db',
             ),
@@ -229,15 +244,24 @@ $dictionary['ProspectList'] = array(
             'type' => 'index',
             'fields' => array('name')
         ),
+        array(
+            'name' => 'idx_list_type',
+            'type' => 'index',
+            'fields' => array('list_type')
+        ),
     ),
     'relationships' => array(
         'prospectlists_assigned_user' =>
-            array('lhs_module' => 'Users', 'lhs_table' => 'users', 'lhs_key' => 'id',
+            array(
+                'lhs_module' => 'Users', 'lhs_table' => 'users', 'lhs_key' => 'id',
                 'rhs_module' => 'ProspectLists', 'rhs_table' => 'prospect_lists', 'rhs_key' => 'assigned_user_id',
-                'relationship_type' => 'one-to-many')
+                'relationship_type' => 'one-to-many'
+            )
     )
 );
 
-VardefManager::createVardef('ProspectLists', 'ProspectList', array(
+VardefManager::createVardef(
+    'ProspectLists', 'ProspectList', array(
     'assignable', 'security_groups',
-));
+)
+);

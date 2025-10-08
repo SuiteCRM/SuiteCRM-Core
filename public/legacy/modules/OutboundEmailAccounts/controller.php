@@ -51,6 +51,32 @@ class OutboundEmailAccountsController extends SugarController
             $this->bean->type = $type;
         }
 
+        if (empty($this->bean) && $type === 'system' && !is_admin($GLOBALS['current_user'])) {
+            $this->hasAccess = false;
+            $this->view = 'noaccess';
+            return;
+        }
+
+        $oe = new OutboundEmail();
+        $oe = $oe->getSystemEmail();
+        if (empty($this->bean->id) && $type === 'system' && $oe !== null) {
+            $this->hasAccess = false;
+            $this->view = 'errors';
+            $this->errors = [
+                translate('LBL_ERROR_OUTBOUND_EMAIL_SYSTEM_EXISTS', 'OutboundEmailAccounts'),
+            ];
+            return;
+        }
+
+        if ($type === 'system' && $oe !== null && $oe->id !== $this->bean->id) {
+            $this->hasAccess = false;
+            $this->view = 'errors';
+            $this->errors = [
+                translate('LBL_ERROR_OUTBOUND_EMAIL_SYSTEM_EXISTS', 'OutboundEmailAccounts'),
+            ];
+            return;
+        }
+
         if (empty($_REQUEST['record']) && $type === 'user') {
             $this->hasAccess = true;
             return;
@@ -62,7 +88,7 @@ class OutboundEmailAccountsController extends SugarController
     }
 
     public function action_save() {
-        global $current_user;
+        global $current_user, $mod_strings;
         $isNewRecord = (empty($this->bean->id) || $this->bean->new_with_id);
 
         $this->bean->mail_sendtype = 'SMTP';
@@ -84,6 +110,14 @@ class OutboundEmailAccountsController extends SugarController
              }
         }
 
+        $oe = new OutboundEmail();
+        $oe = $oe->getSystemEmail();
+        $type = $this->bean->type;
+
+        if ($type === 'user'){
+            $type = 'personal';
+        }
+
         if ($isNewRecord && empty($this->bean->user_id)) {
             $this->bean->user_id = $current_user->id;
             $this->bean->assigned_user_id = $current_user->id;
@@ -93,6 +127,59 @@ class OutboundEmailAccountsController extends SugarController
             $this->bean->assigned_user_id = $this->bean->user_id;
         }
 
+        $authType = $_REQUEST['auth_type'] ?? '';
+
+        $oauth = null;
+        if ($authType === 'oauth' || ($_REQUEST['auth_type'] ?? '') === 'oauth') {
+            $oauth = BeanFactory::getBean('ExternalOAuthConnection', $_REQUEST['external_oauth_connection_id']);
+        }
+
+        if ($type === 'system' && $oe !== null && $oe->id !== $this->bean->id) {
+            $this->hasAccess = false;
+            $this->view = 'errors';
+            $this->errors = [
+                translate('LBL_ERROR_OUTBOUND_EMAIL_SYSTEM_EXISTS', 'OutboundEmailAccounts'),
+            ];
+            return;
+        }
+
+        if ($type === 'system' && $oauth !== null && $oauth->type !== 'group') {
+            SugarApplication::appendErrorMessage($mod_strings['LBL_ERROR_OUTBOUND_EMAIL_SYSTEM_IS_NOT_GROUP']);
+            SugarApplication::redirect('index.php?module=OutboundEmailAccounts&action=DetailView&record=' . $this->bean->id);
+            return;
+        }
+
+        if ($type !== 'system' && $oauth !== null && $oauth->type !== $type) {
+            SugarApplication::appendErrorMessage($mod_strings['LBL_ERROR_OUTBOUND_EMAIL_CONNECTION_TYPE_MISMATCH']);
+            SugarApplication::redirect('index.php?module=OutboundEmailAccounts&action=DetailView&record=' . $this->bean->id);
+            return;
+        }
+
         parent::action_save();
+    }
+
+    public function action_SetDefault()
+    {
+        global $current_user;
+        $outbound_id = empty($_REQUEST['record']) ? "" : $_REQUEST['record'];
+        $oe = BeanFactory::newBean('OutboundEmailAccounts');
+
+        $ownerId = $this->bean->created_by ?? '';
+        if (empty($ownerId)) {
+            $ownerId = $current_user->id;
+        }
+
+        $owner = BeanFactory::getBean('Users', $ownerId);
+
+        if($ownerId === $current_user->id || is_admin($current_user)){
+            $oe->setUsersDefaultOutboundAccount($owner, $outbound_id);
+        }
+
+        $module = (!empty($this->return_module) ? $this->return_module : $this->module);
+        $action = (!empty($this->return_action) ? $this->return_action : 'DetailView');
+        $id = (!empty($this->return_id) ? $this->return_id : $outbound_id);
+
+        $url = "index.php?module=" . $module . "&action=" . $action . "&record=" . $id;
+        $this->set_redirect($url);
     }
 }

@@ -38,264 +38,325 @@
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
-$viewdefs ['Campaigns'] =
-array(
-  'DetailView' =>
-  array(
-    'templateMeta' =>
-    array(
-      'form' =>
-      array(
-        'hidden' =>
-        array(
-          0 => '<input type="hidden" name="mode" value="">',
-        ),
-        'buttons' =>
-        array(
-              0 =>  array(
-                  'customCode' => '<input type="button" class="button" onclick="window.location=\'index.php?module=Campaigns&action=WizardHome&record={$fields.id.value}\';" name="button" id="launch_wizard_button" value="{$MOD.LBL_TO_WIZARD_TITLE}" />',
-              ),
-              1 => array(
-                 'customCode' => '{if $bean->aclAccess("edit")}<input title="{$APP.LBL_DUPLICATE_BUTTON_TITLE}" accessKey="{$APP.LBL_DUPLICATE_BUTTON_KEY}" class="button" onclick="var _form = (this.form) ? this.form : document.forms[0]; _form.return_module.value=\'Campaigns\'; _form.return_action.value=\'DetailView\'; _form.isDuplicate.value=true; _form.action.value=\'EditView\'; _form.return_id.value=\'{$id}\';SUGAR.ajaxUI.submitForm(_form);" type="button" name="Duplicate" value="{$APP.LBL_DUPLICATE_BUTTON_LABEL}" id="duplicate_button">{/if}'
-              ),
-            2 => array(
-                'customCode' => '{if $bean->aclAccess("delete")}<input title="{$APP.LBL_DELETE_BUTTON_TITLE}" accessKey="{$APP.LBL_DELETE_BUTTON_KEY}" class="button" onclick="var _form = (this.form) ? this.form : document.forms[0]; _form.return_module.value=\'Campaigns\'; _form.return_action.value=\'ListView\'; _form.action.value=\'Delete\'; if(confirm(\'{$APP.NTC_DELETE_CONFIRMATION}\')) SUGAR.ajaxUI.submitForm(_form);" type="submit" name="Delete" value="{$APP.LBL_DELETE_BUTTON_LABEL}" id="delete_button">{/if} '
-            ),
-          3 =>
-          array(
-            'customCode' => '<input title="{$MOD.LBL_TEST_BUTTON_TITLE}"  class="button" onclick="this.form.return_module.value=\'Campaigns\'; this.form.return_action.value=\'TrackDetailView\';this.form.action.value=\'Schedule\';this.form.mode.value=\'test\';SUGAR.ajaxUI.submitForm(this.form);" type="{$ADD_BUTTON_STATE}" name="button" id="send_test_button" value="{$MOD.LBL_TEST_BUTTON_LABEL}">',
-            'sugar_html' =>
-            array(
-              'type' => 'input',
-              'value' => '{$MOD.LBL_TEST_BUTTON_LABEL}',
-              'htmlOptions' =>
-              array(
-                'type' => '{$ADD_BUTTON_STATE}',
-                'title' => '{$MOD.LBL_TEST_BUTTON_TITLE}',
-                'class' => 'button',
-                'onclick' => 'this.form = document.getElementById(\'formDetailView\'); this.form.return_module.value=\'Campaigns\'; this.form.return_action.value=\'TrackDetailView\';this.form.action.value=\'Schedule\';this.form.mode.value=\'test\';SUGAR.ajaxUI.submitForm(this.form);',
-                'name' => 'button',
-                'id' => 'send_test_button',
-              ),
-            ),
-          ),
-          4 =>
-          array(
-            'customCode' => '<input title="{$MOD.LBL_QUEUE_BUTTON_TITLE}" class="button" onclick="this.form.return_module.value=\'Campaigns\'; this.form.return_action.value=\'TrackDetailView\';this.form.action.value=\'Schedule\';SUGAR.ajaxUI.submitForm(this.form);" type="{$ADD_BUTTON_STATE}" name="button" id="send_emails_button" value="{$MOD.LBL_QUEUE_BUTTON_LABEL}">',
-            'sugar_html' =>
-            array(
-              'type' => 'input',
-              'value' => '{$MOD.LBL_QUEUE_BUTTON_LABEL}',
-              'htmlOptions' =>
-              array(
-                'type' => '{$ADD_BUTTON_STATE}',
-                'title' => '{$MOD.LBL_QUEUE_BUTTON_TITLE}',
-                'class' => 'button',
-                'onclick' => 'this.form.return_module.value=\'Campaigns\'; this.form.return_action.value=\'TrackDetailView\';this.form.action.value=\'Schedule\';SUGAR.ajaxUI.submitForm(this.form);',
-                'name' => 'button',
-                'id' => 'send_emails_button',
-              ),
-            ),
-          ),
-            /*
-          5 =>
-          array (
-            'customCode' => '<input title="{$APP.LBL_MAILMERGE}" class="button" onclick="this.form.return_module.value=\'Campaigns\'; this.form.return_action.value=\'TrackDetailView\';this.form.action.value=\'MailMerge\';SUGAR.ajaxUI.submitForm(this.form);" type="submit" name="button" id="mail_merge_button" value="{$APP.LBL_MAILMERGE}">',
-            'sugar_html' =>
-            array (
-              'type' => 'submit',
-              'value' => '{$APP.LBL_MAILMERGE}',
-              'htmlOptions' =>
-              array (
-                'title' => '{$APP.LBL_MAILMERGE}',
-                'class' => 'button',
-                'onclick' => 'this.form.return_module.value=\'Campaigns\'; this.form.return_action.value=\'TrackDetailView\';this.form.action.value=\'MailMerge\';SUGAR.ajaxUI.submitForm(this.form);',
-                'name' => 'button',
-                'id' => 'mail_merge_button',
-              ),
-            ),
-          ),
-            */
-          5 =>
-          array(
-            'customCode' => '<input title="{$MOD.LBL_MARK_AS_SENT}" class="button" onclick="this.form.return_module.value=\'Campaigns\'; this.form.return_action.value=\'TrackDetailView\';this.form.action.value=\'DetailView\';this.form.mode.value=\'set_target\';SUGAR.ajaxUI.submitForm(this.form);" type="{$TARGET_BUTTON_STATE}" name="button" id="mark_as_sent_button" value="{$MOD.LBL_MARK_AS_SENT}">',
-            'sugar_html' =>
-            array(
-              'type' => 'input',
-              'value' => '{$MOD.LBL_MARK_AS_SENT}',
-              'htmlOptions' =>
-              array(
-                'type' => '{$TARGET_BUTTON_STATE}',
-                'title' => '{$MOD.LBL_MARK_AS_SENT}',
-                'class' => 'button',
-                'onclick' => 'this.form.return_module.value=\'Campaigns\'; this.form.return_action.value=\'TrackDetailView\';this.form.action.value=\'DetailView\';this.form.mode.value=\'set_target\';SUGAR.ajaxUI.submitForm(this.form);',
-                'name' => 'button',
-                'id' => 'mark_as_sent_button',
-              ),
-            ),
-          ),
-          6 =>
-          array(
-            'customCode' => '<script>{$MSG_SCRIPT}</script>',
-          ),
-        ),
-        'links' =>
-        array(
-          0 => '<input type="button" class="button" onclick="javascript:window.location=\'index.php?module=Campaigns&action=TrackDetailView&record={$fields.id.value}\';" name="button" id="view_status_button" value="{$MOD.LBL_TRACK_BUTTON_LABEL}" />',
-          1 => '<input id="viewRoiButtonId" type="button" class="button" onclick="javascript:window.location=\'index.php?module=Campaigns&action=RoiDetailView&record={$fields.id.value}\';" name="button" id="view_roi_button" value="{$MOD.LBL_TRACK_ROI_BUTTON_LABEL}" />',
-        ),
-      ),
-      'maxColumns' => '2',
-      'widths' =>
-      array(
-        0 =>
-        array(
-          'label' => '10',
-          'field' => '30',
-        ),
-        1 =>
-        array(
-          'label' => '10',
-          'field' => '30',
-        ),
-      ),
-      'useTabs' => true,
-      'tabDefs' =>
-      array(
-        'LBL_CAMPAIGN_INFORMATION' =>
-        array(
-          'newTab' => true,
-          'panelDefault' => 'expanded',
-        ),
-        'LBL_NAVIGATION_MENU_GEN2' =>
-        array(
-          'newTab' => true,
-          'panelDefault' => 'expanded',
-        ),
-        'LBL_PANEL_ASSIGNMENT' =>
-        array(
-          'newTab' => true,
-          'panelDefault' => 'expanded',
-        ),
-      ),
-    ),
-    'panels' =>
-    array(
-      'lbl_campaign_information' =>
-      array(
-        0 =>
-        array(
-          0 => 'name',
-          1 =>
-          array(
-            'name' => 'status',
-            'label' => 'LBL_CAMPAIGN_STATUS',
-          ),
-        ),
-        1 =>
-        array(
-          0 =>
-          array(
-            'name' => 'start_date',
-            'label' => 'LBL_CAMPAIGN_START_DATE',
-          ),
-          1 => 'campaign_type',
-        ),
-        2 =>
-        array(
-          0 =>
-          array(
-            'name' => 'end_date',
-            'label' => 'LBL_CAMPAIGN_END_DATE',
-          ),
-          1 =>
-          array(
-            'name' => 'frequency',
-            'customCode' => '{if $fields.campaign_type.value == "NewsLetter"}<div style=\'none\' id=\'freq_field\'>{$APP_LIST.newsletter_frequency_dom[$fields.frequency.value]}</div>{/if}&nbsp;',
-            'customLabel' => '{if $fields.campaign_type.value == "NewsLetter"}<div style=\'none\' id=\'freq_label\'>{$MOD.LBL_CAMPAIGN_FREQUENCY}</div>{/if}&nbsp;',
-          ),
-        ),
-        3 =>
-        array(
-          0 =>
-          array(
-            'name' => 'content',
-            'label' => 'LBL_CAMPAIGN_CONTENT',
-          ),
-        ),
-        4 =>
-        array(
-          0 =>
-          array(
-            'name' => 'assigned_user_name',
-            'label' => 'LBL_ASSIGNED_TO',
-          ),
-        ),
-      ),
-      'LBL_NAVIGATION_MENU_GEN2' =>
-      array(
-        0 =>
-        array(
-          0 =>
-          array(
-            'name' => 'currency_id',
-            'comment' => 'Currency in use for the campaign',
-            'label' => 'LBL_CURRENCY',
-          ),
-          1 =>
-          array(
-            'name' => 'impressions',
-            'label' => 'LBL_CAMPAIGN_IMPRESSIONS',
-          ),
-        ),
-        1 =>
-        array(
-          0 =>
-          array(
-            'name' => 'budget',
-          ),
-          1 =>
-          array(
-            'name' => 'expected_cost',
-          ),
-        ),
-        2 =>
-        array(
-          0 =>
-          array(
-            'name' => 'actual_cost',
-          ),
-          1 =>
-          array(
-            'name' => 'expected_revenue',
-          ),
-        ),
-        3 =>
-        array(
-          0 =>
-          array(
-            'name' => 'objective',
-            'label' => 'LBL_CAMPAIGN_OBJECTIVE',
-          ),
-        ),
-      ),
-      'LBL_PANEL_ASSIGNMENT' =>
-      array(
-        0 =>
-        array(
-          0 =>
-          array(
-            'name' => 'date_entered',
-            'customCode' => '{$fields.date_entered.value} {$APP.LBL_BY} {$fields.created_by_name.value}',
-          ),
-          1 =>
-          array(
-            'name' => 'date_modified',
-            'label' => 'LBL_DATE_MODIFIED',
-            'customCode' => '{$fields.date_modified.value} {$APP.LBL_BY} {$fields.modified_by_name.value}',
-          ),
-        ),
-      ),
-    ),
-  ),
-);
+$viewdefs ['Campaigns'] = [
+    'DetailView' => [
+        'sidebarWidgets' => [
+            'campaign-charts' => [
+                'type' => 'chart',
+                'labelKey' => 'LBL_CAMPAIGN_CHARTS',
+                'modes' => ['detail'],
+                'options' => [
+                    'toggle' => true,
+                    'headerTitle' => false,
+                    'charts' => [
+                        [
+                            'chartKey' => 'campaign-response-by-recipient-activity',
+                            'chartType' => 'vertical-bar',
+                            'statisticsType' => 'campaign-response-by-recipient-activity',
+                            'labelKey' => 'LBL_CAMPAIGN_RESPONSE_BY_RECIPIENT_ACTIVITY',
+                            'chartOptions' => [
+                                'noBarWhenZero' => false,
+                                'showDataLabel' => true,
+                                'showYAxisLabel' => false,
+                                'showXAxisLabel' => false,
+                                'yAxis' => false,
+                                'xAxis' => true,
+                                'rotateXAxisTicks' => false,
+                                'trimXAxisTicks' => false,
+                            ],
+                        ],
+                        [
+                            'chartKey' => 'campaign-send-status',
+                            'chartType' => 'vertical-bar',
+                            'statisticsType' => 'campaign-send-status',
+                            'labelKey' => 'LBL_CAMPAIGN_SEND_STATUS',
+                            'chartOptions' => [
+                                'noBarWhenZero' => false,
+                                'showDataLabel' => true,
+                                'showYAxisLabel' => false,
+                                'showXAxisLabel' => false,
+                                'yAxis' => false,
+                                'xAxis' => true,
+                                'rotateXAxisTicks' => false,
+                                'trimXAxisTicks' => true,
+                                'maxXAxisTickLength' => 8,
+                            ],
+                        ],
+                    ],
+                ],
+                'acls' => [
+                    'Campaigns' => ['view']
+                ]
+            ],
+        ],
+        'bottomWidgets' => [
+            [
+                'type' => 'record-table',
+                'allowCollapse' => true,
+                'modes' => ['detail'],
+                'options' => [
+                    'recordTable' => [
+                        'name' => 'campaign_interactions',
+                        'type' => 'collection',
+                        'sort_order' => 'desc',
+                        'sort_by' => 'date_start',
+                        'labelKey' => 'LBL_CAMPAIGN_ACTIONS',
+                        'title_key' => 'LBL_CAMPAIGN_ACTIONS',
+                        'headerModule' => 'Campaigns',
+                        'module' => 'EmailMarketing',
+                        'top_buttons' => [
+                            [
+                                'modes' => ['list'],
+                                'acl' => ['edit'],
+                                'action' => 'create',
+                                'key' => 'create',
+                                'module' => 'email-marketing',
+                                'additionalFields' => [
+                                    'campaign_email_marketing_name' => 'name',
+                                    'campaign_id' => 'id',
+                                    'campaign_name' => 'name',
+                                    'created_by' => 'user_name',
+                                    'modified_by' => 'id',
+                                    'parent_id' => 'id',
+                                    'parent_name' => 'name',
+                                ],
+                                'params' => [
+                                    'expanded' => true,
+                                    'collapsedMobile' => true,
+                                    'redirect' => false,
+                                ],
+                                'extraParams' => [
+                                    'type' => 'marketing',
+                                    'parent_type' => 'Campaigns',
+                                    'return_relationship' => 'campaign_email_marketing',
+                                    'target_module' => 'email-marketing',
+                                ],
+                                'labelKey' => 'LBL_NEW_EM_MARKETING',
+                                'widget_class' => 'SubPanelTopButtonQuickCreate',
+                            ],
+                            [
+                                'modes' => ['list'],
+                                'acl' => ['edit'],
+                                'action' => 'create',
+                                'key' => 'create',
+                                'params' => [
+                                    'collapsedMobile' => true,
+                                ],
+                                'module' => 'surveys',
+                                'labelKey' => 'LBL_NEW_SURVEY',
+                                'widget_class' => 'SubPanelTopButtonQuickCreate',
+                            ],
+                            [
+                                'modes' => ['list'],
+                                'acl' => ['edit'],
+                                'action' => 'create',
+                                'key' => 'create',
+                                'module' => 'email-marketing',
+                                'params' => [
+                                    'redirect' => false,
+                                ],
+                                'additionalFields' => [
+                                    'campaign_email_marketing_name' => 'name',
+                                    'campaign_id' => 'id',
+                                    'campaign_name' => 'name',
+                                    'created_by' => 'user_name',
+                                    'modified_by' => 'id',
+                                    'parent_id' => 'id',
+                                    'parent_name' => 'name',
+                                ],
+                                'extraParams' => [
+                                    'type' => 'survey',
+                                    'parent_type' => 'Campaigns',
+                                    'return_relationship' => 'campaign_email_marketing',
+                                    'target_module' => 'email-marketing',
+                                ],
+                                'labelKey' => 'LBL_NEW_EM_SURVEY',
+                                'widget_class' => 'SubPanelTopButtonQuickCreate',
+                            ],
+                            [
+                                'modes' => ['list'],
+                                'acl' => ['edit'],
+                                'action' => 'create',
+                                'key' => 'create',
+                                'module' => 'email-marketing',
+                                'params' => [
+                                    'expanded' => true,
+                                    'redirect' => false,
+                                ],
+                                'additionalFields' => [
+                                    'campaign_email_marketing_name' => 'name',
+                                    'campaign_id' => 'id',
+                                    'campaign_name' => 'name',
+                                    'created_by' => 'user_name',
+                                    'modified_by' => 'id',
+                                    'parent_id' => 'id',
+                                    'parent_name' => 'name',
+                                ],
+                                'extraParams' => [
+                                    'type' => 'transactional',
+                                    'parent_type' => 'Campaigns',
+                                    'return_relationship' => 'campaign_email_marketing',
+                                    'target_module' => 'email-marketing',
+                                ],
+                                'labelKey' => 'LBL_NEW_EM_TRANSACTIONAL',
+                                'widget_class' => 'SubPanelTopButtonQuickCreate',
+                            ],
+                        ],
+                        'columns' => [
+                            [
+                                'name' => 'name',
+                                'label' => 'LBL_NAME',
+                                'link' => true,
+                            ],
+                            [
+                                'name' => 'status',
+                                'label' => 'LBL_STATUS',
+                                'type' => 'enum',
+                                'fieldDefinition' => [
+                                    'options' => 'email_marketing_status_dom'
+                                ]
+                            ],
+                            [
+                                'name' => 'type',
+                                'label' => 'LBL_TYPE',
+                                'type' => 'enum',
+                                'fieldDefinition' => [
+                                    'options' => 'email_marketing_type_dom',
+                                ]
+                            ],
+                            [
+                                'name' => 'date_start',
+                                'label' => 'LBL_SEND_DATE',
+                                'sortable' => true,
+                                'sortReadOnly' => true,
+                                'type' => 'datetime',
+                            ],
+                            [
+                                'name' => 'created_by_name',
+                                'label' => 'LBL_CREATED_BY',
+                                'type' => 'relate',
+                                'fieldDefinition' => [
+                                    'rname' => 'user_name',
+                                    'source' => 'non-db'
+                                ]
+                            ]
+                        ],
+                    ]
+                ],
+            ]
+        ],
+        'templateMeta' => [
+            'maxColumns' => '2',
+            'widths' => [
+                [
+                    'label' => '10',
+                    'field' => '30',
+                ],
+                [
+                    'label' => '10',
+                    'field' => '30',
+                ],
+            ],
+            'useTabs' => true,
+            'tabDefs' => [
+                'LBL_CAMPAIGN_INFORMATION' => [
+                    'newTab' => true,
+                    'panelDefault' => 'expanded',
+                ],
+                'LBL_NAVIGATION_MENU_GEN2' => [
+                    'newTab' => true,
+                    'panelDefault' => 'expanded',
+                ],
+                'LBL_PANEL_ASSIGNMENT' => [
+                    'newTab' => true,
+                    'panelDefault' => 'expanded',
+                ],
+            ],
+        ],
+        'metadata' => [
+            'validateOnlyOnSubmit' => true,
+        ],
+        'panels' => [
+            'lbl_campaign_information' => [
+                [
+                    'name',
+                    [
+                        'name' => 'status',
+                        'label' => 'LBL_CAMPAIGN_STATUS',
+                    ],
+                ],
+                [
+                    [
+                        'name' => 'start_date',
+                        'label' => 'LBL_CAMPAIGN_START_DATE',
+                    ],
+                    [
+                        'name' => 'end_date',
+                        'label' => 'LBL_CAMPAIGN_END_DATE',
+                    ],
+                ],
+                [
+                    [
+                        'name' => 'propects_lists',
+                        'label' => 'LBL_PROSPECT_LISTS'
+                    ],
+                    [
+                        'name' => 'content',
+                        'label' => 'LBL_CAMPAIGN_CONTENT',
+                    ]
+                ],
+                [
+                    [
+                        'name' => 'suppression_lists',
+                        'label' => 'LBL_SUPPRESSION_LISTS'
+                    ],
+                    [
+                        'name' => 'assigned_user_name',
+                        'label' => 'LBL_ASSIGNED_TO',
+                    ],
+                ],
+            ],
+            'LBL_NAVIGATION_MENU_GEN2' => [
+                [
+                    [
+                        'name' => 'budget',
+                    ],
+                    [
+                        'name' => 'expected_cost',
+                    ],
+                ],
+                [
+                    [
+                        'name' => 'actual_cost',
+                    ],
+                    [
+                        'name' => 'expected_revenue',
+                    ],
+                ],
+                [
+                    [
+                        'name' => 'objective',
+                        'label' => 'LBL_CAMPAIGN_OBJECTIVE',
+                    ],
+                    [
+                        'name' => 'impressions',
+                        'label' => 'LBL_CAMPAIGN_IMPRESSIONS',
+                    ],
+                ],
+            ],
+            'LBL_PANEL_ASSIGNMENT' => [
+                [
+                    [
+                        'name' => 'date_entered',
+                        'customCode' => '{$fields.date_entered.value} {$APP.LBL_BY} {$fields.created_by_name.value}',
+                    ],
+                    [
+                        'name' => 'date_modified',
+                        'label' => 'LBL_DATE_MODIFIED',
+                        'customCode' => '{$fields.date_modified.value} {$APP.LBL_BY} {$fields.modified_by_name.value}',
+                    ],
+                ],
+            ],
+        ],
+    ],
+];

@@ -36,8 +36,11 @@ parameters:
     listview_url_query_filter_mapping: true
     module_routing: true
     recordview_actions_limits: true
+    recordview_attachment_limit: true
+    recordview_section_tab_limits: true
     recordview_subpanel_button_limits: true
     convert_ignore: true
+    duplicate_ignore: true
     subpanelview_actions_limits: true
     ui: true
     extensions: true
@@ -47,3 +50,16 @@ parameters:
     login_language: true
     enable_record_pagination: true
     auth_type: true
+    test_email_limit: true
+    jobs:
+      max_retries: true
+      timeout: true
+      failure_lifetime: true
+      success_lifetime: true
+    cron:
+      max_cron_jobs: true
+      max_cron_runtime: true
+      min_cron_interval: true
+    cron_class: true
+    campaign_emails_per_run_default: true
+    campaign_marketing_items_per_run_default: true

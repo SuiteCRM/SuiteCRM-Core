@@ -40,11 +40,15 @@ class UnlinkService
      * @param string $linkedId
      * @return array with feedback
      */
-    public function run(string $module, string $record, string $linkField, string $linkedId): array
+    public function run(string $module, string $record, string $linkField, string $linkedId, array $linkedIds = []): array
     {
         global $beanList;
 
-        if (empty($record) || empty($linkField) || empty($linkedId)) {
+        if (!empty($linkedId)) {
+            $linkedIds = [...$linkedIds ?? [], $linkedId];
+        }
+
+        if (empty($record) || empty($linkField) || empty($linkedIds)) {
             return [
                 'success' => false,
                 'message' => 'LBL_RECORD_NOT_FOUND'
@@ -91,33 +95,11 @@ class UnlinkService
             ];
         }
 
-        $ids = $bean->$linkField->get();
-        if (!in_array($linkedId, $ids, true)) {
-            return [
-                'success' => false,
-                'message' => 'LBL_NOT_LINKED'
-            ];
+        if (count($linkedIds) < 2) {
+            return $this->unlinkRecord($bean, $beanName, $linkField, $record, $linkedIds[0]);
         }
 
-        $result = $this->unlink($bean, $linkField, $record, $linkedId);
-
-        if ($result === false) {
-            return [
-                'success' => false,
-                'message' => 'LBL_UNLINK_RELATIONSHIP_FAILED'
-            ];
-        }
-
-        $this->handleCampaignProspectLists($bean, $beanName, $linkField, $record, $linkedId);
-        $this->handleAccountsLeads($bean, $beanName, $record, $linkField, $linkedId);
-
-        $this->handleMeetings($bean, $beanName, $record, $linkedId);
-        $this->handleUsersEapm($beanName, $linkField, $linkedId);
-
-        return [
-            'success' => true,
-            'message' => 'LBL_UNLINK_RELATIONSHIP_SUCCESS'
-        ];
+        return $this->unlinkRecords($bean, $beanName, $linkField, $record, $linkedIds);
     }
 
     /**
@@ -264,5 +246,74 @@ class UnlinkService
         }
 
         return true;
+    }
+
+    protected function unlinkRecord($bean, $beanName, $linkField, $record, $linkedId): array
+    {
+        $ids = $bean->$linkField->get();
+        if (!in_array($linkedId, $ids)) {
+            return [
+                'success' => false,
+                'message' => 'LBL_NOT_LINKED'
+            ];
+        }
+
+        $result = $this->unlink($bean, $linkField, $record, $linkedId);
+
+        if ($result === false) {
+            return [
+                'success' => false,
+                'message' => 'LBL_UNLINK_RELATIONSHIP_FAILED'
+            ];
+        }
+
+        $this->handleCampaignProspectLists($bean, $beanName, $linkField, $record, $linkedId);
+        $this->handleAccountsLeads($bean, $beanName, $record, $linkField, $linkedId);
+
+        $this->handleMeetings($bean, $beanName, $record, $linkedId);
+        $this->handleUsersEapm($beanName, $linkField, $linkedId);
+
+        return [
+            'success' => true,
+            'message' => 'LBL_UNLINK_RELATIONSHIP_SUCCESS'
+        ];
+    }
+
+    protected function unlinkRecords(SugarBean|bool $bean, mixed $beanName, string $linkField, string $record, array $linkedIds): array
+    {
+        global $log, $app_strings;
+
+        $ids = $bean->$linkField->get();
+        $return = [
+            'success' => true,
+            'message' => 'LBL_ALL_RECORDS_UNLINKED'
+        ];
+        foreach ($linkedIds as $linkedId) {
+            if (!in_array($linkedId, $ids)) {
+                $log->error($app_strings['LBL_NOT_LINKED'] . ' Record ID: ' . $record);
+                $return = [
+                    'success' => false,
+                    'message' => 'LBL_SOME_RECORDS_UNLINKED_FAILED'
+                ];
+            }
+
+            $result = $this->unlink($bean, $linkField, $record, $linkedId);
+
+            if ($result === false) {
+                $log->error($app_strings['LBL_UNLINK_RELATIONSHIP_FAILED'] . ' Record ID: ' . $record);
+                $return = [
+                    'success' => false,
+                    'message' => 'LBL_SOME_RECORDS_UNLINKED_FAILED'
+                ];
+            }
+
+            $this->handleCampaignProspectLists($bean, $beanName, $linkField, $record, $linkedId);
+            $this->handleAccountsLeads($bean, $beanName, $record, $linkField, $linkedId);
+
+            $this->handleMeetings($bean, $beanName, $record, $linkedId);
+            $this->handleUsersEapm($beanName, $linkField, $linkedId);
+        }
+
+        return $return;
     }
 }

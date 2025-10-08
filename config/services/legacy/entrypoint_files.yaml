@@ -1,4 +1,7 @@
 parameters:
+  legacy.entrypoint_paths:
+    ep: index.php
+
   legacy.entrypoint_files:
     'campaign_tracker.php':
       file: campaign_tracker.php

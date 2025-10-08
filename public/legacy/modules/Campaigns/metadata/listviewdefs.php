@@ -8,7 +8,7 @@ if (!defined('sugarEntry') || !sugarEntry) {
  * SugarCRM, Inc. Copyright (C) 2004-2013 SugarCRM Inc.
  *
  * SuiteCRM is an extension to SugarCRM Community Edition developed by SalesAgility Ltd.
- * Copyright (C) 2011 - 2018 SalesAgility Ltd.
+ * Copyright (C) 2011 - 2024 SalesAgility Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -45,43 +45,48 @@ if (!defined('sugarEntry') || !sugarEntry) {
 
 global $theme, $mod_strings;
 
-$listViewDefs['Campaigns'] = array(
-    'NAME' => array(
+$listViewDefs['Campaigns'] = [
+    'NAME' => [
         'width' => '20',
         'label' => 'LBL_LIST_CAMPAIGN_NAME',
         'link' => true,
-        'default' => true),
-    'STATUS' => array(
+        'default' => true
+    ],
+    'STATUS' => [
         'width' => '10',
         'label' => 'LBL_LIST_STATUS',
-        'default' => true),
-    'CAMPAIGN_TYPE' => array(
+        'default' => true
+    ],
+    'START_DATE' => [
         'width' => '10',
-        'label' => 'LBL_LIST_TYPE',
-        'default' => true),
-    'END_DATE' => array(
+        'label' => 'LBL_LIST_START_DATE',
+        'default' => true
+    ],
+    'END_DATE' => [
         'width' => '10',
         'label' => 'LBL_LIST_END_DATE',
-        'default' => true),
-    'DATE_ENTERED' => array(
+        'default' => true
+    ],
+    'EXPECTED_REVENUE' => [
+        'width' => '10',
+        'label' => 'LBL_LIST_EXPECTED_REVENUE',
+        'default' => true
+    ],
+    'EXPECTED_COST' => [
+        'width' => '10',
+        'label' => 'LBL_LIST_EXPECTED_COST',
+        'default' => true
+    ],
+    'DATE_ENTERED' => [
         'width' => '10',
         'label' => 'LBL_DATE_ENTERED',
-        'default' => true),
-
-    'ASSIGNED_USER_NAME' => array(
+        'default' => true
+    ],
+    'ASSIGNED_USER_NAME' => [
         'width' => '8',
         'label' => 'LBL_LIST_ASSIGNED_USER',
         'module' => 'Employees',
         'id' => 'ASSIGNED_USER_ID',
-        'default' => true),
-    'TRACK_CAMPAIGN' => array(
-        'width' => '0.01',
-        'label' => '&nbsp;',
-        'link' => true,
-        'customCode' => ' <a title="{$TRACK_CAMPAIGN_TITLE}" href="index.php?action=TrackDetailView&module=Campaigns&record={$ID}"><!--not_in_theme!--><span class="suitepicon suitepicon-action-view-status"></span></a> ',
-        'default' => true,
-        'studio' => false,
-        'nowrap' => true,
-        'sortable' => false),
-
-);
+        'default' => true
+    ],
+];

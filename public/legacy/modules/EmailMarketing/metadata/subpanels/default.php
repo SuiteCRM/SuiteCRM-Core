@@ -66,13 +66,17 @@ $subpanel_layout = array(
             'vname' => 'LBL_LIST_STATUS',
             'width' => '15%',
         ),
+        'type'=>array(
+            'vname' => 'LBL_LIST_TYPE',
+            'width' => '15%',
+        ),
         'template_name'=>array(
             'vname' => 'LBL_LIST_TEMPLATE_NAME',
             'width' => '15%',
             'widget_class' => 'SubPanelDetailViewLink',
             'target_record_key' => 'template_id',
             'target_module' => 'EmailTemplates',
-         
+
         ),
         'edit_button'=>array(
             'vname' => 'LBL_EDIT_BUTTON',

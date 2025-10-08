@@ -105,7 +105,8 @@ if (!empty($_REQUEST['guid']) && !empty($_REQUEST['key'])) {
         }
 
         if (!$expired) {
-            $password = $_POST['new_password'] ?? '';
+            global $RAW_REQUEST;
+            $password = $RAW_REQUEST['new_password'] ?? $_POST['new_password'] ?? '';
             $usr = new user();
             $errors = $usr->passwordValidationCheck($password);
             // if the form is filled and we want to login

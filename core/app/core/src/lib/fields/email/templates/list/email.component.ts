@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -29,13 +29,10 @@ import {BaseFieldComponent} from '../../../base/base-field.component';
 import {DataTypeFormatter} from '../../../../services/formatters/data-type.formatter.service';
 import {FieldLogicManager} from '../../../field-logic/field-logic.manager';
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
-import {ModuleNavigation} from "../../../../services/navigation/module-navigation/module-navigation.service";
-import {ModuleNameMapper} from "../../../../services/navigation/module-name-mapper/module-name-mapper.service";
-import {Router} from "@angular/router";
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {AppStateStore} from "../../../../store/app-state/app-state.store";
-import {ActionNameMapper} from "../../../../services/navigation/action-name-mapper/action-name-mapper.service";
 import {FieldLogicDisplayManager} from '../../../field-logic-display/field-logic-display.manager';
+import {ObjectMap} from "../../../../common/types/object-map";
+import {RecordModalOptions} from "../../../../services/modals/record-modal.model";
+import {AppStateStore} from "../../../../store/app-state/app-state.store";
 
 @Component({
     selector: 'scrm-email-list',
@@ -50,43 +47,52 @@ export class EmailListFieldsComponent extends BaseFieldComponent implements OnIn
         protected logic: FieldLogicManager,
         protected logicDisplay: FieldLogicDisplayManager,
         protected preferences: UserPreferenceStore,
-        protected navigation: ModuleNavigation,
-        protected moduleNameMapper: ModuleNameMapper,
-        protected actionNameMapper: ActionNameMapper,
-        protected appState: AppStateStore,
-        protected modalService: NgbModal,
-        protected router: Router
+        protected appStateStore: AppStateStore
     ) {
         super(typeFormatter, logic, logicDisplay);
     }
 
     ngOnInit(): void {
-        this.linkType = this.preferences.getUserPreference('email_link_type') || 'mailto';
+        this.linkType = this.preferences.getUserPreference('email_link_type') || 'sugar';
     }
 
-    openEmail() {
-
-        const view = this.actionNameMapper.toLegacy(this.appState.getView());
-        const module = this.moduleNameMapper.toLegacy(this.parent.module);
-        const parent_id = this.parent.id;
-        const parent_name = this.parent.attributes.name;
-        const email = this.field.value;
-
-        let return_id;
-        if (view !== 'ListView' && view !== 'index') {
-            return_id = parent_id;
-        }
-
-        this.router.navigate(['emails', 'compose'], {
-            queryParams: {
-                return_module: module,
-                return_action: view,
-                return_id,
-                to_addrs_names: email,
-                parent_type: module,
-                parent_name,
-                parent_id,
+    openEmailModal() {
+        const options = {
+            mapFields: this.getMappedFields(),
+            record: this.record,
+            parentId: this.record.id,
+            parentModule: this.record.module,
+            module: 'emails',
+            metadataView: 'modalComposeView',
+            closeConfirmationModal: true,
+            closeConfirmationLabel: 'LBL_CLOSE_EMAIL_MODAL',
+            detached: true,
+            headerClass: 'left-aligned-title',
+            dynamicTitleKey: 'LBL_EMAIL_MODAL_DYNAMIC_TITLE',
+            modalOptions: {
+                size: 'lg',
+                scrollable: false
             }
-        })
+        } as RecordModalOptions;
+
+        this.appStateStore.openRecordModal(options);
+    }
+
+    getMappedFields(): ObjectMap {
+        return {
+            default: {
+                'parent_id': 'id',
+                'parent_name': 'fields.name',
+                'parent_type': 'attributes.module_name',
+                'to_addrs_names': [
+                    {
+                        'id': 'id',
+                        'name': 'fields.name',
+                        'email1': 'attributes.email1',
+                        'module_name': 'attributes.module_name'
+                    }
+                ],
+            }
+        } as ObjectMap;
     }
 }

@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2024 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2024 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {ActivatedRoute, Router} from "@angular/router";
 import {combineLatestWith, Observable, Subscription} from "rxjs";
@@ -124,7 +124,9 @@ export class RecordPaginationComponent implements OnInit, OnDestroy {
             },
             icon: 'paginate_previous',
             iconKlass: 'sicon-2x',
-            disabled: this.currentIndex === 1 || this.isRecordsLoading,
+            disabled: computed((): boolean => {
+                return this.currentIndex === 1 || this.isRecordsLoading;
+            }),
             onClick: () => this.prevRecord()
         } as ButtonInterface;
 
@@ -136,7 +138,9 @@ export class RecordPaginationComponent implements OnInit, OnDestroy {
             },
             icon: 'paginate_next',
             iconKlass: 'sicon-2x',
-            disabled: this.currentIndex === this.totalRecordsCount || this.isRecordsLoading,
+            disabled: computed((): boolean => {
+                return this.currentIndex === this.totalRecordsCount || this.isRecordsLoading;
+            }),
             onClick: () => this.nextRecord()
         } as ButtonInterface;
 

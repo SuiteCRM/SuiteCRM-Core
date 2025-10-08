@@ -1,0 +1,4 @@
+parameters:
+  module.recordview.duplicate_ignore:
+    default:
+      -

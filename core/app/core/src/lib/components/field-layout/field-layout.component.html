@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -30,22 +30,35 @@
 
         <div *ngFor="let col of row.cols; index as colNumber"
              [class.field-column-bordered]="row.cols.length > 1 && colNumber < row.cols.length - 1"
+             [class.full-row]="row.cols.length === 1"
              [ngClass]="colClass"
-             class="field-layout-col">
+             class="field-layout-col {{col.colClasses ?? ''}}"
+        >
 
             <ng-container *ngIf="col.field && col.field.display() !== 'none'">
                 <div class="field-layout-field-group-wrapper form-group row">
-                    <div class="{{col?.headerColumnClass}} field-layout-field-label-wrapper col-form-label label-container">
+                    <div *ngIf="col?.field?.metadata?.labelDisplay !== 'none'"
+                            class="{{col?.headerColumnClass}} field-layout-field-label-wrapper col-form-label label-container">
                         <strong>
                             <ng-container
                                 *ngIf="col.field?.required()  && (['edit', 'create'].includes(config.mode))">
                                 <span class="required">*</span>
                             </ng-container>
-                            <label [ngClass]="labelClass">{{col.field.label | uppercase}}</label>
+                            <ng-container *ngIf="col?.field?.metadata?.dynamicFieldLabel">
+                                <scrm-dynamic-label [ngClass]="labelClass"
+                                                    [labelKey]="col.field.metadata.dynamicFieldLabel"
+                                                    [emptyLabel]="col.field.metadata.emptyFieldLabel"
+                                                    [fields]="fields"
+                                                    [context]="{}"
+                                >
+                                </scrm-dynamic-label>
+                            </ng-container>
+                            <ng-container *ngIf="!col.field?.metadata?.dynamicFieldLabel">
+                                <label [ngClass]="labelClass">{{col.field.label | uppercase}}</label>
+                            </ng-container>
                         </strong>
                     </div>
-                    <div class="{{col?.valueColumnClass}} d-flex flex-grow-1 field-layout-field-wrapper"
-                        [ngClass]="{ 'align-items-center': (col?.fieldActions && col?.fieldActions?.position === 'inline') }">
+                    <div class="{{col?.valueColumnClass}} d-flex flex-grow-1 field-layout-field-wrapper">
                         <div class="flex-grow-1 text-break field-layout-field-value-wrapper">
                             <scrm-field [type]="col.field.type"
                                         [mode]="config.mode"
@@ -54,17 +67,6 @@
                                         [record]="record">
                             </scrm-field>
                         </div>
-
-                        <ng-container *ngIf="col?.fieldActions && ((col?.fieldActions?.position ?? 'inline') === 'inline')">
-                            <div>
-                                <scrm-action-group-menu
-                                    [config]="col.adaptor"
-                                    [buttonGroupClass] = "col.fieldActions?.containerKlass ?? ''"
-                                    [klass] = "col.fieldActions?.klass ?? ''"
-                                >
-                                </scrm-action-group-menu>
-                            </div>
-                        </ng-container>
 
                         <div>
                             <button type="button" class="record-action-button"
@@ -75,15 +77,6 @@
                         </div>
                     </div>
                 </div>
-            </ng-container>
-
-            <ng-container *ngIf="col?.fieldActions && ((col?.fieldActions?.position ?? 'inline' ) === 'vertical')">
-                <scrm-action-group-menu
-                    [config]="col.adaptor"
-                    [buttonGroupClass]="col.fieldActions?.containerKlass ?? ''"
-                    [klass] = "col.fieldActions?.klass ?? ''"
-                >
-                </scrm-action-group-menu>
             </ng-container>
 
             <ng-container *ngIf="col.actionSlot">

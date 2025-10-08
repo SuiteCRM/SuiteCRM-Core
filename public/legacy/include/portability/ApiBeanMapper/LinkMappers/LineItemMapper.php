@@ -26,9 +26,11 @@
  */
 
 require_once __DIR__ . '/LinkMapperInterface.php';
+require_once __DIR__ . '/LineItemMapperTrait.php';
 
 abstract class LineItemMapper implements LinkMapperInterface
 {
+    use LineItemMapperTrait;
 
     /**
      * @inheritDoc
@@ -48,29 +50,9 @@ abstract class LineItemMapper implements LinkMapperInterface
 
         $itemBeans = $this->getItemBeans($bean, $definition);
 
-        foreach ($itemBeans as $itemBean) {
-            $attributes = $this->mapItem($itemBean);
-            $itemModule = $itemBean->module_name ?? '';
-            $record = [
-                'id' => $attributes['id'],
-                'module' => $itemModule,
-                'attributes' => $attributes
-            ];
-
-            $container[$newName][] = $record;
-        }
+        $container = $this->mapBeansToApi($itemBeans, $container, $newName);
     }
 
-    /**
-     * Get relate field definition
-     * @param SugarBean $bean
-     * @param string $name
-     * @return array|mixed
-     */
-    protected function getDefinition(SugarBean $bean, string $name)
-    {
-        return $bean->field_defs[$name] ?? [];
-    }
 
     /**
      * Check if it is a line Item
@@ -83,34 +65,6 @@ abstract class LineItemMapper implements LinkMapperInterface
         $definition = $this->getDefinition($bean, $name);
 
         return (bool)($definition['line-item'] ?? false);
-    }
-
-    /**
-     * @param SugarBean $bean
-     * @param array $definition
-     * @return SugarBean[]
-     */
-    protected function getItemBeans(SugarBean $bean, array $definition): array
-    {
-        $relationship = $definition['relationship'] ?? false;
-        $linkName = $definition['name'] ?? false;
-
-        $bean->load_relationship($relationship);
-        /** @var Link2 $link */
-        $link = $bean->$linkName;
-
-        return $link->getBeans();
-    }
-
-    /**
-     * @param SugarBean $itemBean
-     * @return array
-     */
-    protected function mapItem(SugarBean $itemBean): array
-    {
-        $mapper = new ApiBeanMapper();
-
-        return $mapper->toApi($itemBean);
     }
 
     /**

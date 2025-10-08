@@ -70,20 +70,25 @@ $job_strings = array(
     0 => 'refreshJobs',
     1 => 'pollMonitoredInboxes',
     2 => 'runMassEmailCampaign',
-    3 => 'pruneDatabase',
-    4 => 'trimTracker',
-    5 => 'pollMonitoredInboxesForBouncedCampaignEmails',
-    6 => 'pollMonitoredInboxesAOP',
-    7 => 'aorRunScheduledReports',
-    8 => 'processAOW_Workflow',
-    9 => 'sendEmailReminders',
-    10 => 'cleanJobQueue',
-    11 => 'removeDocumentsFromFS',
-    12 => 'trimSugarFeeds',
-    13 => 'syncGoogleCalendar',
-    14 => 'runElasticSearchIndexerScheduler',
+    3 => 'trimTracker',
+    4 => 'pollMonitoredInboxesForBouncedCampaignEmails',
+    5 => 'pollMonitoredInboxesAOP',
+    6 => 'aorRunScheduledReports',
+    7 => 'processAOW_Workflow',
+    8 => 'sendEmailReminders',
+    9 => 'cleanJobQueue',
+    10 => 'removeDocumentsFromFS',
+    11 => 'trimSugarFeeds',
+    12 => 'syncGoogleCalendar',
+    13 => 'runElasticSearchIndexerScheduler',
 );
 
+$jobStrings = [
+    0 => 'send-from-queue',
+    1 => 'email-to-queue',
+    2 => 'clean-up-temporary-files',
+    3 => 'prune-database'
+];
 /**
  * Job 0 refreshes all job schedulers at midnight
  * DEPRECATED
@@ -290,74 +295,6 @@ function runMassEmailCampaign()
     require('modules/EmailMan/EmailManDelivery.php');
     return true;
 }
-
-/**
- *  Job 3
- */
-function pruneDatabase()
-{
-    $GLOBALS['log']->info('----->Scheduler fired job of type pruneDatabase()');
-    $backupDir = sugar_cached('backups');
-    $backupFile = 'backup-pruneDatabase-GMT0_' . gmdate('Y_m_d-H_i_s', strtotime('now')) . '.php';
-
-    $db = DBManagerFactory::getInstance();
-    $tables = $db->getTablesArray();
-    $queryString = array();
-
-    if (!empty($tables)) {
-        foreach ($tables as $kTable => $table) {
-            // find tables with deleted=1
-            $columns = $db->get_columns($table);
-            // no deleted - won't delete
-            if (empty($columns['deleted'])) {
-                continue;
-            }
-
-            $custom_columns = array();
-            if (array_search($table . '_cstm', $tables, true)) {
-                $custom_columns = $db->get_columns($table . '_cstm');
-                if (empty($custom_columns['id_c'])) {
-                    $custom_columns = array();
-                }
-            }
-
-            $qDel = "SELECT * FROM $table WHERE deleted = 1";
-            $rDel = $db->query($qDel);
-
-            // make a backup INSERT query if we are deleting.
-            while ($aDel = $db->fetchByAssoc($rDel, false)) {
-                // build column names
-
-                $queryString[] = $db->insertParams($table, $columns, $aDel, null, false);
-
-                if (!empty($custom_columns) && !empty($aDel['id'])) {
-                    $qDelCstm = 'SELECT * FROM ' . $table . '_cstm WHERE id_c = ' . $db->quoted($aDel['id']);
-                    $rDelCstm = $db->query($qDelCstm);
-
-                    // make a backup INSERT query if we are deleting.
-                    while ($aDelCstm = $db->fetchByAssoc($rDelCstm)) {
-                        $queryString[] = $db->insertParams($table, $custom_columns, $aDelCstm, null, false);
-                    } // end aDel while()
-
-                    $db->query('DELETE FROM ' . $table . '_cstm WHERE id_c = ' . $db->quoted($aDel['id']));
-                }
-            } // end aDel while()
-            // now do the actual delete
-            $db->query('DELETE FROM ' . $table . ' WHERE deleted = 1');
-        } // foreach() tables
-
-        if (!file_exists($backupDir) || !file_exists($backupDir . '/' . $backupFile)) {
-            // create directory if not existent
-            mkdir_recursive($backupDir, false);
-        }
-        // write cache file
-
-        write_array_to_file('pruneDatabase', $queryString, $backupDir . '/' . $backupFile);
-        return true;
-    }
-    return false;
-}
-
 
 ///**
 // * Job 4

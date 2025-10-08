@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -65,42 +65,43 @@ class ListViewDefinitionHandler extends LegacyHandler
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    protected $logger;
 
     /**
      * @var BulkActionDefinitionProviderInterface
      */
-    private $bulkActionDefinitionProvider;
+    protected $bulkActionDefinitionProvider;
 
     /**
      * @var WidgetDefinitionProviderInterface
      */
-    private $widgetDefinitionProvider;
+    protected $widgetDefinitionProvider;
 
     /**
      * @var LineActionDefinitionProviderInterface
      */
-    private $lineActionDefinitionProvider;
+    protected $lineActionDefinitionProvider;
 
     /**
      * @var TableActionDefinitionProviderInterface
      */
-    private $tableActionDefinitionProvider;
+    protected $tableActionDefinitionProvider;
 
     /**
      * @var FilterDefinitionProviderInterface
      */
-    private $filterDefinitionProvider;
+    protected $filterDefinitionProvider;
 
     /**
      * @var array
      */
-    private $listViewSidebarWidgets;
+    protected $listViewSidebarWidgets;
 
     /**
      * @var FieldAliasMapper
      */
-    private $fieldAliasMapper;
+    protected $fieldAliasMapper;
+    protected ViewConfigMappers $viewConfigMappers;
 
     /**
      * RecordViewDefinitionHandler constructor.
@@ -118,24 +119,25 @@ class ListViewDefinitionHandler extends LegacyHandler
      * @param FieldAliasMapper $fieldAliasMapper
      * @param RequestStack $session
      * @param array $listViewSidebarWidgets
+     * @param ViewConfigMappers $viewDefsConfigMappers
      */
     public function __construct(
-        string                                $projectDir,
-        string                                $legacyDir,
-        string                                $legacySessionName,
-        string                                $defaultSessionName,
-        LegacyScopeState                      $legacyScopeState,
-        LoggerInterface                       $logger,
+        string $projectDir,
+        string $legacyDir,
+        string $legacySessionName,
+        string $defaultSessionName,
+        LegacyScopeState $legacyScopeState,
+        LoggerInterface $logger,
         BulkActionDefinitionProviderInterface $bulkActionDefinitionProvider,
-        WidgetDefinitionProviderInterface     $widgetDefinitionProvider,
+        WidgetDefinitionProviderInterface $widgetDefinitionProvider,
         LineActionDefinitionProviderInterface $lineActionDefinitionProvider,
         TableActionDefinitionProviderInterface $tableActionDefinitionProvider,
-        FilterDefinitionProviderInterface     $filterDefinitionProvider,
-        FieldAliasMapper                      $fieldAliasMapper,
-        RequestStack                          $session,
-        array                                 $listViewSidebarWidgets
-    )
-    {
+        FilterDefinitionProviderInterface $filterDefinitionProvider,
+        FieldAliasMapper $fieldAliasMapper,
+        RequestStack $session,
+        array $listViewSidebarWidgets,
+        ViewConfigMappers $viewDefsConfigMappers
+    ) {
         parent::__construct(
             $projectDir,
             $legacyDir,
@@ -152,6 +154,7 @@ class ListViewDefinitionHandler extends LegacyHandler
         $this->filterDefinitionProvider = $filterDefinitionProvider;
         $this->listViewSidebarWidgets = $listViewSidebarWidgets;
         $this->fieldAliasMapper = $fieldAliasMapper;
+        $this->viewConfigMappers = $viewDefsConfigMappers;
     }
 
     /**
@@ -171,11 +174,10 @@ class ListViewDefinitionHandler extends LegacyHandler
      * @throws Exception
      */
     public function get(
-        string          $module,
-        string          $legacyModuleName,
+        string $module,
+        string $legacyModuleName,
         FieldDefinition $fieldDefinition
-    ): array
-    {
+    ): array {
         $this->init();
 
         $metadata = $this->fetch($module, $legacyModuleName, $fieldDefinition);
@@ -194,11 +196,10 @@ class ListViewDefinitionHandler extends LegacyHandler
      * @throws Exception
      */
     public function fetch(
-        string          $module,
-        string          $legacyModuleName,
+        string $module,
+        string $legacyModuleName,
         FieldDefinition $fieldDefinition
-    ): array
-    {
+    ): array {
         $metadata = [
             'columns' => [],
             'bulkActions' => [],
@@ -221,8 +222,18 @@ class ListViewDefinitionHandler extends LegacyHandler
             $displayColumns = [];
         }
 
+        try {
+            $listMeta = ListViewFacade::getMetadata($legacyModuleName);
+        } catch (Exception $e) {
+            $listMeta = [];
+        }
+
+        $listMeta['columns'] = $displayColumns;
+
+        $listMeta = $this->viewConfigMappers->run($module, 'list', $listMeta) ?? [];
+
         $data = [];
-        foreach ($displayColumns as $key => $column) {
+        foreach ($listMeta['columns'] as $key => $column) {
             if (!isset($vardefs[strtolower($key)])) {
                 $this->logger->debug("ListViewDefinitions: '$key' not set on vardefs. Ignoring.");
                 continue;
@@ -231,20 +242,15 @@ class ListViewDefinitionHandler extends LegacyHandler
             $data[] = $this->buildListViewColumn($column, $key, $vardefs);
         }
 
-        try {
-            $listMeta = ListViewFacade::getMetadata($legacyModuleName);
-        } catch (Exception $e) {
-            $listMeta = [];
-        }
 
         $metadata['columns'] = $data;
         $metadata['bulkActions'] = $this->bulkActionDefinitionProvider->getBulkActions(
-                $module,
-                $listMeta['bulkActions'] ?? []
-            ) ?? [];
+            $module,
+            $listMeta['bulkActions'] ?? []
+        ) ?? [];
 
         $metadata['lineActions'] = $this->lineActionDefinitionProvider->getLineActions($module) ?? [];
-        $metadata['tableActions'] = array_values($this->tableActionDefinitionProvider->getActions($module) ?? []);
+        $metadata['tableActions'] = $this->tableActionDefinitionProvider->getActions($module, $listMeta['tableActions'] ?? []);
         $metadata['sidebarWidgets'] = $this->widgetDefinitionProvider->getSidebarWidgets(
             $this->listViewSidebarWidgets,
             $module,

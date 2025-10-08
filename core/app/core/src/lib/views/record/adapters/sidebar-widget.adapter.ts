@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -27,18 +27,33 @@
 import {Injectable} from '@angular/core';
 import {combineLatestWith} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {MetadataStore, RecordViewMetadata} from '../../../store/metadata/metadata.store.service';
+import {MetadataStore, RecordViewSectionMetadata} from '../../../store/metadata/metadata.store.service';
 import {RecordViewStore} from '../store/record-view/record-view.store';
+import {Record} from "../../../common/record/record.model";
+import {ObjectMap} from "../../../common/types/object-map";
+import {ActiveFieldsChecker} from "../../../services/condition-operators/active-fields-checker.service";
 
 @Injectable()
 export class SidebarWidgetAdapter {
 
-    config$ = this.metadata.recordViewMetadata$.pipe(
-        combineLatestWith(this.store.showSidebarWidgets$),
-        map(([metadata, show]: [RecordViewMetadata, boolean]) => {
+    config$ = this.store.sectionMetadata$.pipe(
+        combineLatestWith(this.store.showSidebarWidgets$, this.store.stagingRecord$),
+        map(([metadata, show, record]: [RecordViewSectionMetadata, boolean, Record]) => {
+
+            let filteredWidgets = [];
 
             if (metadata.sidebarWidgets && metadata.sidebarWidgets.length) {
-                metadata.sidebarWidgets.forEach(widget => {
+
+                filteredWidgets = this.store.filterWidgetsByMode(metadata.sidebarWidgets);
+
+                filteredWidgets = filteredWidgets.filter(widget => {
+                    if (widget.activeOnFields && Object.keys(widget.activeOnFields).length) {
+                        return this.isActive(widget.activeOnFields, record);
+                    }
+                    return true; // If no activeOnFields, consider it active
+                });
+
+                filteredWidgets.forEach(widget => {
                     if (widget && widget.refreshOn === 'data-update') {
                         widget.reload$ = this.store.record$.pipe(map(() => true));
                     }
@@ -49,17 +64,53 @@ export class SidebarWidgetAdapter {
                 });
             }
 
+            if (!filteredWidgets.length) {
+                show = false;
+            }
+
+            filteredWidgets = filteredWidgets || [];
+
             return {
-                widgets: metadata.sidebarWidgets || [],
-                show
+                widgets: filteredWidgets,
+                show: show && filteredWidgets.length > 0,
+                showSidebarWidgets: show
             };
         })
     );
 
     constructor(
         protected store: RecordViewStore,
-        protected metadata: MetadataStore
+        protected metadata: MetadataStore,
+        protected activeFieldsChecker: ActiveFieldsChecker
     ) {
+    }
+
+    protected isActive(activeOnFields: ObjectMap, record: Record): boolean {
+
+        const fieldKeys = Object.keys(activeOnFields);
+
+        if (!activeOnFields || !fieldKeys.length) {
+            return true;
+        }
+
+        if (!record || !record?.fields || !Object.keys(record?.fields ?? {}).length) {
+            return false;
+        }
+
+        return fieldKeys.every(fieldKey => {
+
+            const field = record.fields[fieldKey];
+
+            if (!field) {
+                return true; // If field is not present, consider it active
+            }
+
+            const activeOn = activeOnFields[fieldKey] || null;
+
+
+            return this.activeFieldsChecker.isValueActive(record, field, activeOn);
+
+        });
     }
 
 }

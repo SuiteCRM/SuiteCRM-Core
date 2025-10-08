@@ -52,7 +52,24 @@ $e = BeanFactory::newBean('Emails');
 
 // my inbox
 if (ACLController::checkAccess('Emails', 'edit', true)) {
-    $module_menu[]=array("index.php?module=Emails&action=ComposeView&return_module=Emails&return_action=index", $mod_strings['LNK_NEW_SEND_EMAIL'],"Create", 'Emails');
+    $module_menu[]=array("index.php?module=Emails&action=ComposeView&return_module=Emails&return_action=index", $mod_strings['LNK_NEW_SEND_EMAIL'],"Create", 'Emails', null, '',
+        [
+            'process' => 'record-modal',
+            'params' => [
+                'module' => 'emails',
+                'metadataView' => 'modalComposeView',
+                'detached' => true,
+                'headerClass' => 'left-aligned-title',
+                'dynamicTitleKey' => 'LBL_EMAIL_MODAL_DYNAMIC_TITLE',
+                'modalOptions' => [
+                    'size' => 'lg',
+                    'scrollable' => false,
+                ],
+                'closeConfirmationModal' => true,
+                'closeConfirmationLabel' => 'LBL_CLOSE_EMAIL_MODAL',
+            ]
+        ]
+    );
 }
 if (ACLController::checkAccess('Emails', 'list', true)) {
     $module_menu[]=array("index.php?module=Emails&action=index&return_module=Emails&return_action=DetailView", $mod_strings['LNK_VIEW_MY_INBOX'],"List", 'Emails');

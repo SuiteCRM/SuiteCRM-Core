@@ -2,7 +2,7 @@ parameters:
   module.subpanel.top_buttons:
     SubPanelTopSelectButton:
       key: select
-      labelKey: LBL_LINK
+      labelKey: LBL_LINK_UNLINK
       action: select
       modes:
         - list
@@ -65,16 +65,35 @@ parameters:
         - edit
       module: calls
     SubPanelTopComposeEmailButton:
-      key: create
+      key: modal-create
       labelKey: LNK_NEW_EMAIL
-      action: create
+      action: modal-create
       modes:
         - list
+      params:
+        detached: true
+        headerClass: 'left-aligned-title'
+        dynamicTitleKey: LBL_EMAIL_MODAL_DYNAMIC_TITLE
+        closeConfirmationModal: true
+        closeConfirmationLabel: 'LBL_CLOSE_EMAIL_MODAL'
+        modalOptions:
+          size: 'lg'
+          scrollable: false
+        mapFields:
+          default:
+            'parent_id': 'id'
+            'parent_name': 'fields.name'
+            'parent_type': 'attributes.module_name'
+            'to_addrs_names':
+              -
+                'id': 'id'
+                'name': 'fields.name'
+                'email1': 'attributes.email1'
+                'module_name': 'attributes.module_name'
       acl:
         - edit
       module: emails
-      moduleAction:
-        - composeView
+      metadataView: modalComposeView
     SubPanelTopCreateNoteButton:
       key: create
       labelKey: LNK_NEW_NOTE

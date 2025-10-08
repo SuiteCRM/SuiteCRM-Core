@@ -1,0 +1,99 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2025 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+.campaign-sidebar-header {
+  color: $bright-purple;
+  padding-right: .2rem;
+  padding-top: .15rem;
+  font-weight: bolder !important;
+}
+
+.campaign-sidebar-header-icon {
+  fill: $bright-purple;
+  padding-right: .25rem;
+}
+
+.campaign-status-header-row {
+  margin-bottom: 0.3rem;
+}
+
+.campaign-status-check-row {
+  margin-bottom: .6rem;
+  padding-top: 0;
+
+  padding-right: .6rem;
+  vertical-align: bottom;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-grid !important;
+  width: 100%;
+  margin-right: .55rem;
+
+  .campaign-status-check-row-label {
+    font-size: .75em;
+    color: #534d64;
+    overflow: hidden;
+    display: inline-block;
+    white-space: nowrap;
+    font-weight: 600 !important;
+    text-overflow: ellipsis;
+    padding-bottom: 0!important;
+  }
+
+  .campaign-status-check-row-value {
+    font-size: 1.05em;
+    overflow: hidden;
+    display: inline-block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    line-height: 1rem;
+  }
+}
+
+.campaign-status-check-row:last-child {
+  border-bottom: none;
+}
+
+.cron-code-label {
+  .widget-entry-dynamic-label {
+    font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;
+    background: $off-white;
+    color: $less-median-grey;
+    border: 1px solid $slade-grey;
+    border-radius: 4px;
+    padding: 1em;
+    margin: 1em 0;
+    overflow-x: auto;
+    font-size: 1em;
+    white-space: break-spaces;
+  }
+}
+
+.cron-label {
+  .widget-entry-dynamic-label {
+    white-space: break-spaces;
+  }
+}

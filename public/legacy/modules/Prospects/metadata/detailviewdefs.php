@@ -156,6 +156,7 @@ array(
           array(
             'name' => 'full_name',
           ),
+          1 => ''
         ),
         1 =>
         array(
@@ -205,14 +206,17 @@ array(
         5 =>
         array(
           0 => 'email1',
+          1 => ''
         ),
         6 =>
         array(
           0 => 'description',
+          1 => ''
         ),
         7 =>
         array(
           0 => 'assigned_user_name',
+          1 => ''
         ),
       ),
       'LBL_MORE_INFORMATION' =>

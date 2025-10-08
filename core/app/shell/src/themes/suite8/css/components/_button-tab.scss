@@ -1,0 +1,141 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2025 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+.tab-button-group {
+
+  .dropdown-button {
+    .dropdown-menu {
+      background-color: $white;
+      box-shadow: 0 .125rem .25rem #00000040;
+      border: 1px solid $extra-light-grey;
+      z-index: 1;
+
+      .dropdown-item {
+        border-color: $main;
+        color: $main;
+        max-width: 158px;
+
+        &:hover {
+          background-color: $sky-blue;
+          color: $white;
+          cursor: pointer;
+          border: none;
+        }
+      }
+    }
+  }
+
+
+  .tab-button {
+    svg {
+      margin: 0;
+      vertical-align: -0.3em;
+    }
+  }
+
+}
+
+.tab-button {
+  border: none;
+  background-color: inherit;
+  color: $shell-grey;
+  border-radius: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+
+  margin-bottom: 0;
+  padding-left: .5rem;
+  padding-right: .5rem;
+  line-height: 24px;
+
+  svg {
+    fill: $shell-grey;
+    stroke: $shell-grey;
+    margin: 0;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:hover {
+    border-bottom: 2px solid $highlight-grey;
+    fill: $highlight-grey;
+    stroke: $highlight-grey;
+    color: $highlight-grey;
+
+    svg {
+      fill: $highlight-grey;
+      stroke: $highlight-grey;
+    }
+  }
+
+  &.active {
+    border-bottom: 2px solid $bright-purple;
+    fill: $bright-purple;
+    stroke: $bright-purple;
+    color: $bright-purple;
+    font-weight: 700;
+
+    svg {
+      fill: $bright-purple;
+      stroke: $bright-purple;
+    }
+
+    &:hover {
+      border-bottom: 2px solid $highlight-purple;
+      fill: $highlight-purple;
+      stroke: $highlight-purple;
+      color: $highlight-purple;
+
+      svg {
+        fill: $highlight-purple;
+        stroke: $highlight-purple;
+      }
+    }
+  }
+
+  &.dropdown-toggle {
+    padding-left: .1rem;
+    padding-right: .1rem;
+
+    &:focus {
+      outline: none;
+      border: none
+    }
+
+    &:hover {
+      outline: none;
+      border: none
+    }
+    &.active {
+      border-bottom: 2px solid $bright-purple;
+    }
+  }
+
+}

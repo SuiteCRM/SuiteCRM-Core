@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,24 +26,25 @@
 */
 -->
 <div class="d-flex align-items-center">
-    <ng-container *ngIf="initModule">
-        <div class="flex-grow-1 w-100 mr-1">
+    <ng-container *ngIf="initModule()">
+        <div #tagWrapper class="flex-grow-1 w-100 mr-1">
             <p-dropdown
                 #tag
-                [options]="options"
+                [options]="currentOptions()"
                 [(ngModel)]="selectedValue"
                 [optionLabel]="getRelateFieldName()"
-                (onChange)="onAdd($event.value)"
+                (onChange)="onAdd($event.value, $event)"
                 (onLazyLoad)="onFilter()"
                 (onShow)="focusFilterInput()"
                 (onHide)="resetFunction(tag.options)"
-                [emptyMessage]="emptyFilterLabel"
-                [emptyFilterMessage]="emptyFilterLabel"
+                [emptyMessage]="emptyFilterLabel()"
+                [emptyFilterMessage]="emptyFilterLabel()"
                 [placeholder]="placeholderLabel"
                 [autoOptionFocus]="false"
                 [autofocusFilter]="false"
                 [focusOnHover] = "true"
                 [filter]="true"
+                [loading]="loading()"
                 [lazy]="true"
                 [dataKey]="'id'"
                 [filterBy]="getRelateFieldName()"
@@ -68,6 +69,60 @@
                         <scrm-image image="search" class="p-element p-dropdown-filter-search-icon"></scrm-image>
                     </div>
 
+                </ng-template>
+                <ng-template pTemplate="selectedItem">
+                    <div class="align-items-end relate-item related-selected-item" *ngIf="selectedValue">
+                        <div [style.max-width]="tagWrapper?.offsetWidth - 62 + 'px'" class="selected-item-label" *ngIf="!dynamicOptionLabel">{{ selectedValue[relateFieldName] ?? '' }}</div>
+                        <ng-container *ngIf="dynamicOptionLabel">
+                            <div class="relate-item-header-field"
+                                 [style.max-width]="tagWrapper?.offsetWidth - 180 + 'px'"
+                            >
+                                <scrm-dynamic-label [labelKey]="dynamicOptionLabel"
+                                                    [fields]="selectedValue"
+                                                    [context]="dynamicOptionLabelContext"
+                                                    [displayTitle]="true"
+                                >
+                                </scrm-dynamic-label>
+                            </div>
+                            <div *ngIf="dynamicOptionSubLabel"
+                                 class="relate-item-subheader-field"
+                            >
+                                <scrm-dynamic-label [labelKey]="dynamicOptionSubLabel"
+                                                    [fields]="selectedValue"
+                                                    [context]="dynamicOptionLabelContext"
+                                                    [displayTitle]="true"
+                                >
+                                </scrm-dynamic-label>
+                            </div>
+                        </ng-container>
+                    </div>
+                </ng-template>
+                <ng-template let-option pTemplate="item">
+                    <div class="align-items-end relate-item" *ngIf="option">
+                        <div [style.max-width]="tagWrapper?.offsetWidth - 35 + 'px'"  class="related-item-label" *ngIf="!dynamicOptionLabel">{{ option[relateFieldName] ?? '' }}</div>
+                        <ng-container *ngIf="dynamicOptionLabel">
+                            <div class="relate-item-header-field"
+                                 [style.max-width]="tagWrapper?.offsetWidth - 180 + 'px'"
+                            >
+                                <scrm-dynamic-label [labelKey]="dynamicOptionLabel"
+                                                    [fields]="option"
+                                                    [context]="dynamicOptionLabelContext"
+                                                    [displayTitle]="true"
+                                >
+                                </scrm-dynamic-label>
+                            </div>
+                            <div *ngIf="dynamicOptionSubLabel"
+                                 class="relate-item-subheader-field"
+                            >
+                                <scrm-dynamic-label [labelKey]="dynamicOptionSubLabel"
+                                                    [fields]="option"
+                                                    [context]="dynamicOptionLabelContext"
+                                                    [displayTitle]="true"
+                                >
+                                </scrm-dynamic-label>
+                            </div>
+                        </ng-container>
+                    </div>
                 </ng-template>
             </p-dropdown>
         </div>

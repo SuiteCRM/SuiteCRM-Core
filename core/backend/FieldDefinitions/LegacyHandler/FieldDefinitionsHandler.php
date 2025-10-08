@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -31,8 +31,10 @@ use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;
 use App\FieldDefinitions\Entity\FieldDefinition;
 use App\FieldDefinitions\Service\FieldDefinitionsProviderInterface;
+use App\FieldDefinitions\Service\VardefConfigMapperRegistry;
 use App\Module\Service\ModuleNameMapperInterface;
 use Exception;
+use Psr\Log\LoggerInterface;
 use SugarView;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -45,17 +47,7 @@ class FieldDefinitionsHandler extends LegacyHandler implements FieldDefinitionsP
     public const HANDLER_KEY = 'field-definitions';
 
     /**
-     * @var ModuleNameMapperInterface
-     */
-    private $moduleNameMapper;
-
-    /**
-     * @var FieldDefinitionMappers
-     */
-    private $mappers;
-
-    /**
-     * SystemConfigHandler constructor.
+     * FieldDefinitionsHandler constructor.
      * @param string $projectDir
      * @param string $legacyDir
      * @param string $legacySessionName
@@ -64,6 +56,7 @@ class FieldDefinitionsHandler extends LegacyHandler implements FieldDefinitionsP
      * @param ModuleNameMapperInterface $moduleNameMapper
      * @param FieldDefinitionMappers $mappers
      * @param RequestStack $session
+     * @param LoggerInterface $logger
      */
     public function __construct(
         string $projectDir,
@@ -71,14 +64,14 @@ class FieldDefinitionsHandler extends LegacyHandler implements FieldDefinitionsP
         string $legacySessionName,
         string $defaultSessionName,
         LegacyScopeState $legacyScopeState,
-        ModuleNameMapperInterface $moduleNameMapper,
-        FieldDefinitionMappers $mappers,
-        RequestStack $session
+        protected ModuleNameMapperInterface $moduleNameMapper,
+        protected FieldDefinitionMappers $mappers,
+        RequestStack $session,
+        protected LoggerInterface $logger,
+        protected VardefConfigMapperRegistry $vardefConfigMapperRegistry,
     ) {
         parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState,
             $session);
-        $this->moduleNameMapper = $moduleNameMapper;
-        $this->mappers = $mappers;
     }
 
     /**
@@ -102,7 +95,7 @@ class FieldDefinitionsHandler extends LegacyHandler implements FieldDefinitionsP
 
         $vardefs = new FieldDefinition();
         $vardefs->setId($moduleName);
-        $vardefs->setVardef($this->getDefinitions($legacyModuleName));
+        $vardefs->setVardef($this->getDefinitions($legacyModuleName, $moduleName));
 
         $mappers = $this->mappers->get($moduleName);
 
@@ -116,19 +109,80 @@ class FieldDefinitionsHandler extends LegacyHandler implements FieldDefinitionsP
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getOptionsKey(string $module, string $fieldName): ?string
+    {
+        $fieldDefinition = $this->getVardef($module);
+        $fieldDef = $fieldDefinition->getVardef()[$fieldName] ?? null;
+
+        if (!$fieldDef) {
+            return null;
+        }
+
+        $optionsKey = $fieldDef['options'] ?? null;
+        if (!$optionsKey) {
+            return null;
+        }
+
+        return $optionsKey;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getFieldDefinition(string $moduleName, string $field): ?array
+    {
+        $fieldDefinitions = $this->getVardef($moduleName);
+        if (empty($fieldDefinitions)) {
+            return null;
+        }
+
+        $vardefs = $fieldDefinitions->getVardef();
+        if (empty($vardefs)) {
+            return null;
+        }
+
+        $fieldDefinition = $vardefs[$field] ?? null;
+        if (empty($fieldDefinition)) {
+            return null;
+        }
+
+        return $fieldDefinition;
+    }
+
+
+    /**
      * Get legacy definitions
      * @param string $legacyModuleName
-     * @return array|mixed
+     * @return array
      */
-    protected function getDefinitions(string $legacyModuleName)
+    protected function getDefinitions(string $legacyModuleName, string $moduleName): array
     {
         try {
             $sugarView = new SugarView();
             $data = $sugarView->getVardefsData($legacyModuleName);
         } catch (Exception $e) {
+            $this->logger->error(
+                "Failed to get legacy definitions for module {module}: {error}",
+                [
+                    'module' => $legacyModuleName,
+                    'error' => $e->getMessage(),
+                    'exception' => $e
+                ]
+            );
             return [];
         }
 
-        return $data[0][$legacyModuleName] ?? [];
+        $vardefs = $data[0][$legacyModuleName] ?? [];
+
+        $mappers = $this->vardefConfigMapperRegistry->get($moduleName);
+
+        foreach ($mappers as $mapper) {
+            $vardefs = $mapper->map($vardefs);
+        }
+
+        return $vardefs;
+
     }
 }

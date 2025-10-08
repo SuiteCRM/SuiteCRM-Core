@@ -145,6 +145,7 @@ array(
             'name' => 'description',
             'nl2br' => true,
           ),
+          1 => ''
         ),
         6 =>
         array(
@@ -153,6 +154,7 @@ array(
             'name' => 'assigned_user_name',
             'label' => 'LBL_ASSIGNED_TO',
           ),
+          1 => ''
         ),
       ),
       'LBL_PANEL_ASSIGNMENT' =>

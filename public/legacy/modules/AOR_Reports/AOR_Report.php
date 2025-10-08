@@ -205,7 +205,7 @@ class AOR_Report extends Basic
             $field = BeanFactory::newBean('AOR_Fields');
             $field->retrieve($row['id']);
 
-            $path = unserialize(base64_decode($field->module_path));
+            $path = unserialize(base64_decode($field->module_path),['allowed_classes' => false]);
 
             $field_bean = new $beanList[$this->report_module]();
 
@@ -311,7 +311,7 @@ class AOR_Report extends Basic
             $GLOBALS['log']->fatal('ambiguous group display for report ' . $this->id);
         } else {
             if ($rowsCount == 1) {
-                $rows[0]['module_path'] = unserialize(base64_decode($rows[0]['module_path']));
+                $rows[0]['module_path'] = unserialize(base64_decode($rows[0]['module_path']),['allowed_classes' => false]);
                 if (!$rows[0]['module_path'][0]) {
                     $module = new $beanList[$this->report_module]();
                     $rows[0]['field_id_name'] = $module->field_defs[$rows[0]['field']]['id_name'] ? $module->field_defs[$rows[0]['field']]['id_name'] : $module->field_defs[$rows[0]['field']]['name'];
@@ -440,7 +440,7 @@ class AOR_Report extends Basic
 
             $field_label = str_replace(' ', '_', (string) $field->label);
 
-            $path = unserialize(base64_decode($field->module_path));
+            $path = unserialize(base64_decode($field->module_path),['allowed_classes' => false]);
 
             $field_module = $module;
             $table_alias = $field_module->table_name;
@@ -670,7 +670,7 @@ class AOR_Report extends Basic
             $field = BeanFactory::newBean('AOR_Fields');
             $field->retrieve($row['id']);
 
-            $path = unserialize(base64_decode($field->module_path));
+            $path = unserialize(base64_decode($field->module_path),['allowed_classes' => false]);
 
             $field_bean = new $beanList[$this->report_module]();
 
@@ -905,7 +905,7 @@ class AOR_Report extends Basic
                 // End
             }
 
-            $path = unserialize(base64_decode($field->module_path));
+            $path = unserialize(base64_decode($field->module_path),['allowed_classes' => false]);
 
             $field_bean = new $beanList[$this->report_module]();
 
@@ -1047,7 +1047,7 @@ class AOR_Report extends Basic
             $field = BeanFactory::newBean('AOR_Fields');
             $field->retrieve($row['id']);
 
-            $path = unserialize(base64_decode($field->module_path));
+            $path = unserialize(base64_decode($field->module_path),['allowed_classes' => false]);
             $field_bean = new $beanList[$this->report_module]();
             $field_module = $this->report_module;
             $field_alias = $field_bean->table_name;
@@ -1240,9 +1240,7 @@ class AOR_Report extends Basic
 
                 $field->label = str_replace(' ', '_', (string) $field->label) . $i;
 
-                $path = unserialize(base64_decode($field->module_path));
-
-                $data = $field_module->field_defs[$field->field] ?? [];
+                $path = unserialize(base64_decode($field->module_path),['allowed_classes' => false]);
 
                 $field_module = $module;
                 $table_alias = $field_module->table_name;
@@ -1265,7 +1263,7 @@ class AOR_Report extends Basic
                         $field_module = $new_field_module;
                     }
                 }
-
+                $data = $field_module->field_defs[$field->field] ?? [];
 
                 if (!empty($data)){
                     if ($data['type'] == 'relate' && isset($data['id_name'])) {
@@ -1340,10 +1338,11 @@ class AOR_Report extends Basic
                     unset($query['id_select'][$table_alias]);
                 }
 
-                if ($field->group_by == 1) {
+                if ($field->field_function != null) {
+                    $unique = $field->group_by == 1 ? 'DISTINCT ' : '';
+                    $select_field = $field->field_function . '(' . $unique . $select_field . ')';
+                } elseif ($field->group_by == 1) {
                     $query['group_by'][] = $select_field;
-                } elseif ($field->field_function != null) {
-                    $select_field = $field->field_function . '(' . $select_field . ')';
                 } else {
                     $query['second_group_by'][] = $select_field;
                 }
@@ -1490,14 +1489,14 @@ class AOR_Report extends Basic
                 $condition = BeanFactory::newBean('AOR_Conditions');
                 $condition->retrieve($row['id']);
 
-                $path = unserialize(base64_decode($condition->module_path));
+                $path = unserialize(base64_decode($condition->module_path),['allowed_classes' => false]);
 
                 $condition_module = $module;
                 $table_alias = $condition_module->table_name;
                 $oldAlias = $table_alias;
                 if (!empty($path[0]) && $path[0] != $module->module_dir) {
                     foreach ($path as $rel) {
-                        if (empty($rel)) {
+                        if (empty($rel) || !is_string($rel)) {
                             continue;
                         }
                         // Bug: Prevents relationships from loading.
@@ -1629,7 +1628,7 @@ class AOR_Report extends Basic
                             break;
 
                         case 'Date':
-                            $params = unserialize(base64_decode($condition->value));
+                            $params = unserialize(base64_decode($condition->value),['allowed_classes' => false]);
 
                             // Fix for issue #1272 - AOR_Report module cannot update Date type parameter.
                             if ($params == false) {

@@ -1,0 +1,149 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2025 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+
+<div class="squire-editor field-html-editor html-editor field-html" #editorWrapper>
+    <div #toolbar class="field-html-editor-toolbar squire-editor-toolbar">
+        <ng-container *ngFor="let layoutItems of activeButtonLayout(); let i = index">
+            <span *ngIf="i > 0" class="squire-editor-toolbar-divider">|</span>
+            <ng-container *ngFor="let item of layoutItems | keyvalue">
+
+                <ng-container *ngIf="item?.value?.type === 'button'">
+                    <scrm-button class="squire-editor-toolbar-item" [config]="item.value"></scrm-button>
+                </ng-container>
+
+                <ng-container *ngIf="item?.value?.type === 'popup-button-list' && item?.value.items?.length">
+                    <scrm-popup-button [icon]="item?.value?.icon"
+                                       [klass]="item?.value?.klass"
+                                       [dynamicClass]="item.value.dynamicClass"
+                                       [openStatusEventEmitter]="showPopups"
+                                       [showPopup]="item.value.showPopup"
+                                       [popoverClass]="''"
+                                       [titleKey]="item.value.titleKey"
+                                       [disabled]="item.value.disabled"
+                                       placement="bottom"
+                                       [class.hide-popover]="!item.value.showPopup()"
+                                       class="squire-editor-toolbar-item"
+                    >
+                        <div popup-content class="container container-popover scrollbar-thin">
+                            <div *ngFor="let item of item?.value.items" class="squire-editor-button-row row py-1">
+                                <scrm-button class="squire-editor-toolbar-item w-100" [config]="item"></scrm-button>
+                            </div>
+                        </div>
+                    </scrm-popup-button>
+                </ng-container>
+
+                <ng-container *ngIf="item?.value?.type === 'popup-button-grid' && item?.value?.sections">
+                    <scrm-popup-button [icon]="item?.value?.icon"
+                                       [dynamicClass]="item.value.dynamicClass"
+                                       [klass]="item?.value?.klass"
+                                       [showPopup]="item?.value?.showPopup"
+                                       [openStatusEventEmitter]="showPopups"
+                                       [disabled]="item.value.disabled"
+                                       [popoverClass]="''"
+                                       [titleKey]="item.value.titleKey"
+                                       [class.hide-popover]="!item.value.showPopup()"
+                                       placement="bottom"
+                                       class="squire-editor-toolbar-item"
+                    >
+                        <div popup-content class="grid-popup-body container-popover scrollbar-thin">
+                            <div *ngFor="let section of item?.value?.sections | keyvalue"
+                                 [ngClass]="section?.value?.klass"
+                                 class="d-flex flex-wrap squire-editor-popup-row button-row">
+                                <div *ngFor="let sectionItem of section?.value.items"
+                                     class="squire-editor-popup-col">
+                                    <scrm-button [config]="sectionItem"></scrm-button>
+                                </div>
+                            </div>
+                        </div>
+                    </scrm-popup-button>
+                </ng-container>
+
+                <ng-container *ngIf="item?.value?.type === 'insert-link'">
+                    <scrm-button class="squire-editor-toolbar-item" [config]="item?.value"></scrm-button>
+                    <scrm-insert-link-popup-button [config]="item?.value"
+                                                   [displayButton]="item?.value?.metadata?.displayButton"
+                                                   [openStatusEventEmitter]="item?.value?.metadata?.openStatusEventEmitter"
+                                                   [linkUrl]="item?.value?.metadata?.linkURL"
+                                                   [linkEventEmitter]="item.value?.metadata?.linkEventEmitter"
+                                                   class="squire-editor-toolbar-item"
+                    >
+                    </scrm-insert-link-popup-button>
+                </ng-container>
+
+                <ng-container *ngIf="item?.value?.type === 'color-selector'">
+                    <scrm-color-selector class="squire-editor-toolbar-item"
+                                         [config]="item?.value"
+                                         [openStatusEventEmitter]="showPopups"
+                    ></scrm-color-selector>
+                </ng-container>
+
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="collapsedButtons().length">
+            <span class="squire-editor-toolbar-divider">|</span>
+            <scrm-popup-button [icon]="collapsedDropdownButton().icon"
+                               [klass]="collapsedDropdownButton().klass"
+                               [popoverClass]="''"
+                               placement="bottom"
+                               class="squire-editor-toolbar-item"
+            >
+                <div popup-content class="container container-popover scrollbar-thin">
+                    <div *ngFor="let item of collapsedButtons()" class="row py-1">
+                        <scrm-button [config]="item"></scrm-button>
+                    </div>
+                </div>
+            </scrm-popup-button>
+        </ng-container>
+    </div>
+
+    <iframe [class.d-none]="editorMode() !== 'html'" #editorEl #frame
+            src="dist/squire-document.html"
+            (load)="initIframeEditor(frame)"
+            class="editor-container squire-editor-content scrollbar-thin"
+            [ngStyle]="{
+            'min-height': minHeight() ? minHeight() : 'auto',
+            'height': height() ? height() : 'auto',
+            'max-height': maxHeight() ? maxHeight() : 'auto',
+            'width': '100%',
+            'border': 'none',
+            }"
+    ></iframe>
+
+    <div *ngIf="editorMode() === 'code'"
+         [ngStyle]="{
+         'display': 'block',
+         'min-height': minHeight() ? minHeight() : 'auto',
+         'height': height() ? height() : 'auto',
+         'max-height': maxHeight() ? maxHeight() : 'auto'
+         }"
+    >
+        <scrm-monaco-editor #monacoEditor style="height: 100%" (valueChange)="updateFieldValue($event)"
+                            [content]="field.value"></scrm-monaco-editor>
+    </div>
+</div>
+

@@ -20,6 +20,7 @@ services:
       $copyLegacyAssetPaths: '%legacy.copy_asset_paths%'
       $legacyApiPaths: '%legacy.api_paths%'
       $legacyApiPathFiles: '%legacy.api_path_files%'
+      $legacyEntrypointPaths: '%legacy.entrypoint_paths%'
       $legacyEntrypointFiles: '%legacy.entrypoint_files%'
       $exposedUserPreferences: '%legacy.exposed_user_preferences%'
       $userPreferencesKeyMap: '%legacy.user_preferences_key_map%'
@@ -40,12 +41,18 @@ services:
       $listViewColumnLimits: '%module.listview.column_limits%'
       $listViewSettingsLimits: '%module.listview.settings_limits%'
       $listViewActionsLimits: '%module.listview.actions_limits%'
+      $metadataEntries: '%module.metadata.entries%'
       $recordViewActions: '%module.recordview.actions%'
       $recordViewActionLimits: '%module.recordview.actions_limits%'
+      $recordViewAttachmentLimits: '%module.recordview.attachment_limits%'
+      $recordViewSectionTabLimits: '%module.recordview.section_tab_limits%'
+      $recordModalActions: '%module.recordmodal.actions%'
       $recordViewSidebarWidgets: '%module.recordview.sidebar_widgets%'
       $recordViewBottomWidgets: '%module.recordview.bottom_widgets%'
+      $recordViewHeaderWidgets: '%module.recordview.header_widgets%'
       $recordViewTopWidgets: '%module.recordview.top_widgets%'
       $recordViewConvertIgnore: '%module.recordview.convert_ignore%'
+      $recordViewDuplicateIgnore: '%module.recordview.duplicate_ignore%'
       $recordViewSubpanelButtonLimits: '%module.recordview.subpanel_button_limits%'
       $subpanelViewActionLimits: '%module.subpanelview.actions_limits%'
       $groupedFieldsTypeMap: '%record.fields.grouped_fields_type_map%'
@@ -70,6 +77,7 @@ services:
       $sessionExpiredConfig: '%auth.session-expired%'
       $adminOnlyModuleActions: '%system.admin_only_module_actions%'
       $navbarAdministrationOverrides: '%navbar.administration_override%'
+      $navbarOverrides: '%navbar.overrides%'
       $quickActions: '%quick_actions%'
       $graphqlShowDocs: '%graphql.graphql_show_docs%'
       $language: '%language%'
@@ -89,8 +97,12 @@ services:
       tags: [ 'system.config.mapper' ]
     App\FieldDefinitions\LegacyHandler\FieldDefinitionMapperInterface:
       tags: [ 'field.definition.mapper' ]
+    App\FieldDefinitions\Service\VardefConfigMapperInterface:
+      tags: [ 'vardef.mapper' ]
     App\ViewDefinitions\LegacyHandler\ViewDefinitionMapperInterface:
       tags: [ 'view.definition.mapper' ]
+    App\ViewDefinitions\LegacyHandler\ViewConfigMapperInterface:
+      tags: [ 'view.config.mapper' ]
     App\Data\LegacyHandler\PresetListDataHandlerInterface:
       tags: [ 'app.data.preset.handler' ]
     App\Engine\Service\ActionAvailabilityChecker\ActionAvailabilityCheckerInterface:
@@ -108,6 +120,8 @@ services:
       tags: [ 'app.legacy.migration.step' ]
     App\Install\Service\Installation\InstallStepInterface:
       tags: [ 'app.install.step' ]
+    App\Schedulers\Service\SchedulerInterface:
+      tags: [ 'app.scheduler' ]
     App\Install\Service\Cli\CliStepInterface:
       tags: ['cli.install.step']
     App\ViewDefinitions\Service\MassUpdateDefinitionMapperInterface:
@@ -128,9 +142,22 @@ services:
       tags: [ 'record.saveHandlers.field' ]
     App\Data\Service\Record\RecordSaveHandlers\RecordFieldTypeSaveHandlerInterface:
       tags: [ 'record.saveHandlers.fieldType' ]
-    \App\Data\Service\Record\RecordSaveHandlers\RecordSaveHandlerInterface:
+    App\Data\Service\Record\RecordSaveHandlers\RecordSaveHandlerInterface:
       tags: [ 'record.saveHandlers.record' ]
-
+    App\Data\Service\Record\RecordDeleteHandlers\RecordFieldDeleteHandlerInterface:
+      tags: [ 'record.deleteHandlers.field' ]
+    App\Data\Service\Record\RecordDeleteHandlers\RecordFieldTypeDeleteHandlerInterface:
+      tags: [ 'record.deleteHandlers.fieldType' ]
+    App\Data\Service\Record\RecordDeleteHandlers\RecordDeleteHandlerInterface:
+      tags: [ 'record.deleteHandlers.record' ]
+    App\Module\Campaigns\Service\Email\Targets\Validation\EmailTargetValidatorInterface:
+      tags: [ 'email.target.validator' ]
+    App\Emails\Service\EmailParserHandler\EmailParserInterface:
+      tags: [ 'email.parser' ]
+    App\Module\Campaigns\Service\Email\Parser\CampaignEmailParserInterface:
+      tags: [ 'campaign.email.parser' ]
+    App\MediaObjects\Validator\UploadValidator\UploadValidatorInterface:
+      tags: [ 'media-object.upload.validator.registry' ]
 
   # makes classes in src/ available to be used as services
   # this creates a service per class whose id is the fully-qualified class name
@@ -173,6 +200,10 @@ services:
     arguments:
       - !tagged { tag: 'app.process.handler' }
 
+  App\Schedulers\Service\SchedulerRegistry:
+    arguments:
+      - !tagged { tag: 'app.scheduler' }
+
   App\Engine\Service\Extensions\ExtensionAssetCopyCacheWarmer:
     arguments:
       - '@App\Engine\Service\Extensions\ExtensionAssetCopyInterface'
@@ -191,6 +222,12 @@ services:
       - '@?property_accessor'
 
   security.listener.json_login_ldap.main: '@App\Security\Ldap\AppCheckLdapCredentialsListener'
+
+  App\Data\EventSubscriber\RecordInitDoctrineEventListener:
+    arguments:
+      - '@App\Authentication\LegacyHandler\UserHandler'
+    tags:
+      - { name: doctrine.event_listener, event: prePersist }
 
   App\Security\TwoFactor\EventListener\TotpEncryptionListener:
     arguments:
@@ -281,10 +318,21 @@ services:
     arguments:
       - !tagged { tag: 'field.definition.mapper' }
 
+  App\FieldDefinitions\Service\VardefConfigMapperRegistry:
+    # inject all services tagged with field.definition.mapper as first argument
+    lazy: true
+    arguments:
+      - !tagged { tag: 'vardef.mapper' }
+
   App\ViewDefinitions\LegacyHandler\ViewDefinitionMappers:
     # inject all services tagged with view.definition.mapper as first argument
     arguments:
       - !tagged { tag: 'view.definition.mapper' }
+      -
+  App\ViewDefinitions\LegacyHandler\ViewConfigMappers:
+    # inject all services tagged with view.config.mapper as first argument
+    arguments:
+      - !tagged { tag: 'view.config.mapper' }
 
   App\Data\LegacyHandler\PresetListDataHandlers:
     # inject all services tagged with app.data.preset.handler as first argument
@@ -402,12 +450,50 @@ services:
       - !tagged { tag: 'record.saveHandlers.fieldType' }
 
   App\Data\Service\Record\RecordSaveHandlers\RecordSaveHandlerRegistry:
+    lazy: true
     arguments:
       - !tagged { tag: 'record.saveHandlers.record' }
+
+  App\Data\Service\Record\RecordDeleteHandlers\RecordFieldDeleteHandlerRegistry:
+    arguments:
+      - !tagged { tag: 'record.deleteHandlers.field' }
+
+  App\Data\Service\Record\RecordDeleteHandlers\RecordFieldTypeDeleteHandlerRegistry:
+    arguments:
+      - !tagged { tag: 'record.deleteHandlers.fieldType' }
+
+  App\Data\Service\Record\RecordDeleteHandlers\RecordDeleteHandlerRegistry:
+    lazy: true
+    arguments:
+      - !tagged { tag: 'record.deleteHandlers.record' }
+
+  App\Emails\Service\EmailParserHandler\EmailParserRegistry:
+    arguments:
+      - !tagged { tag: 'email.parser' }
+
+  App\Module\Campaigns\Service\Email\Parser\CampaignEmailParserRegistry:
+    arguments:
+      - !tagged { tag: 'campaign.email.parser' }
+
+  App\Module\Campaigns\Service\Email\Targets\Validation\EmailTargetValidatorRegistry:
+    arguments:
+      - !tagged { tag: 'email.target.validator' }
 
   App\Security\Ldap\AppLdapUserProviderProxy:
     $ldapUserProvider: '@security.user.provider.concrete.ldap_users'
     $entityUserProvider: '@security.user.provider.concrete.app_user_provider'
+
+  App\MediaObjects\Services\UuidMediaObjectFileNamer:
+    lazy: true
+    public: true
+
+  App\MediaObjects\Validator\UploadValidator\UploadValidatorRegistry:
+    arguments:
+      - !tagged { tag: 'media-object.upload.validator.registry' }
+
+  media_object_file_namer:
+    alias: App\MediaObjects\Services\UuidMediaObjectFileNamer
+    public: true
 
   saml_user_factory:
     alias: App\Security\Saml\AppSamlUserFactory
@@ -457,6 +543,7 @@ services:
   App\Routes\Service\NavigationProviderInterface: '@App\Navbar\LegacyHandler\NavbarHandler'
   App\Process\Service\ProcessHandlerInterface: '@App\Process\LegacyHandler\ResetPasswordHandler'
   App\Data\Service\RecordActionDefinitionProviderInterface: '@App\Data\Service\RecordActionDefinitionProvider'
+  App\Data\Service\RecordModalActionDefinitionProviderInterface: '@App\Data\Service\RecordModalActionDefinitionProvider'
   App\Data\Service\RecordDeletionServiceInterface: '@App\Data\LegacyHandler\RecordDeletionHandler'
   App\Data\Service\RecordListProviderInterface: '@App\Data\LegacyHandler\RecordListHandler'
   App\Data\Service\RecordProviderInterface: '@App\Data\LegacyHandler\RecordHandler'

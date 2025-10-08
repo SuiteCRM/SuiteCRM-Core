@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -35,12 +35,15 @@ import {
 } from '../record-thread-sidebar-widget/record-thread-sidebar-widget.component';
 import {RecordTableWidgetComponent} from "../record-table-widget/record-table-widget.component";
 import {RecordTableWidgetModule} from "../record-table-widget/record-table-widget.module";
+import {BannerGridSidebarWidgetModule} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.module";
+import {BannerGridSidebarWidgetComponent} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.component";
 
 export const sidebarWidgetModules = [
     HistorySidebarWidgetModule,
     ChartSidebarWidgetModule,
     StatisticsSidebarWidgetModule,
-    RecordTableWidgetModule
+    RecordTableWidgetModule,
+    BannerGridSidebarWidgetModule
 ];
 
 export const componentTypeMap = {
@@ -48,5 +51,6 @@ export const componentTypeMap = {
     chart: ChartSidebarWidgetComponent,
     statistics: StatisticsSidebarWidgetComponent,
     'record-thread': RecordThreadSidebarWidgetComponent,
-    'record-table': RecordTableWidgetComponent
+    'record-table': RecordTableWidgetComponent,
+    'banner-grid': BannerGridSidebarWidgetComponent
 };

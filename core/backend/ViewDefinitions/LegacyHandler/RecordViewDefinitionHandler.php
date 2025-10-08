@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -56,37 +56,43 @@ class RecordViewDefinitionHandler extends LegacyHandler
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    protected $logger;
 
     /**
      * @var RecordActionDefinitionProviderInterface
      */
-    private $actionDefinitionProvider;
+    protected $actionDefinitionProvider;
 
     /**
      * @var WidgetDefinitionProviderInterface
      */
-    private $widgetDefinitionProvider;
+    protected $widgetDefinitionProvider;
 
     /**
      * @var array
      */
-    private $recordViewSidebarWidgets;
+    protected $recordViewSidebarWidgets;
 
     /**
      * @var array
      */
-    private $recordViewBottomWidgets;
+    protected $recordViewBottomWidgets;
 
     /**
      * @var array
      */
-    private $recordViewTopWidgets;
+    protected $recordViewHeaderWidgets;
+
+    /**
+     * @var array
+     */
+    protected $recordViewTopWidgets;
 
     /**
      * @var FieldAliasMapper
      */
-    private $fieldAliasMapper;
+    protected $fieldAliasMapper;
+    protected ViewConfigMappers $viewConfigMappers;
 
     /**
      * RecordViewDefinitionHandler constructor.
@@ -101,8 +107,10 @@ class RecordViewDefinitionHandler extends LegacyHandler
      * @param FieldAliasMapper $fieldAliasMapper
      * @param array $recordViewSidebarWidgets
      * @param array $recordViewBottomWidgets
+     * @param array $recordViewHeaderWidgets
      * @param array $recordViewTopWidgets
      * @param RequestStack $session
+     * @param ViewConfigMappers $viewDefsConfigMappers
      */
     public function __construct(
         string $projectDir,
@@ -116,8 +124,10 @@ class RecordViewDefinitionHandler extends LegacyHandler
         FieldAliasMapper $fieldAliasMapper,
         array $recordViewSidebarWidgets,
         array $recordViewBottomWidgets,
+        array $recordViewHeaderWidgets,
         array $recordViewTopWidgets,
-        RequestStack $session
+        RequestStack $session,
+        ViewConfigMappers $viewDefsConfigMappers
     ) {
         parent::__construct(
             $projectDir,
@@ -132,8 +142,10 @@ class RecordViewDefinitionHandler extends LegacyHandler
         $this->widgetDefinitionProvider = $widgetDefinitionProvider;
         $this->recordViewSidebarWidgets = $recordViewSidebarWidgets;
         $this->recordViewBottomWidgets = $recordViewBottomWidgets;
+        $this->recordViewHeaderWidgets = $recordViewHeaderWidgets;
         $this->recordViewTopWidgets = $recordViewTopWidgets;
         $this->fieldAliasMapper = $fieldAliasMapper;
+        $this->viewConfigMappers = $viewDefsConfigMappers;
     }
 
     /**
@@ -170,47 +182,86 @@ class RecordViewDefinitionHandler extends LegacyHandler
      * @param string $module
      * @param string $legacyModuleName
      * @param FieldDefinition $fieldDefinition
+     * @param string $type
      * @return array
      */
     public function fetch(
         string $module,
         string $legacyModuleName,
-        FieldDefinition $fieldDefinition
+        FieldDefinition $fieldDefinition,
+        string $type = 'detail'
     ): array {
-        $detailViewDefs = $this->getDetailViewDefs($legacyModuleName);
-        $editViewDefs = $this->getEditViewDefs($legacyModuleName);
+        $recordViewDefs = [];
+        $editViewDefs = [];
+        if ($type === 'detail') {
+            $recordViewDefs = $this->getDetailViewDefs($legacyModuleName, $module);
+            $editViewDefs = $this->getEditViewDefs($legacyModuleName);
+        } else {
+            $recordViewDefs = $this->getRecordViewDefs($legacyModuleName, $type);
+        }
         $vardefs = $fieldDefinition->getVardef();
 
         $metadata = [
+            'header' => [],
             'templateMeta' => [],
             'topWidget' => [],
             'sidebarWidgets' => [],
             'bottomWidgets' => [],
+            'headerWidgets' => [],
             'actions' => [],
             'panels' => [],
             'summaryTemplates' => [],
             'vardefs' => $vardefs,
             'metadata' => [],
+            'sections' => [],
         ];
 
-        $this->addTemplateMeta($detailViewDefs, $metadata);
-        $this->addMetadata($detailViewDefs, $metadata);
-        $this->addTopWidgetConfig($module, $detailViewDefs, $metadata);
-        $this->addSidebarWidgetConfig($module, $detailViewDefs, $metadata);
-        $this->addBottomWidgetConfig($module, $detailViewDefs, $metadata);
-        $this->addPanelDefinitions($detailViewDefs, $editViewDefs, $vardefs, $metadata);
-        $this->addActionConfig($module, $detailViewDefs, $metadata);
-        $this->addSummaryTemplates($detailViewDefs, $metadata);
+        $this->addTemplateMeta($recordViewDefs, $metadata);
+        $this->addMetadata($recordViewDefs, $metadata);
+        $this->addTopWidgetConfig($module, $recordViewDefs, $metadata);
+        $this->addSidebarWidgetConfig($module, $recordViewDefs, $metadata);
+        $this->addBottomWidgetConfig($module, $recordViewDefs, $metadata);
+        $this->addHeaderWidgetConfig($module, $recordViewDefs, $metadata);
+        $this->addPanelDefinitions($recordViewDefs, $editViewDefs, $vardefs, $metadata);
+        $this->addActionConfig($module, $recordViewDefs, $metadata);
+        $this->addSummaryTemplates($recordViewDefs, $metadata);
+        $this->addBackButton($recordViewDefs, $metadata);
+
+        if (!empty($recordViewDefs['sections']) && is_array($recordViewDefs['sections'])) {
+            foreach ($recordViewDefs['sections'] as $index => $section) {
+                $metadata['sections'][$index] = [
+                    'templateMeta' => [],
+                    'metadata' => [],
+                    'sidebarWidgets' => [],
+                    'bottomWidgets' => [],
+                    'headerWidgets' => [],
+                    'topWidget' => [],
+                    'panels' => [],
+                    'subpanels' => $section['subpanels'] ?? [],
+                    'order' => $section['order'] ?? 0,
+                    'tabAction' => $section['tabAction'] ?? '',
+                ];
+                $this->addTemplateMeta($section,  $metadata['sections'][$index]);
+                $this->addMetadata($section,  $metadata['sections'][$index]);
+                $this->addTopWidgetConfig($module, $section,  $metadata['sections'][$index]);
+                $this->addSidebarWidgetConfig($module, $section,  $metadata['sections'][$index]);
+                $this->addBottomWidgetConfig($module, $section,  $metadata['sections'][$index]);
+                $this->addHeaderWidgetConfig($module, $section,  $metadata['sections'][$index]);
+                $this->addPanelDefinitions($section, [], $vardefs,  $metadata['sections'][$index]);
+            }
+
+        }
 
         return $metadata;
     }
 
     /**
      * Get detail view defs from legacy
+     * @param string $legacyModuleName
      * @param string $module
      * @return array
      */
-    protected function getDetailViewDefs(string $module): array
+    protected function getDetailViewDefs(string $legacyModuleName, string $module): array
     {
         /* @noinspection PhpIncludeInspection */
         require_once 'include/MVC/View/ViewFactory.php';
@@ -218,15 +269,17 @@ class RecordViewDefinitionHandler extends LegacyHandler
         /* @var ViewDetail $view */
         $view = ViewFactory::loadView(
             'detail',
-            $module,
-            BeanFactory::newBean($module)
+            $legacyModuleName,
+            BeanFactory::newBean($legacyModuleName)
         );
 
-        $view->module = $module;
+        $view->module = $legacyModuleName;
 
         $this->loadDetailViewMetadata($view);
 
-        return $view->dv->defs ?? [];
+        $result = $view->dv->defs ?? [];
+
+        return $this->viewConfigMappers->run($module, 'record', $result) ?? [];
     }
 
     /**
@@ -309,6 +362,58 @@ class RecordViewDefinitionHandler extends LegacyHandler
     }
 
     /**
+     * Get detail view defs from legacy
+     * @param string $module
+     * @param string $legacyViewType
+     * @return array
+     */
+    protected function getRecordViewDefs(string $module, string $legacyViewType): array
+    {
+        /* @noinspection PhpIncludeInspection */
+        require_once 'include/MVC/View/ViewFactory.php';
+
+        /* @var ViewDetail $view */
+        $view = ViewFactory::loadView(
+            $legacyViewType,
+            $module,
+            BeanFactory::newBean($module)
+        );
+
+        if (empty($view)) {
+            $view = ViewFactory::loadView(
+                'detail',
+                $module,
+                BeanFactory::newBean($module)
+            );
+        }
+
+        $view->module = $module;
+
+        $metadataFile = $view->getMetaDataFile();
+
+        if (empty($metadataFile) || !file_exists($metadataFile)) {
+            return [];
+        }
+
+        $viewdefs = [];
+        require($metadataFile);
+
+        if (!empty($viewdefs[$module][$legacyViewType . 'View'])) {
+            return $viewdefs[$module][$legacyViewType . 'View'];
+        }
+
+        if (!empty($viewdefs[$module][$legacyViewType])) {
+            return $viewdefs[$module][$legacyViewType];
+        }
+
+        if (!empty($viewdefs[$module]['DetailView'])) {
+            return $viewdefs[$module]['DetailView'];
+        }
+
+        return [];
+    }
+
+    /**
      * @param array $viewDefs
      * @param array $metadata
      */
@@ -317,6 +422,7 @@ class RecordViewDefinitionHandler extends LegacyHandler
         $metadata['templateMeta']['maxColumns'] = $viewDefs['templateMeta']['maxColumns'] ?? 2;
         $metadata['templateMeta']['useTabs'] = $viewDefs['templateMeta']['useTabs'] ?? true;
         $metadata['templateMeta']['tabDefs'] = $viewDefs['templateMeta']['tabDefs'] ?? [];
+        $metadata['templateMeta']['colClasses'] = $viewDefs['templateMeta']['colClasses'] ?? [];
     }
 
     /**
@@ -325,7 +431,7 @@ class RecordViewDefinitionHandler extends LegacyHandler
      */
     protected function addMetadata(array $viewDefs, array &$metadata): void
     {
-        $metadata['metadata']= $viewDefs['metadata'] ?? [];
+        $metadata['metadata'] = $viewDefs['metadata'] ?? [];
     }
 
     /**
@@ -403,6 +509,20 @@ class RecordViewDefinitionHandler extends LegacyHandler
     }
 
     /**
+     * @param string $module
+     * @param array $viewDefs
+     * @param array $metadata
+     */
+    protected function addHeaderWidgetConfig(string $module, array $viewDefs, array &$metadata): void
+    {
+        $metadata['headerWidgets'] = $this->widgetDefinitionProvider->getHeaderWidgets(
+            $this->recordViewBottomWidgets,
+            $module,
+            ['widgets' => $viewDefs['headerWidgets'] ?? []]
+        );
+    }
+
+    /**
      * @param array $detailViewDefs
      * @param array $editViewDefs
      * @param array|null $vardefs
@@ -456,6 +576,7 @@ class RecordViewDefinitionHandler extends LegacyHandler
                     $definition = $cell;
 
                     if (empty($cell)) {
+                        $newRow['cols'][] = ['name' => '', 'fieldDefinition' => []];
                         continue;
                     }
 
@@ -467,6 +588,10 @@ class RecordViewDefinitionHandler extends LegacyHandler
 
                     if (is_string($cell)) {
                         $definition = $this->getBaseFieldCellDefinition($cell);
+                    }
+
+                    if (isset($cell['name'])  && empty($cell['name'])) {
+                        $newRow['cols'][] = ['name' => '', 'fieldDefinition' => []];
                     }
 
                     $this->addCell($newRow, $definition, $vardefs, $editViewFields);
@@ -525,7 +650,7 @@ class RecordViewDefinitionHandler extends LegacyHandler
                         $cells[$definition['name']] = $definition;
                     }
 
-                    if (isset($definition['name'])){
+                    if (isset($definition['name'])) {
                         $cells[$definition['name']] = $definition;
                     }
                 }
@@ -545,6 +670,13 @@ class RecordViewDefinitionHandler extends LegacyHandler
         $definition['name'] = $field;
 
         return $definition;
+    }
+
+    protected function addBackButton(array $detailViewDefs, array &$metadata): void
+    {
+        $backButton = $detailViewDefs['header']['backButton'] ?? ['display' => true];
+
+        $metadata['header']['backButton'] = $backButton;
     }
 
     /**
@@ -656,4 +788,5 @@ class RecordViewDefinitionHandler extends LegacyHandler
 
         return $definition;
     }
+
 }

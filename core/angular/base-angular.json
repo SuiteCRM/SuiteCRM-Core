@@ -22,7 +22,8 @@
             "polyfills": "core/app/shell/src/polyfills.ts",
             "tsConfig": "core/app/shell/tsconfig.app.json",
             "scripts": [
-              "node_modules/tinymce/tinymce.min.js"
+              "node_modules/tinymce/tinymce.min.js",
+              "node_modules/dompurify/dist/purify.min.js"
             ],
             "styles": [
               "node_modules/bootstrap-css-only/css/bootstrap.min.css",
@@ -49,7 +50,23 @@
                 "glob": "**/*",
                 "input": "node_modules/tinymce",
                 "output": "/tinymce/"
-              }
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/monaco-editor/min/",
+                "output": "/mona/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/squire-rte/dist/",
+                "output": "/squire/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/dompurify/dist/",
+                "output": "/dompurify/"
+              },
+              "core/app/shell/src/squire-document.html"
             ],
             "allowedCommonJsDependencies": [
               "graphql-tag",

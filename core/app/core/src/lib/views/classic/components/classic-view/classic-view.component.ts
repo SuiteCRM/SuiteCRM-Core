@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,15 +24,18 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {AfterViewInit, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, HostListener, NgZone, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DomSanitizer} from '@angular/platform-browser';
 import {IframeResizeHandlerHandler} from '../../services/iframe-resize-handler.service';
 import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
 import {AuthService} from '../../../../services/auth/auth.service';
+import {AppStateStore} from '../../../../store/app-state/app-state.store';
 import {RouteConverter, RouteInfo} from '../../../../services/navigation/route-converter/route-converter.service';
 import {IframePageChangeObserver} from '../../services/iframe-page-change-observer.service';
 import {take} from "rxjs/operators";
+import {RecordModalOptions} from "../../../../services/modals/record-modal.model";
+import {isString} from "lodash-es";
 
 interface RoutingExclusions {
     [key: string]: string[];
@@ -46,6 +49,28 @@ interface RoutingExclusions {
 export class ClassicViewUiComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild('dataContainer', {static: true}) dataContainer: ElementRef;
+
+    @HostListener('window:message', ['$event'])
+    onMessage(event) {
+
+        if (isString(event.data) && event.data === 'cache-reload') {
+            this.auth.clearBackendCacheable();
+            this.router.navigateByUrl(this.router.url).then();
+            return;
+        }
+
+        if (isString(event.data)) {
+            return;
+        }
+
+        const options = JSON.parse(event.data);
+
+        if (options.type === 'record-modal'){
+            const modalOptions = options.params as RecordModalOptions;
+            this.loadModal(modalOptions);
+        }
+    }
+
     public wrapper: any;
     public url: string;
     protected iframe = null;
@@ -60,6 +85,7 @@ export class ClassicViewUiComponent implements OnInit, OnDestroy, AfterViewInit 
         private auth: AuthService,
         private ngZone: NgZone,
         private systemConfigs: SystemConfigStore,
+        protected appStateStore: AppStateStore,
     ) {
     }
 
@@ -177,6 +203,10 @@ export class ClassicViewUiComponent implements OnInit, OnDestroy, AfterViewInit 
             this.onIFrameLoad.bind(this),
             this.onIFrameUnload.bind(this),
         );
+    }
+
+    protected loadModal(options: RecordModalOptions): void {
+        this.appStateStore.recordModalOpenEventEmitter.emit(options);
     }
 
     protected buildIframeResizeHandlerHandler(): IframeResizeHandlerHandler {

@@ -44,6 +44,7 @@ if (!defined('sugarEntry') || !sugarEntry) {
 
 $mod_strings = array(
     'LBL_SEND_DATE_TIME' => 'Send Date',
+    'LBL_SEND_ON' => 'Send On',
     'LBL_IN_QUEUE' => 'In Process',
     'LBL_IN_QUEUE_DATE' => 'Queued Date',
 
@@ -61,7 +62,10 @@ $mod_strings = array(
     'LBL_EMAIL_CONFIRM_OPT_IN_TEMPLATE_ID' => 'Confirm Opt In Email Template',
     'LBL_LEGACY_EMAIL_COMPOSE_BEHAVIOR' => 'Enable Legacy Email Compose Behaviour',
     'LBL_EMAIL_OUTBOUND_CONFIGURATION' => 'Outgoing Mail Configuration',
-    'LBL_EMAILS_PER_RUN' => 'Number of emails sent per batch:',
+    'LBL_EMAILS_PER_RUN' => 'Number of emails processed/sent per batch:',
+    'LBL_CAMPAIGN_MARKETING_RECORDS_PER_RUN' => 'Number of emails marketing records to process per run:',
+    'LBL_TRACKERS_ENABLED' => 'Trackers enabled:',
+    'LBL_TRACKER_LINKS_ENABLED' => 'Tracker Links Enabled',
     'LBL_ID' => 'Id',
     'LBL_LIST_CAMPAIGN' => 'Campaign',
     'LBL_LIST_FORM_TITLE' => 'Queue',
@@ -94,6 +98,7 @@ $mod_strings = array(
     'LBL_EXCHANGE_SMTPSERVER' => 'Exchange Server',
     'LBL_EMAIL_LINK_TYPE' => 'Email Client',
     'LBL_MARKETING_ID' => 'Marketing Id',
+    'LBL_LIST_MARKETING_NAME' => 'Marketing Name',
     'LBL_MODULE_ID' => 'EmailMan',
     'LBL_MODULE_NAME' => 'Email Settings',
     'LBL_MODULE_TITLE' => 'Outbound Email Queue Management',
@@ -139,6 +144,7 @@ $mod_strings = array(
     'LBL_FROM_ADDRESS_HELP' => 'When enabled, the assigning user\\\'s name and email address will be included in the From field of the email. This feature might not work with SMTP servers that do not allow sending from a different email account than the server account.',
     'LBL_HELP' => 'Help' /*for 508 compliance fix*/,
     'LBL_OUTBOUND_EMAIL_ACCOUNT_VIEW' => 'View Outbound Email Accounts',
+    'LBL_SYSTEM_OUTBOUND_EMAIL_ACCOUNT' => 'System Outbound Email Account',
     'LBL_ALLOW_SEND_AS_USER' => 'Users may send as themselves:',
     'LBL_ALLOW_SEND_AS_USER_DESC' => 'When enabled, <b>all</b> users can send email using the outgoing mail server, using their own primary email address as the &quot;From:&quot; address.<br>This feature might not work with SMTP servers that do not allow sending from a different email account than the server account.',
 );

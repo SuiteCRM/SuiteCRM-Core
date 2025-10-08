@@ -47,12 +47,11 @@
     {
         padding-left: 0px;
     }
-    div.resultsTable {
-        overflow: auto;
-        width: 100%;
-        padding-top: 20px;
-        position: relative;
-    }
+div.resultsTable {
+    overflow: auto;
+    padding-top: 20px;
+    position: relative;
+}
 </style>
 {/literal}
 
@@ -98,7 +97,7 @@
 </form>
 
 <br/>
-    
+
 <table width="100%" id="tabListContainerTable" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td nowrap id="tabListContainerTD">

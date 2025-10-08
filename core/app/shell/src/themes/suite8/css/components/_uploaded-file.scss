@@ -1,0 +1,362 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2025 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+a.clickable.file-field-uploaded-link:hover {
+  text-decoration: none;
+
+  .uploaded-file {
+    border: 1px solid $bright-purple;
+  }
+}
+
+.uploaded-file-compact {
+  display: flex;
+  align-items: center;
+  font-size: 0.95em;
+  margin-top: 0.5em;
+  justify-content: space-between;
+  width: fit-content;
+  padding: 0.1em;
+  background: $off-white-lighter;
+  border-radius: 0.2rem;
+  border: 1px solid $lightgray;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  .uploaded-file-info-container {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+
+    &.uploaded-file-error {
+      .uploaded-file-icon {
+        color: $error;
+      }
+
+      .uploaded-file-info {
+        .uploaded-file-name {
+          color: $error;
+        }
+      }
+
+    }
+
+    .uploaded-file-icon-container {
+      .uploaded-file-icon {
+        margin-right: .3em;
+        color: $bright-purple;
+        font-size: larger;
+        line-height: 100%;
+        height: auto;
+        display: block;
+
+        &.uploaded-file-icon-error {
+          color: $error;
+        }
+
+        svg-icon {
+          display: block;
+          line-height: 1;
+        }
+      }
+    }
+
+    .uploaded-file-info {
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+      justify-content: space-between;
+      align-items: center;
+
+      .uploaded-file-name {
+        color: $bright-purple;
+        font-weight: 500;
+        line-height: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .uploaded-file-size {
+        color: $shell-grey;
+        font-size: 0.9em;
+        line-height: 1.25;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        align-content: end;
+      }
+    }
+
+
+  }
+
+  .upload-progress-bar {
+    height: 4px;
+    background: $lightgray;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 4px;
+    display: flex;
+    margin-left: 0.2em;
+  }
+
+  .upload-progress-bar-fill {
+    height: 100%;
+    background: $bright-purple;
+    transition: width 0.3s ease;
+    border-radius: 4px 0 0 4px;
+  }
+
+  .uploaded-file-actions {
+    .upload-clear-button {
+
+      font-size: large;
+      color: $bright-purple;
+      fill: $bright-purple;
+
+      &.upload-clear-button-error {
+        color: $error;
+        fill: $error;
+      }
+
+      svg-icon {
+        line-height: 1;
+        display: block;
+
+        svg {
+          width: 1em;
+          height: 1em;
+
+
+          @media (max-width: 480px) {
+            width: 1.15em;
+            height: 1.25em;
+          }
+        }
+      }
+
+
+      &:hover {
+        color: $dark-purple;
+        fill: $dark-purple;
+        border-color: transparent;
+        background: transparent;
+      }
+    }
+  }
+
+}
+
+.uploaded-file {
+  display: flex;
+  align-items: center;
+  font-size: 0.95em;
+  margin-top: 0.5em;
+  width: fit-content;
+  padding: 0.1em;
+  background: $off-white-lighter;
+  border-radius: 0.2rem;
+  border: 1px solid $lightgray;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  .uploaded-file-info-container {
+    display: flex;
+    align-items: center;
+
+    &.uploaded-file-error {
+      .uploaded-file-icon {
+        color: $error;
+      }
+
+      .uploaded-file-info {
+        .uploaded-file-name {
+          color: $error;
+        }
+      }
+
+    }
+
+    .uploaded-file-icon-container {
+      .uploaded-file-icon {
+        margin-right: .3em;
+        color: $bright-purple;
+        font-size: x-large;
+        line-height: 100%;
+        height: auto;
+        display: block;
+
+        &.uploaded-file-icon-error {
+          color: $error;
+        }
+
+        svg-icon {
+          display: block;
+          line-height: 1;
+        }
+      }
+    }
+
+    .uploaded-file-info {
+      display: flex;
+      flex-direction: column;
+
+      a.clickable:hover {
+        color: #8d74cc !important;
+      }
+
+      .uploaded-file-name {
+        color: $bright-purple;
+        font-weight: 500;
+        margin-right: 0.5em;
+        line-height: 1.25;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .uploaded-file-size {
+        color: $shell-grey;
+        font-size: 0.9em;
+        line-height: 1.25;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+
+  }
+
+  .upload-progress-bar {
+    height: 4px;
+    background: $lightgray;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 4px;
+    display: flex;
+    margin-left: 0.2em;
+  }
+
+  .upload-progress-bar-fill {
+    height: 100%;
+    background: $bright-purple;
+    transition: width 0.3s ease;
+    border-radius: 4px 0 0 4px;
+  }
+
+  .uploaded-file-actions {
+    .upload-clear-button {
+
+      font-size: large;
+      color: $bright-purple;
+      fill: $bright-purple;
+
+      &.upload-clear-button-error {
+        color: $error;
+        fill: $error;
+      }
+
+      svg-icon {
+        line-height: 1;
+        display: block;
+
+        svg {
+          width: 1em;
+          height: 1em;
+        }
+      }
+
+
+      &:hover {
+        color: $dark-purple;
+        fill: $dark-purple;
+        border-color: transparent;
+        background: transparent;
+      }
+    }
+  }
+
+}
+
+.field-mode-list.field-type-attachment,
+.field-mode-list.field-type-file {
+
+  a.clickable.file-field-uploaded-link:hover {
+    .uploaded-file {
+      &:hover {
+        border: none;
+        border-bottom: 1px solid $bright-purple;
+        border-radius: 0;
+        padding-bottom: 1px;
+      }
+    }
+  }
+
+  .uploaded-file {
+    padding: 0em;
+    background: transparent;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+
+    &:hover {
+      border: none;
+      border-bottom: 1px solid $bright-purple;
+      border-radius: 0;
+      padding-bottom: 1px;
+    }
+
+    .uploaded-file-info-container {
+
+      .uploaded-file-icon-container {
+
+        .uploaded-file-icon {
+          margin-right: .4em;
+          font-size: 0.8rem;
+        }
+      }
+
+      .uploaded-file-info {
+
+        .uploaded-file-name {
+          font-weight: 700;
+          margin-right: initial;
+        }
+      }
+
+
+    }
+
+  }
+}
+

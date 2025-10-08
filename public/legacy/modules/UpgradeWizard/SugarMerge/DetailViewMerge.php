@@ -101,6 +101,7 @@ class DetailViewMerge extends EditViewMerge
         $this->mergeTemplateMeta();
         $this->mergeSidebarWidgets();
         $this->mergeBottomWidgets();
+        $this->mergeHeaderWidgets();
         $this->mergeTopWidget();
         $this->mergeRecordActions();
         $this->setPanels();

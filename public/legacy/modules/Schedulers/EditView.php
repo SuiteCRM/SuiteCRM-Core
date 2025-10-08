@@ -153,11 +153,21 @@ $start_at = 1;
 // setup function drop down
 include_once('modules/Schedulers/_AddJobsHere.php');
 
+$job_function = "<option value=''>--</option>";
 if (is_array($job_strings) && !empty($job_strings)) {
-    $job_function = "<option value=''>--</option>";
     foreach ($job_strings as $k => $function) {
         $job_function .= "<option value='function::".$function."'";
         if ($focus->job === "function::".$function) {
+            $job_function .= " SELECTED ";
+        }
+        $job_function .= ">".$mod_strings['LBL_'.strtoupper($function)]."</option>";
+    }
+}
+
+if (is_array($jobStrings) && !empty($jobStrings)) {
+    foreach ($jobStrings as $k => $function) {
+        $job_function .= "<option value='scheduler::".$function."'";
+        if ($focus->job === "scheduler::".$function) {
             $job_function .= " SELECTED ";
         }
         $job_function .= ">".$mod_strings['LBL_'.strtoupper($function)]."</option>";

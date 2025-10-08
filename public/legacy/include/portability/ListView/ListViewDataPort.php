@@ -398,9 +398,9 @@ class ListViewDataPort extends ListViewData
         $query .= $ret_array['inner_join'] ?? '';
         $query .= $ret_array['where'] ?? '';
         $query .= $params['custom_where'] ?? '';
+        $query .= $ret_array['group_by'] ?? '';
         $query .= $ret_array['order_by'] ?? '';
         $query .= $params['custom_order_by'] ?? '';
-        $query .= $ret_array['group_by'] ?? '';
 
         return $query;
     }

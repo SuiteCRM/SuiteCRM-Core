@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -29,9 +29,10 @@ import {CommonModule} from '@angular/common';
 import {RecordComponent} from './record.component';
 import {FieldModule} from '../../../../fields/field.module';
 import {RecordContainerModule} from '../record-container/record-container.module';
-import {RecordHeaderModule} from '../record-header/record-header.module';
 import {StatusBarModule} from '../../../../components/status-bar/status-bar.module';
 import {SubpanelModule} from '../../../../containers/subpanel/components/subpanel/subpanel.module';
+import {DynamicComponent} from "ng-dynamic-component";
+import {BaseRecordHeaderModule} from "../record-header/base-record-header/base-record-header.module";
 
 @NgModule({
     declarations: [RecordComponent],
@@ -40,9 +41,10 @@ import {SubpanelModule} from '../../../../containers/subpanel/components/subpane
         CommonModule,
         FieldModule,
         RecordContainerModule,
-        RecordHeaderModule,
+        BaseRecordHeaderModule,
         StatusBarModule,
-        SubpanelModule
+        SubpanelModule,
+        DynamicComponent
     ],
 })
 export class RecordModule {

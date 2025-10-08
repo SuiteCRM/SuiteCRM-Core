@@ -135,7 +135,7 @@ function get_campaign_mailboxes_with_stored_options()
     $r = $db->query($q);
 
     while ($a = $db->fetchByAssoc($r)) {
-        $ret[$a['id']] = unserialize(base64_decode($a['stored_options']));
+        $ret[$a['id']] = unserialize(base64_decode($a['stored_options']), ['allowed_classes' => false]);
     }
     return $ret;
 }
@@ -215,6 +215,7 @@ function log_campaign_activity($identifier, $activity, $update = true, $clicked_
             $data['target_tracker_key'] = $db->quoted($identifier);
             $data['activity_type'] = $db->quoted($activity);
             $data['activity_date'] = "'" . TimeDate::getInstance()->nowDb() . "'";
+            $data['more_information'] = $db->quoted($row['more_information']);
             $data['hits'] = 1;
             $data['deleted'] = 0;
             if (!empty($clicked_url_key)) {
@@ -285,6 +286,7 @@ function log_campaign_activity($identifier, $activity, $update = true, $clicked_
         if ($row && (strtolower($row['target_type']) == 'users' && $activity == 'removed')) {
             $return_array['target_id'] = $row['target_id'];
             $return_array['target_type'] = $row['target_type'];
+            $return_array['is_test_entry'] = $row['is_test_entry'];
             return $return_array;
         } elseif ($row) {
             $data['id'] = "'" . create_guid() . "'";
@@ -296,6 +298,8 @@ function log_campaign_activity($identifier, $activity, $update = true, $clicked_
             $data['activity_date'] = "'" . TimeDate::getInstance()->nowDb() . "'";
             $data['list_id'] = $db->quoted($row['list_id']);
             $data['marketing_id'] = $db->quoted($row['marketing_id']);
+            $data['more_information'] = $db->quoted($row['more_information']);
+            $data['is_test_entry'] = $db->quoted($row['is_test_entry']);
             $data['hits'] = 1;
             $data['deleted'] = 0;
             if (!empty($clicked_url_key)) {
@@ -305,6 +309,7 @@ function log_campaign_activity($identifier, $activity, $update = true, $clicked_
             //values for return array..
             $return_array['target_id'] = $row['target_id'];
             $return_array['target_type'] = $row['target_type'];
+            $return_array['is_test_entry'] = $row['is_test_entry'];
 
             // quote variable first
             $dataArrayKeys = array_keys($data);
@@ -325,6 +330,7 @@ function log_campaign_activity($identifier, $activity, $update = true, $clicked_
     } else {
         $return_array['target_id'] = $row['target_id'];
         $return_array['target_type'] = $row['target_type'];
+        $return_array['is_test_entry'] = $row['is_test_entry'];
 
         // quote variable first
         $rowIdQuoted = $db->quote($row['id']);
@@ -722,13 +728,29 @@ function process_subscriptions($subscription_string_to_parse)
         $relationship = strtolower($focus->getObjectName()).'s';
         //--grab all the list for this campaign id
         $pl_qry ="select id, list_type from prospect_lists where id in (select prospect_list_id from prospect_list_campaigns ";
-        $pl_qry .= "where campaign_id = " . $focus->db->quoted($campaign) . ") and deleted = 0 ";
+        $pl_qry .= "where campaign_id = " . $focus->db->quoted($campaign) . " and deleted = 0) and deleted = 0 ";
         $pl_qry_result = $focus->db->query($pl_qry);
         //build the array with list information
         $pl_arr = array();
         $GLOBALS['log']->debug("In Campaigns Util, about to run query: ".$pl_qry);
+        $idSuppressionLists = [];
         while ($row = $focus->db->fetchByAssoc($pl_qry_result)) {
             $pl_arr[] = $row;
+
+            if (($row['list_type'] ?? '') === 'exempt') {
+                $idSuppressionLists[] = $row['id'];
+            }
+        }
+
+
+        if (empty($idSuppressionLists)) {
+            global $db;
+            //if there are no lists, then exit
+            $GLOBALS['log']->debug("In Campaigns Util, unsubscribe function, no lists found for campaign: ".$campaign .". Going unsubscribe at a global level.");
+            $id = $focus->id;
+            $query = "UPDATE email_addresses SET email_addresses.opt_out = 1 WHERE EXISTS(SELECT 1 FROM email_addr_bean_rel ear WHERE ear.bean_id = '$id' AND ear.deleted=0 AND email_addresses.id = ear.email_address_id)";
+            $status=$db->query($query);
+            return;
         }
 
         //retrieve lists that this user belongs to

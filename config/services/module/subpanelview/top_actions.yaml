@@ -11,6 +11,18 @@ parameters:
             - list
           acl:
             - edit
+        modal-create:
+          key: modal-create
+          labelKey: LBL_QUICK_CREATE
+          action: modal-create
+          params:
+            modalOptions:
+              size: xl
+              scrollable: true
+          modes:
+            - list
+          acl:
+            - edit
         link:
           key: select
           labelKey: LBL_LINK

@@ -52,6 +52,16 @@ $companyLogoURL = $themeObject->getImageURL('company_logo.png');
 
 require_once 'modules/Campaigns/utils.php';
 if ($trackerId) {
+    global $db;
+    $identifierQuoted = $db->quote($trackerId);
+    $query = "select * from campaign_log where target_tracker_key='$identifierQuoted' and activity_type='viewed'";
+    $viewedQuery = $db->query($query);
+    $row = $db->fetchByAssoc($viewedQuery);
+
+    if (empty($row)) {
+        log_campaign_activity($trackerId, 'viewed');
+    }
+
     $surveyLinkTracker = getSurveyLinkTracker($trackerId);
     log_campaign_activity($trackerId, 'link', true, $surveyLinkTracker);
 }
@@ -145,7 +155,7 @@ EOF;
 function displaySurvey($survey, $contactId, $trackerId)
 {
     ?>
-    <form method="post">
+    <form method="post" onsubmit="disableSubmitButton(this)">
         <input type="hidden" name="entryPoint" value="surveySubmit">
         <input type="hidden" name="id" value="<?= $survey->id ?>">
         <input type="hidden" name="contact" value="<?= $contactId ?>">
@@ -163,6 +173,11 @@ function displaySurvey($survey, $contactId, $trackerId)
     } ?>
         <button class="btn btn-primary" type="submit"><?php echo $survey->getSubmitText(); ?></button>
     </form>
+    <script>
+        function disableSubmitButton(form) {
+            form.querySelector('button[type="submit"]').disabled = true; 
+        }
+    </script>    
     <?php
 }
 

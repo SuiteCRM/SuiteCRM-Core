@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="./squire/squire.js"></script>
+    <script type="text/javascript" src="./dompurify/purify.min.js"></script>
+    <style>
+        .scrollbar-thin {
+
+            &::-webkit-scrollbar {
+                width: 5px;
+                height: 5px;
+            }
+
+            &::-webkit-scrollbar-track {
+                box-shadow: inset 0 0 6px transparent;
+                background: transparent;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: #9e9ba8;
+                border-radius: 51px;
+            }
+
+            &::-webkit-scrollbar-thumb:hover {
+                background: #9e9ba8;
+            }
+        }
+
+        #editorContainer:focus-visible {
+            box-shadow: none;
+            outline: 0;
+            border: none ;
+            min-height: 270px;
+            height: 270px;
+        }
+    </style>
+    <base target="_blank" />
+</head>
+<body style="margin:0;" class="scrollbar-thin">
+<div id="editorContainer" ></div>
+<script type="text/javascript">
+
+    var defaultStyle = '';
+    var fixedWidthStyle =
+        'border:1px solid #ccc;border-radius:3px;background:#f6f6f6;font-family:menlo,consolas,monospace;font-size:90%;';
+
+    var codeStyle = fixedWidthStyle + 'padding:1px 3px;';
+    var preStyle = fixedWidthStyle + 'margin:7px 0;padding:7px 10px;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:break-word;';
+
+    var defaults = {
+        label: 'MAIL_MESSAGE_BODY',
+        tabIndex: 9,
+        editorConfig: {
+            blockAttributes: null,
+            tagAttributes: {
+                blockquote: {
+                    type: 'cite',
+                },
+                li: null,
+                pre: {
+                    style: preStyle,
+                },
+                code: {
+                    style: codeStyle,
+                },
+            },
+            classNames: {
+                color: 'squire-editor-color',
+                fontFamily: 'squire-editor-font',
+                fontSize: 'squire-editor-size',
+                highlight: 'squire-editor-highlight',
+            },
+            sanitizeToDOMFragment(html) {
+                return html;
+            },
+        },
+        layout: {
+            minHeight: 270,
+            height: 270,
+        },
+    };
+
+    editor = new Squire(document.getElementById('editorContainer'), defaults);
+
+    var clickFocusListener = function ($event) {
+        if ($event.target === $event.currentTarget) {
+            editor.focus();
+        }
+    };
+    document.getElementsByTagName('html')[0].addEventListener('click', clickFocusListener);
+
+    var removeClickFocusEventListener = function() {
+        document.getElementsByTagName('html')[0].removeEventListener('click',clickFocusListener);
+    };
+</script>
+</body>
+</html>

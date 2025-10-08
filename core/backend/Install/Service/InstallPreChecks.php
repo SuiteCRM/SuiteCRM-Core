@@ -4,8 +4,8 @@
  * SugarCRM Community Edition is a customer relationship management program developed by
  * SugarCRM, Inc. Copyright (C) 2004-2013 SugarCRM Inc.
  *
- * SuiteCRM is an extension to SugarCRM Community Edition developed by SalesAgility Ltd.
- * Copyright (C) 2011 - 2024 SalesAgility Ltd.
+ * SuiteCRM is an extension to SugarCRM Community Edition developed by SuiteCRM Ltd.
+ * Copyright (C) 2011 - 2024 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -205,9 +205,24 @@ class InstallPreChecks
             'result' => '',
             'errors' => [],
         ];
+
         if (empty($baseUrl)) {
-            $baseUrl = ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . $_SERVER['HTTP_HOST'] . ($_SERVER['BASE'] ?? '');
+
+            $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '');
+            $https = $_SERVER['HTTPS'] ?? '';
+
+            if (!empty($https) && ($https == 'on' || $https['HTTPS'] == 1) ||
+                !empty($proto) && $proto == 'https') {
+                $protocol = 'https://';
+            } elseif (($_SERVER['REQUEST_SCHEME'] ?? 'https') === 'https') {
+                $protocol = 'https://';
+            } else {
+                $protocol = 'http://';
+            }
+
+            $baseUrl = $protocol . $_SERVER['HTTP_HOST'] . ($_SERVER['BASE'] ?? '');
         }
+
         $baseUrl = rtrim($baseUrl, '/');
         $baseUrl .= '/';
         curl_setopt($ch, CURLOPT_URL, $baseUrl);
@@ -341,8 +356,22 @@ class InstallPreChecks
         ];
 
         if (empty($baseUrl)) {
-            $baseUrl = ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . $_SERVER['HTTP_HOST'] . ($_SERVER['BASE'] ?? '');
+
+            $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '');
+            $https = $_SERVER['HTTPS'] ?? '';
+
+            if (!empty($https) && ($https == 'on' || $https['HTTPS'] == 1) ||
+                !empty($proto) && $proto == 'https') {
+                $protocol = 'https://';
+            } elseif (($_SERVER['REQUEST_SCHEME'] ?? 'https') === 'https') {
+                $protocol = 'https://';
+            } else {
+                $protocol = 'http://';
+            }
+
+            $baseUrl = $protocol . $_SERVER['HTTP_HOST'] . ($_SERVER['BASE'] ?? '');
         }
+
         $baseUrl = rtrim($baseUrl, '/');
         $baseUrl .= '/';
         $apiUrl = $baseUrl . 'api/graphql';

@@ -52,18 +52,13 @@ $subpanel_layout = array(
 
 
     'list_fields' => array(
-        'recipient_name'=>array(
+        'related_name' => array(
             'vname' => 'LBL_LIST_RECIPIENT_NAME',
-            'width' => '14%',
+            'width' => '20%',
             'sortable'=>false,
         ),
         'recipient_email'=>array(
             'vname' => 'LBL_LIST_RECIPIENT_EMAIL',
-            'width' => '14%',
-            'sortable'=>false,
-        ),
-        'marketing_name'=>array(
-            'vname' => 'LBL_LIST_MARKETING_NAME',
             'width' => '14%',
             'sortable'=>false,
         ),
@@ -74,16 +69,6 @@ $subpanel_layout = array(
         'activity_date' => array(
             'vname' => 'LBL_ACTIVITY_DATE',
             'width' => '14%',
-        ),
-        'related_name' => array(
-            'widget_class' => 'SubPanelDetailViewLink',
-            'target_record_key' => 'related_id',
-            'target_module_key' => 'related_type',
-            'parent_id' =>'target_id',
-            'parent_module'=>'target_type',
-            'vname' => 'LBL_RELATED',
-            'width' => '20%',
-            'sortable'=>false,
         ),
         'hits' => array(
             'vname' => 'LBL_HITS',

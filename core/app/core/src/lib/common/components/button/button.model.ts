@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -23,24 +23,43 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Supercharged by SuiteCRM".
  */
+import {FieldMap} from "../../record/field.model";
+import {Signal} from "@angular/core";
+import {ObjectMap} from "../../types/object-map";
 
 export declare type ButtonCallback = (...args) => void;
+export declare type PopoverValidation = (...args) => boolean;
 
 export interface ButtonInterface {
     id?: string;
     klass?: string | string[] | Set<string> | { [key: string]: any };
+    style?: string;
+    dynamicClass?: Signal<string>;
     onClick?: ButtonCallback;
     debounceClick?: boolean;
     clickDebounceTime?: number;
     label?: string;
     labelKey?: string;
     titleKey?: string;
+    dynamicLabelKey?: string;
+    dynamicLabelFields?: FieldMap;
     title?: string;
     icon?: string;
+    showPopup?: PopoverValidation;
+    dynamicIcon?: Signal<string>;
     iconKlass?: string;
     labelModule?: string;
     section?: string;
-    disabled?: boolean;
+    disabled?: Signal<boolean>;
+    isRunning?: Signal<boolean>;
+    type?: string;
+    metadata?: ObjectMap;
+    active?: boolean;
+    maxWidth?: string;
+}
+
+export interface ButtonInterfaceMap {
+    [key: string]: ButtonInterface;
 }
 
 export class Button implements ButtonInterface {

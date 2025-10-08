@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -57,23 +57,28 @@ export class SelectModalService {
 
         const modal = this.modalService.open(RecordListModalComponent, {size: 'xl', scrollable: true});
         modal.componentInstance.module = selectModule;
-        modal.result.then((result: RecordListModalResult) => {
+        modal.result.then(
+            (result: RecordListModalResult) => {
 
-            if (!result || !result.selection || !result.selection.selected) {
-                return;
-            }
+                if (!result || !result.selection || !result.selection.selected) {
+                    return;
+                }
 
-            const record: Record = this.getSelectedRecord(result);
-            if (!record.id) {
-                let message = this.languageStore.getFieldLabel('ERROR_NO_RECORD');
-                this.message.addDangerMessage(message);
-                return;
-            }
+                const record: Record = this.getSelectedRecord(result);
+                if (!record.id) {
+                    let message = this.languageStore.getFieldLabel('ERROR_NO_RECORD');
+                    this.message.addDangerMessage(message);
+                    return;
+                }
 
-            if (onSelectCallback !== null) {
-                onSelectCallback(record);
+                if (onSelectCallback !== null) {
+                    onSelectCallback(record);
+                }
+            },
+            () => {
+                // Modal dismissed
             }
-        });
+        );
     }
 
     /**

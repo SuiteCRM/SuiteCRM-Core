@@ -194,26 +194,44 @@ class EmailMan extends SugarBean
         $query = array('select' => '', 'from' => '', 'where' => '', 'order_by' => '');
 
 
-        $query['select'] =
-            'SELECT '
-            . $this->table_name
-            . '.* , '
-            . 'campaigns.name as campaign_name, '
-            . 'email_marketing.name as message_name, '
-            . '(CASE related_type '
-            . 'WHEN \'Contacts\' THEN '
-            . $this->db->concat('contacts', array('first_name', 'last_name'), '&nbsp;')
-            . ' '
-            . 'WHEN \'Leads\' THEN '
-            . $this->db->concat('leads', array('first_name', 'last_name'), '&nbsp;')
-            . ' '
-            . 'WHEN \'Accounts\' THEN accounts.name '
-            . 'WHEN \'Users\' THEN '
-            . $this->db->concat('users', array('first_name', 'last_name'), '&nbsp;') . ' '
-            . "WHEN 'Prospects' THEN "
-            . $this->db->concat('prospects', array('first_name', 'last_name'), '&nbsp;')
-            . ' '
-            . 'END) recipient_name';
+        if ($singleSelect){
+            $query['select'] =
+                'SELECT '
+                . $this->table_name
+                . '.* , '
+                . $this->table_name
+                . '.more_information as recipient_email , '
+                . 'campaigns.name as campaign_name, '
+                . 'campaigns.id as campaign_id, '
+                . 'email_marketing.name as message_name, '
+                . 'email_marketing.id as marketing_id, '
+                . '(CASE related_type '
+                . 'WHEN \'Contacts\' THEN '
+                . $this->db->concat('contacts', array('first_name', 'last_name'), '&nbsp;')
+                . ' '
+                . 'WHEN \'Leads\' THEN '
+                . $this->db->concat('leads', array('first_name', 'last_name'), '&nbsp;')
+                . ' '
+                . 'WHEN \'Accounts\' THEN accounts.name '
+                . 'WHEN \'Users\' THEN '
+                . $this->db->concat('users', array('first_name', 'last_name'), '&nbsp;') . ' '
+                . "WHEN 'Prospects' THEN "
+                . $this->db->concat('prospects', array('first_name', 'last_name'), '&nbsp;')
+                . ' '
+                . 'END) recipient_name';
+        } else {
+            $query['select'] =
+                'SELECT '
+                . 'send_date_time as date_end, '
+                . 'email_marketing.subject as name, '
+                . 'user_id as assigned_user_id, '
+                . "'pending_send' as status ";
+
+            if (in_array('marketing_id', array_keys($filter))) {
+                $query['select'] .= ', ' . $this->table_name . '.id, email_marketing.id as marketing_id, u.user_name as assigned_user_name ';
+            }
+
+        }
 
         $query['from'] =
             ' '
@@ -236,7 +254,10 @@ class EmailMan extends SugarBean
             . 'LEFT JOIN prospect_lists ON prospect_lists.id = '.$this->table_name.'.list_id '
             . 'LEFT JOIN email_addr_bean_rel ON email_addr_bean_rel.bean_id = '.$this->table_name.'.related_id and '.$this->table_name.'.related_type = email_addr_bean_rel.bean_module and email_addr_bean_rel.primary_address = 1 and email_addr_bean_rel.deleted=0 '
             . 'LEFT JOIN campaigns ON campaigns.id = '.$this->table_name.'.campaign_id '
+            . 'LEFT JOIN users u ON u.id = '.$this->table_name.'.user_id '
             . 'LEFT JOIN email_marketing ON email_marketing.id = '.$this->table_name.'.marketing_id ';
+
+        $query['from_min'] = $query['from'];
 
         $where_auto = " $this->table_name.deleted=0";
 
@@ -302,7 +323,7 @@ class EmailMan extends SugarBean
         }
 
         $query =
-            "SELECT $this->table_name.* , campaigns.name as campaign_name, email_marketing.name as message_name, (CASE related_type WHEN 'Contacts' THEN "
+            "SELECT $this->table_name.*, $this->table_name.more_information as recipient_email, campaigns.name as campaign_name, email_marketing.name as message_name, $this->table_name.send_date_time, (CASE related_type WHEN 'Contacts' THEN "
             . $this->db->concat('contacts', array('first_name', 'last_name'), '&nbsp;') . " WHEN 'Leads' THEN "
             . $this->db->concat('leads', array('first_name', 'last_name'), '&nbsp;') . " WHEN 'Accounts' THEN accounts.name WHEN 'Users' THEN "
             . $this->db->concat('users', array('first_name', 'last_name'), '&nbsp;') . " WHEN 'Prospects' THEN "
@@ -1509,7 +1530,7 @@ class EmailMan extends SugarBean
      * @param \Contact|\Account|\Prospect|\SugarBean $bean
      * @return bool true === block email from being sent
      */
-    protected function shouldBlockEmail(SugarBean $bean)
+    public function shouldBlockEmail(SugarBean $bean)
     {
         global $sugar_config;
 

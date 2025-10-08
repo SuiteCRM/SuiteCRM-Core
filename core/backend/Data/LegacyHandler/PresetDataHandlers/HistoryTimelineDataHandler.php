@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -35,6 +35,7 @@ use App\Engine\LegacyHandler\LegacyScopeState;
 use App\FieldDefinitions\Service\FieldDefinitionsProviderInterface;
 use App\Module\Service\ModuleNameMapperInterface;
 use App\Statistics\StatisticsHandlingTrait;
+use App\Languages\Service\LanguageManagerInterface;
 use BadMethodCallException;
 use BeanFactory;
 use Psr\Log\LoggerAwareInterface;
@@ -54,15 +55,6 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
      * @var LoggerInterface
      */
     private $logger;
-    /**
-     * @var RecordMapper
-     */
-    private $recordMapper;
-
-    /**
-     * @var FieldDefinitionsProviderInterface
-     */
-    private $fieldDefinitionProvider;
 
     /**
      * HistoryTimelineDataHandler constructor.
@@ -73,6 +65,9 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
      * @param LegacyScopeState $legacyScopeState
      * @param ModuleNameMapperInterface $moduleNameMapper
      * @param RequestStack $session
+     * @param RecordMapper $recordMapper
+     * @param FieldDefinitionsProviderInterface $fieldDefinitionProvider
+     * @param LanguageManagerInterface $languageManager
      */
     public function __construct(
         string $projectDir,
@@ -82,13 +77,12 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
         LegacyScopeState $legacyScopeState,
         ModuleNameMapperInterface $moduleNameMapper,
         RequestStack $session,
-        RecordMapper $recordMapper,
-        FieldDefinitionsProviderInterface $fieldDefinitionProvider
+        protected RecordMapper $recordMapper,
+        protected FieldDefinitionsProviderInterface $fieldDefinitionProvider,
+        protected LanguageManagerInterface $languageManager
     ) {
         parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState,
             $moduleNameMapper, $session);
-        $this->recordMapper = $recordMapper;
-        $this->fieldDefinitionProvider = $fieldDefinitionProvider;
     }
 
     /**
@@ -200,7 +194,6 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
                     "status" => [],
                     "date_modified" => [],
                     "date_entered" => [
-
                         "alias" => 'date_end',
                         "sort_by" => 'date_end'
                     ],
@@ -215,6 +208,13 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
                     ],
                     "date_entered" => [],
                     "date_due" => [],
+                ],
+                'emailman' => [
+                    "name" => [],
+                    "status" => [],
+                    "date_modified" => [],
+                    "date_entered" => [],
+                    "date_end" => [],
                 ],
                 'linkedemails' => [
                     "name" => [],
@@ -237,6 +237,7 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
             'oldcalls' => 'Calls',
             'notes' => 'Notes',
             'emails' => 'Emails',
+            'emailman' => 'EmailMan',
             'linkedemails' => 'Emails',
             'audit' => 'audit'
         ];
@@ -308,6 +309,8 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
                         /** @var User $user */
                         $user = BeanFactory::getBean('Users', $auditFieldValue);
                         $auditFieldValue = $user->user_name ?? '';
+                    } else {
+                        $auditFieldValue = $this->languageManager->getListLabel($legacyParentModule, $field, $auditFieldValue);
                     }
 
                     $auditDescription .= implode(" ", [$auditedFieldLabelKey, $auditFieldValue, '<br/>']);

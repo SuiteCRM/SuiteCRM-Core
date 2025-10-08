@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -29,12 +29,21 @@ import {ViewMode} from '../views/view.model';
 import {Record} from '../record/record.model';
 import {SearchCriteria} from '../views/list/search-criteria.model';
 import {StringMap} from '../types/string-map';
-import { LogicDefinitions } from '../metadata/metadata.model';
+import {LogicDefinitions, AfterActionLogicDefinitions} from '../metadata/metadata.model';
+import {ObjectMap} from "../types/object-map";
+import {AsyncActionInput} from "../../services/process/processes/async-action/async-action";
+import {BaseRecordContainerStoreInterface} from "../containers/record/record-container.store.model";
+import {WritableSignal} from "@angular/core";
 
 export interface ActionData {
     [key: string]: any;
 
     action?: Action;
+    asyncData?: AsyncActionInput;
+}
+
+export interface RecordBasedActionData extends ActionData {
+    store?: BaseRecordContainerStoreInterface;
 }
 
 export interface ActionHandlerMap<D extends ActionData> {
@@ -82,6 +91,7 @@ export interface Action {
     key: string;
     labelKey?: string;
     titleKey?: string;
+    descriptionKey?: string;
     label?: string;
     icon?: string;
     klass?: string[];
@@ -91,7 +101,9 @@ export interface Action {
     params?: { [key: string]: any };
     extraParams?: { [key: string]: any };
     acl?: string[];
+    afterActionLogic?: AfterActionLogicDefinitions;
     displayLogic?: LogicDefinitions;
+    isRunning?: WritableSignal<boolean>;
 }
 
 export interface ActionDataSource {
@@ -100,7 +112,11 @@ export interface ActionDataSource {
     getActions(context?: ActionContext): Observable<Action[]>;
 
     runAction(action: Action, context?: ActionContext): void;
+
+    isActive(action: Action): boolean;
 }
+
+export type ActionDataSourceBuilderFunction = (options?: ObjectMap) => ActionDataSource;
 
 export interface ActionManager<D extends ActionData> {
 

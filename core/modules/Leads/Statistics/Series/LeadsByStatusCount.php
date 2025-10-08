@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -35,6 +35,7 @@ use App\Statistics\Service\StatisticsProviderInterface;
 use App\Statistics\StatisticsHandlingTrait;
 use App\Statistics\Model\ChartOptions;
 use App\Module\Service\ModuleNameMapperInterface;
+use App\Languages\Service\LanguageManagerInterface;
 use BeanFactory;
 use SugarBean;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -46,17 +47,7 @@ class LeadsByStatusCount extends LegacyHandler implements StatisticsProviderInte
     public const KEY = 'leads-by-status-count';
 
     /**
-     * @var ListDataQueryHandler
-     */
-    private $queryHandler;
-
-    /**
-     * @var ModuleNameMapperInterface
-     */
-    private $moduleNameMapper;
-
-    /**
-     * LeadDaysOpen constructor.
+     * LeadsByStatusCount constructor.
      * @param string $projectDir
      * @param string $legacyDir
      * @param string $legacySessionName
@@ -65,6 +56,7 @@ class LeadsByStatusCount extends LegacyHandler implements StatisticsProviderInte
      * @param ListDataQueryHandler $queryHandler
      * @param ModuleNameMapperInterface $moduleNameMapper
      * @param RequestStack $requestStack
+     * @param LanguageManagerInterface $languageManager
      */
     public function __construct(
         string $projectDir,
@@ -72,13 +64,12 @@ class LeadsByStatusCount extends LegacyHandler implements StatisticsProviderInte
         string $legacySessionName,
         string $defaultSessionName,
         LegacyScopeState $legacyScopeState,
-        ListDataQueryHandler $queryHandler,
-        ModuleNameMapperInterface $moduleNameMapper,
-        RequestStack $requestStack
+        protected ListDataQueryHandler $queryHandler,
+        protected ModuleNameMapperInterface $moduleNameMapper,
+        RequestStack $requestStack,
+        protected LanguageManagerInterface $languageManager
     ) {
         parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState, $requestStack);
-        $this->queryHandler = $queryHandler;
-        $this->moduleNameMapper = $moduleNameMapper;
     }
 
     /**
@@ -120,17 +111,25 @@ class LeadsByStatusCount extends LegacyHandler implements StatisticsProviderInte
         }
 
         $query = $this->queryHandler->getQuery($bean, $criteria, $sort);
-        $query['select'] = 'SELECT leads.status as name, count(*) as value';
+        $query['select'] = 'SELECT leads.status, count(*) as value';
         $query['order_by'] = '';
         $query['group_by'] = ' GROUP BY leads.status ';
 
         $result = $this->runQuery($query, $bean);
 
-        $nameField = 'name';
-        $valueField = 'value';
+        $series = $this->buildSingleSeries(
+            $result,
+            'status',
+            'value',
+        );
 
-        $series = $this->buildSingleSeries($result, $nameField, $valueField);
-
+        foreach ($series->singleSeries as $seriesItem) {
+            $seriesItem->name = $this->languageManager->getListLabel(
+                'leads',
+                'status',
+                $seriesItem->name
+            );
+        }
 
         $chartOptions = new ChartOptions();
 

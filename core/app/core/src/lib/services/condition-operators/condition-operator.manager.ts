@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -32,6 +32,7 @@ import {ConditionOperatorModel} from './condition-operator.model';
 import {IsEmptyAction} from './is-empty/is-empty.action';
 import {IsEqualAction} from './is-equal/is-equal.action';
 import {NotEqualAction} from './not-equal/not-equal.action';
+import {AnyValueAction} from "./any-value/any-value.action";
 
 @Injectable({
     providedIn: 'root'
@@ -44,8 +45,8 @@ export class ConditionOperatorManager {
         public notEmptyAction: NotEmptyAction,
         public isEmptyAction: IsEmptyAction,
         public isEqualAction: IsEqualAction,
-        public notEqualAction: NotEqualAction
-
+        public notEqualAction: NotEqualAction,
+        public anyValueAction: AnyValueAction
     ) {
     }
 
@@ -57,6 +58,7 @@ export class ConditionOperatorManager {
             'is-empty': this.isEmptyAction,
             'is-equal': this.isEqualAction,
             'not-equal': this.notEqualAction,
+            'any-value': this.anyValueAction
         };
 
         return operatorMap[key];

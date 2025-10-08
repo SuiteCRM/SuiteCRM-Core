@@ -353,6 +353,7 @@ $viewdefs ['Contacts'] =
                                                 'studio' => 'false',
                                                 'label' => 'LBL_EMAIL_ADDRESS',
                                             ),
+                                        1 => ''
                                     ),
                                 5 =>
                                     array(
@@ -398,6 +399,7 @@ $viewdefs ['Contacts'] =
                                                 'comment' => 'How did the contact come about',
                                                 'label' => 'LBL_LEAD_SOURCE',
                                             ),
+                                        1 => ''
                                     ),
                                 1 =>
                                     array(

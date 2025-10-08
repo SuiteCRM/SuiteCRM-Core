@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -75,7 +75,7 @@ export class ActiveFieldsChecker {
      * @param {object} record
      * @param {object} activeOnAttributes
      */
-    protected areAttributesActive(
+    public areAttributesActive(
         relatedAttributesFields: string[],
         record: Record,
         activeOnAttributes: StringArrayMatrix
@@ -107,7 +107,7 @@ export class ActiveFieldsChecker {
      * @param {object} record
      * @param {object} activeOnFields
      */
-    protected areFieldsActive(relatedFields: string[], record: Record, activeOnFields: StringArrayMap): boolean {
+    public areFieldsActive(relatedFields: string[], record: Record, activeOnFields: StringArrayMap): boolean {
         return relatedFields.every(fieldKey => {
             const fields = record.fields;
             const field = (fields && record.fields[fieldKey]) || null;
@@ -125,7 +125,7 @@ export class ActiveFieldsChecker {
      * @param {object} field
      * @param {array} activeValues
      */
-    protected isValueActive(record: Record, field: Field, activeValues: string[] | any): boolean {
+    public isValueActive(record: Record, field: Field, activeValues: string[] | any): boolean {
 
         let isActive = false;
         if (field.valueList && field.valueList.length) {
@@ -165,6 +165,9 @@ export class ActiveFieldsChecker {
             }
 
             const operator = this.operatorManager.get(operatorKey);
+            if (!operator) {
+                return;
+            }
             opsArr.push(operator.run(record, field, activeValue))
             isActive = opsArr.every(data => data);
         })

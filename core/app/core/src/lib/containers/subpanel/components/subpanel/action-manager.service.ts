@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -32,6 +32,7 @@ import {AsyncProcessSubpanelAction} from '../../actions/async-process/async-proc
 import {SubpanelShowFilterAction} from "../../actions/show-filter/show-filter.action";
 import {BaseActionManager} from "../../../../services/actions/base-action-manager.service";
 import {SubpanelClearFilterAction} from "../../actions/clear-filter/clear-filter.action";
+import {SubpanelModalCreateAction} from "../../actions/modal-create/modal-create.action";
 
 @Injectable({
     providedIn: 'root',
@@ -43,7 +44,8 @@ export class SubpanelActionManager extends BaseActionManager<SubpanelActionData>
         protected select: SubpanelSelectAction,
         protected async: AsyncProcessSubpanelAction,
         protected showFilter: SubpanelShowFilterAction,
-        protected clearFilter: SubpanelClearFilterAction
+        protected clearFilter: SubpanelClearFilterAction,
+        protected modalCreate: SubpanelModalCreateAction
     ) {
         super();
         async.modes.forEach(mode => this.actions[mode][async.key] = async);
@@ -51,5 +53,7 @@ export class SubpanelActionManager extends BaseActionManager<SubpanelActionData>
         select.modes.forEach(mode => this.actions[mode][select.key] = select);
         showFilter.modes.forEach(mode => this.actions[mode][showFilter.key] = showFilter);
         clearFilter.modes.forEach(mode => this.actions[mode][clearFilter.key] = clearFilter);
+        clearFilter.modes.forEach(mode => this.actions[mode][clearFilter.key] = clearFilter);
+        modalCreate.modes.forEach(mode => this.actions[mode][modalCreate.key] = modalCreate);
     }
 }

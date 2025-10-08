@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -63,21 +63,22 @@ class SubPanelDefinitionHandler extends LegacyHandler implements SubPanelDefinit
     /**
      * @var FieldDefinitionsProviderInterface
      */
-    private $fieldDefinitionProvider;
+    protected $fieldDefinitionProvider;
 
     /**
      * @var SubpanelTopActionDefinitionProviderInterface
      */
-    private $subpanelTopActionDefinitionProvider;
+    protected $subpanelTopActionDefinitionProvider;
 
     /**
      * @var SubpanelLineActionDefinitionProviderInterface
      */
-    private $subpanelLineActionDefinitionProvider;
+    protected $subpanelLineActionDefinitionProvider;
     /**
      * @var FieldAliasMapper
      */
-    private $fieldAliasMapper;
+    protected $fieldAliasMapper;
+    protected ViewConfigMappers $viewConfigMappers;
 
     /**
      * ViewDefinitionsHandler constructor.
@@ -92,6 +93,7 @@ class SubPanelDefinitionHandler extends LegacyHandler implements SubPanelDefinit
      * @param SubpanelLineActionDefinitionProviderInterface $subpanelLineActionDefinitionProvider
      * @param FieldAliasMapper $fieldAliasMapper
      * @param RequestStack $session
+     * @param ViewConfigMappers $viewDefsConfigMappers
      */
     public function __construct(
         string $projectDir,
@@ -105,6 +107,7 @@ class SubPanelDefinitionHandler extends LegacyHandler implements SubPanelDefinit
         SubpanelLineActionDefinitionProviderInterface $subpanelLineActionDefinitionProvider,
         FieldAliasMapper $fieldAliasMapper,
         RequestStack $session,
+        ViewConfigMappers $viewDefsConfigMappers
     ) {
         parent::__construct(
             $projectDir,
@@ -119,6 +122,7 @@ class SubPanelDefinitionHandler extends LegacyHandler implements SubPanelDefinit
         $this->subpanelTopActionDefinitionProvider = $subpanelTopActionDefinitionProvider;
         $this->subpanelLineActionDefinitionProvider = $subpanelLineActionDefinitionProvider;
         $this->fieldAliasMapper = $fieldAliasMapper;
+        $this->viewConfigMappers = $viewDefsConfigMappers;
     }
 
     /**
@@ -184,7 +188,14 @@ class SubPanelDefinitionHandler extends LegacyHandler implements SubPanelDefinit
 
         $resultingTabs = [];
 
+        $tabs = $this->viewConfigMappers->run('module', 'subpanel', $tabs);
+
         foreach ($tabs as $key => $tab) {
+
+            if (($tab['hidden'] ?? false) === true) {
+                continue;
+            }
+
             try {
                 /** @var aSubPanel $subpanel */
                 $subpanel = $spd->load_subpanel($key);

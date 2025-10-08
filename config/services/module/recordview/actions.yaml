@@ -5,6 +5,7 @@ parameters:
         edit:
           key: edit
           labelKey: LBL_EDIT
+          priority: 100
           params:
             expanded: true
           modes:
@@ -14,8 +15,10 @@ parameters:
         save:
           key: save
           labelKey: LBL_SAVE_BUTTON_LABEL
+          priority: 100
           params:
             expanded: true
+            disableOnRun: true
           modes:
             - edit
           acl:
@@ -23,14 +26,17 @@ parameters:
         saveNew:
           key: saveNew
           labelKey: LBL_SAVE_BUTTON_LABEL
+          priority: 100
           params:
             expanded: true
+            disableOnRun: true
           modes:
             - create
           acl:
             - edit
         cancel:
           key: cancel
+          priority: 200
           labelKey: LBL_CANCEL
           params:
             expanded: true
@@ -39,6 +45,7 @@ parameters:
         cancelCreate:
           key: cancelCreate
           labelKey: LBL_CANCEL
+          priority: 200
           params:
             expanded: true
           modes:
@@ -46,6 +53,7 @@ parameters:
         saveContinue:
           key: saveContinue
           labelKey: LBL_SAVE_CONTINUE_LABEL
+          priority: 150
           params:
             expanded: true
             collapsedMobile: true
@@ -53,9 +61,20 @@ parameters:
             - edit
           acl:
             - edit
+        toggle-widgets:
+          key: toggle-widgets
+          labelKey: LBL_INSIGHTS
+          priority: 5000
+          params:
+            expanded: true
+          modes:
+            - detail
+            - edit
+          acl: [ ]
         delete:
           key: delete
           labelKey: LBL_DELETE
+          priority: 2000
           asyncProcess: true
           params:
             displayConfirmation: true
@@ -67,6 +86,7 @@ parameters:
         duplicate:
           key: duplicate
           labelKey: LBL_DUPLICATE_BUTTON
+          priority: 1900
           asyncProcess: true
           params:
           modes:
@@ -77,6 +97,7 @@ parameters:
         audit:
           key: audit
           labelKey: LNK_VIEW_CHANGE_LOG
+          priority: 1800
           asyncProcess: true
           params:
           modes:
@@ -88,6 +109,7 @@ parameters:
         duplicate-merge:
           key: duplicate-merge
           labelKey: LBL_DUP_MERGE
+          priority: 1700
           asyncProcess: true
           params:
           modes:

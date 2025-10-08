@@ -1,0 +1,223 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2025 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+
+.squire-editor {
+  border: 1px solid $very-light-grey;
+  border-radius: .2rem;
+
+  .squire-editor-toolbar {
+    border-bottom: 1px solid $very-light-grey;
+    border-radius: .2rem .2rem 0 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+    box-sizing: border-box;
+    height: 29px;
+    left: 0;
+    padding: 0 2px;
+    right: 0;
+    top: 0;
+    display: block;
+    align-items: center;
+    justify-content: start;
+    position: relative;
+    background-color: $shaded-white;
+
+    .squire-editor-toolbar-divider {
+      padding: 0 1px;
+      color: $shell-grey;
+      line-height: 27px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .squire-editor-toolbar-item {
+      display: inline-block;
+      line-height: 27px;
+      vertical-align: middle;
+
+      svg {
+        vertical-align: -.2em;
+        display: inline-block;
+      }
+    }
+
+    .hide-popover {
+      .popover-body {
+        padding: 0 !important;
+      }
+    }
+
+    .squire-editor-button-row {
+      border-radius: 3px;
+
+      &:hover {
+        background-color: $very-light-grey;
+      }
+    }
+
+    .squire-editor-button {
+
+      &.disabled {
+        cursor: auto;
+      }
+
+      &.squire-editor-button-active {
+        background-color: $very-light-grey;
+      }
+
+      &:hover:not(.disabled) {
+        background-color: $very-light-grey;
+      }
+
+      &.squire-editor-collapsed-button {
+        &::after {
+          content: none;
+        }
+      }
+
+
+      align-items: center;
+      background: transparent;
+      border: 1px solid transparent;
+      box-sizing: border-box;
+      display: inline-flex;
+      flex: 0 0 auto;
+      justify-content: center;
+      max-width: 100%;
+      outline: none;
+      position: relative;
+      text-align: center;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+      white-space: nowrap;
+
+
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      height: 24px;
+      line-height: 1.375rem;
+      padding: 0 2px;
+      margin: 0 1px;
+
+      &.squire-editor-list-button {
+        width: 100%;
+        line-height: 100%;
+        height: 100%;
+        justify-content: start;
+      }
+
+
+      svg {
+        font-size: 1.1rem;
+      }
+
+      .image-text-colour {
+        svg {
+          font-size: 1.2rem;
+        }
+      }
+
+      .image-highlighter {
+        svg {
+          font-size: 0.95rem;
+        }
+      }
+
+      .image-down_carret {
+        display: flex;
+        align-items: center;
+
+        svg {
+          font-size: 0.8rem;
+          line-height: 0.8rem;
+        }
+      }
+
+
+    }
+
+    .popover-body {
+      .grid-popup-body {
+        //width: 125px;
+        width: 175px;
+      }
+
+      background-color: $shaded-white;
+      padding: .25rem .25rem;
+    }
+  }
+
+  &.squire-editor-detail {
+    .squire-editor-content {
+      margin-top: 0px;
+      padding: 15px 15px 15px;
+    }
+  }
+
+  .squire-editor-content {
+    min-height: 200px;
+    border-radius: .2rem;
+
+    margin-top: -29px;
+    outline: none;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding: 44px 15px 15px;
+
+    &:focus-visible {
+      box-shadow: none;
+      outline: 0;
+      border: none;
+    }
+
+    ul {
+      list-style-type: revert !important;
+      padding-inline-start: revert !important;
+    }
+
+    a {
+      color: revert;
+      text-decoration: revert;
+      background-color: revert;
+    }
+
+
+    blockquote {
+      margin: 0;
+      border-left: 2px solid $midnight-blue-faded;
+      background: $grey-transparent;
+      padding-left: 1ex;
+      padding-top: 1ex;
+      padding-bottom: 1ex;
+    }
+
+  }
+
+}
+
+

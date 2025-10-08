@@ -329,7 +329,7 @@ class SchedulersJob extends Basic
      * Takes messages in $this->message, errors & $message and assembles them into $this->message
      * @param string $message
      */
-    protected function addMessages($message)
+    public function addMessages($message)
     {
         if (!empty($this->errors)) {
             $this->message .= $this->errors;

@@ -69,6 +69,16 @@ if (empty($_REQUEST['track'])) {
     $track = $_REQUEST['track'];
 }
 if (!empty($_REQUEST['identifier'])) {
+
+    $identifierQuoted = $db->quote($_REQUEST['identifier']);
+    $query = "select * from campaign_log where target_tracker_key='$identifierQuoted' and activity_type='viewed'";
+    $viewedQuery = $db->query($query);
+    $row = $db->fetchByAssoc($viewedQuery);
+
+    if (empty($row)) {
+        log_campaign_activity($_REQUEST['identifier'], 'viewed');
+    }
+
     $keys = log_campaign_activity($_REQUEST['identifier'], 'link', true, $track);
 } else {
     //if this has no identifier, then this is a web/banner campaign

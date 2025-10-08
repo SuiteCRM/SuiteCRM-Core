@@ -1,0 +1,406 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2025 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+.record-modal {
+  background-color: $white;
+
+  &.minimizable {
+    .modal-title {
+      cursor: pointer;
+      flex-grow: 1;
+    }
+  }
+
+  .modal-header {
+    background-color: $white;
+    padding-bottom: 0;
+    padding-top: 0;
+
+    &.left-aligned-title {
+      justify-content: space-between;
+
+      .modal-title {
+        margin-left: 0;
+        margin-right: 0;
+        align-items: start;
+      }
+    }
+
+    .modal-title {
+      margin-top: 0;
+      margin-bottom: 0;
+      padding-top: .5rem;
+      padding-bottom: .5rem;
+    }
+
+    .close-button {
+      font-size: 1.5em;
+      height: 1em;
+    }
+
+    .minimise-button {
+      font-size: .65em;
+      outline: 0;
+
+      svg {
+        vertical-align: middle;
+      }
+    }
+  }
+
+  .modal-body {
+    padding-top: 0;
+    overflow-y: auto;
+    max-height: 80vh;
+
+    .record-content.panel-layout {
+
+      .row:first-child {
+        margin-bottom: 0 !important;
+
+        .card-body {
+          padding-bottom: 0 !important;
+
+          .field-layout {
+            .field-layout-row {
+              .full-row {
+                .squire-editor {
+                  max-width: 568px;
+                }
+              }
+            }
+          }
+
+          .field-layout.edit,
+          .field-layout.create {
+
+            .form-row > .col, .form-row > [class*=col-] {
+              padding-bottom: 0rem !important;
+              padding-right: 0.8rem !important;
+              padding-left: 0.8rem !important;
+
+              .field-layout-field-group-wrapper {
+                margin-bottom: 0.3rem !important;
+              }
+            }
+
+            .form-row:last-child > .col, .form-row:last-child > [class*=col-] {
+              padding-bottom: 0rem !important;
+            }
+
+
+            .col-form-label-sm {
+              font-size: .65rem;
+            }
+          }
+        }
+      }
+
+    }
+
+  }
+
+  .tab-content {
+    background-color: $white;
+  }
+}
+
+.record-modal-position-sticky {
+  position: sticky;
+  top: 0em;
+  z-index: 11;
+  padding: 0.5em 0 1em 0;
+  background-color: $off-white;
+  border-bottom: 1px solid rgba(0, 0, 0, .1);
+}
+
+body.modal-open.detached-modal-open {
+  padding-right: 0 !important;
+  overflow: auto !important;
+}
+
+#detached-modals {
+  position: fixed !important;
+  right: 45px;
+  bottom: 0;
+  margin: 0;
+  transform: translate(0) !important;
+  width: max-content;
+  display: flex;
+  align-items: flex-end;
+  z-index: map-get($zindex, modal-low) !important;
+  pointer-events: none;
+
+  .detached-modal {
+    position: relative;
+    width: auto;
+    box-shadow: 0 0 0.8rem #0000005c !important;
+    margin-left: 0.5rem;
+
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    .modal-header {
+      background-color: $main;
+
+      .minimise-button {
+        border: 0;
+        outline: 0;
+        color: $white;
+        fill: $white;
+        background-color: transparent;
+        margin: 0;
+        padding: .25rem .55rem;
+      }
+
+      .close-button {
+        color: $white;
+      }
+
+      .modal-title {
+        color: $white;
+      }
+    }
+
+    .modal-dialog {
+      margin: 0;
+    }
+
+    .modal-content {
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+      animation: none;
+    }
+
+    .record-modal {
+    }
+
+    .record-modal.minimized {
+      width: 300px;
+
+      .modal-header {
+        margin-bottom: 0;
+        border-bottom: 0 !important;
+
+        .modal-title {
+          max-width: 226px;
+          overflow: hidden;
+
+          span {
+            max-width: 215px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            line-height: 1;
+          }
+        }
+
+      }
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  .detached-modal {
+    .modal-dialog.modal-lg, .modal-dialog.modal-xl {
+      max-width: 614px;
+
+      .modal-header {
+        .modal-title {
+          max-width: 524px;
+          overflow: hidden;
+
+          span {
+            max-width: 524px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            line-height: 1;
+          }
+        }
+      }
+
+      .record-content.panel-layout {
+
+        .row:first-child {
+
+          .card-body {
+
+            .field-layout {
+              .field-layout-row {
+                .full-row {
+                  .squire-editor {
+                    max-width: 583px;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991px) {
+  .detached-modal {
+
+    .modal-dialog.modal-lg, .modal-dialog.modal-xl {
+      max-width: 500px;
+
+      .modal-header {
+        .modal-title {
+          max-width: 426px;
+          overflow: hidden;
+
+          span {
+            max-width: 424px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            line-height: 1;
+          }
+        }
+      }
+
+      .record-content.panel-layout {
+
+        .row:first-child {
+
+          .card-body {
+
+            .field-layout {
+              .field-layout-row {
+                .full-row {
+                  .squire-editor {
+                    max-width: 468px;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 575px) {
+  #detached-modals {
+    right: 0;
+    left: 0;
+    width: fit-content;
+
+    .detached-modal {
+      float: left;
+      margin-left: 0rem;
+      box-shadow: none;
+      display: none !important;
+
+      &:first-child {
+        display: block !important;
+
+        .modal-dialog {
+          .record-modal.minimized {
+            width: 90vw;
+
+            .modal-title {
+              max-width: calc(100vw - 138px);
+
+              span {
+                max-width: calc(100vw - 138px);
+              }
+            }
+          }
+        }
+      }
+
+      .modal-dialog {
+
+        .modal-body {
+          max-height: 80vh;
+
+          .record-content.panel-layout {
+
+            .row:first-child {
+
+              .card-body {
+
+                .field-layout {
+                  .field-layout-row {
+                    .full-row {
+                      .squire-editor {
+                        max-width: calc(100vw - 33px);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .record-modal {
+          box-shadow: 0 0 .8rem #0000005c !important;
+        }
+
+        .record-modal.minimized {
+          margin-left: 0rem;
+        }
+
+        .modal-header {
+          .modal-title {
+
+            &.minimized {
+              max-width: 223px;
+
+              span {
+                max-width: 223px;
+              }
+            }
+
+            max-width: calc(100vw - 77px);
+            overflow: hidden;
+            span {
+              max-width: calc(100vw - 77px);
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              display: inline-block;
+              line-height: 1;
+            }
+          }
+        }
+      }
+    }
+  }
+
+}

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @deprecated since SuiteCRM 8.9.0
+ */
 #[\AllowDynamicProperties]
 class SuiteMozaik
 {

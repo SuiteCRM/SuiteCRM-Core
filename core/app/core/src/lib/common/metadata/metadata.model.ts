@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,7 +26,7 @@
 
 import {FieldDefinition, FieldMetadata, LineItemsMetadata} from '../record/field.model';
 import {FieldLogicMap} from '../actions/field-logic-action.model';
-import {Action} from '../actions/action.model';
+import {Action, ActionDataSource} from '../actions/action.model';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {ViewMode} from "../views/view.model";
 
@@ -47,7 +47,7 @@ export interface ViewFieldDefinition {
     metadata?: FieldMetadata;
     logic?: FieldLogicMap;
     fieldActions?: FieldActions;
-    adaptor?: any;
+    fieldActionsAdapter?: any;
     displayLogic?: FieldLogicMap;
 
     [key: string]: any;
@@ -81,6 +81,12 @@ export interface FieldActions {
     klass: string;
     containerKlass: string;
     position: string;
+    adapter?: ActionDataSource;
+}
+
+
+export interface FieldActionsArrayMap {
+    [key: string]: Action[];
 }
 
 export interface TabDefinitions {
@@ -92,10 +98,20 @@ export interface TabDefinition {
     panelDefault: 'expanded' | 'collapsed';
     display?: boolean;
     displayLogic?: LogicDefinitions;
+    showHeader?: boolean;
 }
 
 export interface LogicDefinitions {
     [key: string]: LogicDefinition;
+}
+
+export interface AfterActionLogicDefinitions {
+    [key: string]: AfterActionLogicDefinition;
+}
+
+export interface AfterActionLogicDefinition {
+    field?: string;
+    logic?: LogicDefinition;
 }
 
 export interface LogicDefinition {

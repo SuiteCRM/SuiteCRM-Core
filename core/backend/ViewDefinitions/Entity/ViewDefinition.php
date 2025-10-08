@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -74,6 +74,14 @@ class ViewDefinition
     #[ApiProperty(
         openapiContext: [
             'type' => 'array',
+            'description' => 'The record-modal metadata'
+        ]
+    )]
+    public array $recordModal;
+
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'array',
             'description' => 'The search metadata'
         ]
     )]
@@ -94,6 +102,14 @@ class ViewDefinition
         ]
     )]
     public array $massUpdate;
+
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'array',
+            'description' => 'Extra metadata entries'
+        ]
+    )]
+    public array $extra;
 
     /**
      * The module
@@ -179,6 +195,24 @@ class ViewDefinition
     }
 
     /**
+     * Get Record Modal metadata
+     * @return array|null
+     */
+    public function getRecordModal(): ?array
+    {
+        return $this->recordModal ?? null;
+    }
+
+    /**
+     * Set Record Modal metadata
+     * @param array $recordModal
+     */
+    public function setRecordModal(array $recordModal): void
+    {
+        $this->recordModal = $recordModal;
+    }
+
+    /**
      * Get Search Metadata
      * @return array|null
      */
@@ -239,5 +273,51 @@ class ViewDefinition
         $this->massUpdate = $massUpdate;
 
         return $this;
+    }
+
+    /**
+     * Get extra metadata entries
+     * @return array|null
+     */
+    public function getExtraEntries(): ?array
+    {
+        return $this->extra ?? null;
+    }
+
+    /**
+     * Set extra metadata entries
+     * @param array $extraEntries
+     */
+    public function setExtraEntries(array $extraEntries): void
+    {
+        $this->extra = $extraEntries;
+    }
+
+    /**
+     * Get extra metadata entry
+     * @param $key
+     * @return array|null
+     */
+    public function getExtraEntry($key): ?array
+    {
+        if (empty($this->extra[$key])) {
+            return null;
+        }
+
+        return $this->extra[$key] ?? null;
+    }
+
+    /**
+     * Set extra metadata entry
+     * @param string $key
+     * @param array $definition
+     */
+    public function setExtraEntry(string$key, array $definition): void
+    {
+        if (empty($this->extra)) {
+            $this->extra = [];
+        }
+
+        $this->extra[$key] = $definition;
     }
 }

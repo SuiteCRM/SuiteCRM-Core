@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -81,6 +81,7 @@ export class RecordStore {
         protected message: MessageService,
         protected recordManager: RecordManager,
         protected recordMappers: RecordMapperRegistry,
+        protected options: ObjectMap = null
     ) {
 
 
@@ -111,7 +112,7 @@ export class RecordStore {
 
         this.initFieldDefaults = initDefaultValues;
 
-        this.initRecord(newRecord);
+        this.initRecord(newRecord, initDefaultValues);
 
         this.updateState(newRecord);
     }
@@ -125,7 +126,7 @@ export class RecordStore {
 
     setStaging(record: Record): void {
 
-        this.initRecord(record);
+        this.initRecord(record, false, this?.options ?? null);
 
         this.staging.next(this.stagingState = record);
     }
@@ -281,7 +282,7 @@ export class RecordStore {
     protected updateStaging(state: Record): void {
 
         const newState = deepClone(this.extractBaseRecord(state));
-        this.initRecord(newState, this.initFieldDefaults);
+        this.initRecord(newState, this.initFieldDefaults, this?.options ?? null);
 
         this.staging.next(this.stagingState = newState);
     }
@@ -303,8 +304,9 @@ export class RecordStore {
      *
      * @param {object} record Record
      * @param {boolean} initDefaultValues
+     * @param options
      */
-    protected initRecord(record: Record, initDefaultValues: boolean = false): void {
+    protected initRecord(record: Record, initDefaultValues: boolean = false, options: ObjectMap = null): void {
 
         if (this.metadata) {
             record.metadata = this.metadata;
@@ -321,6 +323,10 @@ export class RecordStore {
         if (initDefaultValues) {
             this.recordManager.initFieldDefaults(record);
             this.fieldDefaultsInitialized = true;
+        }
+
+        if (options?.initVardefBasedFieldActions && options?.buildFieldActionAdapter) {
+            this.recordManager.initVardefBasedFieldActions(record, options.buildFieldActionAdapter);
         }
     }
 

@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {catchError, finalize, map, shareReplay, tap} from 'rxjs/operators';
 import {Params} from '@angular/router';
@@ -46,11 +46,13 @@ import {Record} from '../../../../common/record/record.model';
 import {ViewMode} from '../../../../common/views/view.model';
 import {RecordStoreFactory} from '../../../../store/record/record.store.factory';
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
-import {PanelLogicManager} from '../../../../components/panel-logic/panel-logic.manager';
 import {RecordConvertService} from "../../../../services/record/record-convert.service";
+import {RecordDuplicateService} from "../../../../services/record/record-duplicate.service";
 
 @Injectable()
 export class CreateViewStore extends RecordViewStore {
+
+    protected duplicateService: RecordDuplicateService;
 
     constructor(
         protected recordFetchGQL: RecordFetchGQL,
@@ -68,7 +70,6 @@ export class CreateViewStore extends RecordViewStore {
         protected auth: AuthService,
         protected recordStoreFactory: RecordStoreFactory,
         protected preferences: UserPreferenceStore,
-        protected panelLogicManager: PanelLogicManager,
         protected recordConvertService: RecordConvertService
     ) {
         super(
@@ -86,9 +87,10 @@ export class CreateViewStore extends RecordViewStore {
             statisticsBatch,
             recordStoreFactory,
             preferences,
-            panelLogicManager,
             recordConvertService
         );
+
+        this.duplicateService = inject(RecordDuplicateService);
     }
 
     /**
@@ -106,10 +108,13 @@ export class CreateViewStore extends RecordViewStore {
         this.internalState.recordID = recordID;
         this.setMode(mode);
         this.parseParams(params);
-        this.calculateShowWidgets();
         this.showTopWidget = false;
         this.showBottomWidgets = false;
+        this.showHeaderWidgets = false;
+        this.showSidebarWidgets = false;
         this.showSubpanels = false;
+        this.calculateCurrentSection(params);
+        this.calculateShowWidgets();
 
         const isDuplicate = this.params.isDuplicate ?? false;
         const isConvert = this.params.isConvert ?? false;
@@ -128,7 +133,7 @@ export class CreateViewStore extends RecordViewStore {
     }
 
     save(): Observable<Record> {
-        this.appStateStore.updateLoading(`${this.internalState.module}-record-save-new`, true);
+        this.appStateStore.updateLoading(`${this.internalState.module}-record-save-new`, true, false);
 
         return this.recordStore.save().pipe(
             catchError(() => {
@@ -137,7 +142,7 @@ export class CreateViewStore extends RecordViewStore {
             }),
             finalize(() => {
                 this.setMode('detail' as ViewMode);
-                this.appStateStore.updateLoading(`${this.internalState.module}-record-save-new`, false);
+                this.appStateStore.updateLoading(`${this.internalState.module}-record-save-new`, false, false);
             })
         );
     }
@@ -158,13 +163,18 @@ export class CreateViewStore extends RecordViewStore {
                 assigned_user_id: user.id,
                 assigned_user_name: {
                     id: user.id,
-                    user_name: user.userName
                 },
                 relate_to: params?.return_relationship,
                 relate_id: params?.parent_id
             }
             /* eslint-enable camelcase,@typescript-eslint/camelcase */
         } as Record;
+
+        if (this.preferences.getUserPreference('use_real_names') !== 'off') {
+            blankRecord.attributes.assigned_user_name.full_name = (user?.firstName ?? '') + (user?.lastName ?? '');
+        } else {
+            blankRecord.attributes.assigned_user_name.user_name = user.userName;
+        }
 
         this.recordManager.injectParamFields(params, blankRecord, this.getVardefs());
 
@@ -188,11 +198,13 @@ export class CreateViewStore extends RecordViewStore {
                 false
             ).pipe(
                 tap((data: Record) => {
-                    data.id = '';
-                    data.attributes.id = '';
-                    // eslint-disable-next-line camelcase,@typescript-eslint/camelcase
-                    data.attributes.date_entered = '';
-                    this.recordManager.injectParamFields(this.params, data, this.getVardefs());
+
+                    const vardefs = this.getVardefs();
+
+                    const parsedRecord = this.duplicateService.duplicateParse(data, vardefs);
+
+                    this.recordManager.injectParamFields(this.params, parsedRecord, vardefs);
+
                     this.recordStore.setRecord(data);
                     this.updateState({
                         ...this.internalState,
@@ -237,8 +249,22 @@ export class CreateViewStore extends RecordViewStore {
      * Calculate if widgets are to display
      */
     protected calculateShowWidgets(): void {
-        const show = false;
-        this.showSidebarWidgets = show;
-        this.widgets = show;
+
+        this.showBottomWidgets = true;
+        this.showHeaderWidgets = true;
+
+        if (this.getMode() === 'create') {
+            this.showSidebarWidgets = false;
+            this.widgets = true;
+            return;
+        }
+
+        const recordViewMeta = this.getRecordViewMetadata();
+        const sidebarWidgetsConfig = recordViewMeta?.sidebarWidgets || [];
+        const hasSidebarConfig = sidebarWidgetsConfig?.length > 0;
+
+        const userPreference = this.loadPreference(this.getModuleName(), 'show-sidebar-widgets');
+        this.showSidebarWidgets = userPreference ?? hasSidebarConfig;
+        this.widgets = hasSidebarConfig;
     }
 }

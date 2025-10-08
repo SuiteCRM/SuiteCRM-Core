@@ -92,11 +92,27 @@ function clearQueryParamsAndNavigate() {
 				</tr>
 				<tr>
 					<td width="40%" scope="row">
+						{$MOD.LBL_CAMPAIGN_MARKETING_RECORDS_PER_RUN}&nbsp;<span class="required">{$APP.LBL_REQUIRED_SYMBOL}</span>
+					</td>
+					<td width="50%" >
+						<input name='massemailer_campaign_marketing_items_per_run' tabindex='1' maxlength='128' type="text" value="{$CAMPAIGN_MARKETING_RECORDS_PER_RUN}">
+					</td>
+				</tr>
+				<tr>
+					<td width="40%" scope="row">
 						{$MOD.LBL_EMAILS_PER_RUN}&nbsp;<span class="required">{$APP.LBL_REQUIRED_SYMBOL}</span>
 					</td>
 					<td width="50%" >
 						<input name='massemailer_campaign_emails_per_run' tabindex='1' maxlength='128' type="text" value="{$EMAILS_PER_RUN}">
 					</td>
+				</tr>
+				<tr>
+					<td scope="row">
+						{$MOD.LBL_TRACKER_LINKS_ENABLED}&nbsp;<span class="required">{$APP.LBL_REQUIRED_SYMBOL}</span>
+					</td>
+					<td >
+						<input type="radio" name="massemailer_trackers_enabled" {if $TRACKERS_ENABLED == 'true'}checked{/if} value="true"> {$APP.LBL_YES}
+						<input type="radio" name="massemailer_trackers_enabled" {if $TRACKERS_ENABLED == 'false'}checked{/if} value="false"> {$APP.LBL_NO}
 				</tr>
 				<tr>
 					<td scope="row">

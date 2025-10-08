@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,11 +28,11 @@
 
 .p-multiselect {
   width: 100%;
-  height: calc(1.5em + 0.5rem + 1px);
+  height: calc(1.5em + 0.5rem - 1px);
 
   .p-multiselect-label {
     font-size: 0.85rem;
-    padding: 0.35rem 0.48rem;
+    padding: 0.30rem 0.48rem;
     max-width: 400px;
   }
 
@@ -49,13 +49,40 @@
       }
     }
 
+    .p-multiselect-items-wrapper {
+      overflow-y: auto;
+
+      &::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      &::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px transparent;
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: $light-grey;
+        border-radius: 51px;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: $light-grey;
+      }
+    }
+
     ul.p-multiselect-items {
       padding-inline-start: 0em;
+      padding: 0!important;
+
+     .p-multiselect-empty-message{
+       font-size: 0.875rem!important;
+     }
     }
   }
 
   .p-overlay {
-    z-index: 1!important;
+    z-index: 1 !important;
   }
 }
 

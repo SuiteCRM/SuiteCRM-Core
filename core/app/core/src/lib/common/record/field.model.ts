@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,20 +25,28 @@
  */
 
 import {SearchCriteriaFieldFilter} from '../views/list/search-criteria.model';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {asapScheduler, BehaviorSubject, Observable} from 'rxjs';
 import {AsyncValidatorFn, UntypedFormArray, UntypedFormControl, ValidatorFn} from '@angular/forms';
 import {Record} from './record.model';
 import {FieldLogicMap} from '../actions/field-logic-action.model';
 import {ObjectMap} from '../types/object-map';
 import {ViewMode} from '../views/view.model';
 import {signal, WritableSignal} from "@angular/core";
+import {FieldActions} from "../metadata/metadata.model";
+import {StandardValidationErrors} from "../services/validators/validators.model";
 
 export type DisplayType = 'none' | 'show' | 'readonly' | 'inline' | 'disabled' | 'default';
 
 export interface Option {
     value: string;
     label?: string;
+    link?: string;
     labelKey?: string;
+}
+
+export interface AsyncValidationDefinition {
+    key: string;
+    params?: { [key: string]: string };
 }
 
 export interface ValidationDefinition {
@@ -79,6 +87,7 @@ export interface FieldDefinition {
     inline_edit?: boolean;
     validation?: ValidationDefinition;
     validations?: ValidationDefinition[];
+    asyncValidators?: AsyncValidationDefinition[]
     template?: string;
     display?: string;
     displayType?: string;
@@ -96,6 +105,7 @@ export interface FieldDefinition {
     lineItems?: LineItemsMetadata;
     metadata?: FieldMetadata;
     default?: string;
+    initDefaultProcess?: string;
     defaultValueModes?: ViewMode[];
     modes?: ViewMode[];
     relationship?: string;
@@ -166,12 +176,14 @@ export interface AttributeDependency {
 export type FieldSource = 'field' | 'attribute' | 'item' | 'groupField';
 
 export declare type DefaultValueInitCallback = () => void;
+export declare type InitValueSignalFunction = () => void;
 
 export interface Field {
     type: string;
     value?: string;
     valueList?: string[];
     valueObject?: any;
+    valueSignal?: WritableSignal<string>;
     valueObjectArray?: ObjectMap[];
     name?: string;
     vardefBased?: boolean;
@@ -186,13 +198,16 @@ export interface Field {
     display?: WritableSignal<DisplayType>;
     required?: WritableSignal<boolean>;
     defaultDisplay?: string;
+    displayType?: string;
     default?: string;
+    defaultValueObject?: any;
     defaultValueModes?: ViewMode[];
     source?: FieldSource;
-    valueSource?: 'value' | 'valueList' | 'valueObject' | 'criteria';
+    valueSource?: 'value' | 'valueList' | 'valueObject' | 'valueObjectArray' | 'criteria';
     metadata?: FieldMetadata;
     definition?: FieldDefinition;
     criteria?: SearchCriteriaFieldFilter;
+    asyncValidationErrors?: StandardValidationErrors;
     formControl?: UntypedFormControl;
     itemFormArray?: UntypedFormArray;
     validators?: ValidatorFn[];
@@ -207,7 +222,11 @@ export interface Field {
     previousValue?: string;
     useFullColumn?: string[];
 
+    fieldActions?: FieldActions;
+
     initDefaultValue?: DefaultValueInitCallback;
+    initDefaultValueObject?: DefaultValueInitCallback;
+    initValueSignal?: InitValueSignalFunction;
 }
 
 export class BaseField implements Field {
@@ -219,12 +238,16 @@ export class BaseField implements Field {
     loading?: WritableSignal<boolean> = signal(false);
     dynamicLabelKey?: string;
     readonly?: boolean;
+    defaultValueObject?: any;
     display?: WritableSignal<DisplayType>;
     required?: WritableSignal<boolean>;
     defaultDisplay?: string;
+    displayType?: string;
     default?: string;
+    initDefaultProcess?: string;
     defaultValueModes?: ViewMode[];
     source?: FieldSource;
+    valueSignal?: WritableSignal<string>;
     metadata?: FieldMetadata;
     definition?: FieldDefinition;
     criteria?: SearchCriteriaFieldFilter;
@@ -242,17 +265,21 @@ export class BaseField implements Field {
     displayLogic?: FieldLogicMap;
     useFullColumn?: string[];
 
+    fieldActions?: FieldActions;
+
     protected valueState?: string;
     protected valueListState?: string[];
     protected valueObjectState?: any;
     protected valueObjectArrayState?: ObjectMap[];
     defaultValueInitialized: boolean = false;
+    defaultValueObjectInitialized: boolean = false;
 
     constructor() {
         this.valueSubject = new BehaviorSubject<FieldValue>({} as FieldValue);
         this.valueChanges$ = this.valueSubject.asObservable();
         this.display = signal('default');
         this.required = signal(false);
+        this.valueSignal = signal('');
     }
 
     get value(): string {
@@ -263,7 +290,11 @@ export class BaseField implements Field {
         const changed = value !== this.valueState;
 
         this.valueState = value;
-
+        if (typeof value === 'string') {
+            asapScheduler.schedule(() => {
+                this.valueSignal.set(value)
+            })
+        }
         if (changed) {
             this.emitValueChanges();
         }
@@ -302,7 +333,8 @@ export class BaseField implements Field {
         this.valueSubject.next({
             value: this.valueState,
             valueList: this.valueListState,
-            valueObject: this.valueObjectState
+            valueObject: this.valueObjectState,
+            valueObjectArray: this.valueObjectArrayState
         })
     }
 
@@ -322,12 +354,33 @@ export class BaseField implements Field {
         }
     }
 
+    initValueSignal(): void {
+        this.valueSignal.set(this.value)
+    }
+
+    initDefaultValueObject(): void {
+
+        if (this.defaultValueObjectInitialized) {
+            return;
+        }
+
+        const defaultValue = this?.defaultValueObject ?? this?.definition?.defaultValueObject ?? null;
+        if (!this.valueObject && defaultValue) {
+            this.valueObject = defaultValue;
+            this?.formControl?.setValue(defaultValue);
+            this.defaultValueObjectInitialized = true;
+        } else if (this.valueObject === null) {
+            this.valueObject = {};
+        }
+    }
+
 }
 
 export interface FieldValue {
     value?: string;
     valueList?: string[];
     valueObject?: any;
+    valueObjectArray?: ObjectMap[];
 }
 
 

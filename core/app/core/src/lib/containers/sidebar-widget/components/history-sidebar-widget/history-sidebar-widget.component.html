@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,7 +25,7 @@
 * the words "Supercharged by SuiteCRM".
 */
 -->
-<scrm-widget-panel [title]="getHeaderLabel()">
+<scrm-widget-panel [key]="key" [mode]="mode" [context]="context?.module ?? ''" [title]="getHeaderLabel()">
     <div widget-body *ngIf="(adapter?.dataStream$| async) as vm">
 
         <div class="widget-background history-timeline p-2 pt-0">
@@ -62,7 +62,7 @@
                             <div class="card">
                                 <div class="card-body p-1 pr-2 pl-2">
                                     <p class="card-title text-break history-timeline-entry-title">
-                                        <a *ngIf="entry.record.module !== 'audit'"
+                                        <a *ngIf="entry.record.module !== 'audit' && entry.record.module !== 'emailman'"
                                            [routerLink]="redirectLink(entry.record.module, entry.record.id)"
                                         >
                                             <scrm-field [type]="entry.title.type"
@@ -71,7 +71,7 @@
                                                         [record]="entry.record">
                                             </scrm-field>
                                         </a>
-                                        <a *ngIf="entry.record.module === 'audit'">
+                                        <a *ngIf="entry.record.module === 'audit' || entry.record.module === 'emailman'">
                                             <scrm-field [type]="entry.title.type"
                                                         mode="list"
                                                         [field]="entry.title"

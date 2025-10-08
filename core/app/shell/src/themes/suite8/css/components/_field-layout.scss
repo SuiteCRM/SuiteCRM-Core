@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -55,6 +55,14 @@
   padding-top: 5px !important;
 }
 
+.field-group-label {
+  span.required {
+    color: $amaranth;
+    float: inline-start;
+    position: initial;
+  }
+}
+
 span.required {
   color: $amaranth;
   position: absolute;
@@ -94,6 +102,19 @@ span.required {
     }
   }
 
+  .full-row {
+    @media (min-width: 992px) {
+      .col-lg-3 {
+        flex: 0 0 12.4861%;
+        max-width: 12.4861%;
+      }
+
+      .col-lg-9 {
+        flex: 0 0 87.39%;
+        max-width: 87.39%;
+      }
+    }
+  }
 
 
   .col-form-label {

@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -27,14 +27,30 @@
 -->
 <button type="button"
         [ngClass]="config.klass"
+        [class]="dynamicClass()"
         (click)="runClick($event)"
-        [disabled]="config?.disabled || ''"
+        [disabled]="disabled() || isRunning()"
+        [style]="config?.style || ''"
+        [style.max-width]="config?.maxWidth ? config?.maxWidth + 'px': null"
         [title]="(language.getFieldLabel(config.titleKey) || config?.title) || ''">
+    <ng-container *ngIf="!isRunning()">
     <scrm-image *ngIf="config.icon"
                 [image]="config.icon"
                 [klass]="config.iconKlass || ''"
                 [title]="language.getFieldLabel(config.titleKey || '')"></scrm-image>
+    <scrm-image *ngIf="dynamicIcon()"
+                [image]="dynamicIcon()"
+                [klass]="config.iconKlass || ''"
+                [title]="language.getFieldLabel(config.titleKey || '')"></scrm-image>
     <ng-container *ngIf="!config.labelKey">{{ config.label || '' }}</ng-container>
     <scrm-label *ngIf="config.labelKey" [labelKey]="config.labelKey" [module]="config.labelModule ?? ''"></scrm-label>
+    <scrm-dynamic-label *ngIf="config.dynamicLabelKey"
+                        [labelKey]="config.dynamicLabelKey"
+                        [module]="config.labelModule ?? ''"
+                        [fields]="config?.dynamicLabelFields"></scrm-dynamic-label>
+    </ng-container>
     <ng-content></ng-content>
+    <ng-container *ngIf="isRunning()">
+        <scrm-inline-loading-spinner klass="inline-spinner-md"></scrm-inline-loading-spinner>
+    </ng-container>
 </button>

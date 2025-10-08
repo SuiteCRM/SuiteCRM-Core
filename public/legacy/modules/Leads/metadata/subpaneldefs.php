@@ -48,9 +48,10 @@ $layout_defs['Leads'] = array(
         'activities' => array(
             'order' => 20,
             'sort_order' => 'desc',
-            'sort_by' => 'date_due',
+            'sort_by' => 'date_end',
             'title_key' => 'LBL_ACTIVITIES_SUBPANEL_TITLE',
             'type' => 'collection',
+            'header_definition_from_subpanel' => 'meetings',
             'subpanel_name' => 'activities',   //this values is not associated with a physical file.
             'module' => 'Activities',
 
@@ -91,6 +92,12 @@ $layout_defs['Leads'] = array(
                     'set_subpanel_data' => 'oldcalls',
                     'generate_select' => true,
                 ),
+                'emailman' => [
+                    'module' => 'EmailMan',
+                    'subpanel_name' => 'ForActivities',
+                    'generate_select' => true,
+                    'get_subpanel_data' => 'function:getUpcomingEmails',
+                ]
             )
         ),
         'history' => array(

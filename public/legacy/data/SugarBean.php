@@ -4502,6 +4502,7 @@ class SugarBean
      * populate the upper limit on ListViews.
      *
      * @param string $query Select query string
+     * @param mixed $alias
      * @return string count query
      *
      * Internal function, do not override.
@@ -4520,6 +4521,10 @@ class SugarBean
             } else {
                 $star = 'DISTINCT ' . $this->table_name . '.id';
             }
+        }
+
+        if (is_array($alias)) {
+            $alias = $alias[0];
         }
 
         // change the select expression to 'count(*)'

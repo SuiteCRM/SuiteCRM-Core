@@ -171,7 +171,7 @@ class TemplateHandler
         );
         $contents = $this->ss->fetch($tpl);
         // Insert validation and quick search stuff here
-        if ($view === 'EditView' || $ajaxSave || $view === 'ConvertLead' || $view === 'ComposeView' || strpos($view, 'QuickCreate')) {
+        if ($view === 'EditView' || $ajaxSave || $view === 'ConvertLead' || $view === 'ComposeView' || $view === 'ModalComposeView' || strpos($view, 'QuickCreate')) {
             global $dictionary, $app_strings, $mod_strings;
 
             $mod = BeanFactory::getObjectName($module);

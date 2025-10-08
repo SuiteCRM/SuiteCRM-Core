@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,7 +26,7 @@
 
 import {Injectable} from '@angular/core';
 import {ViewFieldDefinition} from '../../common/metadata/metadata.model';
-import {FieldMap, FieldDefinitionMap} from '../../common/record/field.model';
+import {FieldDefinitionMap, FieldMap} from '../../common/record/field.model';
 import {Record} from '../../common/record/record.model';
 import {isVoid} from '../../common/utils/value-utils';
 import {UntypedFormGroup} from '@angular/forms';
@@ -34,6 +34,9 @@ import {LanguageStore} from '../../store/language/language.store';
 import {FieldManager} from './field/field.manager';
 import {Params} from '@angular/router';
 import {FieldHandlerRegistry} from "./field/handler/field-handler.registry";
+import {ActionDataSourceBuilderFunction} from "../../common/actions/action.model";
+import {ObjectMap} from "../../common/types/object-map";
+import {deepClone} from "../../common/utils/object-utils";
 
 @Injectable({
     providedIn: 'root'
@@ -112,7 +115,8 @@ export class RecordManager {
 
         Object.entries(record.fields).forEach(([key, field]) => {
             const fieldHandler = this.fieldHandlerRegistry.get(record.module, field.type);
-            fieldHandler.initDefaultValue(field, record);
+            fieldHandler.initDefaultValue(field, record, false);
+            fieldHandler.initDefaultValueObject(field, record);
         });
     }
 
@@ -251,5 +255,17 @@ export class RecordManager {
                 }
             });
         }
+    }
+
+    initVardefBasedFieldActions(record: Record, buildFieldActionAdapter: ActionDataSourceBuilderFunction): void {
+        Object.values(record?.fields ?? {}).forEach(field => {
+            let fieldActions = field.fieldActions ?? field?.definition?.fieldActions ?? null;
+            if (fieldActions && !fieldActions.adapter) {
+                fieldActions = deepClone(fieldActions);
+                fieldActions.adapter = buildFieldActionAdapter({field} as ObjectMap);
+                field.fieldActions = fieldActions;
+            }
+        });
+
     }
 }

@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -23,6 +23,8 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Supercharged by SuiteCRM".
  */
+
+import {isString} from "lodash-es";
 
 /**
  * Check if value is false
@@ -54,3 +56,38 @@ export const isVoid = (value: any): boolean => (value === null || typeof value =
  * @returns {boolean} isEmptyString
  */
 export const isEmptyString = (value: any): boolean => (typeof value === 'string' && !value.trim());
+/**
+ * Check if value is an empty string
+ *
+ * @param {any} value to check
+ * @returns {boolean} isEmptyString
+ */
+export const isEmail = (value: any): boolean => (typeof value === 'string' && /[\w-\.]+@([\w-]+\.)+[\w-]+$/.test(value ?? ''));
+/**
+ * Check if value is an empty string
+ *
+ * @param {any} value to check
+ * @returns {boolean} isEmptyString
+ */
+export const isURL = (value: any): boolean => {
+    if (!isString(value)) {
+        return false;
+    }
+    if(value.includes('javascript:')) {
+        return false;
+    }
+
+    if(!value.includes('https://') && !value.includes('http://') && value.includes('.')) {
+        value = 'http://' + value;
+    }
+
+    let url: URL;
+
+    try {
+        url = new URL(value);
+    } catch (e) {
+        return false;
+    }
+
+    return url?.protocol === "http:" || url?.protocol === "https:";
+}

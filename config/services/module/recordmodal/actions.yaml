@@ -1,0 +1,26 @@
+parameters:
+  module.recordmodal.actions:
+    default:
+      actions:
+        save:
+          key: save
+          labelKey: LBL_SAVE_BUTTON_LABEL
+          params:
+            expanded: true
+          modes:
+            - edit
+            - create
+          acl:
+            - edit
+            - create
+        cancel:
+          key: cancel
+          labelKey: LBL_CANCEL
+          params:
+            expanded: true
+          modes:
+            - edit
+            - create
+          acl:
+            - edit
+            - create

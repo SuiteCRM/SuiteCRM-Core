@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,19 +26,21 @@
 
 import {Injectable} from '@angular/core';
 import {Action, ActionContext} from '../../../common/actions/action.model';
-import {AsyncActionService} from '../../../services/process/processes/async-action/async-action';
+import {AsyncActionInput, AsyncActionService} from '../../../services/process/processes/async-action/async-action';
 import {MessageService} from '../../../services/message/message.service';
 import {LineActionActionManager} from '../line-actions/line-action-manager.service';
 import {LineActionData} from '../line-actions/line.action';
 import {ConfirmationModalService} from '../../../services/modals/confirmation-modal.service';
-import {BaseRecordActionsAdapter} from '../../../services/actions/base-record-action.adapter';
 import {LanguageStore} from '../../../store/language/language.store';
 import {SelectModalService} from '../../../services/modals/select-modal.service';
 import {MetadataStore} from '../../../store/metadata/metadata.store.service';
 import {AppMetadataStore} from "../../../store/app-metadata/app-metadata.store.service";
+import {FieldModalService} from "../../../services/modals/field-modal.service";
+import {BaseActionsAdapter} from "../../../services/actions/base-action.adapter";
+import {FieldLogicManager} from "../../../fields/field-logic/field-logic.manager";
 
 @Injectable()
-export abstract class BaseLineActionsAdapter extends BaseRecordActionsAdapter<LineActionData> {
+export abstract class BaseLineActionsAdapter<D extends LineActionData> extends BaseActionsAdapter<D> {
 
     protected constructor(
         protected actionManager: LineActionActionManager,
@@ -47,8 +49,10 @@ export abstract class BaseLineActionsAdapter extends BaseRecordActionsAdapter<Li
         protected confirmation: ConfirmationModalService,
         protected language: LanguageStore,
         protected selectModalService: SelectModalService,
+        protected fieldModalService: FieldModalService,
         protected metadata: MetadataStore,
-        protected appMetadataStore: AppMetadataStore
+        protected appMetadataStore: AppMetadataStore,
+        protected logic: FieldLogicManager,
     ) {
         super(
             actionManager,
@@ -57,15 +61,42 @@ export abstract class BaseLineActionsAdapter extends BaseRecordActionsAdapter<Li
             confirmation,
             language,
             selectModalService,
+            fieldModalService,
             metadata,
-            appMetadataStore
+            appMetadataStore,
+            logic
         )
     }
 
-    protected buildActionData(action: Action, context?: ActionContext): LineActionData {
+    protected buildActionData(action: Action, context?: ActionContext): D {
         return {
             record: (context && context.record) || null,
             action: action
-        } as LineActionData;
+        } as D;
+    }
+
+    /**
+     * Get action name
+     * @param action
+     */
+    protected getActionName(action: Action) {
+        return `record-${action.key}`;
+    }
+
+    /**
+     * Build backend process input
+     *
+     * @param action
+     * @param actionName
+     * @param moduleName
+     * @param context
+     */
+    protected buildActionInput(action: Action, actionName: string, moduleName: string, context: ActionContext = null): AsyncActionInput {
+        return {
+            action: actionName,
+            module: moduleName,
+            id: (context && context.record && context.record.id) || '',
+            params: (action && action.params) || [],
+        } as AsyncActionInput;
     }
 }

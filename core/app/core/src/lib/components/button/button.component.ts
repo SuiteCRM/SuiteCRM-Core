@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,8 +24,8 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {ButtonInterface, ButtonCallback} from '../../common/components/button/button.model';
+import {Component, Input, OnDestroy, OnInit, signal, Signal} from '@angular/core';
+import {ButtonCallback, ButtonInterface} from '../../common/components/button/button.model';
 import {LanguageStore} from '../../store/language/language.store';
 import {Observable, Subject, Subscription} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
@@ -36,6 +36,11 @@ import {debounceTime} from 'rxjs/operators';
 })
 export class ButtonComponent implements OnInit, OnDestroy {
     @Input() config: ButtonInterface;
+
+    isRunning: Signal<boolean> = signal(false);
+    dynamicClass: Signal<string> = signal('');
+    dynamicIcon: Signal<string> = signal('');
+    disabled: Signal<boolean> = signal(false);
     clickCallBack: ButtonCallback;
     protected clickBuffer = new Subject<any>();
     protected clickBuffer$: Observable<any> = this.clickBuffer.asObservable();
@@ -48,6 +53,22 @@ export class ButtonComponent implements OnInit, OnDestroy {
         const isToDebounce = this.config?.debounceClick ?? null;
         this.clickCallBack = this.config?.onClick ?? null;
         const clickDebounceTime = this.getDebounceTime();
+
+        if (this.config?.dynamicClass) {
+            this.dynamicClass = this.config?.dynamicClass;
+        }
+
+        if (this.config?.dynamicIcon) {
+            this.dynamicIcon = this.config?.dynamicIcon;
+        }
+
+        if (this.config?.disabled) {
+            this.disabled = this.config?.disabled;
+        }
+
+        if (this.config.isRunning){
+            this.isRunning = this.config.isRunning;
+        }
 
         if (isToDebounce && this.clickCallBack) {
             this.subs.push(this.clickBuffer$.pipe(debounceTime(clickDebounceTime)).subscribe(value => {

@@ -3,12 +3,7 @@
         #EditView_tabs {
             clear: both;
         }
-    }  
-    #EditView {
-        .buttons {
-            top: -0.8em;
-        }
-    }   
+    }
     .panel {
         margin-top: 0;
     }
@@ -23,11 +18,11 @@
     }
     input[type=text],input[type=password],input[type=email],input[type=number]{
         background-color: $transparent-color;
-        border: 1px solid $form-border-color;       
+        border: 1px solid $form-border-color;
     }
     textarea {
         background-color: $transparent-color;
-        border: 1px solid $form-border-color; 
+        border: 1px solid $form-border-color;
     }
     .drop-area {
         height: 570px;
@@ -41,7 +36,7 @@
             font-size: 3em !important;
             line-height: 7px !important;
         }
-    }   
+    }
     #addChartButton {
         background: $nepal-grey;
         &:hover {
@@ -56,7 +51,7 @@
         }
     }
     .aor-tab-content #fieldLines tbody tr:nth-of-type(2n) td {
-        background: $very-light-grey;        
+        background: $very-light-grey;
     }
     .detail {
         padding-bottom: 1em;

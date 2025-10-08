@@ -1,0 +1,344 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2025 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+.field-mode-detail.field-type-attachment {
+  .attachments-detail-mode {
+    margin-bottom: .5rem;
+
+    .uploaded-files {
+
+      .popover-body {
+
+        ul .uploaded-files-popover-item {
+
+          .uploaded-file {
+
+            .uploaded-file-info {
+              a {
+                max-width: 248px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.field-mode-detail.field-type-attachment {
+  .attachments-edit-mode {
+    .dropdown-button {
+      .dropdown-toggle {
+        padding: 0.1rem;
+        padding-right: 0.3rem;
+        margin: 0;
+        margin-right: 0.4rem;
+      }
+    }
+  }
+}
+
+.field-mode-list.field-type-attachment,
+.field-mode-detail.field-type-attachment,
+.field-mode-edit.field-type-attachment {
+  .attachments.attachments-detail-mode,
+  .attachments.attachments-list-mode,
+  .attachments.attachments-edit-mode {
+
+    .uploaded-files {
+
+      .file-group {
+        .file {
+          padding-top: 0;
+
+          &:first-child {
+            padding-left: 0px !important;
+          }
+
+          .uploaded-file {
+            padding: .2em;
+
+            .uploaded-file-info-container {
+              .uploaded-file-icon-container {
+                .uploaded-file-icon {
+                  line-height: inherit;
+
+                  svg-icon {
+                    line-height: inherit;
+
+                    svg {
+                      width: 1.1em;
+                      height: 1.15em;
+                    }
+                  }
+                }
+              }
+
+              .uploaded-file-info {
+                justify-content: start;
+
+                > a {
+                  line-height: 1;
+                }
+
+                .uploaded-file-size {
+                  font-size: .9em !important;
+                  top: inherit;
+                  position: inherit;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .popover-body {
+        line-height: .25rem;
+        padding: 2px !important;
+        box-shadow: 0 .5rem 1rem #00000026 !important;
+
+        .popover-content {
+          padding-left: 0;
+          padding-right: 0;
+          margin-left: 1px;
+          margin-right: 0;
+        }
+
+        ul .uploaded-files-popover-item {
+          padding-left: 5px;
+          padding-right: 0;
+          margin-bottom: 5px;
+          padding-bottom: 0px;
+
+          &:not(:last-child) {
+            padding-bottom: 5px;
+            border-bottom: 1px solid lightgrey;
+          }
+        }
+
+        ul .uploaded-files-popover-item {
+
+          .uploaded-file {
+            border: none;
+            background-color: transparent;
+            justify-content: space-between;
+            align-items: center;
+
+            .uploaded-file-icon {
+              font-size: large;
+            }
+
+            .uploaded-file-info {
+              flex-direction: row;
+
+              a {
+                max-width: 248px;
+              }
+            }
+
+            .uploaded-file-name {
+              line-height: 1.25 !important;
+            }
+          }
+        }
+
+        u {
+          padding-inline-start: 0.5em !important;
+        }
+      }
+    }
+  }
+}
+
+.field-mode-list.field-type-attachment {
+  .attachments.attachments-list-mode {
+    .uploaded-files {
+      .file-group {
+        .file {
+          .uploaded-file {
+            min-width: 150px !important;
+            .uploaded-file-info-container {
+              .uploaded-file-info {
+                > a {
+                  max-width: 130px !important;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .attachments-more-link {
+        > div {
+          min-width: 46px;
+        }
+      }
+    }
+  }
+}
+
+
+.attachments {
+  display: flex;
+  flex-grow: 1;
+  flex-wrap: wrap;
+
+  .dropdown-button {
+
+    .dropdown-toggle {
+      padding: .15rem .5rem;
+    }
+
+    .dropdown-menu {
+      background-color: white !important;
+
+      .dropdown-item {
+        background-color: inherit;
+        box-shadow: 0 .2rem 1rem #00000026 !important;
+      }
+    }
+
+
+  }
+
+  .uploaded-files {
+
+    .file-group {
+      display: flex;
+      line-height: .25rem;
+
+      .file {
+        padding-top: .2em;
+
+        .uploaded-file-name {
+          line-height: 1.25 !important;
+        }
+
+        .uploaded-file-actions {
+          .upload-clear-button {
+            font-size: medium !important;
+          }
+        }
+      }
+    }
+
+    .uploaded-file-size {
+      font-size: .7em !important;
+      top: 2px;
+      position: relative;
+    }
+
+    .popover-body {
+      line-height: .25rem;
+      padding: 2px !important;
+      box-shadow: 0 .5rem 1rem #00000026 !important;
+
+      .popover-content {
+        padding-left: 0;
+        padding-right: 0;
+        margin-left: 1px;
+        margin-right: 0;
+      }
+
+      ul .uploaded-files-popover-item {
+        padding-left: 5px;
+        padding-right: 0;
+        margin-bottom: 5px;
+        padding-bottom: 5px;
+
+        &:not(:last-child) {
+          border-bottom: 1px solid lightgrey;
+        }
+      }
+
+      ul .uploaded-files-popover-item {
+        .uploaded-file-compact {
+          border: none;
+          background-color: transparent;
+          justify-content: space-between;
+          align-items: center;
+
+          .uploaded-file-name {
+            line-height: 1.25 !important;
+          }
+        }
+      }
+
+      u {
+        padding-inline-start: 0.5em !important;
+      }
+    }
+
+    .clickable {
+      color: $bright-purple !important;
+    }
+
+    .popover {
+      max-width: fit-content !important;
+    }
+  }
+
+  .file-upload {
+    display: flex;
+    flex-grow: 1;
+
+    .upload-label-container {
+      display: flex;
+      flex-grow: 1;
+      align-items: center;
+      cursor: pointer;
+      height: 100%;
+
+      .upload-label {
+        padding-right: 0.5rem;
+      }
+
+      .image-upload {
+        padding-left: 0.5rem;
+      }
+    }
+  }
+}
+
+@media (min-width: 600px) and (max-width: 640px) {
+  .attachments {
+    .uploaded-files {
+      .file-group {
+        .file {
+          .uploaded-file {
+            min-width: 160px !important;
+            .uploaded-file-info-container {
+              .uploaded-file-info {
+                > a {
+                  max-width: 130px !important;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -36,6 +36,7 @@ require_once __DIR__ . '/TypeMappers/DateMapper.php';
 require_once __DIR__ . '/TypeMappers/DateTimeMapper.php';
 require_once __DIR__ . '/TypeMappers/DateTimeComboMapper.php';
 require_once __DIR__ . '/TypeMappers/MultiEnumMapper.php';
+require_once __DIR__ . '/TypeMappers/MultiRelateMapper.php';
 require_once __DIR__ . '/TypeMappers/BooleanMapper.php';
 require_once __DIR__ . '/TypeMappers/HtmlMapper.php';
 require_once __DIR__ . '/TypeMappers/TextMapper.php';
@@ -44,6 +45,8 @@ require_once __DIR__ . '/ApiBeanModuleMappers.php';
 require_once __DIR__ . '/ModuleMappers/SavedSearch/SavedSearchMappers.php';
 require_once __DIR__ . '/ModuleMappers/AOP_Case_Updates/CaseUpdatesMappers.php';
 require_once __DIR__ . '/ModuleMappers/Alerts/AlertsMappers.php';
+require_once __DIR__ . '/ModuleMappers/EmailMan/EmailManMappers.php';
+require_once __DIR__ . '/ModuleMappers/Tasks/TasksMappers.php';
 require_once __DIR__ . '/../Bean/Field/Validation/FieldValidatorRegistry.php';
 
 class ApiBeanMapper
@@ -83,6 +86,7 @@ class ApiBeanMapper
         $this->typeMappers[DateMapper::getType()] = new DateMapper();
         $this->typeMappers[DateTimeMapper::getType()] = new DateTimeMapper();
         $this->typeMappers[MultiEnumMapper::getType()] = new MultiEnumMapper();
+        $this->typeMappers[MultiRelateMapper::getType()] = new MultiRelateMapper();
         $this->typeMappers[BooleanMapper::getType()] = new BooleanMapper();
         $this->typeMappers['boolean'] = $this->typeMappers[BooleanMapper::getType()];
         $this->typeMappers[HtmlMapper::getType()] = new HtmlMapper();
@@ -94,6 +98,8 @@ class ApiBeanMapper
         $this->linkMappers[EmailAddressLinkMapper::getRelateModule()]['all'] = new EmailAddressLinkMapper();
         $this->moduleMappers[CaseUpdatesMappers::getModule()] = new CaseUpdatesMappers();
         $this->moduleMappers[AlertsMappers::getModule()] = new AlertsMappers();
+        $this->moduleMappers[EmailManMappers::getModule()] = new EmailManMappers();
+        $this->moduleMappers[TasksMappers::getModule()] = new TasksMappers();
         $this->linkMappers[DefaultLinkMapper::getRelateModule()] = [];
         $this->linkMappers[DefaultLinkMapper::getRelateModule()]['all'] = new DefaultLinkMapper();
         global $api_bean_mappers;
@@ -228,29 +234,21 @@ class ApiBeanMapper
 
         [$linkFields, $idFields] = $this->getLinkFields($bean);
 
+        $idTypeFields = $this->getIdTypeFields($bean);
+
         $mappedAttributes = [];
 
         foreach ($bean->field_defs as $field => $properties) {
-            $mappedAttributes[$field] = true;
 
-            if (!isset($values[$field])) {
+            if ($idTypeFields[$field] ?? null){
                 continue;
             }
 
-            $this->toBeanMap($bean, $values, $properties, $field);
+            $this->processMapping($bean, $values, $idFields, $mappedAttributes, $field, $properties);
+        }
 
-            if (!$this->isIdField($idFields, $field) && $this->isLinkField($properties)) {
-                if (!$this->hasLinkMapper($bean->module_name, $properties)) {
-                    continue;
-                }
-
-                $this->mapLinkFieldToBean($bean, $values, $properties);
-                continue;
-            }
-
-            $this->validate($bean->module_name, $field, $properties, $values[$field] ?? null, $idFields);
-
-            $bean->$field = $values[$field];
+        foreach ($idTypeFields as $field => $properties) {
+            $this->processMapping($bean, $values, $idFields, $mappedAttributes, $field, $properties, true);
         }
 
         foreach ($bean->relationship_fields as $field => $link) {
@@ -270,6 +268,30 @@ class ApiBeanMapper
                 $attributeMapper->toBean($bean, $values, $field);
             }
         }
+    }
+
+    protected function processMapping($bean, &$values, $idFields, &$mappedAttributes, $field, $properties): void
+    {
+        $mappedAttributes[$field] = true;
+
+        if (!isset($values[$field])) {
+            return;
+        }
+
+        $this->toBeanMap($bean, $values, $properties, $field);
+
+        if (!$this->isIdField($idFields, $field) && $this->isLinkField($properties)) {
+            if (!$this->hasLinkMapper($bean->module_name, $properties)) {
+                return;
+            }
+
+            $this->mapLinkFieldToBean($bean, $values, $properties);
+            return;
+        }
+
+        $this->validate($bean->module_name, $field, $properties, $values[$field] ?? null, $idFields);
+
+        $bean->$field = $values[$field];
     }
 
 
@@ -581,23 +603,24 @@ class ApiBeanMapper
         $type = $properties['type'] ?? '';
 
         if ($type === 'relate' && isset($bean->field_defs[$field])) {
-            $idName = $bean->field_defs[$field]['id_name'] ?? '';
+            $fieldDef = $bean->field_defs[$field];
+            $idName = $fieldDef['id_name'] ?? '';
 
-            if ($idName !== $field) {
-
-                $idValue = $values[$field]['id'] ?? '';
-                if (empty($values[$idName]) && !empty($idValue)) {
-                    $values[$idName] = $idValue;
+            if ($field !== $idName) {
+                if (!empty($idName)) {
+                    $values[$idName] = $values[$idName] ?? $values[$field]['id'] ?? '';
                 }
 
-                $rName = $bean->field_defs[$field]['rname'] ?? '';
-                $value = $values[$field][$rName] ?? '';
-                $values[$field] = $value;
+                $rName = $fieldDef['rname'] ?? 'name';
+                $values[$field] = $values[$field][$rName] ?? $values[$field] ?? '';
             }
         }
 
-        if (!empty($properties['isMultiSelect']) || $type === 'multienum') {
+        if ((!empty($properties['isMultiSelect']) || $type === 'multienum')) {
             $multiSelectValue = $values[$field];
+            if($type === 'multirelate') {
+                return;
+            }
             if (!is_array($values[$field])) {
                 $multiSelectValue = [];
             }
@@ -816,5 +839,22 @@ class ApiBeanMapper
             $registry->logErrors($errors, 'ApiBeanMapper field validation');
             throw new InvalidArgumentException("Invalid $field field value ");
         }
+    }
+
+    /**
+     * @param SugarBean $bean
+     * @return array
+     */
+    protected function getIdTypeFields(SugarBean $bean): array
+    {
+        $idTypeFields = [];
+        foreach ($bean->field_defs as $field => $properties) {
+            if (isset($properties['type']) && $properties['type'] !== 'id') {
+                continue;
+            }
+
+            $idTypeFields[$field] = $properties;
+        }
+        return $idTypeFields;
     }
 }

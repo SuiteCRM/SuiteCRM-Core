@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -54,7 +54,7 @@ export class StateManager {
         this.stateStores.appStore = this.buildMapEntry(appStore, false);
         this.stateStores.navigationStore = this.buildMapEntry(navigationStore, true);
         this.stateStores.languageStore = this.buildMapEntry(languageStore, true);
-        this.stateStores.metadataStore = this.buildMapEntry(metadataStore, false);
+        this.stateStores.metadataStore = this.buildMapEntry(metadataStore, true);
         this.stateStores.systemConfigStore = this.buildMapEntry(systemConfigStore, false);
         this.stateStores.themeImagesStore = this.buildMapEntry(themeImagesStore, false);
         this.stateStores.userPreferenceStore = this.buildMapEntry(userPreferenceStore, true);

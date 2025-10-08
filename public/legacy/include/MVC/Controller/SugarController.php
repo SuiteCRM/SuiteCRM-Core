@@ -95,6 +95,12 @@ class SugarController
     public $return_action = null;
 
     /**
+     * @var string|null $return_section
+     * The name of the return section.
+     */
+    public $return_section = null;
+
+    /**
      * @var string|null $return_id uuid
      * The id of the return record.
      */
@@ -266,6 +272,9 @@ class SugarController
         }
         if (!empty($_REQUEST['return_id'])) {
             $this->return_id = $_REQUEST['return_id'];
+        }
+        if (!empty($_REQUEST['return_section'])) {
+            $this->return_section = $_REQUEST['return_section'];
         }
     }
 
@@ -693,6 +702,12 @@ class SugarController
         $id = (!empty($this->return_id) ? $this->return_id : $this->bean->id);
 
         $url = "index.php?module=" . $module . "&action=" . $action . "&record=" . $id;
+
+        $section = (!empty($this->return_section) ? $this->return_section : '');
+        if (!empty($section)) {
+            $url .= "&section=" . $section;
+        }
+
         $this->set_redirect($url);
     }
 
@@ -734,6 +749,11 @@ class SugarController
                 $_REQUEST['return_id'] :
                 '';
             $url = "index.php?module=" . $return_module . "&action=" . $return_action . "&record=" . $return_id;
+
+            $section = (!empty($this->return_section) ? $this->return_section : '');
+            if (!empty($section)) {
+                $url .= "&section=" . $section;
+            }
         } else {
             $url = $_REQUEST['return_url'];
         }
@@ -1012,7 +1032,11 @@ class SugarController
                 require_once($this->entry_point_registry[$entryPoint]['file']);
                 $this->_processed = true;
                 $this->view = '';
+            } else {
+                $this->no_action();
             }
+        } elseif (isset($_REQUEST['entryPoint'])) {
+            $this->no_action();
         }
     }
 

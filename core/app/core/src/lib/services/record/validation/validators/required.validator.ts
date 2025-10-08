@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -108,6 +108,43 @@ export const multienumRequiredValidator = (viewField: ViewFieldDefinition, recor
     }
 );
 
+export const multiflexrelateRequiredValidator = (viewField: ViewFieldDefinition, record: Record, utils: FormControlUtils): StandardValidatorFn => (
+    (control: AbstractControl): StandardValidationErrors | null => {
+        const name = viewField.name || '';
+
+        if (!name || !record || !record.fields) {
+            return null;
+        }
+
+        const field = record?.fields[name] ?? {} as Field;
+
+        if (!field) {
+            return null;
+        }
+
+        let activeItems: any[] = field?.valueObjectArray;
+
+        if (!activeItems) {
+            activeItems = field.valueList;
+        }
+
+        if (activeItems && activeItems.length > 0) {
+            return null;
+        }
+
+        return {
+            required: {
+                required: true,
+                message: {
+                    labelKey: 'LBL_VALIDATION_ERROR_REQUIRED',
+                    context: {}
+                }
+            }
+        };
+    }
+);
+
+
 
 @Injectable({
     providedIn: 'root'
@@ -142,6 +179,10 @@ export class RequiredValidator implements ValidatorInterface {
 
         if (type === 'multienum') {
             return [multienumRequiredValidator(viewField, record, this.utils)];
+        }
+
+        if (type === 'multiflexrelate') {
+            return [multiflexrelateRequiredValidator(viewField, record, this.utils)];
         }
 
         return [requiredValidator(this.utils)];

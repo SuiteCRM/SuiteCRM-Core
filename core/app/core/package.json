@@ -1,6 +1,6 @@
 {
   "name": "core",
-  "version": "8.8.0",
+  "version": "8.9.0",
   "peerDependencies": {
     "@angular/common": "^12.1.0",
     "@angular/core": "^12.1.0",

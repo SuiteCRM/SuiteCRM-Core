@@ -1,5 +1,18 @@
 parameters:
   module.base_actions:
+    modules:
+      email-marketing:
+        actions:
+          edit:
+            key: edit
+            labelKey: LBL_EDIT
+            priority: 1
+            params:
+              expanded: true
+            acl:
+              - email-marketing-status-checker
+            availability:
+              - email-marketing-status-checker
     default:
       actions:
         index: &index

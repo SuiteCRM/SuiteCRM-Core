@@ -554,6 +554,17 @@ $report_include_modules['SurveyQuestionOptions'] = 'SurveyQuestionOptions';
 $modInvisList[] = 'SurveyQuestionOptions';
 
 
+$beanList['MediaObjects'] = 'MediaObject';
+$modInvisList[] = 'MediaObjects';
+$adminOnlyList['MediaObjects'] = ['all' => 1];
+$beanFiles['MediaObject'] = 'modules/MediaObjects/MediaObject.php';
+
+$beanFiles['ArchivedDocumentMediaObject'] = 'modules/MediaObjects/ArchivedDocumentMediaObject.php';
+$beanFiles['PrivateDocumentMediaObject'] = 'modules/MediaObjects/PrivateDocumentMediaObject.php';
+$beanFiles['PrivateImageMediaObject'] = 'modules/MediaObjects/PrivateImageMediaObject.php';
+$beanFiles['PublicDocumentMediaObject'] = 'modules/MediaObjects/PublicDocumentMediaObject.php';
+$beanFiles['PublicImageMediaObject'] = 'modules/MediaObjects/PublicImageMediaObject.php';
+
 
 if (file_exists('include/modules_override.php')) {
     include 'include/modules_override.php';

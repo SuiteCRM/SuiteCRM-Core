@@ -148,6 +148,8 @@ class CampaignLog extends SugarBean
     {
         global $locale;
         $db= DBManagerFactory::getInstance();
+        $related_id = $db->quote($related_id);
+
         if ($related_type == 'Emails') {
             $query="SELECT name from emails where id='$related_id'";
             $result=$db->query($query);
@@ -196,6 +198,16 @@ class CampaignLog extends SugarBean
                 return $row['name'];
             }
         }
+
+        if ($related_type == 'Users') {
+            $query="SELECT first_name, last_name from users where id='$related_id'";
+            $result=$db->query($query);
+            $row=$db->fetchByAssoc($result);
+            if ($row != null) {
+                return $row['first_name'] . ' ' . $row['last_name'];
+            }
+        }
+
         return $related_id.$related_type;
     }
 }

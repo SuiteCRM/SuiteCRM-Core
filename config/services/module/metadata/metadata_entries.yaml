@@ -1,0 +1,21 @@
+parameters:
+  module.metadata.entries:
+    default:
+      entries:
+        recordView:
+          type: record
+          legacyType: Detail
+        listView:
+          type: list
+        search:
+          type: search
+        subPanel:
+          type: search
+        massUpdate:
+          type: massUpdate
+    modules:
+      emails:
+        entries:
+          modalComposeView:
+            type: record
+            legacyType: ModalCompose

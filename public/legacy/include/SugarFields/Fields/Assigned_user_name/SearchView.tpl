@@ -40,5 +40,4 @@
 
 *}
 {{capture name=display_size assign=size}}{{$displayParams.size|default:6}}{{/capture}}
-
 {html_options name='{{$vardef.name}}[]' options=$user_options size="{{$size}}" style="width: 150px" {{if $size > 1}}multiple="1"{{/if}} selected={{sugarvar key='value' string=true}}}

@@ -25,3 +25,5 @@ parameters:
       - config
     studio:
       - wizard
+    emailman:
+      - campaignconfig

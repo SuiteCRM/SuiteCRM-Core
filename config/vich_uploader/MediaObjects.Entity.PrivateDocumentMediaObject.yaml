@@ -1,0 +1,8 @@
+App\MediaObjects\Entity\PrivateDocumentMediaObject:
+  file:
+    mapping: private_documents_media_object # required
+    filename_property: filePath  # required
+    size: size
+    mime_type: mimeType
+    original_name: originalName
+    dimensions: dimensions

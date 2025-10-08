@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,19 +25,48 @@
 * the words "Supercharged by SuiteCRM".
 */
 -->
-<div [class]="klass">
-    <div class="modal-header {{headerKlass}} d-flex align-items-center">
-        <div class="modal-title">
-            <scrm-label *ngIf="titleKey" [labelKey]="titleKey"></scrm-label>
+<div [class]="klass" [class.minimizable]="minimizable" [ngClass]="{'minimized': isMinimized()}">
+    <div class="modal-header pt-0 pb-0 {{headerKlass}} d-flex align-items-center">
+        <div class="modal-title"
+             (click)="minimizable ? toggleMinimize() : null">
+            <scrm-label class="mt-1" *ngIf="titleKey && !dynamicTitleKey" [labelKey]="titleKey"></scrm-label>
+            <scrm-dynamic-label *ngIf="dynamicTitleKey"
+                                class="mt-1"
+                                [labelKey]="dynamicTitleKey"
+                                [fields]="dynamicTitleFields()"
+                                [context]="dynamicTitleContext()"
+            ></scrm-dynamic-label>
+            <scrm-label class="small text-muted mt-2" *ngIf="descriptionKey && !dynamicDescriptionKey" [labelKey]="descriptionKey"></scrm-label>
+            <scrm-dynamic-label *ngIf="dynamicDescriptionKey"
+                                class="small text-muted mt-2"
+                                [labelKey]="dynamicDescriptionKey"
+                                [fields]="dynamicDescriptionFields()"
+                                [context]="dynamicDescriptionContext()"
+            ></scrm-dynamic-label>
+            <span *ngIf="limit" class="small text-muted mt-1">
+                <scrm-label [labelKey]="limitLabel" ></scrm-label>
+                {{limit}}
+                <scrm-label *ngIf="limitEndLabel" [labelKey]="limitEndLabel" ></scrm-label>
+            </span>
         </div>
-        <scrm-close-button *ngIf="closable" [config]="close"></scrm-close-button>
+        <div>
+            <scrm-minimise-button *ngIf="minimizable"
+                                  [config]="minimiseButton"
+                                  [status]="minimiseStatus()"
+                                  [status$]="minimiseStatus$"
+            >
+            </scrm-minimise-button>
+            <scrm-close-button *ngIf="closable" [config]="close"></scrm-close-button>
+        </div>
     </div>
+    <ng-container *ngIf="!isMinimized()">
+        <div class="modal-body {{bodyKlass}}">
+            <ng-content select="[modal-body]"></ng-content>
+        </div>
 
-    <div class="modal-body {{bodyKlass}}">
-        <ng-content select="[modal-body]"></ng-content>
-    </div>
+        <div class="modal-footer {{footerKlass}}">
+            <ng-content select="[modal-footer]"></ng-content>
+        </div>
+    </ng-container>
 
-    <div class="modal-footer {{footerKlass}}">
-        <ng-content select="[modal-footer]"></ng-content>
-    </div>
 </div>

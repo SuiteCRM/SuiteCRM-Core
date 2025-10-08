@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -129,11 +129,12 @@ class RecordHandler extends LegacyHandler implements RecordProviderInterface
         $this->init();
         $this->startLegacyApp();
 
-        $bean = $this->retrieveRecord($module, $id);
+        $bean = $this->retrieveBean($module, $id);
 
         $record = $this->buildRecord($id, $module, $bean, 'retrieve');
-
         $this->close();
+
+        $this->entityRecordMapperRunner->toExternal($record, 'retrieve');
 
         return $record;
     }
@@ -143,7 +144,7 @@ class RecordHandler extends LegacyHandler implements RecordProviderInterface
      * @param string $id
      * @return SugarBean
      */
-    protected function retrieveRecord(string $module, string $id): SugarBean
+    protected function retrieveBean(string $module, string $id): SugarBean
     {
         $moduleName = $this->validateModuleName($module);
 
@@ -175,13 +176,13 @@ class RecordHandler extends LegacyHandler implements RecordProviderInterface
      */
     private function validateModuleName($moduleName): string
     {
-        $moduleName = $this->moduleNameMapper->toLegacy($moduleName);
+        $legacyModuleName = $this->moduleNameMapper->toLegacy($moduleName);
 
-        if (!$this->moduleNameMapper->isValidModule($moduleName)) {
-            throw new InvalidArgumentException('Invalid module name: ' . $moduleName);
+        if (!$this->moduleNameMapper->isValidModule($legacyModuleName)) {
+            throw new InvalidArgumentException('Invalid module name | legacy - ' . $legacyModuleName . '| input - ' . $moduleName);
         }
 
-        return $moduleName;
+        return $legacyModuleName;
     }
 
     /**
@@ -210,6 +211,11 @@ class RecordHandler extends LegacyHandler implements RecordProviderInterface
      */
     public function buildRecord(string $id, string $module, SugarBean $bean, ?string $mode = ''): Record
     {
+        $activeScope = $this->state->getActiveScope();
+        if (!$activeScope) {
+            $this->init();
+        }
+
         $record = new Record();
         /* @noinspection PhpIncludeInspection */
         require_once 'include/portability/ApiBeanMapper/ApiBeanMapper.php';
@@ -230,8 +236,6 @@ class RecordHandler extends LegacyHandler implements RecordProviderInterface
         $record->setAcls($this->acl->getRecordAcls($bean));
         $record->setFavorite($this->favorites->isFavorite($module, $id));
 
-        $this->entityRecordMapperRunner->toExternal($record, $mode);
-
         return $record;
     }
 
@@ -247,7 +251,7 @@ class RecordHandler extends LegacyHandler implements RecordProviderInterface
 
         $id = $record->getAttributes()['id'] ?? '';
         /** @var SugarBean $bean */
-        $bean = $this->retrieveRecord($record->getModule(), $id);
+        $bean = $this->retrieveBean($record->getModule(), $id);
 
         if (empty($id)) {
             $bean->assigned_user_id = $current_user->id;
@@ -260,26 +264,71 @@ class RecordHandler extends LegacyHandler implements RecordProviderInterface
         $previousVersion = null;
         if (!empty($bean->id) && empty($bean->new_with_id)) {
             $previousVersion = $this->buildRecord($bean->id, $record->getModule(), $bean, 'retrieve');
+            $this->close();
+            $this->entityRecordMapperRunner->toExternal($previousVersion, 'retrieve');
+            $this->init();
         }
 
+        $this->close();
         $this->entityRecordMapperRunner->toInternal($record, 'save');
         $this->saveHandlerRunner->run($previousVersion, $record, null, 'before-save');
+        $this->init();
 
         $this->setFields($bean, $record->getAttributes());
         $this->setUpdatedFields($bean, $record->getAttributes());
 
         $this->save($bean);
 
-
-        $refreshedBean = $this->retrieveRecord($record->getModule(), $bean->id);
+        $refreshedBean = $this->retrieveBean($record->getModule(), $bean->id);
 
         $savedRecord = $this->buildRecord($bean->id, $record->getModule(), $refreshedBean, 'save');
+        $this->close();
 
+        $this->entityRecordMapperRunner->toExternal($savedRecord, 'save');
         $this->saveHandlerRunner->run($previousVersion, $record, $savedRecord, 'after-save');
+
+        return $savedRecord;
+    }
+
+    /**
+     * Map record to bean
+     * @param Record $record
+     * @return SugarBean
+     */
+    public function mapToBean(Record $record): SugarBean
+    {
+        $this->init();
+        $this->startLegacyApp();
+
+        $legacyModuleName = $this->moduleNameMapper->toLegacy($record->getModule());
+
+        $bean = BeanFactory::newBean($legacyModuleName);
+        $this->setFields($bean, $record->getAttributes());
+        $this->setUpdatedFields($bean, $record->getAttributes());
 
         $this->close();
 
-        return $savedRecord;
+        return $bean;
+    }
+
+    /**
+     * Map bean to record
+     * @param SugarBean $bean
+     * @return Record
+     */
+    public function mapToRecord(SugarBean $bean): Record
+    {
+        $this->init();
+        $this->startLegacyApp();
+
+        $moduleName = $this->moduleNameMapper->toFrontEnd($bean->module_name);
+
+        $record = $this->buildRecord($bean->id, $moduleName, $bean, 'map');
+        $this->close();
+
+        $this->entityRecordMapperRunner->toExternal($record, 'map');
+
+        return $record;
     }
 
     /**
@@ -339,4 +388,17 @@ class RecordHandler extends LegacyHandler implements RecordProviderInterface
         }
     }
 
+    public function getTable(string $module): string
+    {
+        $this->init();
+
+        $legacyModuleName = $this->moduleNameMapper->toLegacy($module);
+
+        $bean = BeanFactory::newBean($legacyModuleName);
+        $table = $bean->table_name ?? '';
+
+        $this->close();
+
+        return $table;
+    }
 }

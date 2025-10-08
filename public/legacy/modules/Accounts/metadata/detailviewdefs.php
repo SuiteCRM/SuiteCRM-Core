@@ -211,6 +211,7 @@ array(
             'studio' => 'false',
             'label' => 'LBL_EMAIL',
           ),
+          1 => '',
         ),
         3 =>
         array(
@@ -243,6 +244,7 @@ array(
             'comment' => 'Full text of the note',
             'label' => 'LBL_DESCRIPTION',
           ),
+          1 => ''
         ),
       ),
       'LBL_PANEL_ADVANCED' =>
@@ -284,10 +286,12 @@ array(
             'name' => 'parent_name',
             'label' => 'LBL_MEMBER_OF',
           ),
+          1 => '',
         ),
         3 =>
         array(
           0 => 'campaign_name',
+          1 => '',
         ),
       ),
       'LBL_PANEL_ASSIGNMENT' =>

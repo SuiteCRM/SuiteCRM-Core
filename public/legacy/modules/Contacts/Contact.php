@@ -619,6 +619,10 @@ class Contact extends Person implements EmailInterface
         return get_unlinked_email_query($type, $this);
     }
 
+    public function getUpcomingEmails() {
+        return getUpcomingEmails($this);
+    }
+
     /**
      * used by import to add a list of users
      *

@@ -116,6 +116,9 @@ class User extends Person implements EmailInterface
     public $sugar_login;
     public $external_auth_only;
     public $show_on_employees;
+    public $email_opt_out;
+    public $link_guid;
+    public $invalid_email;
 
     /**
      * @var bool
@@ -711,10 +714,14 @@ class User extends Person implements EmailInterface
 
         $this->savePreferencesToDB();
 
-        if ((isset($_POST['old_password']) || $this->portal_only) &&
-            (isset($_POST['new_password']) && !empty($_POST['new_password'])) &&
+        global $RAW_REQUEST;
+        $oldPassword = $RAW_REQUEST['old_password'] ?? $_POST['old_password'] ?? null;
+        $newPassword = $RAW_REQUEST['new_password'] ?? $_POST['new_password'] ?? null;
+
+        if ((isset($oldPassword) || $this->portal_only) &&
+            (isset($newPassword) && !empty($newPassword)) &&
             (isset($_POST['password_change']) && $_POST['password_change'] === 'true')) {
-            if (!$this->change_password($_POST['old_password'], $_POST['new_password'])) {
+            if (!$this->change_password($oldPassword, $newPassword)) {
                 if (isset($_POST['page']) && $_POST['page'] === 'EditView') {
                     SugarApplication::appendErrorMessage($this->error_string);
                     SugarApplication::redirect("Location: index.php?action=EditView&module=Users&record=" . $_POST['record']);
@@ -768,7 +775,8 @@ class User extends Person implements EmailInterface
             if (isset($_POST['mailmerge_on']) && !empty($_POST['mailmerge_on'])) {
                 $this->setPreference('mailmerge_on', 'on', 0, 'global');
             } else {
-                $this->setPreference('mailmerge_on', 'off', 0, 'global');
+                $mailMerge = $this->getCurrentPreference('mailmerge_on');
+                $this->setPreference('mailmerge_on', $mailMerge ?? 'off', 0, 'global');
             }
 
             if (isset($_POST['subpanel_pagination_type'])) {
@@ -790,37 +798,43 @@ class User extends Person implements EmailInterface
             if (isset($_POST['user_swap_last_viewed'])) {
                 $this->setPreference('swap_last_viewed', $_POST['user_swap_last_viewed'], 0, 'global');
             } else {
-                $this->setPreference('swap_last_viewed', '', 0, 'global');
+                $lastViewedSwap = $this->getCurrentPreference('swap_last_viewed');
+                $this->setPreference('swap_last_viewed', $lastViewedSwap ?? '', 0, 'global');
             }
 
             if (isset($_POST['user_swap_shortcuts'])) {
                 $this->setPreference('swap_shortcuts', $_POST['user_swap_shortcuts'], 0, 'global');
             } else {
-                $this->setPreference('swap_shortcuts', '', 0, 'global');
+                $swapShortcuts = $this->getCurrentPreference('swap_shortcuts');
+                $this->setPreference('swap_shortcuts', $swapShortcuts ?? '', 0, 'global');
             }
 
             if (isset($_POST['use_group_tabs'])) {
                 $this->setPreference('navigation_paradigm', $_POST['use_group_tabs'], 0, 'global');
             } else {
-                $this->setPreference('navigation_paradigm', $GLOBALS['sugar_config']['default_navigation_paradigm'], 0, 'global');
+                $groupTabs = $this->getCurrentPreference('navigation_paradigm');
+                $this->setPreference('navigation_paradigm', $groupTabs ?? $GLOBALS['sugar_config']['default_navigation_paradigm'], 0, 'global');
             }
 
             if (isset($_POST['sort_modules_by_name'])) {
                 $this->setPreference('sort_modules_by_name', $_POST['sort_modules_by_name'], 0, 'global');
             } else {
-                $this->setPreference('sort_modules_by_name', '', 0, 'global');
+                $modulesByName = $this->getCurrentPreference('sort_modules_by_name');
+                $this->setPreference('sort_modules_by_name', $modulesByName ?? '', 0, 'global');
             }
 
             if (isset($_POST['user_subpanel_tabs'])) {
                 $this->setPreference('subpanel_tabs', $_POST['user_subpanel_tabs'], 0, 'global');
             } else {
-                $this->setPreference('subpanel_tabs', '', 0, 'global');
+                $subpanelTabs = $this->getCurrentPreference('subpanel_tabs');
+                $this->setPreference('subpanel_tabs', $subpanelTabs ?? '', 0, 'global');
             }
 
             if (isset($_POST['user_count_collapsed_subpanels'])) {
                 $this->setPreference('count_collapsed_subpanels', $_POST['user_count_collapsed_subpanels'], 0, 'global');
             } else {
-                $this->setPreference('count_collapsed_subpanels', '', 0, 'global');
+                $countCollapsedSubpanel = $this->getCurrentPreference('count_collapsed_subpanels');
+                $this->setPreference('count_collapsed_subpanels', $countCollapsedSubpanel ?? '', 0, 'global');
             }
 
             if (isset($_POST['user_theme'])) {
@@ -831,7 +845,8 @@ class User extends Person implements EmailInterface
             if (isset($_POST['user_module_favicon'])) {
                 $this->setPreference('module_favicon', $_POST['user_module_favicon'], 0, 'global');
             } else {
-                $this->setPreference('module_favicon', '', 0, 'global');
+                $moduleFavicon = $this->getCurrentPreference('module_favicon');
+                $this->setPreference('module_favicon', $moduleFavicon ?? '', 0, 'global');
             }
 
             $tabs = new TabController();
@@ -854,7 +869,8 @@ class User extends Person implements EmailInterface
             if (isset($_POST['no_opps'])) {
                 $this->setPreference('no_opps', $_POST['no_opps'], 0, 'global');
             } else {
-                $this->setPreference('no_opps', 'off', 0, 'global');
+                $noOpps = $this->getCurrentPreference('no_opps');
+                $this->setPreference('no_opps', $noOpps ?? 'off', 0, 'global');
             }
 
             if (isset($_POST['reminder_time'])) {
@@ -873,12 +889,18 @@ class User extends Person implements EmailInterface
             if (isset($_POST['timezone'])) {
                 $this->setPreference('timezone', $_POST['timezone'], 0, 'global');
             } else {
-                $this->setPreference('timezone', 'UTC', 0, 'global');
+                $timezone = $this->getCurrentPreference('timezone');
+                $this->setPreference('timezone', $timezone, 0, 'global');
             }
-            if (isset($_POST['ut'])) {
-                $this->setPreference('ut', '0', 0, 'global');
+
+            $ut = $_POST['ut'] ?? '0';
+
+            if (isset($ut)) {
+                $value = $_POST['ut'] === 'on' ? '0' : '1';
+                $this->setPreference('ut', $value, 0, 'global');
             } else {
-                $this->setPreference('ut', '1', 0, 'global');
+                $ut = $this->getCurrentPreference('ut');
+                $this->setPreference('ut', $ut ?? '1', 0, 'global');
             }
             if (isset($_POST['currency'])) {
                 $this->setPreference('currency', $_POST['currency'], 0, 'global');
@@ -947,20 +969,23 @@ class User extends Person implements EmailInterface
                 $this->setPreference('use_real_names', 'on', 0, 'global');
             } elseif (!isset($_POST['use_real_names']) && !isset($_POST['from_dcmenu'])) {
                 // Make sure we're on the full form and not the QuickCreate.
-                $this->setPreference('use_real_names', 'off', 0, 'global');
+                $useRealNames = $this->getCurrentPreference('use_real_names');
+                $this->setPreference('use_real_names', $useRealNames ?? 'off', 0, 'global');
             }
 
             if (isset($_POST['mail_smtpauth_req'])) {
                 $this->setPreference('mail_smtpauth_req', $_POST['mail_smtpauth_req'], 0, 'global');
             } else {
-                $this->setPreference('mail_smtpauth_req', '', 0, 'global');
+                $smtpAuthRequired = $this->getCurrentPreference('mail_smtpauth_req');
+                $this->setPreference('mail_smtpauth_req', $smtpAuthRequired ?? '', 0, 'global');
             }
 
             // SSL-enabled SMTP connection
             if (isset($_POST['mail_smtpssl'])) {
                 $this->setPreference('mail_smtpssl', 1, 0, 'global');
             } else {
-                $this->setPreference('mail_smtpssl', 0, 0, 'global');
+                $smtpSsl = $this->getCurrentPreference('mail_smtpssl');
+                $this->setPreference('mail_smtpssl', $smtpSsl ?? 0, 0, 'global');
             }
             ///////////////////////////////////////////////////////////////////////////
             ////    PDF SETTINGS
@@ -1016,7 +1041,8 @@ class User extends Person implements EmailInterface
             if (isset($_POST['gsync_cal'])) {
                 $this->setPreference('syncGCal', 1, 0, 'GoogleSync');
             } else {
-                $this->setPreference('syncGCal', 0, 0, 'GoogleSync');
+                $syncGCal = $this->getCurrentPreference('syncGCal');
+                $this->setPreference('syncGCal', $syncGCal ?? 0, 0, 'GoogleSync');
             }
             if ($this->user_hash === null) {
                 $newUser = true;
@@ -1865,7 +1891,7 @@ EOQ;
             } else {
                 $r = $user->db->query("SELECT value FROM config WHERE name = 'fromaddress'");
                 $a = $user->db->fetchByAssoc($r);
-                $fromddr = $a['value'];
+                $fromaddr = $a['value'];
             }
         }
 
@@ -2480,7 +2506,7 @@ EOQ;
     {
         $editorType = $this->getPreference('editor_type');
         if (!$editorType) {
-            $editorType = 'mozaik';
+            $editorType = 'tinymce';
             $this->setPreference('editor_type', $editorType);
         }
 
@@ -2547,6 +2573,10 @@ EOQ;
             $this->is_admin = $originalIsAdminValue;
         }
 
+    }
+
+    protected function getCurrentPreference(string $key) {
+        return $_SESSION[$this->user_name.'_PREFERENCES']['global'][$key] ?? $this->getPreference($key);
     }
 
     /**

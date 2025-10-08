@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -78,6 +78,12 @@ class NavbarHandler extends LegacyHandler implements NavigationProviderInterface
     /**
      * @var array
      */
+    protected $navbarOverrides;
+
+
+    /**
+     * @var array
+     */
     protected $quickActionsConfig;
 
     /**
@@ -109,6 +115,7 @@ class NavbarHandler extends LegacyHandler implements NavigationProviderInterface
         RequestStack $session,
         array $moduleRouting,
         array $navbarAdministrationOverrides,
+        array $navbarOverrides,
         array $quickActions
     ) {
         parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState,
@@ -119,6 +126,7 @@ class NavbarHandler extends LegacyHandler implements NavigationProviderInterface
         $this->moduleRegistry = $moduleRegistry;
         $this->moduleRouting = $moduleRouting;
         $this->navbarAdministrationOverrides = $navbarAdministrationOverrides;
+        $this->navbarOverrides = $navbarOverrides;
         $this->quickActionsConfig = $quickActions;
     }
 
@@ -287,6 +295,12 @@ class NavbarHandler extends LegacyHandler implements NavigationProviderInterface
             }
         }
 
+        foreach ($this->navbarOverrides ?? [] as $key => $item) {
+            if ($modules[$key] && !empty($modules[$item])) {
+                $modules[$key] = $modules[$item];
+            }
+        }
+
         return $modules;
     }
 
@@ -349,6 +363,7 @@ class NavbarHandler extends LegacyHandler implements NavigationProviderInterface
                 'labelKey' => $this->mapEntry($frontendModule, $action, 'labelKey', $label),
                 'url' => $this->mapEntry($frontendModule, $action, 'url', $routeInfo['route'] ?? ''),
                 'process' => $process['process'] ?? '',
+                'processParams' => $process['params'] ?? [],
                 'params' => $routeInfo['params'] ?? [],
                 'icon' => $this->mapEntry($frontendModule, $action, 'icon', ''),
                 'actionLabelKey' => $this->mapEntry($frontendModule, $action, 'actionLabelKey', ''),

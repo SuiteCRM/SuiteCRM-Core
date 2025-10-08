@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -45,6 +45,7 @@ import {RangeValidator} from './validators/range.validator';
 import {PrimaryEmailValidator} from './validators/primary-email.validator';
 import {DuplicateEmailValidator} from './validators/duplicate-email.validator';
 import {LineItemsRequiredValidator} from "./validators/line-items-required.validator";
+import {AsyncProcessValidator} from "./async-validators/async-process.validator";
 
 export interface ValidationManagerInterface {
     registerSaveValidator(module: string, key: string, validator: ValidatorInterface): void;
@@ -82,6 +83,7 @@ export class ValidationManager implements ValidationManagerInterface {
     };
 
     constructor(
+        protected asyncProcessValidator: AsyncProcessValidator,
         protected requiredValidator: RequiredValidator,
         protected rangeValidator: RangeValidator,
         protected currencyValidator: CurrencyValidator,
@@ -93,7 +95,7 @@ export class ValidationManager implements ValidationManagerInterface {
         protected phoneValidator: PhoneValidator,
         protected primaryEmailValidator: PrimaryEmailValidator,
         protected duplicateEmailValidator: DuplicateEmailValidator,
-        protected lineItemsRequiredValidator: LineItemsRequiredValidator
+        protected lineItemsRequiredValidator: LineItemsRequiredValidator,
     ) {
 
         this.saveValidators = new OverridableMap<ValidatorInterface>();
@@ -199,6 +201,17 @@ export class ValidationManager implements ValidationManagerInterface {
             if (validator.applies(record, viewField)) {
                 validations.push(validator.getValidator(viewField, record));
             }
+        });
+
+        const definitionValidators = viewField?.fieldDefinition?.asyncValidators ?? null;
+
+        if (!definitionValidators){
+            return validations;
+        }
+
+        Object.keys(definitionValidators).forEach((key) => {
+            const validator = definitionValidators[key];
+            validations.push(this.asyncProcessValidator.getValidator(validator, viewField, record));
         });
 
         return validations;

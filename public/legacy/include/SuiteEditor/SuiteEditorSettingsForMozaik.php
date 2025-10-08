@@ -48,6 +48,9 @@ if (!defined('sugarEntry') || !sugarEntry) {
  * store and extends an associative settings for a mozaik editor
  * in constructor, set the default settings for a mozaik editor
  * and if settings argument exists extends it
+ *
+ * @deprecated since SuiteCRM 8.9.0
+ *
  */
 class SuiteEditorSettingsForMozaik extends SuiteEditorSettingsForTinyMCE
 {

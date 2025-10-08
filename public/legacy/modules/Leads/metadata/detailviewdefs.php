@@ -250,10 +250,12 @@ $viewdefs ['Leads'] =
                                 5 =>
                                     array(
                                         0 => 'email1',
+                                        1 => '',
                                     ),
                                 6 =>
                                     array(
                                         0 => 'description',
+                                        1 => '',
                                     ),
                             ),
                         'LBL_PANEL_ADVANCED' =>
@@ -280,6 +282,7 @@ $viewdefs ['Leads'] =
                                                 'name' => 'campaign_name',
                                                 'label' => 'LBL_CAMPAIGN',
                                             ),
+                                        1 => ''
                                     ),
                             ),
                         'LBL_PANEL_ASSIGNMENT' =>

@@ -1,5 +1,7 @@
 parameters:
     legacy.exposed_user_preferences:
+        Emails:
+            defaultOEAccount: true
         global:
             sort_modules_by_name: true
             navigation_paradigm: true

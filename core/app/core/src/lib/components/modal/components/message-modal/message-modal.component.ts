@@ -55,6 +55,7 @@ export class MessageModalComponent implements OnInit {
     @Input() fields: FieldMap = {};
     @Input() textKey: string;
     @Input() buttons: AnyModalButtonInterface[] = [];
+    @Input() onClose: Function = () => {};
 
     buttonGroup$: Observable<ModalButtonGroupInterface>;
     closeButton: ButtonInterface;
@@ -71,6 +72,7 @@ export class MessageModalComponent implements OnInit {
         this.closeButton = {
             klass: ['btn', 'btn-outline-light', 'btn-sm'],
             onClick: (): void => {
+                this.onClose();
                 this.activeModal.close({
                     type: 'close-button'
                 } as ModalCloseFeedBack);

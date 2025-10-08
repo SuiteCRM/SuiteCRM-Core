@@ -65,5 +65,15 @@ export class ConfirmationModalService {
                 }
             } as ModalButtonInterface,
         ];
+
+        if (onClose) {
+            modal.componentInstance.onClose = onClose;
+        }
+
+        modal.dismissed.subscribe(() => {
+            if (onClose) {
+                onClose();
+            }
+        });
     }
 }

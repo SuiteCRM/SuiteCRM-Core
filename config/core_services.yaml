@@ -44,7 +44,6 @@ services:
       $metadataEntries: '%module.metadata.entries%'
       $recordViewActions: '%module.recordview.actions%'
       $recordViewActionLimits: '%module.recordview.actions_limits%'
-      $recordViewAttachmentLimits: '%module.recordview.attachment_limits%'
       $recordViewSectionTabLimits: '%module.recordview.section_tab_limits%'
       $recordModalActions: '%module.recordmodal.actions%'
       $recordViewSidebarWidgets: '%module.recordview.sidebar_widgets%'

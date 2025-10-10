@@ -32,6 +32,7 @@ use App\Data\Service\Record\EntityRecordMappers\EntityRecordMapperRunner;
 use App\Data\Service\RecordListProviderInterface;
 use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;
+use App\Module\LegacyHandler\ModuleRegistryHandler;
 use App\Module\Service\ModuleNameMapperInterface;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -83,7 +84,8 @@ class RecordListHandler extends LegacyHandler implements RecordListProviderInter
         ListDataHandler $listDataHandler,
         PresetListDataHandlers $presetHandlers,
         RequestStack $session,
-        EntityRecordMapperRunner $entityRecordMapperRunner
+        EntityRecordMapperRunner $entityRecordMapperRunner,
+        protected ModuleRegistryHandler $moduleRegistryHandler
     ) {
         parent::__construct(
             $projectDir,
@@ -122,8 +124,20 @@ class RecordListHandler extends LegacyHandler implements RecordListProviderInter
         int $limit = -1,
         array $sort = []
     ): RecordList {
+
+        $legacyModuleName = $this->moduleNameMapper->toLegacy($moduleName);
+
         $this->init();
         $this->startLegacyApp();
+
+        $accessibleModules = $this->moduleRegistryHandler->getUserAccessibleModules() ?? [];
+
+        if (!in_array($legacyModuleName, $accessibleModules)){
+            $recordList = new RecordList();
+            $recordList->setId($moduleName);
+            $recordList->setRecords([]);
+            return $recordList;
+        }
 
         $moduleName = $this->validateModuleName($moduleName);
 

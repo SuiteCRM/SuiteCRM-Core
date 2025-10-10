@@ -54,90 +54,6 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 class AppMetadataProvider implements AppMetadataProviderInterface
 {
-    /**
-     * @var ModuleNameMapperInterface
-     */
-    protected $moduleNameMapper;
-
-    /**
-     * @var SystemConfigProviderInterface
-     */
-    protected $systemConfigProvider;
-
-    /**
-     * @var UserPreferencesProviderInterface
-     */
-    protected $userPreferenceService;
-
-    /**
-     * @var NavigationProviderInterface
-     */
-    protected $navigationService;
-
-    /**
-     * @var AppStringsHandler
-     */
-    protected $appStringsHandler;
-
-    /**
-     * @var AppListStringsHandler
-     */
-    protected $appListStringsHandler;
-
-    /**
-     * @var ModStringsHandler
-     */
-    protected $modStringsHandler;
-
-    /**
-     * @var ThemeImageService
-     */
-    protected $themeImageService;
-
-    /**
-     * @var ModuleMetadataProviderInterface
-     */
-    protected $moduleMetadata;
-
-    /**
-     * @var Security
-     */
-    protected $security;
-
-    /**
-     * @var UserHandler
-     */
-    protected $userHandler;
-
-    /**
-     * @var AdminPanelDefinitionProviderInterface
-     */
-    protected $adminPanelDefinitions;
-
-    /**
-     * @var CacheInterface
-     */
-    protected $cache;
-
-    /**
-     * @var CacheManagerInterface
-     */
-    protected $cacheManager;
-
-    /**
-     * @var InstallHandler
-     */
-    private $installHandler;
-
-    /**
-     * @var RecentlyViewedHandler
-     */
-    protected $recentlyViewedHandler;
-
-    /**
-     * @var ModuleRegistryHandler $moduleRegistryHandler ;
-     */
-    protected $moduleRegistryHandler;
 
     /**
      * AppMetadataProvider constructor.
@@ -159,42 +75,25 @@ class AppMetadataProvider implements AppMetadataProviderInterface
      * @param ModuleRegistryHandler $moduleRegistryHandler
      */
     public function __construct(
-        ModuleNameMapperInterface             $moduleNameMapper,
-        SystemConfigProviderInterface         $systemConfigProvider,
-        UserPreferencesProviderInterface      $userPreferenceService,
-        NavigationProviderInterface           $navigationService,
-        AppStringsHandler                     $appStringsHandler,
-        AppListStringsHandler                 $appListStringsHandler,
-        ModStringsHandler                     $modStringsHandler,
-        ThemeImageService                     $themeImageService,
-        ModuleMetadataProviderInterface       $moduleMetadata,
-        Security                              $security,
-        UserHandler                           $userHandler,
-        AdminPanelDefinitionProviderInterface $adminPanelDefinitions,
-        CacheInterface                        $cache,
-        CacheManagerInterface                 $cacheManager,
-        InstallHandler                        $installHandler,
-        RecentlyViewedHandler                 $recentlyViewedHandler,
-        ModuleRegistryHandler                 $moduleRegistryHandler,
+        protected ModuleNameMapperInterface $moduleNameMapper,
+        protected SystemConfigProviderInterface $systemConfigProvider,
+        protected UserPreferencesProviderInterface $userPreferenceService,
+        protected NavigationProviderInterface $navigationService,
+        protected AppStringsHandler $appStringsHandler,
+        protected AppListStringsHandler $appListStringsHandler,
+        protected ModStringsHandler $modStringsHandler,
+        protected ThemeImageService $themeImageService,
+        protected ModuleMetadataProviderInterface $moduleMetadata,
+        protected Security $security,
+        protected UserHandler $userHandler,
+        protected AdminPanelDefinitionProviderInterface $adminPanelDefinitions,
+        protected CacheInterface $cache,
+        protected CacheManagerInterface $cacheManager,
+        protected InstallHandler $installHandler,
+        protected RecentlyViewedHandler $recentlyViewedHandler,
+        protected ModuleRegistryHandler $moduleRegistryHandler,
     )
     {
-        $this->moduleNameMapper = $moduleNameMapper;
-        $this->systemConfigProvider = $systemConfigProvider;
-        $this->userPreferenceService = $userPreferenceService;
-        $this->navigationService = $navigationService;
-        $this->appStringsHandler = $appStringsHandler;
-        $this->appListStringsHandler = $appListStringsHandler;
-        $this->modStringsHandler = $modStringsHandler;
-        $this->themeImageService = $themeImageService;
-        $this->moduleMetadata = $moduleMetadata;
-        $this->security = $security;
-        $this->userHandler = $userHandler;
-        $this->adminPanelDefinitions = $adminPanelDefinitions;
-        $this->cache = $cache;
-        $this->cacheManager = $cacheManager;
-        $this->installHandler = $installHandler;
-        $this->recentlyViewedHandler = $recentlyViewedHandler;
-        $this->moduleRegistryHandler = $moduleRegistryHandler;
     }
 
     /**
@@ -518,6 +417,10 @@ class AppMetadataProvider implements AppMetadataProviderInterface
         foreach ($modules as $module) {
             $isToExclude = $toExclude[$module] ?? false;
             if ($isToExclude) {
+                continue;
+            }
+
+            if (!in_array($module, $this->moduleRegistryHandler->getUserAccessibleModules())) {
                 continue;
             }
 

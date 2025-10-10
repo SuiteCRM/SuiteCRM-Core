@@ -72,6 +72,7 @@ export interface ChartOptionMap {
     xAxis?: any;
     yAxis?: any;
     legend?: any;
+    legendTitle?: string;
     showXAxisLabel?: any;
     showYAxisLabel?: any;
     xAxisLabel?: any;

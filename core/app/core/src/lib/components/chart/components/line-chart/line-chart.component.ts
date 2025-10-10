@@ -29,6 +29,7 @@ import {MultiSeries} from '../../../../common/containers/chart/chart.model';
 import {isFalse} from '../../../../common/utils/value-utils';
 import {BaseChartComponent} from '../base-chart/base-chart.component';
 import {ScreenSizeObserverService} from "../../../../services/ui/screen-size-observer/screen-size-observer.service";
+import {LanguageStore} from "../../../../store/language/language.store";
 
 @Component({
     selector: 'scrm-line-chart',
@@ -49,12 +50,17 @@ export class LineChartComponent extends BaseChartComponent implements OnInit, On
     showXAxisLabel: boolean;
     showYAxisLabel: boolean;
     xAxisLabel: string;
+    legendTitle: string;
     yAxisLabel: string;
     yAxisTickFormatting: Function;
     xAxisTickFormatting: Function;
     tooltipDisabled: boolean;
 
-    constructor(protected elementRef: ElementRef, protected screenSize: ScreenSizeObserverService) {
+    constructor(
+        protected elementRef: ElementRef,
+        protected screenSize: ScreenSizeObserverService,
+        protected language: LanguageStore
+    ) {
         super(elementRef, screenSize);
     }
 
@@ -80,6 +86,7 @@ export class LineChartComponent extends BaseChartComponent implements OnInit, On
         this.xAxisTicks = this.getXAxisTicks();
         this.showXAxisLabel = this.getShowXAxisLabel();
         this.showYAxisLabel = this.getShowYAxisLabel();
+        this.legendTitle = this.getLegendTitle();
         this.xAxisLabel = this.getXAxisLabel();
         this.yAxisLabel = this.getYAxisLabel();
         this.yAxisTickFormatting = this.getYAxisTickFormatting();
@@ -109,6 +116,10 @@ export class LineChartComponent extends BaseChartComponent implements OnInit, On
 
     getLegend(): boolean {
         return !isFalse(this.dataSource.options.legend);
+    }
+
+    getLegendTitle(): string {
+        return this.language.getFieldLabel(this.dataSource.options.legendTitle) || this.language.getFieldLabel('LBL_LEGEND');
     }
 
     getXScaleMin(): number | string {

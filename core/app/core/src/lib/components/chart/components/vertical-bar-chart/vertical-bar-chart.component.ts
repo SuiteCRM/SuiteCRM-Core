@@ -88,6 +88,10 @@ export class VerticalBarChartComponent extends BaseChartComponent implements OnI
         return !isFalse(this.dataSource.options.legend);
     }
 
+    get legendTitle(): string {
+        return this.language.getFieldLabel(this.dataSource.options.legendTitle) || this.language.getFieldLabel('LBL_LEGEND');
+    }
+
     get showXAxisLabel(): boolean {
         return isTrue(this.dataSource.options.showXAxisLabel ?? false);
     }

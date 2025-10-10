@@ -76,6 +76,7 @@ export class TwoFactorCheckComponent implements OnInit{
         this.authService.check2fa(authCode).subscribe(response => {
 
             if (isTrue(response?.login_success) && isTrue(response?.two_factor_complete)) {
+                this.message.removeMessages();
                 this.message.addSuccessMessageByKey('LBL_FACTOR_AUTH_SUCCESS');
 
                 if (this.baseRoute.isNativeAuth()) {

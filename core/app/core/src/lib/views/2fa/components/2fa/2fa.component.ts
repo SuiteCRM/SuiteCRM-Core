@@ -120,6 +120,7 @@ export class TwoFactorComponent implements OnInit {
                 this.message.addDangerMessageByKey('LBL_FACTOR_AUTH_FAIL');
                 return;
             }
+            this.message.removeMessages();
             this.disable2fa();
 
             return;
@@ -158,6 +159,7 @@ export class TwoFactorComponent implements OnInit {
             const verified = response?.two_factor_setup_complete ?? false;
 
             if (isTrue(verified)) {
+                this.message.removeMessages();
                 this.generateCodes();
                 this.message.addSuccessMessageByKey('LBL_FACTOR_AUTH_SUCCESS');
 
@@ -204,6 +206,7 @@ export class TwoFactorComponent implements OnInit {
                 return;
             }
 
+            this.message.removeMessages();
             this.areRecoveryCodesGenerated.set(false)
             this.generateCodes()
             this.message.addSuccessMessageByKey('LBL_REGENERATED_BACKUP_CODES');

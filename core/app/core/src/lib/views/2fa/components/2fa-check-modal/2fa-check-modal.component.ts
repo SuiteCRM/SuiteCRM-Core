@@ -71,6 +71,7 @@ export class TwoFactorCheckModalComponent implements OnInit{
 
         this.checkTwoFactorCode.checkCode(authCode).subscribe({
             next: (response) => {
+                this.message.removeMessages();
                 this.closeModal(response.data.two_factor_complete)
             },
             error: () => {

@@ -28,6 +28,7 @@
     margin-bottom: .5rem;
 
     .uploaded-files {
+      flex-grow: 1;
 
       .popover-body {
 
@@ -68,7 +69,7 @@
   .attachments.attachments-edit-mode {
 
     .uploaded-files {
-
+      flex-grow: 1;
       .file-group {
         .file {
           padding-top: 0;
@@ -224,7 +225,7 @@
   }
 
   .uploaded-files {
-
+    flex-grow: 1;
     .file-group {
       display: flex;
       line-height: .25rem;
@@ -248,6 +249,10 @@
       font-size: .7em !important;
       top: 2px;
       position: relative;
+    }
+
+    .box-loading {
+      background-color: lightgrey;
     }
 
     .popover-body {

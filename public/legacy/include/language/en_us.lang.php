@@ -4257,6 +4257,7 @@ $app_strings['LBL_OFTEN'] = 'As often as possible.';
 $app_strings['LBL_MIN_MARK'] = 'minute mark';
 $app_strings['LBL_INBOUND_EMAIL'] = 'Inbound Email';
 
+$app_strings['LBL_LEGEND'] = 'Legend';
 
 $app_strings['LBL_EMAIL_MARKETING_NOT_UNSCHEDULED'] = 'Email Marketing is not Un Scheduled cannot schedule';
 $app_strings['LBL_INCORRECT_RECORD_ID'] = 'Incorrect record id';

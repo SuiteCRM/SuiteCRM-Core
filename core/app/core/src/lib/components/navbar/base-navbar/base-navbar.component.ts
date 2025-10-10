@@ -216,6 +216,11 @@ export class BaseNavbarComponent implements OnInit, OnDestroy, AfterViewInit {
         this.recentlyViewedCount = this.systemConfigStore.getUi('global_recently_viewed');
 
         this.subs.push(this.notificationStore.notificationsEnabled$.subscribe(notificationsEnabled => {
+
+            if (!Object.keys(this?.navigation?.modules ?? []).includes('Notifications') && !Object.keys(this?.navigation?.modules ?? []).includes('alerts')){
+                notificationsEnabled = false;
+            }
+
             this.notificationsEnabled.set(notificationsEnabled);
         }));
 

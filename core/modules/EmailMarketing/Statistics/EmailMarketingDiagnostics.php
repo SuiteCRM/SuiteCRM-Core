@@ -27,10 +27,12 @@
 
 namespace App\Module\EmailMarketing\Statistics;
 
+use App\Authentication\LegacyHandler\UserHandler;
 use App\Data\LegacyHandler\PreparedStatementHandler;
 use App\Data\Service\RecordProviderInterface;
 use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;
+use App\Languages\LegacyHandler\AppStringsHandler;
 use App\Statistics\Entity\Statistic;
 use App\Statistics\Service\StatisticsProviderInterface;
 use App\Statistics\StatisticsHandlingTrait;
@@ -71,7 +73,9 @@ class EmailMarketingDiagnostics extends LegacyHandler implements StatisticsProvi
         protected SettingsProviderInterface $settingsProvider,
         protected SystemConfigHandler $configHandler,
         protected PreparedStatementHandler $preparedStatementHandler,
-        protected RecordProviderInterface $recordProvider
+        protected RecordProviderInterface $recordProvider,
+        protected AppStringsHandler $appStringsHandler,
+        protected UserHandler $userHandler,
     ) {
         parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState, $session);
     }
@@ -148,16 +152,18 @@ class EmailMarketingDiagnostics extends LegacyHandler implements StatisticsProvi
 
     protected function mapBoolValue(mixed $default): string
     {
+        $strings = $this->appStringsHandler->getAppStrings($this->userHandler->getCurrentLanguage())->getItems();
+
         if (is_bool($default)) {
-            $default = $default ? 'Yes' : 'No';
+            $default = $default ? $strings['LBL_YES'] : $strings['LBL_NO'];
         }
 
         if (isTrue($default)) {
-            $default = 'Yes';
+            $default = $strings['LBL_YES'];
         }
 
         if (isFalse($default)) {
-            $default = 'No';
+            $default = $strings['LBL_NO'];
         }
 
         return $default;

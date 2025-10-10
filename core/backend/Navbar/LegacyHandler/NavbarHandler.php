@@ -296,7 +296,7 @@ class NavbarHandler extends LegacyHandler implements NavigationProviderInterface
         }
 
         foreach ($this->navbarOverrides ?? [] as $key => $item) {
-            if ($modules[$key] && !empty($modules[$item])) {
+            if (isset($modules[$key]) && !empty($modules[$item])) {
                 $modules[$key] = $modules[$item];
             }
         }

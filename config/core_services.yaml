@@ -503,6 +503,10 @@ services:
     alias: App\Routes\Service\LegacyRouteHandler
     public: true
 
+  app.cron.handler:
+    alias: App\Schedulers\LegacyHandler\CronHandler
+    public: true
+
   graphql.introspection_manager:
     alias: App\Security\GraphqlIntrospectionManager
     public: true

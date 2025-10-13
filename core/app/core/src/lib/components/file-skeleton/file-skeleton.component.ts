@@ -31,18 +31,11 @@ import {LanguageStore} from "../../store/language/language.store";
     selector: 'scrm-file-skeleton',
     templateUrl: 'file-skeleton.component.html'
 })
-export class FileSkeletonComponent implements OnInit{
+export class FileSkeletonComponent {
     @Input() compact: boolean = false;
 
-    loadingLabel: string;
-
     constructor(
-        protected language: LanguageStore
     ) {
-    }
-
-    ngOnInit() {
-        this.loadingLabel = this.language.getFieldLabel('LBL_LOADING_ATTACHMENTS');
     }
 
 }

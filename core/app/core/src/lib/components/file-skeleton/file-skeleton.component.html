@@ -26,7 +26,7 @@
  */
 -->
 <div [class.uploaded-file]="!compact"
-     [class.uploaded-file-compact]="compact" class="box-loading">
+     [class.uploaded-file-compact]="compact">
     <div [class.d-flex]="compact"
          [class.flex-grow-1]="compact">
         <div class="uploaded-file-info-container">
@@ -36,11 +36,9 @@
                 </div>
             </div>
             <div class="uploaded-file-info">
-                    <span class="uploaded-file-name">
-                       {{ loadingLabel }}
-                    </span>
-                <span class="uploaded-file-size">
-                    00.00 MB
+                <span class="uploaded-file-name pl-5 pr-5 pb-3 rounded box-loading">
+                </span>
+                <span class="uploaded-file-size pb-2 w-25 rounded box-loading">
                 </span>
             </div>
         </div>

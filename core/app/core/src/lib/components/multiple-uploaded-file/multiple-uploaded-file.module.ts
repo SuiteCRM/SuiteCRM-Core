@@ -30,6 +30,7 @@ import {MultipleUploadedFileComponent} from "./multiple-uploaded-file.component"
 import {UploadedFileComponent} from "../uploaded-file/uploaded-file.component";
 import {LabelModule} from "../label/label.module";
 import {NgbPopover} from "@ng-bootstrap/ng-bootstrap";
+import {FileSkeletonModule} from "../file-skeleton/file-skeleton.module";
 
 @NgModule({
     declarations: [MultipleUploadedFileComponent],
@@ -41,6 +42,7 @@ import {NgbPopover} from "@ng-bootstrap/ng-bootstrap";
         UploadedFileComponent,
         LabelModule,
         NgbPopover,
+        FileSkeletonModule,
     ]
 })
 export class MultipleUploadedFileModule {

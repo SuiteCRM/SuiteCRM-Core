@@ -138,7 +138,7 @@ export class DatetimeFormatter implements Formatter {
             if (!dateTime.isValid) {
                 return dateString;
             }
-            return formatDate(dateTime.toJSDate(), toFormat, this.locale, this.userTimeZone());
+            return formatDate(dateTime.toJSDate(), toFormat, this.locale, this.userTimeZone(dateTime));
         }
         return '';
     }
@@ -329,12 +329,12 @@ export class DatetimeFormatter implements Formatter {
         return !dateTime.isValid;
     }
 
-    userTimeZone(): string {
+    userTimeZone(dateTime: DateTime): string {
         let userTZ = this.preferences.getUserPreference('timezone') ?? 'GMT';
         if (!userTZ) {
             userTZ = 'GMT';
         }
-        const milliseconds = DateTime.now().setZone(userTZ).toMillis();
+        const milliseconds = dateTime.setZone(userTZ).toMillis();
         return IANAZone.create(userTZ).formatOffset(milliseconds, 'techie');
     }
 

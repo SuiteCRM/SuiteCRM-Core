@@ -65,6 +65,7 @@ export class MultipleUploadedFileComponent implements OnChanges, AfterViewInit, 
     @Input() minWidth: string = '185px';
     @Input() popoverMinWidth: string = '355px';
     @Input() popoverMaxTextLength: string = '250px';
+    @Input() popoverLinkPosition: string = 'bottom';
     @Input() popoverTarget: HTMLElement;
     @Input() clickable: boolean = false;
     @Input() displayType: string = 'default';

@@ -77,7 +77,7 @@
             </div>
         </ng-container>
     </ng-container>
-    <div class="d-flex" #popoverDefaultTarget *ngIf="files && files.length > breakpoint">
+    <div class="d-flex" [class.flex-column]="popoverLinkPosition === 'bottom'" #popoverDefaultTarget *ngIf="files && files.length > breakpoint">
         <div class="d-flex flex-column">
             <ng-container *ngFor="let chunk of chunkedArray()">
                 <div class="file-group">

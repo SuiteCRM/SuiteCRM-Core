@@ -45,6 +45,7 @@ export class BaseAttachmentComponent extends BaseFileComponent {
     popoverMinWidth: string;
     maxTextWidth: string;
     minWidth: string;
+    popoverLinkPosition: string;
     storageType: string;
 
     constructor(
@@ -100,6 +101,7 @@ export class BaseAttachmentComponent extends BaseFileComponent {
         this.breakpoint = metadata?.breakpoint ?? null;
         this.chunks = metadata?.maxPerRow ?? null;
         this.compact = metadata?.compact ?? false;
+        this.popoverLinkPosition = metadata?.popoverLinkPosition ?? 'bottom';
         this.popoverMaxTextLength = metadata?.popoverMaxTextLength ?? '200px';
         this.popoverMinWidth = metadata?.popoverMinWidth ?? '315px';
         this.storageType = this.field.metadata.storage_type ?? 'private-documents';

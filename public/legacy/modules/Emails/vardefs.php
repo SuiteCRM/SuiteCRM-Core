@@ -130,6 +130,7 @@ $dictionary['Email'] = array(
                 'maxTextWidth' => '75px',
                 'minWidth' => '185px',
                 'labelDisplay' => 'none',
+                'popoverLinkPosition' => 'side',
                 'storage_type' => 'private-documents',
                 'upload_maxsize' => 10000000,
             ],

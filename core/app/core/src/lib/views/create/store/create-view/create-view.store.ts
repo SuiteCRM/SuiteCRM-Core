@@ -48,6 +48,7 @@ import {RecordStoreFactory} from '../../../../store/record/record.store.factory'
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
 import {RecordConvertService} from "../../../../services/record/record-convert.service";
 import {RecordDuplicateService} from "../../../../services/record/record-duplicate.service";
+import {FieldActionsAdapterFactory} from "../../../../components/field-layout/adapters/field.actions.adapter.factory";
 
 @Injectable()
 export class CreateViewStore extends RecordViewStore {
@@ -70,7 +71,8 @@ export class CreateViewStore extends RecordViewStore {
         protected auth: AuthService,
         protected recordStoreFactory: RecordStoreFactory,
         protected preferences: UserPreferenceStore,
-        protected recordConvertService: RecordConvertService
+        protected recordConvertService: RecordConvertService,
+        protected fieldActionAdaptorFactory: FieldActionsAdapterFactory,
     ) {
         super(
             recordFetchGQL,
@@ -87,7 +89,8 @@ export class CreateViewStore extends RecordViewStore {
             statisticsBatch,
             recordStoreFactory,
             preferences,
-            recordConvertService
+            recordConvertService,
+            fieldActionAdaptorFactory
         );
 
         this.duplicateService = inject(RecordDuplicateService);

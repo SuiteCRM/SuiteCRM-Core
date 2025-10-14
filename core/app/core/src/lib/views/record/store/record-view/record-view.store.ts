@@ -32,7 +32,7 @@ import {Params} from '@angular/router';
 import {isVoid} from '../../../../common/utils/value-utils';
 import {deepClone} from '../../../../common/utils/object-utils';
 import {BooleanMap} from '../../../../common/types/boolean-map';
-import {FieldDefinitionMap, FieldMetadata} from '../../../../common/record/field.model';
+import {Field, FieldDefinitionMap, FieldMetadata} from '../../../../common/record/field.model';
 import {FieldLogicMap} from '../../../../common/actions/field-logic-action.model';
 import {Record} from '../../../../common/record/record.model';
 import {ViewFieldDefinition, ViewFieldDefinitionMap} from '../../../../common/metadata/metadata.model';
@@ -70,6 +70,8 @@ import {ObjectMap} from "../../../../common/types/object-map";
 import {WidgetMetadata} from "../../../../common/metadata/widget.metadata";
 import {BaseRecordContainerStoreInterface} from "../../../../common/containers/record/record-container.store.model";
 import {toObservable} from "@angular/core/rxjs-interop";
+import {ActionDataSource, ActionDataSourceBuilderFunction} from "../../../../common/actions/action.model";
+import {FieldActionsAdapterFactory} from "../../../../components/field-layout/adapters/field.actions.adapter.factory";
 
 const initialState: RecordViewState = {
     module: '',
@@ -154,12 +156,19 @@ export class RecordViewStore extends ViewStore implements StateStore, BaseRecord
         protected statisticsBatch: StatisticsBatch,
         protected recordStoreFactory: RecordStoreFactory,
         protected preferences: UserPreferenceStore,
-        protected recordConvertService: RecordConvertService
+        protected recordConvertService: RecordConvertService,
+        protected fieldActionAdaptorFactory: FieldActionsAdapterFactory,
     ) {
 
         super(appStateStore, languageStore, navigationStore, moduleNavigation, metadataStore);
 
-        this.recordStore = recordStoreFactory.create(this.getViewFieldsObservable(), this.getRecordMetadata$());
+        const initOptions = {
+            initVardefBasedFieldActions: true,
+            buildFieldActionAdapter: ((options?: ObjectMap): ActionDataSource => {
+                return this.fieldActionAdaptorFactory.create('recordView', ((options?.field) as Field)?.name ?? '', this);
+            }) as ActionDataSourceBuilderFunction
+        };
+        this.recordStore = recordStoreFactory.create(this.getViewFieldsObservable(), this.getRecordMetadata$(), initOptions);
 
         this.record$ = this.recordStore.state$.pipe(distinctUntilChanged());
         this.stagingRecord$ = this.recordStore.staging$.pipe(distinctUntilChanged());

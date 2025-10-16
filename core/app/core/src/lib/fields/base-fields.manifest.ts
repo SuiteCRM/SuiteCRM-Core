@@ -267,7 +267,7 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'datetime.list': DateTimeDetailFieldComponent,
     'datetime.detail': DateTimeDetailFieldComponent,
     'datetime.edit': DateTimeEditFieldComponent,
-    'datetime.filter': DateTimeFilterFieldComponent,
+    'datetime.filter': DateFilterFieldComponent,
     'url.list': UrlDetailFieldComponent,
     'url.detail': UrlDetailFieldComponent,
     'icon.detail': IconDetailFieldComponent,

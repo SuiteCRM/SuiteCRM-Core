@@ -30,10 +30,11 @@ import {DataTypeFormatter} from '../../services/formatters/data-type.formatter.s
 import {StandardFieldRegistry} from '../standard-field.registry';
 import {RecordManager} from '../../services/record/record.manager';
 import {emptyObject} from '../../common/utils/object-utils';
-import {Field, FieldDefinition, FieldAttribute} from '../../common/record/field.model';
+import {Field, FieldAttribute, FieldDefinition} from '../../common/record/field.model';
 import set from 'lodash-es/set';
 import {FieldLogicManager} from '../field-logic/field-logic.manager';
 import {FieldLogicDisplayManager} from '../field-logic-display/field-logic-display.manager';
+import {CompositeAttributeTypeOverrideRegistry} from "../composite/composite-attribute-type-override.registry";
 
 @Component({template: ''})
 export class BaseComposite extends BaseFieldComponent implements OnInit, OnDestroy {
@@ -43,7 +44,8 @@ export class BaseComposite extends BaseFieldComponent implements OnInit, OnDestr
         protected registry: StandardFieldRegistry,
         protected recordManager: RecordManager,
         protected logic: FieldLogicManager,
-        protected logicDisplay: FieldLogicDisplayManager
+        protected logicDisplay: FieldLogicDisplayManager,
+        protected attributeTypeOverrideRegistry: CompositeAttributeTypeOverrideRegistry
     ) {
         super(typeFormatter, logic, logicDisplay);
     }
@@ -61,6 +63,8 @@ export class BaseComposite extends BaseFieldComponent implements OnInit, OnDestr
         let module = (this.record && this.record.module) || 'default';
 
         const displayType = (definition && definition.displayType) || '';
+
+        type = this.attributeTypeOverrideRegistry.getType(module, this?.field?.name ?? '', type, this?.originalMode ?? '')
 
         return this.registry.getDisplayType(module, type, displayType, this.getMode(), this.field.name);
     }

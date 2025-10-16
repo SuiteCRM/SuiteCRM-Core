@@ -31,6 +31,7 @@ import {RecordManager} from '../../services/record/record.manager';
 import {BaseComposite} from '../base/base-composite.component';
 import {FieldLogicManager} from '../field-logic/field-logic.manager';
 import {FieldLogicDisplayManager} from '../field-logic-display/field-logic-display.manager';
+import {CompositeAttributeTypeOverrideRegistry} from "./composite-attribute-type-override.registry";
 
 @Component({
     selector: 'scrm-composite-field',
@@ -44,9 +45,10 @@ export class CompositeComponent extends BaseComposite {
         protected registry: StandardFieldRegistry,
         protected recordManager: RecordManager,
         protected logic: FieldLogicManager,
-        protected logicDisplay: FieldLogicDisplayManager
+        protected logicDisplay: FieldLogicDisplayManager,
+        protected attributeTypeOverrideRegistry: CompositeAttributeTypeOverrideRegistry
     ) {
-        super(typeFormatter, registry, recordManager, logic, logicDisplay);
+        super(typeFormatter, registry, recordManager, logic, logicDisplay, attributeTypeOverrideRegistry);
     }
 
 }

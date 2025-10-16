@@ -8137,7 +8137,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^9.31.0":
+"eslint@npm:^9.37.0":
   version: 9.37.0
   resolution: "eslint@npm:9.37.0"
   dependencies:
@@ -14439,7 +14439,7 @@ __metadata:
     bootstrap: "npm:^5.3.3"
     bootstrap-css-only: "npm:^4.4.1"
     dompurify: "npm:^3.2.4"
-    eslint: "npm:^9.31.0"
+    eslint: "npm:^9.37.0"
     eslint-import-resolver-alias: "npm:^1.1.2"
     eslint-import-resolver-typescript: "npm:^3.6.3"
     eslint-plugin-compat: "npm:^6.0.1"

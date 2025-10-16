@@ -4697,7 +4697,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^8.38.0":
+"@typescript-eslint/parser@npm:^8.46.1":
   version: 8.46.1
   resolution: "@typescript-eslint/parser@npm:8.46.1"
   dependencies:
@@ -14471,7 +14471,7 @@ __metadata:
     "@types/luxon": "npm:3.4.2"
     "@types/object-hash": "npm:^3.0.6"
     "@typescript-eslint/eslint-plugin": "npm:^8.46.1"
-    "@typescript-eslint/parser": "npm:^8.38.0"
+    "@typescript-eslint/parser": "npm:^8.46.1"
     angular-svg-icon: "npm:^17.0.0"
     apollo-angular: "npm:^7.2.0"
     barrelsby: "npm:^2.8.1"

@@ -49,7 +49,7 @@
     "graphql": "^16.9.0",
     "lodash-es": "^4.17.21",
     "luxon": "3.5.0",
-    "mathjs": "^13.2.0",
+    "mathjs": "^13.2.3",
     "monaco-editor": "^0.52.2",
     "ng-animate": "^2.0.1",
     "ng-dynamic-component": "^10.7.0",

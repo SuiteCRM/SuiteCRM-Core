@@ -11080,7 +11080,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mathjs@npm:^13.2.0":
+"mathjs@npm:^13.2.3":
   version: 13.2.3
   resolution: "mathjs@npm:13.2.3"
   dependencies:
@@ -14500,7 +14500,7 @@ __metadata:
     karma-jasmine-html-reporter: "npm:^2.1.0"
     lodash-es: "npm:^4.17.21"
     luxon: "npm:3.5.0"
-    mathjs: "npm:^13.2.0"
+    mathjs: "npm:^13.2.3"
     monaco-editor: "npm:^0.52.2"
     ng-animate: "npm:^2.0.1"
     ng-dynamic-component: "npm:^10.7.0"

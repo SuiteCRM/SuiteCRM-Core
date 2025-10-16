@@ -67,7 +67,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "18.2.21",
     "@angular-eslint/builder": "18.3.1",
-    "@angular/cli": "18.2.20",
+    "@angular/cli": "18.2.21",
     "@angular/compiler-cli": "18.2.8",
     "@angular/language-service": "18.2.8",
     "@types/jasmine": "~5.1.4",

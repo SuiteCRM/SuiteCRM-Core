@@ -36,7 +36,7 @@
     "@angular/router": "18.2.8",
     "@apollo/client": "^3.11.8",
     "@ng-bootstrap/ng-bootstrap": "17.0.1",
-    "@nrwl/workspace": "19.8.4",
+    "@nrwl/workspace": "19.8.14",
     "@popperjs/core": "^2.11.8",
     "@swimlane/ngx-charts": "^20.5.0",
     "@tinymce/tinymce-angular": "^8.0.1",

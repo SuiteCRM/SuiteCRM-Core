@@ -2391,12 +2391,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.25.6":
-  version: 7.25.7
-  resolution: "@babel/runtime@npm:7.25.7"
-  dependencies:
-    regenerator-runtime: "npm:^0.14.0"
-  checksum: 10c0/86b7829d2fc9343714a9afe92757cf96c4dc799006ca61d73cda62f4b9e29bfa1ce36794955bc6cb4c188f5b10db832c949339895e1bbe81a69022d9d578ce29
+"@babel/runtime@npm:^7.25.7":
+  version: 7.28.4
+  resolution: "@babel/runtime@npm:7.28.4"
+  checksum: 10c0/792ce7af9750fb9b93879cc9d1db175701c4689da890e6ced242ea0207c9da411ccf16dc04e689cc01158b28d7898c40d75598f4559109f761c12ce01e959bf7
   languageName: node
   linkType: hard
 
@@ -6447,10 +6445,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"complex.js@npm:^2.1.1":
-  version: 2.1.1
-  resolution: "complex.js@npm:2.1.1"
-  checksum: 10c0/c5dbb83954b472cf7fb1aebf8d140a7eb85a00b73eeb2b4ee4d192f98f038f3800f54550747b85be1114fedcbefebb2ade709b17b3cd40ab2bd546cb8fe9121c
+"complex.js@npm:^2.2.5":
+  version: 2.4.2
+  resolution: "complex.js@npm:2.4.2"
+  checksum: 10c0/c78cca0a3c08fa48845e2703b9772bdd80d44e56728382d43879183cb23391da6e8b6326ceec23c685abfd529b61d34842ba1784d7fa3783b194fbc6d0850d7c
   languageName: node
   linkType: hard
 
@@ -10779,11 +10777,11 @@ __metadata:
   linkType: hard
 
 "mathjs@npm:^13.2.0":
-  version: 13.2.0
-  resolution: "mathjs@npm:13.2.0"
+  version: 13.2.3
+  resolution: "mathjs@npm:13.2.3"
   dependencies:
-    "@babel/runtime": "npm:^7.25.6"
-    complex.js: "npm:^2.1.1"
+    "@babel/runtime": "npm:^7.25.7"
+    complex.js: "npm:^2.2.5"
     decimal.js: "npm:^10.4.3"
     escape-latex: "npm:^1.2.0"
     fraction.js: "npm:^4.3.7"
@@ -10793,7 +10791,7 @@ __metadata:
     typed-function: "npm:^4.2.1"
   bin:
     mathjs: bin/cli.js
-  checksum: 10c0/75a3f7ff8e401f86ac3b9ca9b67961e062dba94a0fb68a989ef234e932516451fbf63e70a17f504616cdb6c888697826395e028c851907c7ef3e357750714ffc
+  checksum: 10c0/a8c160931e926a65e59b983f285672ce3797682d703074670e39c11b36a15ceec01e2044de1ef5929227695da21ed2e401ef715c333d564eebff4aaa5c9c48cf
   languageName: node
   linkType: hard
 

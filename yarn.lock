@@ -7976,7 +7976,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-import-resolver-typescript@npm:^3.6.3":
+"eslint-import-resolver-typescript@npm:^3.10.1":
   version: 3.10.1
   resolution: "eslint-import-resolver-typescript@npm:3.10.1"
   dependencies:
@@ -14441,7 +14441,7 @@ __metadata:
     dompurify: "npm:^3.2.4"
     eslint: "npm:^9.37.0"
     eslint-import-resolver-alias: "npm:^1.1.2"
-    eslint-import-resolver-typescript: "npm:^3.6.3"
+    eslint-import-resolver-typescript: "npm:^3.10.1"
     eslint-plugin-compat: "npm:^6.0.1"
     eslint-plugin-import: "npm:^2.32.0"
     eslint-plugin-jasmine: "npm:^4.2.2"

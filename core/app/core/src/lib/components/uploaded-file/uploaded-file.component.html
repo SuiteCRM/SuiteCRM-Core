@@ -28,9 +28,11 @@
 <div [class.uploaded-file]="!compact"
      [class.uploaded-file-compact]="compact"
      [style.min-width]="minWidth"
+     class="uploaded-file-wrapper"
 >
     <div [class.d-flex]="compact"
          [class.flex-grow-1]="compact"
+         class="uploaded-file-info-wrapper"
     >
         <div class="uploaded-file-info-container"
              [class.uploaded-file-error]="file?.status() === 'error'">

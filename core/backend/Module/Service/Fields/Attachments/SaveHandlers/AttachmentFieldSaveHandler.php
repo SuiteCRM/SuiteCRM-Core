@@ -115,6 +115,13 @@ class AttachmentFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
             return;
         }
 
+        $currentMediaObjectIds = [];
+        foreach ($currentMediaObjects as $currentMediaObject) {
+            $currentMediaObjectIds[$currentMediaObject->getId()] = true;
+        }
+
+        $receivedItems = [];
+
         foreach ($attachments as $key => $attachment) {
             $id = $attachment['id'] ?? '';
             if (empty($id)) {
@@ -127,22 +134,26 @@ class AttachmentFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
                 return;
             }
 
+            if (isset($currentMediaObjectIds[$mediaObject->getId()])) {
+                $receivedItems[$mediaObject->getId()] = true;
+                continue;
+            }
+
             $mediaObject->setParentType($parentType);
             $mediaObject->setParentId($parentId);
             $mediaObject->setParentField($field);
             $mediaObject->setTemporary(false);
 
-            foreach ($currentMediaObjects as $currentMediaObject) {
-                if ($currentMediaObject->getId() !== $mediaObject->getId()) {
-                    // This will delete the media object from the repository and file system
-                    $this->mediaObjectManager->deleteMediaObject($storageType, $currentMediaObject);
-                }
-            }
+            $receivedItems[$mediaObject->getId()] = true;
 
             $this->mediaObjectManager->saveMediaObject($storageType, $mediaObject);
         }
 
+        foreach ($currentMediaObjects as $currentMediaObject) {
+            if (!isset($receivedItems[$currentMediaObject->getId()])) {
+                // This will delete the media object from the repository and file system
+                $this->mediaObjectManager->deleteMediaObject($storageType, $currentMediaObject);
+            }
+        }
     }
-
-
 }

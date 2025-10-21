@@ -83,7 +83,7 @@ class CopyLegacyAssets extends Command
     {
         $this->copyAssets();
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

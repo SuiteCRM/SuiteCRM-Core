@@ -357,11 +357,11 @@ abstract class BaseCommand extends Command
             $question = new ConfirmationQuestion($question, false);
             $answer = $helper->ask($input, $output, $question);
             if ($answer === false) {
-                return 1;
+                return Command::FAILURE;
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
 

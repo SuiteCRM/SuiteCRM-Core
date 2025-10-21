@@ -71,7 +71,7 @@ class RunSchedulersCommand extends BaseCommand
                 'Exiting as requested',
                 '========================='
             ]);
-            return 1;
+            return Command::FAILURE;
         }
 
         $allowed = $this->cronHandler->isAllowedCronUser();

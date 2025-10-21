@@ -29,6 +29,7 @@ namespace App\Install\Command;
 
 use App\Engine\Service\ProcessSteps\ProcessStepExecutorInterface;
 use Exception;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -60,7 +61,7 @@ abstract class BaseStepExecutorCommand extends BaseCommand
                 'Exiting as requested',
                 '========================='
             ]);
-            return 1;
+            return Command::FAILURE;
         }
 
         $output->writeln([
@@ -80,10 +81,10 @@ abstract class BaseStepExecutorCommand extends BaseCommand
         ]);
 
         if ($success === false) {
-            return 1;
+            return Command::FAILURE;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

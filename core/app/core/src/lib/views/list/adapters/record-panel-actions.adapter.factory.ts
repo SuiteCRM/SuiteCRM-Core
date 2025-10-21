@@ -40,6 +40,7 @@ import {FieldModalService} from "../../../services/modals/field-modal.service";
 import {RecordMapperRegistry} from "../../../common/record/record-mappers/record-mapper.registry";
 import {BaseSaveRecordMapper} from "../../../store/record/record-mappers/base-save.record-mapper";
 import {FieldLogicManager} from "../../../fields/field-logic/field-logic.manager";
+import {RecordManager} from "../../../services/record/record.manager";
 
 @Injectable({
     providedIn: 'root',
@@ -59,6 +60,7 @@ export class ListViewRecordPanelActionAdapterFactory {
         protected recordMappers: RecordMapperRegistry,
         protected baseMapper: BaseSaveRecordMapper,
         protected logic: FieldLogicManager,
+        protected recordManager: RecordManager
     ) {
         recordMappers.register('default', baseMapper.getKey(), baseMapper);
     }
@@ -77,7 +79,8 @@ export class ListViewRecordPanelActionAdapterFactory {
             this.metadata,
             this.appMetadataStore,
             this.recordMappers,
-            this.logic
+            this.logic,
+            this.recordManager
         );
 
         const collapseButtons = listStore?.recordPanelConfig?.collapseActions ?? null;

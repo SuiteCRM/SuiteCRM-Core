@@ -52,6 +52,7 @@ import {FieldModalService} from "../../../services/modals/field-modal.service";
 import {RecordMapperRegistry} from "../../../common/record/record-mappers/record-mapper.registry";
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {FieldLogicManager} from "../../../fields/field-logic/field-logic.manager";
+import {RecordManager} from "../../../services/record/record.manager";
 
 @Injectable()
 export class RecordModalActionsAdapter extends BaseRecordActionsAdapter<RecordModalActionData> {
@@ -71,6 +72,7 @@ export class RecordModalActionsAdapter extends BaseRecordActionsAdapter<RecordMo
         protected fieldModalService: FieldModalService,
         protected recordMappers: RecordMapperRegistry,
         protected logic: FieldLogicManager,
+        protected recordManager: RecordManager
     ) {
         super(
             actionManager,
@@ -83,7 +85,8 @@ export class RecordModalActionsAdapter extends BaseRecordActionsAdapter<RecordMo
             metadata,
             appMetadataStore,
             recordMappers,
-            logic
+            logic,
+            recordManager
         );
     }
 

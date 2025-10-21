@@ -43,8 +43,6 @@ import {RecordMapperRegistry} from "../../common/record/record-mappers/record-ma
 @Injectable()
 export abstract class BaseRecordActionsAdapter<D extends RecordBasedActionData> extends BaseActionsAdapter<D> {
 
-    protected recordManager: RecordManager;
-
     protected constructor(
         protected actionManager: ActionManager<D>,
         protected asyncActionService: AsyncActionService,
@@ -57,6 +55,7 @@ export abstract class BaseRecordActionsAdapter<D extends RecordBasedActionData> 
         protected appMetadataStore: AppMetadataStore,
         protected recordMappers: RecordMapperRegistry,
         protected logic: FieldLogicManager,
+        protected recordManager: RecordManager
     ) {
         super(
             actionManager,
@@ -70,8 +69,6 @@ export abstract class BaseRecordActionsAdapter<D extends RecordBasedActionData> 
             appMetadataStore,
             logic
         );
-
-        this.recordManager = inject(RecordManager);
     }
 
     runAction(action: Action, context: ActionContext = null): void {

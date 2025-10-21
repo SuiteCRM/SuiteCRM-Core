@@ -28,16 +28,11 @@ import {
     AfterViewInit,
     Component,
     ElementRef,
-    EventEmitter,
-    HostListener,
+    EventEmitter, HostListener,
     Input,
-    OnChanges,
-    OnDestroy,
-    Output,
-    signal,
-    SimpleChanges,
-    ViewChild,
-    WritableSignal
+    OnChanges, OnDestroy,
+    Output, signal, SimpleChanges,
+    ViewChild, WritableSignal
 } from "@angular/core";
 import {UploadedFile} from "../uploaded-file/uploaded-file.model";
 import {SystemConfigStore} from "../../store/system-config/system-config.store";
@@ -62,8 +57,8 @@ export class MultipleUploadedFileComponent implements OnChanges, AfterViewInit, 
     @Input() allowClear: boolean = true;
     @Input() compact: boolean = false;
     @Input() chunks: number;
-    @Input() breakpoint: number;
-    @Input() maxTextWidth: string;
+    @Input() breakpoint: number = 2;
+    @Input() maxTextWidth: string = '150px';
     @Input() wrapper: HTMLElement = {} as HTMLElement;
     @Input() ancestorSelector: string;
     @Input() minWidth: string = '185px';
@@ -114,7 +109,7 @@ export class MultipleUploadedFileComponent implements OnChanges, AfterViewInit, 
 
         this.maxPerRow = Math.min(maxCalculated, maxAllowed);
 
-        const visibleFiles = this.files.slice(0, this.breakpoint);
+        const visibleFiles = this.files.slice(0, this.breakpoint ?? 2);
         this.chunkedArray.set(this.chunkArray(visibleFiles, this.maxPerRow));
     }
 

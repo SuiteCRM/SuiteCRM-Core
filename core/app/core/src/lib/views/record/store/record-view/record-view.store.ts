@@ -232,6 +232,8 @@ export class RecordViewStore extends ViewStore implements StateStore, BaseRecord
             ...this.internalState,
             showSidebarWidgets: show
         });
+
+        window.dispatchEvent(new Event('resize'));
     }
 
     get showBottomWidgets(): boolean {

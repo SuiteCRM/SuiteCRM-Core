@@ -28,16 +28,20 @@ import {
     AfterViewInit,
     Component,
     ElementRef,
-    EventEmitter, HostListener,
+    EventEmitter,
+    HostListener,
     Input,
-    OnChanges, OnDestroy,
-    Output, signal, SimpleChanges,
-    ViewChild, WritableSignal
+    OnChanges,
+    OnDestroy,
+    Output,
+    signal,
+    SimpleChanges,
+    ViewChild,
+    WritableSignal
 } from "@angular/core";
 import {UploadedFile} from "../uploaded-file/uploaded-file.model";
 import {SystemConfigStore} from "../../store/system-config/system-config.store";
 import {Subscription} from "rxjs";
-import {RecordViewStore} from "../../views/record/store/record-view/record-view.store";
 
 @Component({
     selector: 'scrm-multiple-uploaded-files',
@@ -73,7 +77,6 @@ export class MultipleUploadedFileComponent implements OnChanges, AfterViewInit, 
     @Output('clear') clear: EventEmitter<UploadedFile> = new EventEmitter<UploadedFile>();
 
     constructor(
-        public recordViewStore: RecordViewStore,
         protected systemConfigStore: SystemConfigStore,
     ) {
     }
@@ -116,9 +119,6 @@ export class MultipleUploadedFileComponent implements OnChanges, AfterViewInit, 
     }
 
     ngAfterViewInit() {
-        this.subs.push(this.recordViewStore.showSidebarWidgets$.subscribe((value) => {
-            this.recalculateWithLoading();
-        }));
 
         setTimeout(() => {
             this.loading.set(true);

@@ -30,7 +30,7 @@ import {
     ElementRef,
     EventEmitter, HostListener,
     Input,
-    OnChanges, OnDestroy,
+    OnChanges, OnDestroy, OnInit,
     Output, signal, SimpleChanges,
     ViewChild, WritableSignal
 } from "@angular/core";
@@ -43,7 +43,7 @@ import {Subscription} from "rxjs";
     templateUrl: './multiple-uploaded-file.component.html',
     styles: [],
 })
-export class MultipleUploadedFileComponent implements OnChanges, AfterViewInit, OnDestroy {
+export class MultipleUploadedFileComponent implements OnChanges, OnInit, AfterViewInit, OnDestroy {
 
     maxPerRow: number;
     maxPerRowWidth: number;
@@ -79,6 +79,17 @@ export class MultipleUploadedFileComponent implements OnChanges, AfterViewInit, 
     @HostListener('window:resize', ['$event'])
     onResize(): void {
         this.recalculateWithLoading();
+    }
+
+    ngOnInit(): void {
+        const config = this.systemConfigStore.getUi('multiple-file-upload');
+        if (!this.breakpoint || this.breakpoint < 1) {
+            this.breakpoint = config?.breakpoint ?? 2;
+        }
+
+        if (!this.chunks || this.chunks < 1) {
+            this.chunks = config?.chunks ?? 2;
+        }
     }
 
     calculateDynamicMaxPerRow(): void {

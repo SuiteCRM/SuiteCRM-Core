@@ -72,6 +72,11 @@
       flex-grow: 1;
 
       .file-group {
+
+        &:not(first-child) {
+          margin-top: 0.2rem
+        }
+
         .file {
           padding-top: 0;
 

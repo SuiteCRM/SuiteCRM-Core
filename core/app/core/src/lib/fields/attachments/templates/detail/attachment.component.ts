@@ -33,6 +33,7 @@ import {MediaObjectsService} from "../../../../services/media-objects/media-obje
 import {
     LegacyEntrypointLinkBuilder
 } from "../../../../services/navigation/legacy-entrypoint-link-builder/legacy-entrypoint-link-builder.service";
+import {SystemConfigStore} from "../../../../store/system-config/system-config.store";
 
 @Component({
     selector: 'scrm-attachments-detail',
@@ -48,22 +49,15 @@ export class AttachmentDetailFieldComponent extends BaseAttachmentComponent impl
         protected logic: FieldLogicManager,
         protected logicDisplay: FieldLogicDisplayManager,
         protected mediaObjects: MediaObjectsService,
-        protected legacyEntrypointLinkBuilder: LegacyEntrypointLinkBuilder
+        protected legacyEntrypointLinkBuilder: LegacyEntrypointLinkBuilder,
+        protected systemConfig: SystemConfigStore
     ) {
-        super(typeFormatter, logic, logicDisplay, mediaObjects, legacyEntrypointLinkBuilder);
+        super(typeFormatter, logic, logicDisplay, mediaObjects, legacyEntrypointLinkBuilder, systemConfig);
     }
 
     ngOnInit() {
         super.ngOnInit();
-        this.getValuesFromMetadata();
+        this.getValuesFromMetadata('detail');
         this.initUploadedFiles();
-    }
-
-    protected getValuesFromMetadata(): void {
-        super.getValuesFromMetadata();
-        const metadata = this.field.metadata ?? {};
-        this.breakpoint = metadata?.breakpoint ?? null;
-        this.chunks = metadata?.maxPerRow ?? null;
-        this.popoverMaxTextLength = metadata?.popoverMaxTextLength ?? '248px';
     }
 }

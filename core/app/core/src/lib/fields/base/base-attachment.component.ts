@@ -34,6 +34,7 @@ import {
     LegacyEntrypointLinkBuilder
 } from "../../services/navigation/legacy-entrypoint-link-builder/legacy-entrypoint-link-builder.service";
 import {UploadedFile} from "../../components/uploaded-file/uploaded-file.model";
+import {SystemConfigStore} from "../../store/system-config/system-config.store";
 
 @Component({template: ''})
 export class BaseAttachmentComponent extends BaseFileComponent {
@@ -53,7 +54,8 @@ export class BaseAttachmentComponent extends BaseFileComponent {
         protected logic: FieldLogicManager,
         protected logicDisplay: FieldLogicDisplayManager,
         protected mediaObjects: MediaObjectsService,
-        protected legacyEntrypointLinkBuilder: LegacyEntrypointLinkBuilder
+        protected legacyEntrypointLinkBuilder: LegacyEntrypointLinkBuilder,
+        protected systemConfig: SystemConfigStore
     ) {
         super(typeFormatter, logic, logicDisplay, mediaObjects, legacyEntrypointLinkBuilder);
     }
@@ -96,16 +98,20 @@ export class BaseAttachmentComponent extends BaseFileComponent {
         } as UploadedFile;
     }
 
-    protected getValuesFromMetadata(): void {
+    protected getValuesFromMetadata(mode: string): void {
+
+        const config = this.systemConfig.getUi('attachments') ?? {};
+        const modeConfig = config[mode] ?? {};
+
         const metadata = this.field.metadata ?? {};
-        this.breakpoint = metadata?.breakpoint ?? null;
-        this.chunks = metadata?.maxPerRow ?? null;
-        this.compact = metadata?.compact ?? false;
-        this.popoverLinkPosition = metadata?.popoverLinkPosition ?? 'bottom';
-        this.popoverMaxTextLength = metadata?.popoverMaxTextLength ?? '200px';
-        this.popoverMinWidth = metadata?.popoverMinWidth ?? '315px';
+        this.breakpoint = metadata?.breakpoint ?? modeConfig['breakpoint'] ?? null;
+        this.chunks = metadata?.maxPerRow ?? modeConfig['maxPerRow'] ?? null;
+        this.compact = metadata?.compact ?? modeConfig['compact'] ?? false;
+        this.popoverLinkPosition = metadata?.popoverLinkPosition ?? modeConfig['popoverLinkPosition'] ?? 'bottom';
+        this.popoverMaxTextLength = metadata?.popoverMaxTextLength ?? modeConfig['popoverMaxTextLength'] ?? '200px';
+        this.popoverMinWidth = metadata?.popoverMinWidth ?? modeConfig['popoverMinWidth'] ?? '315px';
         this.storageType = this.field.metadata.storage_type ?? 'private-documents';
-        this.maxTextWidth = metadata?.maxTextWidth ?? '150px';
-        this.minWidth = metadata?.minWidth ?? '185px';
+        this.maxTextWidth = metadata?.maxTextWidth ?? modeConfig['maxTextWidth'] ?? '150px';
+        this.minWidth = metadata?.minWidth ?? modeConfig['minWidth'] ?? '185px';
     }
 }

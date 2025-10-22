@@ -26,10 +26,12 @@
 */
 -->
 <div class="attachments attachments-list-mode">
-    <div [class.d-none]="!uploadedFiles()" class="uploaded-files">
+    <div *ngIf="uploadedFiles()?.length" class="uploaded-files"  #wrapper>
         <scrm-multiple-uploaded-files
                 [files]="uploadedFiles()"
                 [breakpoint]="breakpoint"
+                [ancestorSelector]="'scrm-attachments-list'"
+                [wrapper]="wrapper"
                 [chunks]="chunks"
                 [popoverMaxTextLength]="popoverMaxTextLength"
                 [popoverMinWidth]="popoverMinWidth"

@@ -56,7 +56,7 @@ export class AttachmentEditFieldComponent extends BaseAttachmentComponent implem
 
     ngOnInit() {
         super.ngOnInit();
-        this.getValuesFromMetadata();
+        this.getValuesFromMetadata('edit');
 
         if (this.validStorageTypes.includes(this.storageType)) {
             this.isValidStorageType = true;
@@ -78,8 +78,9 @@ export class AttachmentEditFieldComponent extends BaseAttachmentComponent implem
         protected legacyEntrypointLinkBuilder: LegacyEntrypointLinkBuilder,
         protected systemConfigs: SystemConfigStore
     ) {
-        super(typeFormatter, logic, logicDisplay, mediaObjectsService, legacyEntrypointLinkBuilder);
+        super(typeFormatter, logic, logicDisplay, mediaObjectsService, legacyEntrypointLinkBuilder, systemConfigs);
     }
+
 
     onFileAdd(files: FileList) {
         if (!files || files.length === 0) {

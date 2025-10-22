@@ -26,7 +26,7 @@
 */
 -->
 <div class="attachments attachments-detail-mode">
-    <div [class.d-none]="!uploadedFiles()" class="uploaded-files" #wrapper>
+    <div *ngIf="uploadedFiles()?.length" class="uploaded-files" #wrapper>
         <scrm-multiple-uploaded-files class="d-flex flex-column"
                                       [files]="uploadedFiles()"
                                       [breakpoint]="breakpoint"

@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
 import {ViewContext} from '../../../../common/views/view.model';
 import {WidgetMetadata} from '../../../../common/metadata/widget.metadata';
@@ -56,10 +56,11 @@ export class ListContainerComponent implements OnInit, OnDestroy {
     screen: ScreenSize = ScreenSize.Medium;
     maxColumns = 5;
     tableConfig: TableConfig;
-    displayWidgets: boolean = true;
-    swapWidgets: boolean = false;
+    showSidebar: WritableSignal<boolean> = signal(true);
+    swapWidgets: WritableSignal<boolean> = signal(false);
     sidebarWidgetConfig: any;
-    widgetDisplayType: string = 'none';
+    widgetDisplayType: WritableSignal<string> = signal('none');
+    displayWidgets: WritableSignal<boolean> = signal(false);
 
     protected subs: Subscription[] = [];
 
@@ -90,12 +91,24 @@ export class ListContainerComponent implements OnInit, OnDestroy {
 
         this.subs.push(this.sidebarWidgetAdapter.config$.subscribe(sidebarWidgetConfig => {
             this.sidebarWidgetConfig = sidebarWidgetConfig;
-            this.displayWidgets = this.store.widgets && this.store.showSidebarWidgets;
-            this.widgetDisplayType = this.getDisplay(!!(this.sidebarWidgetConfig.show && this.sidebarWidgetConfig.widgets));
+            this.showSidebar.set(this.store.widgets && this.store.showSidebarWidgets);
+            const widgetDisplayType = this.getDisplay(!!(this.sidebarWidgetConfig.show && this.sidebarWidgetConfig.widgets));
+
+            if (widgetDisplayType !== this.widgetDisplayType()) {
+                if (widgetDisplayType === 'none') {
+                    this.displayWidgets.set(false);
+                } else {
+                    setTimeout(() => {
+                        this.displayWidgets.set(true);
+                    }, 500)
+                }
+            }
+
+            this.widgetDisplayType.set(widgetDisplayType);
         }));
 
         this.subs.push(this.sidebarWidgetHandler.widgetSwap$.subscribe(swap => {
-            this.swapWidgets = swap;
+            this.swapWidgets.set(swap);
         }));
     }
 

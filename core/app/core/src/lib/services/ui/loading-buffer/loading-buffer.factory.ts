@@ -36,10 +36,11 @@ export class LoadingBufferFactory {
     constructor(protected config: SystemConfigStore) {
     }
 
-    create(delayConfigKey: string = 'loading_display_delay'): LoadingBuffer {
+    create(delayConfigKey: string = 'loading_display_delay', initialStatus: boolean = false): LoadingBuffer {
         return new LoadingBuffer(
             this.config,
-            delayConfigKey
+            delayConfigKey,
+            initialStatus
         );
     }
 }

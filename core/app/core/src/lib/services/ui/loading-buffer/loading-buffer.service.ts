@@ -34,13 +34,20 @@ export class LoadingBuffer {
 
     loading$: Observable<boolean>;
 
-    protected loadingStore = new BehaviorSubject<boolean>(false);
-    protected loadingBufferStore = new BehaviorSubject<boolean>(false);
+    protected loadingStore: BehaviorSubject<boolean>;
+    protected loadingBufferStore: BehaviorSubject<boolean>;
     protected loadingBufferStore$: Observable<boolean>;
     protected subs: Subscription[] = [];
     protected buffered = false;
 
-    constructor(protected config: SystemConfigStore, protected delayConfigKey: string = 'loading_display_delay') {
+    constructor(
+        protected config: SystemConfigStore,
+        protected delayConfigKey: string = 'loading_display_delay',
+        protected initialStatus: boolean = false
+    ) {
+
+        this.loadingStore = new BehaviorSubject<boolean>(initialStatus);
+        this.loadingBufferStore = new BehaviorSubject<boolean>(initialStatus);
 
         this.loading$ = this.loadingStore.asObservable();
 

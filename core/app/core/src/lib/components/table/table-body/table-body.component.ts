@@ -74,7 +74,7 @@ export class TableBodyComponent implements OnInit, OnDestroy {
         protected fieldManager: FieldManager,
         protected loadingBufferFactory: LoadingBufferFactory
     ) {
-        this.loadingBuffer = this.loadingBufferFactory.create('table_loading_display_delay');
+        this.loadingBuffer = this.loadingBufferFactory.create('table_loading_display_delay', true);
     }
 
     ngOnInit(): void {

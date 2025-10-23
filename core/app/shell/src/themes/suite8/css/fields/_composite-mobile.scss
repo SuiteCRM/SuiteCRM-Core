@@ -24,18 +24,29 @@
  * the words "Supercharged by SuiteCRM".
  */
 @media all and (max-width: $breakpoint-xxlarge) {
-    .composite-field-wrapper {
-      flex-wrap: wrap;
-      .checkbox-container {
-        input {
-          position: inherit;
-        }
+
+  .composite-field-wrapper:has(> :nth-child(3):last-child) > :nth-child(n+2) {
+    height: 80% !important;
+  }
+
+  .composite-field-wrapper:has(> :nth-child(3):nth-last-child(1)) > :first-child {
+    height: 50% !important;
+  }
+
+  .composite-field-wrapper:has(> :nth-child(2)) {
+    flex-wrap: wrap;
+    height: 50% !important;
+
+    .checkbox-container {
+      input {
+        position: inherit;
       }
     }
   }
+}
 
-  @media all and (max-width: $breakpoint-xxlarge) {
-    .mailto-field {
-      margin-top: 0.5em;
-    }
+@media all and (max-width: $breakpoint-xxlarge) {
+  .mailto-field {
+    margin-top: 0.5em;
   }
+}

@@ -420,7 +420,7 @@ class AppMetadataProvider implements AppMetadataProviderInterface
                 continue;
             }
 
-            if (!in_array($module, $this->moduleRegistryHandler->getUserAccessibleModules())) {
+            if (!in_array($this->moduleNameMapper->toLegacy($module), $this->moduleRegistryHandler->getUserAccessibleModules())) {
                 continue;
             }
 

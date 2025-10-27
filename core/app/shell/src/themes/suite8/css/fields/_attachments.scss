@@ -63,7 +63,8 @@
 
 .field-mode-list.field-type-attachment,
 .field-mode-detail.field-type-attachment,
-.field-mode-edit.field-type-attachment {
+.field-mode-edit.field-type-attachment,
+.field-mode-create.field-type-attachment {
   .attachments.attachments-detail-mode,
   .attachments.attachments-list-mode,
   .attachments.attachments-edit-mode {
@@ -211,7 +212,6 @@
 .attachments {
   display: flex;
   flex-grow: 1;
-  flex-wrap: wrap;
 
   .dropdown-button {
 
@@ -243,12 +243,6 @@
 
         .uploaded-file-name {
           line-height: 1.25 !important;
-        }
-
-        .uploaded-file-actions {
-          .upload-clear-button {
-            font-size: medium !important;
-          }
         }
       }
     }
@@ -374,5 +368,11 @@
         }
       }
     }
+  }
+}
+
+@media (max-width: $breakpoint-small) {
+  .attachments {
+    flex-wrap: wrap;
   }
 }

@@ -138,7 +138,7 @@ export class RecordPaginationService {
 
     public getRecordPaginationObj(module: string): RecordPaginationModel {
         const key = module + '-' + 'recordview-current-record-pagination';
-        const data = this.localStorageService.get(key)[module];
+        const data = this.localStorageService.get(key)[module] ?? null;
         if (!data || emptyObject(data)) {
             return;
         }

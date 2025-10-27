@@ -75,7 +75,7 @@ export class LocalStorageService {
             store = JSON.parse(storeJson);
         }
 
-        return store[key];
+        return store[key] ?? {};
     }
 
     protected getLocalStorage(): Storage {

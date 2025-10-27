@@ -36,8 +36,7 @@
                             <scrm-uploaded-file
                                     class="file"
                                     [file]="file"
-                                    [minWidth]="minWidth"
-                                    [maxTextWidth]="maxTextWidth"
+                                    [maxTextWidth]="maxTextWidth()"
                                     [compact]="compact"
                                     [allowClear]="false"
                             >
@@ -54,8 +53,7 @@
                             <scrm-uploaded-file
                                     class="file"
                                     [file]="file"
-                                    [minWidth]="minWidth"
-                                    [maxTextWidth]="maxTextWidth"
+                                    [maxTextWidth]="maxTextWidth()"
                                     [allowClear]="false"
                                     [savedIcon]="'download-arrow'"
                                     [displaySize]="false"
@@ -67,8 +65,8 @@
 
                 </ng-container>
                 <ng-container *ngIf="displayType !== 'link' && displayType !== 'button'">
-                    <scrm-uploaded-file *ngFor="let file of group" class="file pl-1" [file]="file" [minWidth]="minWidth"
-                                        [maxTextWidth]="maxTextWidth"
+                    <scrm-uploaded-file *ngFor="let file of group" class="file pl-1" [file]="file"
+                                        [maxTextWidth]="maxTextWidth()"
                                         [allowClear]="allowClear"
                                         [compact]="compact"
                                         (clear)="clearFiles($event)">
@@ -90,8 +88,7 @@
                                 <scrm-uploaded-file
                                         class="file"
                                         [file]="file"
-                                        [minWidth]="minWidth"
-                                        [maxTextWidth]="maxTextWidth"
+                                        [maxTextWidth]="maxTextWidth()"
                                         [compact]="compact"
                                         [allowClear]="false"
                                 >
@@ -106,8 +103,7 @@
                                         class="file"
                                         [file]="file"
                                         [compact]="compact"
-                                        [minWidth]="minWidth"
-                                        [maxTextWidth]="maxTextWidth"
+                                        [maxTextWidth]="maxTextWidth()"
                                         [allowClear]="false"
                                         [savedIcon]="'download-arrow'"
                                         [displaySize]="false"
@@ -117,9 +113,8 @@
                         </ng-container>
                         <ng-container *ngIf="displayType !== 'link' && displayType !== 'button'">
                             <scrm-uploaded-file class="pl-1 file" [file]="file" [compact]="compact"
-                                                [minWidth]="minWidth"
                                                 [allowClear]="allowClear"
-                                                [maxTextWidth]="maxTextWidth"
+                                                [maxTextWidth]="maxTextWidth()"
                                                 (clear)="clearFiles($event)">
                             </scrm-uploaded-file>
                         </ng-container>
@@ -134,7 +129,7 @@
                      *ngFor="let file of files.slice(breakpoint)">
                     <scrm-uploaded-file class="d-flex justify-content-center pr-1" [file]="file" [compact]="compact"
                                         [allowClear]="allowClear"
-                                        [minWidth]="popoverMinWidth" [maxTextWidth]="popoverMaxTextLength"
+                                        [maxTextWidth]="maxTextWidth()"
                                         (clear)="clearFiles($event)">
                     </scrm-uploaded-file>
                 </div>

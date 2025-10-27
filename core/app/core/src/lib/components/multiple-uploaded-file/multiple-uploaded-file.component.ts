@@ -52,6 +52,7 @@ export class MultipleUploadedFileComponent implements OnChanges, OnInit, AfterVi
     popover: WritableSignal<HTMLElement> = signal({} as HTMLElement);
     loading: WritableSignal<boolean> = signal(true);
     protected subs: Subscription[] = [];
+    maxTextWidth: WritableSignal<string> = signal('');
 
     @Input() files: UploadedFile[] = [];
     @Input() allowClear: boolean = true;
@@ -119,6 +120,15 @@ export class MultipleUploadedFileComponent implements OnChanges, OnInit, AfterVi
         const maxAllowed = this.chunks ?? 100;
 
         this.maxPerRow = Math.min(maxCalculated, maxAllowed);
+
+        const availableWidthPerItem = this.maxPerRowWidth / this.maxPerRow;
+        const iconWidth = 32;
+        const buttonWidth = 32;
+        const padding = 20;
+        const sizeWidth = this.displayType !== 'link' ? 60 : 0; // File size display width
+
+        const dynamicTextWidth = Math.max(100, availableWidthPerItem - iconWidth - buttonWidth - padding - sizeWidth);
+        this.maxTextWidth.set(`${Math.floor(dynamicTextWidth)}px`);
 
         const visibleFiles = this.files.slice(0, this.breakpoint ?? 2);
         this.chunkedArray.set(this.chunkArray(visibleFiles, this.maxPerRow));

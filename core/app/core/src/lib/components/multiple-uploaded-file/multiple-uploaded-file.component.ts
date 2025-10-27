@@ -185,6 +185,7 @@ export class MultipleUploadedFileComponent implements OnChanges, AfterViewInit, 
         this.loading.set(true);
         setTimeout(() => {
             this.calculateDynamicMaxPerRow();
+            this.setPopover();
             this.loading.set(false);
         }, 150);
     }

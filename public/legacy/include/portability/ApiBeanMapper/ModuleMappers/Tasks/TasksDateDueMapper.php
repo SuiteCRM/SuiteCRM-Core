@@ -58,15 +58,20 @@ class TasksDateDueMapper implements FieldMapperInterface
      */
     public function toApi(SugarBean $bean, array &$container, string $alternativeName = ''): void
     {
-        $altName = 'date_end';
+        $field = 'date_end';
 
-        if (empty($bean->$altName)) {
-            $container[$altName] = '';
+        if (!isset($bean->$field)) {
+            $field = $this->getField();
         }
 
-        $dbDate = $this->dateFormatService->toDBDateTime($bean->$altName);
+        if (empty($bean->$field)) {
+            $container[$field] = '';
+            return;
+        }
 
-        $container[$altName] = $dbDate;
+        $dbDate = $this->dateFormatService->toDBDateTime($bean->$field);
+
+        $container[$field] = $dbDate;
     }
 
     /**

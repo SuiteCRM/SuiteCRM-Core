@@ -42,9 +42,6 @@ export class BaseAttachmentComponent extends BaseFileComponent {
     breakpoint: number;
     compact: boolean;
     chunks: number;
-    popoverMaxTextLength: string;
-    popoverMinWidth: string;
-    maxTextWidth: string;
     minWidth: string;
     popoverLinkPosition: string;
     storageType: string;
@@ -108,10 +105,7 @@ export class BaseAttachmentComponent extends BaseFileComponent {
         this.chunks = metadata?.maxPerRow ?? modeConfig['maxPerRow'] ?? null;
         this.compact = metadata?.compact ?? modeConfig['compact'] ?? false;
         this.popoverLinkPosition = metadata?.popoverLinkPosition ?? modeConfig['popoverLinkPosition'] ?? 'bottom';
-        this.popoverMaxTextLength = metadata?.popoverMaxTextLength ?? modeConfig['popoverMaxTextLength'] ?? '200px';
-        this.popoverMinWidth = metadata?.popoverMinWidth ?? modeConfig['popoverMinWidth'] ?? '315px';
         this.storageType = this.field.metadata.storage_type ?? 'private-documents';
-        this.maxTextWidth = metadata?.maxTextWidth ?? modeConfig['maxTextWidth'] ?? '150px';
         this.minWidth = metadata?.minWidth ?? modeConfig['minWidth'] ?? '185px';
     }
 }

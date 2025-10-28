@@ -87,7 +87,14 @@ trait DefinitionEntryHandlingTrait
         ActionAvailabilityChecker $actionAvailabilityChecker,
         ?array $context = []
     ): bool {
-        $availabilityCheckerKeys = $entry['availability'] ?? ['acls'];
+
+        $checker = $entry['availability'] ?? null;
+
+        if (empty($checker)) {
+            $checker = ['acls'];
+        }
+
+        $availabilityCheckerKeys = $checker;
 
         if (empty($availabilityCheckerKeys)) {
             return true;

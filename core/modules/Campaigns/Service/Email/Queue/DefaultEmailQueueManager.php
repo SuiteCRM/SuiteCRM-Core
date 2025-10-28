@@ -212,13 +212,13 @@ class DefaultEmailQueueManager implements EmailQueueManagerInterface
         $queryBuilder = $this->preparedStatementHandler->createQueryBuilder();
 
         $queryBuilder->update('emailman')
-                     ->set('in_queue', ':in_queue')
-                     ->set('send_attempts', 'send_attempts + 1')
-                     ->set('in_queue_date', ':in_queue_date')
-                     ->where('id = :id')
-                     ->setParameter('in_queue', '1')
-                     ->setParameter('in_queue_date', $timedate->now())
-                     ->setParameter('id', $id);
+            ->set('in_queue', ':in_queue')
+            ->set('send_attempts', 'send_attempts + 1')
+            ->set('in_queue_date', ':in_queue_date')
+            ->where('id = :id')
+            ->setParameter('in_queue', '1')
+            ->setParameter('in_queue_date', (new \DateTime())->format('Y-m-d H:i:s'))
+            ->setParameter('id', $id);
 
         try {
             $queryBuilder->executeStatement();

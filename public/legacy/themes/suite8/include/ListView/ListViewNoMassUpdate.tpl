@@ -100,7 +100,19 @@
 				<td scope='row' align='{$params.align|default:'left'}' {if $params.nowrap}nowrap='nowrap' {/if}valign='top'><span sugar="sugar{$colCounter}b">
 					{if $col == 'NAME' || $params.bold}<b>{/if}
 				    {if $params.link && !$params.customCode}
-						<{$pageData.tag.$id[$params.ACLTag]|default:$pageData.tag.$id.MAIN} href="#" onMouseOver="javascript:lvg_nav('{if $params.dynamic_module}{$rowData[$params.dynamic_module]}{else}{$params.module|default:$pageData.bean.moduleDir}{/if}', '{$rowData[$params.id]|default:$rowData.ID}', 'd', {$smarty.foreach.rowIteration.iteration}, this);"  onFocus="javascript:lvg_nav('{if $params.dynamic_module}{$rowData[$params.dynamic_module]}{else}{$params.module|default:$pageData.bean.moduleDir}{/if}', '{$rowData[$params.id]|default:$rowData.ID}', 'd', {$smarty.foreach.rowIteration.iteration}, this);">
+						<{$pageData.tag.$id[$params.ACLTag]|default:$pageData.tag.$id.MAIN}
+                            {capture assign="hrefModule"}{if $params.dynamic_module}{$rowData[$params.dynamic_module]}{else}{$params.module|default:$pageData.bean.moduleDir}{/if}{/capture}
+                            {capture assign="hrefRecordId"}{$rowData[$params.id]|default:$rowData.ID}{/capture}
+                            {capture assign="hrefOffset"}{$smarty.foreach.rowIteration.iteration}{/capture}
+                            {capture assign="hrefReturnModule"}{if $params.dynamic_module}{$rowData[$params.dynamic_module]}{else}{$params.module|default:$pageData.bean.moduleDir}{/if}{/capture}
+                            href="{sugar_link
+                                link_only=true
+                                module=$hrefModule
+                                action='DetailView'
+                                record=$hrefRecordId
+                                extraparams="offset=$hrefOffset&stamp={$pageData.stamp}&return_module=$hrefReturnModule"
+                            }"
+                        >
 						{/if}
 					{if $params.customCode}
 						{sugar_evalcolumn_old var=$params.customCode rowData=$rowData}
@@ -128,7 +140,6 @@
 {include file='include/ListView/ListViewPagination.tpl'}
 </table>
 <script type='text/javascript'>
-{literal}function lvg_nav(m,id,act,offset,t){if(t.href.search(/#/) < 0){return;}else{if(act=='pte'){act='ProjectTemplatesEditView';}else if(act=='d'){ act='DetailView';}else if( act =='ReportsWizard'){act = 'ReportsWizard';}else{ act='EditView';}{/literal}url = 'index.php?module='+m+'&offset=' + offset + '&stamp={$pageData.stamp}&return_module='+m+'&action='+act+'&record='+id;t.href=url;{literal}}}{/literal}
 {literal}function lvg_dtails(id){{/literal}return SUGAR.util.getAdditionalDetails( '{$pageData.bean.moduleDir}',id, 'adspan_'+id);{literal}}{/literal}
 {if $contextMenus}
 	{$contextMenuScript}

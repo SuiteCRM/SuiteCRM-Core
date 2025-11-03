@@ -428,7 +428,7 @@ eoq;
 
         if ($current_user->getEmailClient() == 'sugar') {
             $html =<<<HTML
-            <a class="email-link" href="{$addr}"
+            <a class="email-link" href="mailto:{$addr}"
                     onclick="$(document).openEmailModal(this);"
                     data-module="{$module_name}" data-record-id="{$record_id}"
                     data-module-name="{$name}" data-email-address="{$addr}"

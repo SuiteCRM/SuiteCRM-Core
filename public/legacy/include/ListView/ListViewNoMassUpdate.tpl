@@ -96,7 +96,17 @@
 			{if !empty($quickViewLinks)}
 			<td width='1%' nowrap>
 				{if $pageData.access.edit && $pageData.bean.moduleDir != "Employees"}
-					<a title='{$editLinkString}' id="edit-{$rowData.ID}" href='index.php?action=EditView&module={$params.module|default:$pageData.bean.moduleDir}&record={$rowData[$params.id]|default:$rowData.ID}&offset={$pageData.offsets.current+$smarty.foreach.rowIteration.iteration}&stamp={$pageData.stamp}&return_module={$params.module|default:$pageData.bean.moduleDir}' title="{sugar_translate label="LBL_EDIT_INLINE"}"> <span class="suitepicon suitepicon-action-edit"></span></a>
+					{capture assign="editModule"}{$params.module|default:$pageData.bean.moduleDir}{/capture}
+					{capture assign="editRecordId"}{$rowData[$params.id]|default:$rowData.ID}{/capture}
+					{capture assign="editOffset"}{$pageData.offsets.current+$smarty.foreach.rowIteration.iteration}{/capture}
+					<a title="{sugar_translate label="LBL_EDIT_INLINE"}" id="edit-{$rowData.ID}"
+						href="{sugar_link
+							link_only=true
+							module=$editModule
+							action='EditView'
+							record=$editRecordId
+							extraparams="offset=$editOffset&stamp={$pageData.stamp}&return_module=$editModule"
+						}"> <span class="suitepicon suitepicon-action-edit"></span></a>
 				{/if}
 			</td>
 			{/if}

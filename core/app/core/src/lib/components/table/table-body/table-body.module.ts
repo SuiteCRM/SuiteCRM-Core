@@ -38,6 +38,7 @@ import {LineActionModule} from '../../line-action-menu/line-action-menu.module';
 import {
     RecordDetailsPopupButtonModule
 } from "../../popups/components/record-details-popup-button/record-details-popup-button.module";
+import {TableBodySkeletonModule} from "../table-body-skeleton/table-body-skeleton.module";
 
 @NgModule({
     declarations: [TableBodyComponent],
@@ -51,7 +52,8 @@ import {
         LineActionModule,
         LoadingSpinnerModule,
         LabelModule,
-        RecordDetailsPopupButtonModule
+        RecordDetailsPopupButtonModule,
+        TableBodySkeletonModule
     ]
 })
 export class TableBodyModule {

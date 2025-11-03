@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
 import {BehaviorSubject, combineLatestWith, Observable, of, Subscription} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
 import {ColumnDefinition} from '../../../common/metadata/list.metadata.model';
@@ -59,6 +59,9 @@ export class TableBodyComponent implements OnInit, OnDestroy {
     private activeAction: BehaviorSubject<string> = new BehaviorSubject<string>('');
     protected activeAction$: Observable<string> = this.activeAction.asObservable();
 
+    loading: WritableSignal<boolean> = signal(false);
+    columns: WritableSignal<ColumnDefinition[]> = signal([]);
+    displayedColumns: WritableSignal<string[]> = signal([]);
     activeLineAction: ActiveLineAction;
 
     maxColumns = 4;
@@ -99,6 +102,10 @@ export class TableBodyComponent implements OnInit, OnDestroy {
             this.currentPage = Math.ceil(pagination.pageLast / pagination.pageSize);
         }));
 
+        this.subs.push(this.config.dataSource.connect(null).subscribe(() => {
+            this.setLoading(true);
+            setTimeout(() => this.setLoading(false), 100);
+        }));
 
         this.vm$ = this.config.columns.pipe(
             combineLatestWith(
@@ -147,6 +154,9 @@ export class TableBodyComponent implements OnInit, OnDestroy {
                         offset: (index + 1) + ((this.currentPage - 1) * this.pageSize)
                     };
                 });
+
+                this.columns.set(columns);
+                this.displayedColumns.set(displayedColumns);
 
                 return {
                     columns,
@@ -254,6 +264,7 @@ export class TableBodyComponent implements OnInit, OnDestroy {
         if (this.config.loading$) {
             this.subs.push(this.config.loading$.subscribe(loading => {
                 this.loadingBuffer.updateLoading(loading);
+                this.loading.set(loading);
             }));
 
             loading$ = this.loadingBuffer.loading$;
@@ -263,6 +274,10 @@ export class TableBodyComponent implements OnInit, OnDestroy {
 
     trackRecord(index: number, item: Record): any {
         return item?.id ?? '';
+    }
+
+    protected setLoading(value: boolean): void {
+        this.loading.set(value);
     }
 }
 

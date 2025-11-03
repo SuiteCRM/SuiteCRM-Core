@@ -106,7 +106,8 @@ class ImportCacheFiles
             'tempName' => $fileName,
             'isTempFile' => '1',
         ];
-        return 'index.php?' . http_build_query($params);
+        $url = 'index.php?' . http_build_query($params);
+        return entryPointLink($url);
     }
 
 

@@ -130,3 +130,15 @@ function ajaxLink($url)
 
     return $routeConverter->generateUiLink($url);
 }
+
+/**
+ * Convert legacy entryPoint URL to modern Suite 8 format
+ *
+ * @param string $url Legacy URL with entryPoint parameter (e.g., "index.php?entryPoint=download&id=123")
+ * @return string Modern URL format (e.g., "../ep/download?id=123")
+ */
+function entryPointLink(string $url): string
+{
+    require_once 'include/portability/RouteConverter.php';
+    return (new RouteConverter())->generateUiLinkForEntryPoint($url);
+}

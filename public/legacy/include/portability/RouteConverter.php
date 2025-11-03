@@ -120,6 +120,52 @@ class RouteConverter
     }
 
     /**
+     * Convert legacy entryPoint URL to modern /ep/ format
+     *
+     * @param string $uri Legacy URL with entryPoint parameter (e.g., "index.php?entryPoint=download&id=123")
+     * @return string Modern URL format (e.g., "./ep/download?id=123")
+     */
+    public function convertEntryPointUri(string $uri): string
+    {
+        $query = parse_url($uri, PHP_URL_QUERY);
+
+        if (empty($query)) {
+            return $uri;
+        }
+
+        parse_str($query, $data);
+
+        $entryPoint = $data['entryPoint'] ?? '';
+        if (empty($entryPoint)) {
+            return $uri;
+        }
+
+        unset($data['entryPoint']);
+
+        $convertedUri = "./ep/$entryPoint";
+
+        if (!empty($data)) {
+            $httpQuery = http_build_query($data, '', '&', PHP_QUERY_RFC3986);
+            $convertedUri .= "?$httpQuery";
+        }
+
+        return $convertedUri;
+    }
+
+    /**
+     * Convert legacy entryPoint URL to Suite 8 UI link format
+     *
+     * @param string $uri Legacy URL with entryPoint parameter (e.g., "index.php?entryPoint=download&id=123")
+     * @return string Suite 8 URL format (e.g., "../ep/download?id=123")
+     */
+    public function generateUiLinkForEntryPoint(string $uri): string
+    {
+        $link = $this->convertEntryPointUri($uri);
+
+        return str_replace('./', '../', $link);
+    }
+
+    /**
      * Check if the given $request route is a Legacy route
      *
      * @param string $uri

@@ -99,8 +99,14 @@ class ImportCacheFiles
     public static function convertFileNameToUrl($fileName)
     {
         $fileName = str_replace(self::getImportDir() . "/", "", $fileName);
-        $fileName = "index.php?entryPoint=download&id=ImportErrors&type=import&tempName=" . $fileName . "&isTempFile=1";
-        return $fileName;
+        $params = [
+            'entryPoint' => 'download',
+            'id' => 'ImportErrors',
+            'type' => 'import',
+            'tempName' => $fileName,
+            'isTempFile' => '1',
+        ];
+        return 'index.php?' . http_build_query($params);
     }
 
 

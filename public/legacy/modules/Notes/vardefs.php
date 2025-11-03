@@ -313,6 +313,23 @@ $dictionary['Note'] = array(
                 'isnull'=>'true',
                 'module'=>'Contacts',
                 'source'=>'non-db',
+                'logic' => [
+                    'update-value' => [
+                        'key' => 'updateValue',
+                        'modes' => ['edit', 'create'],
+                        'params' => [
+                            'fieldDependencies' => [
+                                'parent_type',
+                                'parent_name',
+                            ],
+                            'targetValueField' => 'parent_name',
+                            'activeOnFields' => [
+                                'parent_type' => ['Contacts'],
+                                'parent_name' => ['operator' => 'any-value'],
+                            ]
+                        ]
+                    ],
+                ]
             ],
 
          'contact_phone'=>

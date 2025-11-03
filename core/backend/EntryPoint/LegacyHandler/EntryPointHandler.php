@@ -53,7 +53,7 @@ class EntryPointHandler extends LegacyHandler
         $this->init();
 
         /** @var SugarController $controller */
-        $controller = ControllerFactory::getController('home');
+        $controller = ControllerFactory::getController('Home');
 
         $valid = false;
         $auth = true;

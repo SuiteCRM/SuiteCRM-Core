@@ -175,17 +175,30 @@ $dictionary['Note'] = array(
                 'importable' => false,
               ],
 
-          'filename' =>
-            [
-                'name' => 'filename',
-                'vname' => 'LBL_FILENAME',
-                'type' => 'file',
-                'dbType' => 'varchar',
-                'len' => '255',
-                'reportable'=>true,
-                'comment' => 'File name associated with the note (attachment)',
-                'importable' => false,
-            ],
+          'file' => [
+              'name' => 'file',
+              'vname' => 'LBL_FILENAME',
+              'type' => 'file',
+              'len' => '255',
+              'source' => 'non-db',
+              'reportable' => true,
+              'comment' => 'File name associated with the note (attachment)',
+              'importable' => false,
+              'metadata' => [
+                  'storage_type' => 'private-documents'
+              ],
+          ],
+
+          'filename' => [
+              'name' => 'filename',
+              'vname' => 'LBL_FILENAME',
+              'type' => 'varchar',
+              'dbType' => 'varchar',
+              'len' => '255',
+              'reportable' => true,
+              'comment' => 'File name associated with the note (attachment)',
+              'importable' => false,
+          ],
 
           'parent_type'=>
             [

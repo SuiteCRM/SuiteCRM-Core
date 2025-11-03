@@ -29,7 +29,12 @@ import {Record} from '../../../../common/record/record.model';
 
 export interface FieldHandler<T extends BaseField> {
     initDefaultValue(field: T, record: Record, runInitDefaultProcess: boolean): void;
+
     initDefaultValueObject(field: T, record: Record): void;
+
+    updateValue(field: T, value: any, record: Record): void;
+
+    getValue(field: T, record: Record): any;
 }
 
 export interface FieldHandlerMap {

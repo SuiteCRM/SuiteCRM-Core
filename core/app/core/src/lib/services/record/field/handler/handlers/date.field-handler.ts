@@ -31,6 +31,7 @@ import {BaseField, Field} from '../../../../../common/record/field.model';
 import {Record} from '../../../../../common/record/record.model';
 import {BaseFieldHandler} from "./base.field-handler";
 import {MessageService} from "../../../../message/message.service";
+
 @Injectable({
     providedIn: 'root'
 })
@@ -85,7 +86,7 @@ export class DateFieldHandler extends BaseFieldHandler<BaseField> {
                 this.messages.addDangerMessageByKey("ERR_FIELD_LOGIC_BACKEND_CALCULATION");
                 return;
             }
-            this.updateValue(field, value.toString(), record);
+            this.setValue(field, value.toString(), record);
             field.defaultValueInitialized = true;
 
         });
@@ -93,7 +94,7 @@ export class DateFieldHandler extends BaseFieldHandler<BaseField> {
 
     }
 
-    protected updateValue(field: Field, value: string, record: Record): void {
+    protected setValue(field: Field, value: string, record: Record): void {
         field.value = value.toString();
         field.formControl.setValue(value);
         // re-validate the parent form-control after value update

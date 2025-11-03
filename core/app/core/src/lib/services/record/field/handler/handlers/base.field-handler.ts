@@ -32,6 +32,7 @@ import {take} from "rxjs/operators";
 import {ProcessService} from "../../../../process/process.service";
 import {MessageService} from "../../../../message/message.service";
 import {isVoid} from "../../../../../common/utils/value-utils";
+import {isArray, isNil, isObject, isString} from "lodash-es";
 
 @Injectable({
     providedIn: 'root'
@@ -42,6 +43,40 @@ export class BaseFieldHandler<T extends BaseField> implements FieldHandler<T> {
         protected processService: ProcessService,
         protected messages: MessageService,
     ) {
+    }
+
+    getValue(field: T, record: Record): any {
+        if (field.valueList) {
+            return field.valueList;
+        }
+
+        if (field.valueObject) {
+            return field.valueObject;
+        }
+
+        if (field.valueObjectArray) {
+            return field.valueObject;
+        }
+
+        return field.value;
+    }
+
+    updateValue(field: T, value: any, record: Record): void {
+        if (isArray(value)) {
+            this.updateValueByType(field, 'valueList', value, record);
+        }
+
+        if (isObject(value)) {
+            this.updateValueByType(field, 'valueObject', value, record);
+        }
+
+        if (isNil(value)) {
+            this.updateValueByType(field, 'value', '', record);
+        }
+
+        if (isString(value) || typeof value === 'number' || typeof value === 'boolean') {
+            this.updateValueByType(field, 'value', value, record);
+        }
     }
 
     initDefaultValue(field: T, record: Record, runInitDefaultProcess: boolean = false): void {

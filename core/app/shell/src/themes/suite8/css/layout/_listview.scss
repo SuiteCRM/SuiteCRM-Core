@@ -141,6 +141,10 @@
   max-width: 220px;
 }
 
+.table .skeleton-line-actions {
+  background-color: #c4b8dc!important;
+}
+
 .table .show-more-column {
   float: none !important;
   width: 16px;
@@ -186,6 +190,10 @@
 .list-view-table a {
   color: $burnt-red;
   font-weight: bold;
+}
+
+.list-view-table .box-loading {
+    background-color: lightgrey;
 }
 
 .pipeline-chart,

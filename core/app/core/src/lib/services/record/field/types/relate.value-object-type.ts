@@ -1,6 +1,6 @@
 /**
  * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
- * Copyright (C) 2024 SuiteCRM Ltd.
+ * Copyright (C) 2025 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -24,16 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {FieldObjectTypeMap} from "./field-object.model";
-import {BaseField} from '../../../common/record/field.model';
-import {MultiEnumField} from "./types/multi-enum.value-object-type";
-import {BoolField} from "./types/bool.value-object-type";
-import {RelateField} from "./types/relate.value-object-type";
+import {BaseField} from '../../../../common/record/field.model';
 
-
-export const baseObjectFieldsTypeMap: FieldObjectTypeMap = {
-    'default': BaseField,
-    'multienum': MultiEnumField,
-    'bool': BoolField,
-    'relate': RelateField
-};
+export class RelateField extends BaseField {
+}

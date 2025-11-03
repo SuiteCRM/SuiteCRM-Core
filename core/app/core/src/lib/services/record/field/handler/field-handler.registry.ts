@@ -30,6 +30,7 @@ import {DateFieldHandler} from "./handlers/date.field-handler";
 import {MultiEnumFieldHandler} from "./handlers/multienum.field-handler";
 import {DefaultFieldHandler} from "./handlers/default.field-handler";
 import {BaseServiceRegistry} from '../../../../common/registry/base-service.registry';
+import {RelateFieldHandler} from "./handlers/relate.field-handler";
 
 @Injectable({
     providedIn: 'root'
@@ -40,14 +41,16 @@ export class FieldHandlerRegistry extends BaseServiceRegistry<FieldHandler<any>>
     protected constructor(
         protected defaultFieldHandler: DefaultFieldHandler,
         protected dateFieldHandler: DateFieldHandler,
-        protected multienumFieldHandler: MultiEnumFieldHandler
+        protected multienumFieldHandler: MultiEnumFieldHandler,
+        protected relateFieldHandler: RelateFieldHandler
     ) {
         super();
 
         this.defaultMap = {
             'default': defaultFieldHandler,
             'date': dateFieldHandler,
-            'multienum': multienumFieldHandler
+            'multienum': multienumFieldHandler,
+            'relate': relateFieldHandler
         };
 
         this.initDefault();

@@ -55,7 +55,7 @@ export class BoolField extends BaseField {
             })
         }
         if (changed) {
-            this.emitValueChanges();
+            this.emitValueChanges('value');
         }
     }
 }

@@ -72,7 +72,7 @@ export class RelateEditFieldComponent extends BaseRelateComponent implements Aft
     @HostListener('document:click', ['$event'])
     onDocClick(event) {
         const clickedInside = this.tag?.el?.nativeElement.contains(event.target);
-        if (!clickedInside){
+        if (!clickedInside) {
             this.tag.hide();
         }
     }
@@ -85,6 +85,8 @@ export class RelateEditFieldComponent extends BaseRelateComponent implements Aft
     placeholderLabel: string = '';
     emptyFilterLabel: Signal<string> = signal('');
     filterValue: string | undefined = '';
+
+    protected onAddChangeTriggered: boolean = false;
 
 
     /**
@@ -140,6 +142,24 @@ export class RelateEditFieldComponent extends BaseRelateComponent implements Aft
         if (this.field?.definition?.filterOnEmpty ?? false) {
             this.tag.onLazyLoad.emit();
         }
+
+        this.subs.push(this.field.valueChanges$.subscribe((changes) => {
+            if (changes.triggerValue != 'valueObject') {
+                return;
+            }
+
+            if (this.onAddChangeTriggered) {
+                this.onAddChangeTriggered = false;
+                return;
+            }
+
+            if (!this.field.valueObject || !this.field.valueObject.id) {
+                this.selectedValue = {};
+                return;
+            }
+
+            this.updateInput();
+        }));
     }
 
     protected init(): void {
@@ -356,6 +376,7 @@ export class RelateEditFieldComponent extends BaseRelateComponent implements Aft
     protected setValue(id: string, relateValue: string, other: AttributeMap = {}): void {
         const relate = this.buildRelate(id, relateValue, other);
         this.field.value = relateValue;
+        this.onAddChangeTriggered = true;
         this.field.valueObject = relate;
         this.field.formControl.setValue(relateValue);
         this.field.formControl.markAsDirty();
@@ -376,16 +397,7 @@ export class RelateEditFieldComponent extends BaseRelateComponent implements Aft
             return;
         }
 
-        const inOptions = (this.options ?? []).some((option) => {
-            return option['id'] === id;
-        });
-
-        if (!inOptions) {
-            const options = this.options ?? [];
-            options.push(this.selectedValue);
-            this.options = options;
-            this.currentOptions.set(this.options)
-        }
+        this.addSelectedValueToOptions();
     }
 
     /**
@@ -458,6 +470,53 @@ export class RelateEditFieldComponent extends BaseRelateComponent implements Aft
     protected setItem(record: Record): void {
         this.tag.writeValue(record.attributes);
         this.onAdd(record.attributes);
+    }
+
+    /**
+     * Update input display when value is changed from outside the component
+     * @protected
+     */
+    protected updateInput(): void {
+        this.tag.writeValue({...this.field.valueObject});
+
+        const rname = this.field?.definition?.rname ?? 'name';
+
+        if (this.field?.metadata?.relateSearchField) {
+            this.field.valueObject[this.field.metadata.relateSearchField] = this.field.valueObject[rname] ?? this.field.valueObject['name'];
+        }
+
+        const relateValue = this.field.valueObject[rname] ?? this.field.valueObject['name'];
+        const id = this.field.valueObject.id;
+
+        if (relateValue) {
+            const relateName = this.getRelateFieldName();
+            this.selectedValue = {...this.field.valueObject, id: id, [relateName]: relateValue};
+        }
+
+        if (this.selectedValue === null) {
+            return;
+        }
+
+        this.addSelectedValueToOptions();
+    }
+
+    /**
+     * Add selected value to options if not already present
+     * @protected
+     */
+    protected addSelectedValueToOptions(): void {
+        const id = this.field.valueObject.id;
+
+        const inOptions = (this.options ?? []).some((option) => {
+            return option['id'] === id;
+        });
+
+        if (!inOptions) {
+            const options = this.options ?? [];
+            options.push(this.selectedValue);
+            this.options = options;
+            this.currentOptions.set(this.options)
+        }
     }
 
     public getTranslatedLabels(): void {
@@ -538,7 +597,6 @@ export class RelateEditFieldComponent extends BaseRelateComponent implements Aft
             criteria
         };
     }
-
 
 
     focusFilterInput() {

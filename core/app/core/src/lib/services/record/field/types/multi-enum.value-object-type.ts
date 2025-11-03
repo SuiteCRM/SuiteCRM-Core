@@ -46,6 +46,6 @@ export class MultiEnumField extends BaseField {
             return;
         }
 
-        this.emitValueChanges();
+        this.emitValueChanges('value');
     }
 }

@@ -215,8 +215,8 @@ export interface Field {
     validators?: ValidatorFn[];
     asyncValidators?: AsyncValidatorFn[];
     itemFormArraySaveValidators?: ValidatorFn[];
-    valueSubject?: BehaviorSubject<FieldValue>;
-    valueChanges$?: Observable<FieldValue>;
+    valueSubject?: BehaviorSubject<FieldValueChanges>;
+    valueChanges$?: Observable<FieldValueChanges>;
     fieldDependencies?: ObjectMap;
     attributeDependencies?: AttributeDependency[];
     logic?: FieldLogicMap;
@@ -261,8 +261,8 @@ export class BaseField implements Field {
     itemFormArraySaveValidators?: ValidatorFn[];
     asyncValidators?: AsyncValidatorFn[];
     attributes?: FieldAttributeMap;
-    valueSubject?: BehaviorSubject<FieldValue>;
-    valueChanges$?: Observable<FieldValue>;
+    valueSubject?: BehaviorSubject<FieldValueChanges>;
+    valueChanges$?: Observable<FieldValueChanges>;
     fieldDependencies: ObjectMap = {};
     attributeDependencies: AttributeDependency[] = [];
     logic?: FieldLogicMap;
@@ -280,7 +280,7 @@ export class BaseField implements Field {
     defaultValueObjectInitialized: boolean = false;
 
     constructor() {
-        this.valueSubject = new BehaviorSubject<FieldValue>({} as FieldValue);
+        this.valueSubject = new BehaviorSubject<FieldValueChanges>({} as FieldValueChanges);
         this.valueChanges$ = this.valueSubject.asObservable();
         this.display = signal('default');
         this.required = signal(false);
@@ -301,7 +301,7 @@ export class BaseField implements Field {
             })
         }
         if (changed) {
-            this.emitValueChanges();
+            this.emitValueChanges('value');
         }
     }
 
@@ -313,7 +313,7 @@ export class BaseField implements Field {
 
         this.valueListState = value;
 
-        this.emitValueChanges();
+        this.emitValueChanges('valueList');
     }
 
     get valueObject(): any {
@@ -322,7 +322,7 @@ export class BaseField implements Field {
 
     set valueObject(value: any) {
         this.valueObjectState = value;
-        this.emitValueChanges();
+        this.emitValueChanges('valueObject');
     }
 
     get valueObjectArray(): any {
@@ -331,15 +331,16 @@ export class BaseField implements Field {
 
     set valueObjectArray(value: ObjectMap[]) {
         this.valueObjectArrayState = value;
-        this.emitValueChanges();
+        this.emitValueChanges('valueObjectArray');
     }
 
-    protected emitValueChanges() {
+    protected emitValueChanges(triggerValue: string) {
         this.valueSubject.next({
             value: this.valueState,
             valueList: this.valueListState,
             valueObject: this.valueObjectState,
-            valueObjectArray: this.valueObjectArrayState
+            valueObjectArray: this.valueObjectArrayState,
+            triggerValue: triggerValue
         })
     }
 
@@ -397,6 +398,10 @@ export interface FieldValue {
     valueList?: string[];
     valueObject?: any;
     valueObjectArray?: ObjectMap[];
+}
+
+export interface FieldValueChanges extends FieldValue{
+    triggerValue?: string;
 }
 
 

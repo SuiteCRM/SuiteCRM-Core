@@ -98,7 +98,7 @@ array(
         array(
           0 =>
           array(
-            'name' => 'filename',
+            'name' => 'file',
           ),
         ),
         3 =>

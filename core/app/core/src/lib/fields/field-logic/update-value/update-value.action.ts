@@ -27,13 +27,14 @@
 import {Injectable} from '@angular/core';
 import {FieldLogicActionData, FieldLogicActionHandler} from '../field-logic.action';
 import {Action} from '../../../common/actions/action.model';
-import {Record} from '../../../common/record/record.model';
 import {Field} from '../../../common/record/field.model';
 import {StringArrayMap} from '../../../common/types/string-map';
 import {ViewMode} from '../../../common/views/view.model';
 import {ActiveFieldsChecker} from "../../../services/condition-operators/active-fields-checker.service";
 import {CurrencyFormatter} from "../../../services/formatters/currency/currency-formatter.service";
 import {ObjectArrayMatrix} from "../../../common/types/object-map";
+import {isObject} from "lodash-es";
+import {FieldHandlerRegistry} from "../../../services/record/field/handler/field-handler.registry";
 
 @Injectable({
     providedIn: 'root'
@@ -43,7 +44,11 @@ export class UpdateValueAction extends FieldLogicActionHandler {
     key = 'updateValue';
     modes = ['edit', 'detail', 'list', 'create', 'massupdate', 'filter'] as ViewMode[];
 
-    constructor(protected activeFieldsChecker: ActiveFieldsChecker, protected currencyFormatter: CurrencyFormatter) {
+    constructor(
+        protected activeFieldsChecker: ActiveFieldsChecker,
+        protected currencyFormatter: CurrencyFormatter,
+        protected fieldHandlerRegistry: FieldHandlerRegistry
+    ) {
         super();
     }
 
@@ -65,18 +70,39 @@ export class UpdateValueAction extends FieldLogicActionHandler {
             return;
         }
 
-        const targetValue = action.params && action.params.targetValue;
+        let targetValue = action.params && action.params.targetValue;
+        const targetValueField = action.params && action.params.targetValueField;
 
-        if (!targetValue) {
+        if (!targetValue && !targetValueField) {
+            return;
+        }
+
+        if (field.type === 'relate' && (!targetValueField && !isObject(targetValue))) {
             return;
         }
 
         const isActive = this.activeFieldsChecker.isActive(relatedFields, record, activeOnFields, relatedAttributesFields, activeOnAttributes);
 
-        let value = data.field?.value;
+        const fieldHandler = this.fieldHandlerRegistry.get(record?.module ?? 'default', field?.type ?? 'varchar');
 
+        let value = fieldHandler.getValue(field, record);
         if (isActive) {
             value = targetValue;
+
+            const targetField = record?.fields[targetValueField] ?? null;
+            let targetFieldValue = fieldHandler?.getValue(targetField, record) ?? null;
+            if (targetFieldValue) {
+                if (field.type === 'relate') {
+                    targetFieldValue = {
+                        'id': targetFieldValue.id ?? '',
+                        'name': targetFieldValue[this.getRelateFieldName(field)] ?? value?.name ?? ''
+                    }
+
+                    targetFieldValue[this.getRelateFieldName(field)] = targetFieldValue['name'] ?? '';
+                }
+
+                value = targetFieldValue;
+            }
         }
 
         if (this.isCurrencyField(field)) {
@@ -87,29 +113,22 @@ export class UpdateValueAction extends FieldLogicActionHandler {
             value = this.currencyFormatter.toUserFormat(value, options);
         }
 
-        this.updateValue(field, value.toString(), record);
-
+        fieldHandler.updateValue(field, value, record);
     }
 
     getTriggeringStatus(): string[] {
         return ['onDependencyChange'];
     }
 
-    /**
-     * Update the new value
-     * @param {object} field
-     * @param value
-     * @param {object} record
-     */
-    protected updateValue(field: Field, value: string, record: Record): void {
-
-        field.value = value.toString();
-        field.formControl.setValue(value);
-        // re-validate the parent form-control after value update
-        record.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
-    }
-
     protected isCurrencyField(field: Field): boolean {
         return field.type === 'currency';
+    }
+
+    protected getRelateFieldName(field: Field): string {
+        if (!field?.definition?.metadata?.relateSearchField) {
+            return (field && field.definition && field.definition.rname) || 'name';
+        }
+
+        return field.definition.metadata.relateSearchField;
     }
 }

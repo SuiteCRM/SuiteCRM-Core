@@ -205,7 +205,7 @@ class SearchDefsDateTypeMapper implements ViewDefinitionMapperInterface
                 continue;
             }
 
-            $enableRangeSearch = $field['enable_range_search'] ?? false;
+            $enableRangeSearch = $field['enable_range_search'] ?? $field['fieldDefinition']['enable_range_search'] ?? false;
 
             if ($enableRangeSearch === 0 || $enableRangeSearch === false || $enableRangeSearch === '0' || $enableRangeSearch === 'false') {
                 continue;

@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,7 +26,8 @@
 
 import {Injectable} from '@angular/core';
 import {SystemConfigStore} from '../../store/system-config/system-config.store';
-import {Field, Record} from 'common';
+import {Field} from '../../common/record/field.model';
+import {Record} from '../../common/record/record.model';
 import {divide, multiply, round} from 'mathjs';
 import {UserPreferenceStore} from '../../store/user-preference/user-preference.store';
 
@@ -45,6 +46,13 @@ export class CurrencyService {
         const isBase = this.isBase(field);
         const currencyId = this.getCurrencyId(record);
 
+        // If currency_id is -99, don't do any conversion
+        // Just return the value as-is (it's already in USD)
+        // Created by Advocotek
+        if (currencyId === '-99') {
+            return field.value;
+        }
+
         if (!isBase && currencyId !== null) {
             return field.value;
         }
@@ -55,9 +63,13 @@ export class CurrencyService {
             return field.value;
         }
 
-        const userCurrency = this.getUserCurrency();
+        let currency = this.getUserCurrency();
 
-        return this.baseToCurrency(userCurrency.id, value).toString();
+        if (!currency?.id) {
+            currency = this.getBaseCurrency();
+        }
+
+        return this.baseToCurrency(currency.id, value).toString();
     }
 
     baseToCurrency(currencyId: string, value: number): number {
@@ -86,7 +98,16 @@ export class CurrencyService {
     }
 
     getCurrencyId(record: Record): string {
-        return record?.fields?.currency_id?.value ?? null;
+        // First try to get from fields (standard way)
+        let currencyId = record?.fields?.currency_id?.value ?? null;
+
+        // Fallback to attributes (for fields not in listviewdefs)
+        // Created by Advocotek
+        if (currencyId === null) {
+            currencyId = record?.attributes?.currency_id ?? null;
+        }
+
+        return currencyId;
     }
 
     isBase(field: Field): boolean {

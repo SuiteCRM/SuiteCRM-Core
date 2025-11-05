@@ -31,6 +31,7 @@ import {Observable, Subscription} from "rxjs";
 import {StringMap} from "../../../../common/types/string-map";
 import {FieldMap} from "../../../../common/record/field.model";
 import {toObservable} from "@angular/core/rxjs-interop";
+import {MaximizeButtonStatus} from "../../../maximize-button/maximize-button.component";
 
 @Component({
     selector: 'scrm-modal',
@@ -56,16 +57,24 @@ export class ModalComponent implements OnInit, OnDestroy {
     @Input() limitLabel = 'LBL_LIMIT';
     @Input() closable: boolean = false;
     @Input() minimizable: boolean = false;
+    @Input() maximizable: boolean = false;
     @Input() isMinimized$: Observable<boolean>;
+    @Input() isMaximized$: Observable<boolean>;
     @Input() close: ButtonInterface = {
         klass: ['btn', 'btn-outline-light', 'btn-sm']
     } as ButtonInterface;
     @Output('onMinimizeToggle') onMinimizeToggle: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @Output('onMaximizeToggle') onMaximizeToggle: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     isMinimized: WritableSignal<boolean> = signal(false);
     minimiseButton: ButtonInterface;
     minimiseStatus: WritableSignal<MinimiseButtonStatus> = signal('maximised');
     minimiseStatus$: Observable<MinimiseButtonStatus> = toObservable(this.minimiseStatus);
+
+    isMaximized: WritableSignal<boolean> = signal(false);
+    maximizeButton: ButtonInterface;
+    maximizeStatus: WritableSignal<MaximizeButtonStatus> = signal('inactive');
+    maximizeStatus$: Observable<MaximizeButtonStatus> = toObservable(this.maximizeStatus);
 
     protected subs: Subscription[] = [];
 
@@ -76,7 +85,14 @@ export class ModalComponent implements OnInit, OnDestroy {
                 this.initMinimiseButton();
             }));
         }
+        if (this.isMaximized$) {
+            this.subs.push(this.isMaximized$.subscribe(maximize => {
+                this.isMaximized.set(maximize);
+                this.initMaximizeButton();
+            }));
+        }
         this.initMinimiseButton();
+        this.initMaximizeButton();
     }
 
     ngOnDestroy(): void {
@@ -97,6 +113,11 @@ export class ModalComponent implements OnInit, OnDestroy {
         this.isMinimized.set(!this.isMinimized());
         this.onMinimizeToggle.emit(this.isMinimized());
         this.initMinimiseStatus();
+        if (this.isMinimized()) {
+            this.isMaximized.set(false);
+            this.onMinimizeToggle.emit(this.isMaximized());
+            this.initMaximizeStatus();
+        }
     }
 
     initMinimiseStatus(): void {
@@ -105,6 +126,35 @@ export class ModalComponent implements OnInit, OnDestroy {
             return;
         }
         this.minimiseStatus.set('maximised');
+    }
+
+    initMaximizeButton(): void {
+        this.maximizeButton = {
+            klass: ['btn', 'btn-outline-light', 'btn-sm', 'border-0'],
+            onClick: () => {
+                this.toggleMaximize();
+            },
+        } as ButtonInterface;
+        this.initMaximizeStatus();
+    }
+
+    toggleMaximize(): void {
+        this.isMaximized.set(!this.isMaximized());
+        this.onMinimizeToggle.emit(this.isMaximized());
+        this.initMaximizeStatus();
+        if (this.isMaximized()) {
+            this.isMinimized.set(false);
+            this.onMinimizeToggle.emit(this.isMinimized());
+            this.initMinimiseStatus();
+        }
+    }
+
+    initMaximizeStatus(): void {
+        if (this.isMaximized()) {
+            this.maximizeStatus.set('active');
+            return;
+        }
+        this.maximizeStatus.set('inactive');
     }
 
 }

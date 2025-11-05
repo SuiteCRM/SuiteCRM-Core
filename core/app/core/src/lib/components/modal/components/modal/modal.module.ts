@@ -34,6 +34,7 @@ import {CloseButtonModule} from '../../../close-button/close-button.module';
 import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {MinimiseButtonModule} from "../../../minimise-button/minimise-button.module";
 import {DynamicLabelModule} from "../../../dynamic-label/dynamic-label.module";
+import {MaximizeButtonModule} from "../../../maximize-button/maximize-button.module";
 
 @NgModule({
     declarations: [ModalComponent],
@@ -45,6 +46,7 @@ import {DynamicLabelModule} from "../../../dynamic-label/dynamic-label.module";
         LabelModule,
         NgbModalModule,
         MinimiseButtonModule,
+        MaximizeButtonModule,
         DynamicLabelModule
     ]
 })

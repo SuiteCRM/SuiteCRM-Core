@@ -56,6 +56,12 @@
                                   [status$]="minimiseStatus$"
             >
             </scrm-minimise-button>
+            <scrm-maximize-button *ngIf="maximizable"
+                                  [config]="maximizeButton"
+                                  [status]="maximizeStatus()"
+                                  [status$]="maximizeStatus$"
+            >
+            </scrm-maximize-button>
             <scrm-close-button *ngIf="closable" [config]="close"></scrm-close-button>
         </div>
     </div>

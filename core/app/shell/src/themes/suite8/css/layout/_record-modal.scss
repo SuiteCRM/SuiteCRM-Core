@@ -144,7 +144,7 @@ body.modal-open.detached-modal-open {
 
 #detached-modals {
   position: fixed !important;
-  right: 45px;
+  right: 0;
   bottom: 0;
   margin: 0;
   transform: translate(0) !important;
@@ -163,6 +163,10 @@ body.modal-open.detached-modal-open {
 
     &:first-child {
       margin-left: 0;
+    }
+
+    &:not(.maximized):last-child {
+      margin-right: 45px;
     }
 
     .modal-header {
@@ -228,8 +232,11 @@ body.modal-open.detached-modal-open {
 
 @media (min-width: 992px) {
   .detached-modal {
-    .modal-dialog.modal-lg, .modal-dialog.modal-xl {
+    .modal-dialog.modal-lg {
       max-width: 614px;
+    }
+
+    .modal-dialog.modal-lg, .modal-dialog.modal-xl {
 
       .modal-header {
         .modal-title {
@@ -271,9 +278,11 @@ body.modal-open.detached-modal-open {
 
 @media (min-width: 576px) and (max-width: 991px) {
   .detached-modal {
+    .modal-dialog.modal-lg {
+      max-width: 500px;
+    }
 
     .modal-dialog.modal-lg, .modal-dialog.modal-xl {
-      max-width: 500px;
 
       .modal-header {
         .modal-title {
@@ -302,6 +311,69 @@ body.modal-open.detached-modal-open {
                 .full-row {
                   .squire-editor {
                     max-width: 468px;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 576px) {
+
+  #detached-modals {
+
+    .detached-modal {
+      &.maximized {
+        position: fixed;
+        inset: 100%;
+        height: 94vh;
+        max-height: 94vh;
+        width: 82vw;
+        max-width: 82vw;
+        transform: translate(-91vw,-97vh);
+        z-index: 1060;
+
+        .modal-dialog {
+          height: 94vh;
+          max-height: 94vh;
+          width: 82vw;
+          max-width: 82vw;
+
+          .modal-content {
+            height: 100%;
+
+            scrm-record-modal {
+              height: 100%;
+              scrm-modal {
+                height: 100%;
+                .record-modal {
+                  height: 100%;
+                  .modal-body {
+                    max-height: calc(94vh - 84px)!important;
+                    .record-content.panel-layout {
+                      .row:first-child {
+                        .card-body {
+                          .field-layout {
+                            .field-layout-row {
+                              .full-row {
+                                .squire-editor {
+                                  max-width: 94vw;
+                                  iframe {
+                                    height: calc(94vh - 286px)!important;
+                                    max-height: calc(94vh - 286px)!important;
+                                    min-height: 20vh !important;
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }

@@ -107,6 +107,7 @@ class DateFieldDefaultCalculation extends LegacyHandler implements ProcessHandle
         $displayDefault = $options['displayDefault'];
 
         $this->init();
+        $this->startLegacyApp();
 
         /* @noinspection PhpIncludeInspection */
         require_once 'include/portability/Services/DateTime/DateTimeService.php';

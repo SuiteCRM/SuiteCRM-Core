@@ -27,7 +27,7 @@ parameters:
     notes:
       index: true
       list: true
-      record: false
+      record: true
     leads:
       index: true
       list: true

@@ -1628,7 +1628,11 @@ class AOR_Report extends Basic
                             break;
 
                         case 'Date':
-                            $params = unserialize(base64_decode($condition->value),['allowed_classes' => false]);
+                            if(is_array($condition->value)) {
+                                $params = $condition->value;
+                            } else {
+                                $params = unserialize(base64_decode($condition->value),['allowed_classes' => false]);
+                            }
 
                             // Fix for issue #1272 - AOR_Report module cannot update Date type parameter.
                             if ($params == false) {

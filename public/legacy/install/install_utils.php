@@ -2478,7 +2478,7 @@ function enableSugarFeeds()
 
 function create_writable_dir($dirname)
 {
-    if ((is_dir($dirname)) || @sugar_mkdir($dirname, 0755)) {
+    if ((is_dir($dirname)) || @sugar_mkdir($dirname, 0755, true)) {
         $ok = make_writable($dirname);
     }
     if (empty($ok)) {

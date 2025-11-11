@@ -144,6 +144,6 @@
         </a>
     </div>
 </ng-container>
-<ng-container *ngIf="loading()">
+<ng-container *ngIf="loading() && (files.length > 0)">
     <scrm-file-skeleton></scrm-file-skeleton>
 </ng-container>

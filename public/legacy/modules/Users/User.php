@@ -2598,8 +2598,12 @@ EOQ;
 
     public function getEditorType()
     {
+        global $app_list_strings;
+
+        $validEditorTypes = array_keys($app_list_strings['dom_editor_type'] ?? []);
+
         $editorType = $this->getPreference('editor_type');
-        if (!$editorType) {
+        if (!$editorType || !in_array($editorType, $validEditorTypes, true)) {
             $editorType = 'tinymce';
             $this->setPreference('editor_type', $editorType);
         }

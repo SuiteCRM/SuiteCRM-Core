@@ -165,10 +165,6 @@ body.modal-open.detached-modal-open {
       margin-left: 0;
     }
 
-    &:not(.maximized):last-child {
-      margin-right: 45px;
-    }
-
     .modal-header {
       background-color: $main;
 
@@ -212,11 +208,11 @@ body.modal-open.detached-modal-open {
         border-bottom: 0 !important;
 
         .modal-title {
-          max-width: 226px;
+          max-width: 190px;
           overflow: hidden;
 
           span {
-            max-width: 215px;
+            max-width: 185px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -225,6 +221,62 @@ body.modal-open.detached-modal-open {
           }
         }
 
+      }
+    }
+  }
+}
+
+div.record-modal-backdrop {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  z-index: 1039;
+  background-color: rgba(0, 0, 0, .5);
+  width: 100vw;
+  height: 100vh;
+  pointer-events: auto;
+}
+
+@media (min-width: 1201px) {
+  .detached-modal {
+    &.maximized {
+      .modal-dialog {
+        .modal-content {
+          scrm-record-modal {
+            scrm-modal {
+              .record-modal {
+                .modal-body {
+                  .record-content.panel-layout {
+                    .row:first-child {
+                      .card-body {
+                        .field-layout {
+                          .field-layout-row {
+                            .full-row {
+                              &.modal-compose-col {
+                                .field-layout-field-group-wrapper{
+                                  .maximize-col-xl-1 {
+                                    flex: 0 0 8.333333%;
+                                    max-width: 8.333333%;
+                                  }
+                                  .maximize-col-xl-11 {
+                                    flex: 0 0 91.666667%;
+                                    max-width: 91.666667%;
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -240,11 +292,11 @@ body.modal-open.detached-modal-open {
 
       .modal-header {
         .modal-title {
-          max-width: 524px;
+          max-width: 500px;
           overflow: hidden;
 
           span {
-            max-width: 524px;
+            max-width: 500px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -273,6 +325,7 @@ body.modal-open.detached-modal-open {
         }
       }
     }
+
   }
 }
 
@@ -286,11 +339,11 @@ body.modal-open.detached-modal-open {
 
       .modal-header {
         .modal-title {
-          max-width: 426px;
+          max-width: 385px;
           overflow: hidden;
 
           span {
-            max-width: 424px;
+            max-width: 385px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -327,6 +380,11 @@ body.modal-open.detached-modal-open {
   #detached-modals {
 
     .detached-modal {
+
+      &:not(.maximized):last-child {
+        margin-right: 45px;
+      }
+
       &.maximized {
         position: fixed;
         inset: 100%;
@@ -334,7 +392,7 @@ body.modal-open.detached-modal-open {
         max-height: 94vh;
         width: 82vw;
         max-width: 82vw;
-        transform: translate(-91vw,-97vh);
+        transform: translate(-91vw, -97vh);
         z-index: 1060;
 
         .modal-dialog {
@@ -348,29 +406,60 @@ body.modal-open.detached-modal-open {
 
             scrm-record-modal {
               height: 100%;
+
               scrm-modal {
                 height: 100%;
+
                 .record-modal {
                   height: 100%;
+
                   .modal-body {
-                    max-height: calc(94vh - 84px)!important;
+                    max-height: calc(94vh - 84px) !important;
+
                     .record-content.panel-layout {
                       .row:first-child {
                         .card-body {
                           .field-layout {
                             .field-layout-row {
                               .full-row {
+
+                                &.modal-compose-col {
+                                  .field-layout-field-group-wrapper{
+                                    .maximize-col-1 {
+                                      flex: 0 0 8.333333%;
+                                      max-width: 8.333333%;
+                                    }
+                                    .maximize-col-11 {
+                                      flex: 0 0 91.666667%;
+                                      max-width: 91.666667%;
+                                    }
+                                  }
+                                }
                                 .squire-editor {
                                   max-width: 94vw;
+
                                   iframe {
-                                    height: calc(94vh - 286px)!important;
-                                    max-height: calc(94vh - 286px)!important;
+                                    height: calc(94vh - 286px) !important;
+                                    max-height: calc(94vh - 286px) !important;
                                     min-height: 20vh !important;
                                   }
                                 }
                               }
                             }
                           }
+                        }
+                      }
+                    }
+                  }
+
+                  .modal-header {
+                    .modal-title {
+                      max-width: calc(100vw - 26% - 120px);
+
+                      scrm-dynamic-label {
+                        max-width: calc(100vw - 26% - 168px);
+                        span {
+                          max-width: calc(100vw - 26% - 169px);
                         }
                       }
                     }
@@ -405,10 +494,10 @@ body.modal-open.detached-modal-open {
             width: 90vw;
 
             .modal-title {
-              max-width: calc(100vw - 138px);
+              max-width: calc(100vw - 180px);
 
               span {
-                max-width: calc(100vw - 138px);
+                max-width: calc(100vw - 180px);
               }
             }
           }
@@ -452,17 +541,18 @@ body.modal-open.detached-modal-open {
           .modal-title {
 
             &.minimized {
-              max-width: 223px;
+              max-width: 199px;
 
               span {
-                max-width: 223px;
+                max-width: 199px;
               }
             }
 
-            max-width: calc(100vw - 77px);
+            max-width: calc(100vw - 160px);
             overflow: hidden;
+
             span {
-              max-width: calc(100vw - 77px);
+              max-width: calc(100vw - 160px);
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis;

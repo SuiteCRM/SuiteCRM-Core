@@ -25,45 +25,51 @@
 * the words "Supercharged by SuiteCRM".
 */
 -->
-<scrm-modal *ngIf="modalStore"
-            [closable]="true"
-            [close]="closeButton"
-            [titleKey]="titleKey"
-            [descriptionKey]="descriptionKey"
-            [dynamicTitleKey]="dynamicTitleKey"
-            [dynamicTitleContext]="context"
-            [dynamicTitleFields]="fields"
-            [dynamicDescriptionKey]="dynamicDescriptionKey"
-            [dynamicDescriptionFields]="fields"
-            [dynamicDescriptionContext]="context"
-            [minimizable]="minimizable"
-            (onMinimizeToggle)="onMinimizeToggle($event)"
-            bodyKlass="m-0 p-0 small-font scrollbar-thin {{bodyClass}}"
-            footerKlass="border-0 {{footerClass}}"
-            headerKlass="border-bottom {{headerClass}} "
-            klass="record-modal rounded {{wrapperClass}}">
-    <div modal-body>
+<div class="record-modal-container" #modalContainer>
+    <scrm-modal *ngIf="modalStore"
+                [closable]="true"
+                [close]="closeButton"
+                [titleKey]="titleKey"
+                [descriptionKey]="descriptionKey"
+                [dynamicTitleKey]="dynamicTitleKey"
+                [dynamicTitleContext]="context"
+                [dynamicTitleFields]="fields"
+                [dynamicDescriptionKey]="dynamicDescriptionKey"
+                [dynamicDescriptionFields]="fields"
+                [dynamicDescriptionContext]="context"
+                [minimizable]="minimizable"
+                (onMinimizeToggle)="onMinimizeToggle($event)"
+                [isMinimized$]="isMinimized$"
+                [maximizable]="maximizable"
+                (onMaximizeToggle)="onMaximizeToggle($event)"
+                bodyKlass="m-0 p-0 small-font scrollbar-thin {{bodyClass}}"
+                footerKlass="border-0 {{footerClass}}"
+                headerKlass="border-bottom {{headerClass}} "
+                klass="record-modal rounded {{wrapperClass}}">
+        <div modal-body>
 
-        <ng-container *ngIf="!isMinimized()">
-            <div *ngIf="record">
-                <scrm-record-content [dataSource]="contentAdapter"></scrm-record-content>
-            </div>
+            <ng-container *ngIf="!isMinimized()">
+                <div *ngIf="record">
+                    <scrm-record-content [dataSource]="contentAdapter"></scrm-record-content>
+                </div>
 
-            <ng-container *ngIf="(loading$ | async) as loading">
-                <scrm-loading-spinner *ngIf="loading" [overlay]="true"></scrm-loading-spinner>
+                <ng-container *ngIf="(loading$ | async) as loading">
+                    <scrm-loading-spinner *ngIf="loading" [overlay]="true"></scrm-loading-spinner>
+                </ng-container>
             </ng-container>
-        </ng-container>
 
-    </div>
-    <div modal-footer>
-        <div *ngIf="record && modalStore" class="h-100 d-flex justify-content-end">
-            <scrm-action-group-menu
-                    [config]="actionsAdapter"
-                    [actionContext]="viewContext"
-                    buttonClass="settings-button"
-                    [isRunning]="validating"
-            >
-            </scrm-action-group-menu>
         </div>
-    </div>
-</scrm-modal>
+        <div modal-footer>
+            <div *ngIf="record && modalStore" class="h-100 d-flex justify-content-end">
+                <scrm-action-group-menu
+                        [config]="actionsAdapter"
+                        [actionContext]="viewContext"
+                        buttonClass="settings-button"
+                        [isRunning]="validating"
+                >
+                </scrm-action-group-menu>
+            </div>
+        </div>
+    </scrm-modal>
+</div>
+

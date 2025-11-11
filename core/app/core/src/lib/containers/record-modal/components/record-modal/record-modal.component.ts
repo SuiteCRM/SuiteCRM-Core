@@ -24,12 +24,12 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, Input, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
+import {Component, ElementRef, Input, OnDestroy, OnInit, signal, ViewChild, WritableSignal} from '@angular/core';
 import {filter, take} from "rxjs/operators";
 import {CommonModule} from "@angular/common";
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {animate, transition, trigger} from '@angular/animations';
-import {combineLatest, Observable, Subscription} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, Subscription} from 'rxjs';
 import {LabelModule} from "../../../../components/label/label.module";
 import {RecordModalStore} from "../../store/record-modal/record-modal.store";
 import {ModalModule} from "../../../../components/modal/components/modal/modal.module";
@@ -81,6 +81,7 @@ export class RecordModalComponent implements OnInit, OnDestroy {
     @Input() metadataView: string = 'recordView';
     @Input() mode: ViewMode;
     @Input() minimizable: boolean = false;
+    @Input() maximizable: boolean = false;
     @Input() recordId: string = '';
     @Input() parentId: string = '';
     @Input() parentModule: string = '';
@@ -96,6 +97,9 @@ export class RecordModalComponent implements OnInit, OnDestroy {
     @Input() closeConfirmationLabel: string = '';
     @Input() closeConfirmationMessages: string[] = [];
     @Input() closeConfirmationModal: boolean = false;
+    @Input() modalOptions: any = null;
+
+    @ViewChild('modalContainer') modalContainer: ElementRef;
 
     validating: WritableSignal<boolean> = signal(false);
 
@@ -106,7 +110,13 @@ export class RecordModalComponent implements OnInit, OnDestroy {
 
     loading$: Observable<boolean>;
     isMinimized: WritableSignal<boolean> = signal(false);
+    isMinimizedStatus: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    isMinimized$: Observable<boolean> = this.isMinimizedStatus.asObservable();
+    isMaximized: WritableSignal<boolean> = signal(false);
+    modalExpandStatus: string = 'normal';
     protected subs: Subscription[] = [];
+    protected backdropEl: HTMLElement | null = null;
+
 
     constructor(
         protected activeModal: NgbActiveModal,
@@ -150,6 +160,8 @@ export class RecordModalComponent implements OnInit, OnDestroy {
         this.contentAdapter = null
         this.actionsAdapter = null
 
+        this.disableBackdrop();
+
         this.modalStore.clear();
         this.modalStore = null;
         this.subs = [];
@@ -166,7 +178,6 @@ export class RecordModalComponent implements OnInit, OnDestroy {
         this.modalStore = this.storeFactory.create(this.metadataView);
         this.contentAdapter = this.recordModalContentAdapterFactory.create(this.modalStore);
         this.actionsAdapter = this.recordModalActionsAdapterFactory.create(this.modalStore, this.activeModal);
-
 
         this.subs.push(
             this.modalStore.loadMetadata(this.module).pipe(take(1)).subscribe(() => {
@@ -194,7 +205,90 @@ export class RecordModalComponent implements OnInit, OnDestroy {
         this.loading$ = this.modalStore.metadataLoading$;
     }
 
-    onMinimizeToggle($event: boolean) {
-        this.isMinimized.set($event);
+    onMinimizeToggle(minimize: boolean): void {
+        if (minimize === this.isMinimized()) {
+            return;
+        }
+        this.isMinimized.set(minimize);
+
+        if (this.modalExpandStatus === 'normal' && minimize) {
+            this.modalExpandStatus = 'minimized';
+        }
+
+        if (this.modalExpandStatus === 'minimized' && !minimize) {
+            this.modalExpandStatus = 'normal';
+            return;
+        }
+
+        if (this.modalExpandStatus === 'maximized' && minimize) {
+            this.onMaximizeToggle(false);
+            this.modalExpandStatus = 'minimized';
+            return;
+        }
     }
+
+    onMaximizeToggle(maximize: boolean): void {
+        if (maximize === this.isMaximized()) {
+            return;
+        }
+
+        const parent = this.getParentModalWindowElement();
+
+        if (parent == null) {
+            this.isMaximized.set(false);
+            return;
+        }
+
+        if (maximize) {
+            parent.classList.add('maximized');
+            this.enableBackdrop();
+        } else {
+            parent.classList.remove('maximized');
+            this.disableBackdrop()
+        }
+
+        this.isMaximized.set(maximize);
+
+        if (this.modalExpandStatus === 'normal' && maximize) {
+            this.modalExpandStatus = 'maximized';
+        }
+
+        if (this.modalExpandStatus === 'maximized' && !maximize) {
+            this.modalExpandStatus = 'normal';
+            return;
+        }
+
+        if (this.modalExpandStatus === 'minimized' && maximize) {
+            this.modalExpandStatus = 'maximized';
+            this.isMinimized.set(false);
+            return;
+        }
+    }
+
+    protected getParentModalWindowElement(): HTMLElement | null {
+        return this.modalContainer?.nativeElement?.parentElement?.parentElement?.parentElement?.parentElement ?? null;
+    }
+
+    protected enableBackdrop(): void {
+        if (this.backdropEl) {
+            return;
+        }
+        const el = document.createElement('div');
+        el.className = 'record-modal-backdrop';
+        el.onclick = (): void => {
+            this.isMinimizedStatus.next(true);
+            this.onMinimizeToggle(true);
+        }
+        document.body.appendChild(el);
+        this.backdropEl = el;
+    }
+
+    protected disableBackdrop(): void {
+        if (!this.backdropEl) {
+            return;
+        }
+        document.body.removeChild(this.backdropEl);
+        this.backdropEl = null;
+    }
+
 }

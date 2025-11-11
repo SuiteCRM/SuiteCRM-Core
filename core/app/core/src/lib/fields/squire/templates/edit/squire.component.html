@@ -135,6 +135,7 @@
     ></iframe>
 
     <div *ngIf="editorMode() === 'code'"
+         class="squire-monaco-editor-container"
          [ngStyle]="{
          'display': 'block',
          'min-height': minHeight() ? minHeight() : 'auto',

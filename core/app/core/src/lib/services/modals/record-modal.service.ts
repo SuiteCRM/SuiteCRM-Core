@@ -88,6 +88,11 @@ export class RecordModalService {
             minimizable = true;
         }
 
+        let maximizable = recordModalOptions?.maximizable ?? false;
+        if (detached) {
+            maximizable = true;
+        }
+
         if (recordModalOptions?.mapFields ?? false){
             let mappedFieldsConfig = recordModalOptions?.mapFields[parentModule] ?? null;
             if (!mappedFieldsConfig) {
@@ -104,6 +109,7 @@ export class RecordModalService {
         modal.componentInstance.module = moduleName;
         modal.componentInstance.mode = mode as ViewMode;
         modal.componentInstance.minimizable = minimizable;
+        modal.componentInstance.maximizable = maximizable;
         modal.componentInstance.titleKey =recordModalOptions?.headerLabelKey ?? recordModalOptions?.labelKey ?? '';
         modal.componentInstance.dynamicTitleKey = recordModalOptions?.dynamicTitleKey ??'';
         modal.componentInstance.dynamicTitleContext = recordModalOptions?.dynamicTitleContext ?? {};
@@ -119,6 +125,7 @@ export class RecordModalService {
         modal.componentInstance.closeConfirmationMessages = recordModalOptions.closeConfirmationMessage ?? [];
         modal.componentInstance.closeConfirmationLabel = recordModalOptions.closeConfirmationLabel ?? '';
         modal.componentInstance.closeConfirmationModal = recordModalOptions.closeConfirmationModal ?? false;
+        modal.componentInstance.modalOptions = {...modalOptions ?? {}};
 
         modal.componentInstance.init();
 

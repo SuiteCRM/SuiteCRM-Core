@@ -83,12 +83,20 @@ export class ModalComponent implements OnInit, OnDestroy {
             this.subs.push(this.isMinimized$.subscribe(minimize => {
                 this.isMinimized.set(minimize);
                 this.initMinimiseButton();
+                if (this.isMinimized()) {
+                    this.isMaximized.set(false);
+                    this.initMaximizeStatus();
+                }
             }));
         }
         if (this.isMaximized$) {
             this.subs.push(this.isMaximized$.subscribe(maximize => {
                 this.isMaximized.set(maximize);
                 this.initMaximizeButton();
+                if (this.isMaximized()) {
+                    this.isMinimized.set(false);
+                    this.initMinimiseStatus();
+                }
             }));
         }
         this.initMinimiseButton();
@@ -115,7 +123,6 @@ export class ModalComponent implements OnInit, OnDestroy {
         this.initMinimiseStatus();
         if (this.isMinimized()) {
             this.isMaximized.set(false);
-            this.onMinimizeToggle.emit(this.isMaximized());
             this.initMaximizeStatus();
         }
     }
@@ -140,11 +147,10 @@ export class ModalComponent implements OnInit, OnDestroy {
 
     toggleMaximize(): void {
         this.isMaximized.set(!this.isMaximized());
-        this.onMinimizeToggle.emit(this.isMaximized());
+        this.onMaximizeToggle.emit(this.isMaximized());
         this.initMaximizeStatus();
         if (this.isMaximized()) {
             this.isMinimized.set(false);
-            this.onMinimizeToggle.emit(this.isMinimized());
             this.initMinimiseStatus();
         }
     }

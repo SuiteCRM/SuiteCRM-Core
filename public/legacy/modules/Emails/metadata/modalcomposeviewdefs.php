@@ -35,6 +35,7 @@ $viewdefs['Emails']['ModalComposeView'] = [
             ]
         ],
         'colClasses' => [
+            'modal-compose-col',
         ],
         'widths' => [
             ['label' => '10', 'field' => '30'],
@@ -114,8 +115,8 @@ $viewdefs['Emails']['ModalComposeView'] = [
                     ],
                     'initDefaultProcess' => 'outbound-email-default',
                     'metadata' => [
-                        'headerColumnClass' => 'col-xs-12 col-sm-2 col-md-2 col-lg-2',
-                        'valueColumnClass' => 'col-xs-12 col-sm-10 col-md-10 col-lg-10',
+                        'headerColumnClass' => 'col-xs-12 col-sm-2 col-md-2 col-lg-2 maximize-col-xl-1',
+                        'valueColumnClass' => 'col-xs-12 col-sm-10 col-md-10 col-lg-10 maximize-col-xl-11',
                         'dynamicOptionLabel' => 'LBL_OUTBOUND_EMAIL_NAME_COMPOSE_LABEL',
                         'dynamicOptionSubLabel' => 'LBL_OUTBOUND_EMAIL_NAME_COMPOSE_SUB_LABEL'
                     ],
@@ -129,8 +130,8 @@ $viewdefs['Emails']['ModalComposeView'] = [
                         'required' => true,
                     ],
                     'metadata' => [
-                        'headerColumnClass' => 'col-xs-12 col-sm-2 col-md-2 col-lg-2',
-                        'valueColumnClass' => 'col-xs-12 col-sm-10 col-md-10 col-lg-10',
+                        'headerColumnClass' => 'col-xs-12 col-sm-2 col-md-2 col-lg-2 maximize-col-xl-1',
+                        'valueColumnClass' => 'col-xs-12 col-sm-10 col-md-10 col-lg-10 maximize-col-xl-11',
                         'relatedModules' => [
                             ['module' => 'Contacts', 'headerField' => 'name', 'subHeaderField' => 'email1'],
                             ['module' => 'Leads', 'headerField' => 'name', 'subHeaderField' => 'email1'],
@@ -195,8 +196,8 @@ $viewdefs['Emails']['ModalComposeView'] = [
                     'display' => 'none',
                     'type' => 'multiflexrelate',
                     'metadata' => [
-                        'headerColumnClass' => 'col-xs-12 col-sm-2 col-md-2 col-lg-2',
-                        'valueColumnClass' => 'col-xs-12 col-sm-10 col-md-10 col-lg-10',
+                        'headerColumnClass' => 'col-xs-12 col-sm-2 col-md-2 col-lg-2 maximize-col-xl-1',
+                        'valueColumnClass' => 'col-xs-12 col-sm-10 col-md-10 col-lg-10 maximize-col-xl-11',
                         'relatedModules' => [
                             ['module' => 'Contacts', 'headerField' => 'name', 'subHeaderField' => 'email1'],
                             ['module' => 'Leads', 'headerField' => 'name', 'subHeaderField' => 'email1'],
@@ -234,8 +235,8 @@ $viewdefs['Emails']['ModalComposeView'] = [
                     'display' => 'none',
                     'type' => 'multiflexrelate',
                     'metadata' => [
-                        'headerColumnClass' => 'col-xs-12 col-sm-2 col-md-2 col-lg-2',
-                        'valueColumnClass' => 'col-xs-12 col-sm-10 col-md-10 col-lg-10',
+                        'headerColumnClass' => 'col-xs-12 col-sm-2 col-md-2 col-lg-2 maximize-col-xl-1',
+                        'valueColumnClass' => 'col-xs-12 col-sm-10 col-md-10 col-lg-10 maximize-col-xl-11',
                         'relatedModules' => [
                             ['module' => 'Contacts', 'headerField' => 'name', 'subHeaderField' => 'email1'],
                             ['module' => 'Leads', 'headerField' => 'name', 'subHeaderField' => 'email1'],
@@ -271,8 +272,8 @@ $viewdefs['Emails']['ModalComposeView'] = [
                 [
                     'name' => 'name',
                     'metadata' => [
-                        'headerColumnClass' => 'col-xs-12 col-sm-2 col-md-2 col-lg-2',
-                        'valueColumnClass' => 'col-xs-12 col-sm-10 col-md-10 col-lg-10'
+                        'headerColumnClass' => 'col-xs-12 col-sm-2 col-md-2 col-lg-2 maximize-col-xl-1',
+                        'valueColumnClass' => 'col-xs-12 col-sm-10 col-md-10 col-lg-10 maximize-col-xl-11'
                     ],
                 ],
             ],

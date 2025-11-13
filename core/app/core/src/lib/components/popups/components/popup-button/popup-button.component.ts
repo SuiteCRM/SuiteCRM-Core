@@ -49,7 +49,7 @@ export class PopupButtonComponent implements OnInit, OnDestroy {
     @Input() icon: string;
     @Input() titleKey: string;
     @Input() klass: string = 'line-action-item line-action float-right';
-    @Input() placement: string = 'right';
+    @Input() placement: string | string[] = 'right';
     @Input() popoverClass: string = 'popover-wrapper';
     @Input() openStatusEventEmitter: EventEmitter<boolean>;
     @Input() displayButton: WritableSignal<boolean> = signal(true);

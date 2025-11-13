@@ -102,6 +102,13 @@
                     ></scrm-color-selector>
                 </ng-container>
 
+                <ng-container *ngIf="item?.value?.type === 'tiered-menu'">
+                    <scrm-tiered-menu-popup-button class="squire-editor-toolbar-item"
+                            [config]="item?.value"
+                            [openStatusEventEmitter]="item.value?.metadata?.openStatusEventEmitter"
+                    ></scrm-tiered-menu-popup-button>
+                </ng-container>
+
             </ng-container>
         </ng-container>
         <ng-container *ngIf="collapsedButtons().length">

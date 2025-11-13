@@ -38,6 +38,9 @@ import {
     InsertLinkPopupButtonComponent
 } from "../../../../components/popups/components/insert-link-popup-button/insert-link-popup-button.component";
 import {MonacoEditorComponent} from "../../../../components/monaco-editor/monaco-editor.component";
+import {
+    TieredMenuPopupButtonModule
+} from "../../../../components/popups/components/tiered-menu-popup-button/tiered-menu-popup-button.module";
 
 @NgModule({
     declarations: [SquireEditFieldComponent],
@@ -54,6 +57,7 @@ import {MonacoEditorComponent} from "../../../../components/monaco-editor/monaco
         ColorSelectorComponent,
         InsertLinkPopupButtonComponent,
         MonacoEditorComponent,
+        TieredMenuPopupButtonModule,
     ],
     providers: []
 })

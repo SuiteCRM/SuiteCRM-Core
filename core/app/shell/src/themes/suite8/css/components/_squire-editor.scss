@@ -167,8 +167,13 @@
         width: 175px;
       }
 
-      background-color: $shaded-white;
+      background-color: $white;
       padding: .25rem .25rem;
+
+
+      .tiered-menu-container .tiered-menu .p-tieredmenu .p-tieredmenu-root-list .p-submenu-list {
+        max-width: 20em!important;
+      }
     }
   }
 

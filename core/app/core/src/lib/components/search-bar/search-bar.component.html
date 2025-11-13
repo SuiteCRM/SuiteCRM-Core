@@ -44,7 +44,7 @@
                 autocomplete="off"
                 #searchInput
                 required>
-            <ul class="dropdown-menu global-search-dropdown" *ngIf="searchWord.length && hasSearchTyped && (searchTrigger === 'enter')">
+            <ul class="dropdown-menu global-search-dropdown" *ngIf="(searchWord.length && hasSearchTyped && (searchTrigger === 'enter')) && showSearchDropdown">
                 <li class="dropdown-item-block" [ngClass]="{'dropdown-active': searchWord}">
                     <a class="dropdown-item" (click)="searchWithEnter()">
                         <scrm-image class="search-icon sicon" image="search"></scrm-image>

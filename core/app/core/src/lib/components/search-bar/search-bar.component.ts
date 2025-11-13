@@ -48,7 +48,9 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     @ViewChild('searchInput') searchInput: ElementRef;
     @Input() labelKey: string = '';
     @Input() klass: string = '';
+    @Input() showSearchDropdown: boolean = true;
     @Input() isMobile: boolean = false;
+    @Input() clearSearchTermOnSearch: boolean = true;
     @Input() searchTrigger: 'enter' | 'input' = 'enter';
     @Output() isSearchVisible = new EventEmitter<boolean>(false);
     @Output() searchExpression = new EventEmitter<string>();
@@ -70,7 +72,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
         })
     );
 
-    constructor(protected languageStore: LanguageStore) {}
+    constructor(protected languageStore: LanguageStore) {
+    }
 
     ngOnInit(): void {
         this.searchForm = new FormGroup({
@@ -101,21 +104,21 @@ export class SearchBarComponent implements OnInit, OnDestroy {
             this.clearSearchTerm();
             this.searchInput.nativeElement.blur();
         } else {
-            if(this.isMobile) {
+            if (this.isMobile) {
                 this.onBlur();
             }
         }
     }
 
-    searchWithInput(value:string): void {
-            this.searchExpression.emit(value);
+    searchWithInput(value: string): void {
+        this.searchExpression.emit(value);
     }
 
     clearSearchTerm(): void {
         this.searchForm.reset();
         this.hasSearchTyped = false;
         this.searchWord = '';
-        if(this.searchTrigger === 'input') {
+        if (this.searchTrigger === 'input') {
             this.searchWithInput(this.searchWord);
         }
     }
@@ -135,10 +138,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
             this.hasSearchTyped = false;
         }, 200);
 
-        if(this.isMobile) {
+        if (this.isMobile) {
             setTimeout(() => {
                 this.isSearchVisible.emit(false);
-            },50);
+            }, 50);
         }
     }
 }

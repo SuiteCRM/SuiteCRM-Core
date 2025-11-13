@@ -14176,10 +14176,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"squire-rte@npm:^2.3.2":
-  version: 2.3.2
-  resolution: "squire-rte@npm:2.3.2"
-  checksum: 10c0/589e2607ae9e19a025f96eb42293cd67e5812ef8975f8d493f74c1826a37e67cd240b3120891ffca89000873da78573dce6f862b79f1290f365d226a83a003d5
+"squire-rte@npm:^2.4.1":
+  version: 2.4.1
+  resolution: "squire-rte@npm:2.4.1"
+  checksum: 10c0/739b5c5c344e1582a3b610deb6bbc9921a0c8a951aaed768631ef8ef1e81d6cd1f7cf436411ad91877fe0ec265230bd16359ae7d2113392e81842e6caa921497
   languageName: node
   linkType: hard
 
@@ -14471,7 +14471,7 @@ __metadata:
     object-hash: "npm:^3.0.0"
     primeng: "npm:^17.18.11"
     rxjs: "npm:^7.8.1"
-    squire-rte: "npm:^2.3.2"
+    squire-rte: "npm:^2.4.1"
     tinymce: "npm:^7.4.1"
     tslib: "npm:^2.8.0"
     typescript: "npm:~5.4.5"

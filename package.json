@@ -58,7 +58,7 @@
     "object-hash": "^3.0.0",
     "primeng": "^17.18.11",
     "rxjs": "^7.8.1",
-    "squire-rte": "^2.3.2",
+    "squire-rte": "^2.4.1",
     "tinymce": "^7.4.1",
     "tslib": "^2.8.0",
     "webpack": "^5.95.0",

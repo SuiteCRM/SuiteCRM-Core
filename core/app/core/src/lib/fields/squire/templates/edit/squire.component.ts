@@ -579,6 +579,9 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             type: 'color-selector',
             icon: 'highlighter',
             titleKey: 'LBL_TEXT_HIGHLIGHT',
+            onClick: (color: ColorButton) => {
+                this?.editor?.setHighlightColor(color.color);
+            },
             klass: 'squire-editor-button btn btn-sm ',
             dynamicClass: computed((): string => {
                 if (this.editorMode() === 'code'){

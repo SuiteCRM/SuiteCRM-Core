@@ -56,6 +56,7 @@ export class GroupFieldBuilder extends FieldBuilder {
      * @param {function} isInitializedFunction
      * @param {function} buildFieldFunction
      * @param {function} addRecordFunction
+     * @param viewFieldDefinitions
      */
     public addGroupFields(
         record: Record,
@@ -64,6 +65,7 @@ export class GroupFieldBuilder extends FieldBuilder {
         isInitializedFunction: Function,
         buildFieldFunction: Function,
         addRecordFunction: Function,
+        viewFieldDefinitions: ViewFieldDefinition[] = []
     ): void {
 
         const definition = (viewField && viewField.fieldDefinition) || {};
@@ -87,6 +89,10 @@ export class GroupFieldBuilder extends FieldBuilder {
                 type: fieldDefinition.type,
                 fieldDefinition
             };
+
+            if (viewFieldDefinitions.length > 0 && viewFieldDefinitions.find(vf => vf.name === fieldDefinition.name)) {
+                groupViewField.fieldDefinition = viewFieldDefinitions.find(vf => vf.name === fieldDefinition.name).fieldDefinition;
+            }
 
             const groupField = buildFieldFunction(record, groupViewField, language);
             groupField.source = 'groupField';

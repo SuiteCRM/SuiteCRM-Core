@@ -81,10 +81,11 @@ export class FieldManager {
      *
      * @param {object} record Record
      * @param {object} viewField ViewFieldDefinition
+     * @param viewFieldDefinitions
      * @param {object} language LanguageStore
      * @returns {object}Field
      */
-    public addField(record: Record, viewField: ViewFieldDefinition, language: LanguageStore = null): Field {
+    public addField(record: Record, viewField: ViewFieldDefinition, viewFieldDefinitions: ViewFieldDefinition[] = [], language: LanguageStore = null): Field {
 
         const field = this.fieldBuilder.buildField(record, viewField, language);
 
@@ -95,7 +96,8 @@ export class FieldManager {
             language,
             this.isFieldInitialized.bind(this),
             this.fieldBuilder.buildField.bind(this.fieldBuilder),
-            this.addToRecord.bind(this)
+            this.addToRecord.bind(this),
+            viewFieldDefinitions
         );
 
         this.attributeBuilder.addAttributes(

@@ -132,7 +132,7 @@ export class RecordManager {
                 return;
             }
 
-            this.fieldManager.addField(record, viewField, this.language);
+            this.fieldManager.addField(record, viewField, viewFieldDefinitions, this.language);
         });
 
         return record.fields;

@@ -89,7 +89,7 @@ class DescriptionHtmlFieldDefinitionMapper implements FieldDefinitionMapperInter
             'type' => 'html',
             'source' => 'non-db',
             'inline_edit' => false,
-            'displayType' => 'html',
+            'displayType' => 'squire',
             'rows' => 5,
             'cols' => 150,
             'logic' => [
@@ -103,7 +103,16 @@ class DescriptionHtmlFieldDefinitionMapper implements FieldDefinitionMapperInter
                         'fromField' => 'outbound_email_name',
                         'signatureAttribute' => 'signature',
                     ],
-                ]
+                ],
+                'update-template-variables' => [
+                    'key' => 'update-template-variables',
+                    'modes' => ['edit', 'create'],
+                    'params' => [
+                        'fieldDependencies' => [
+                            'parent_type',
+                        ],
+                    ],
+                ],
             ]
         ];
     }

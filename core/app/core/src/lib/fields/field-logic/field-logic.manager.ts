@@ -41,6 +41,7 @@ import {UpdateValueAction} from './update-value/update-value.action';
 import {UpdateValueBackendAction} from './update-value-backend/update-value-backend.action';
 import {DisplayTypeBackendAction} from './display-type-backend/display-type-backend.action';
 import {UpdateEmailSignatureAction} from "./update-email-signature/update-email-signature.action";
+import {UpdateTemplateVariablesAction} from "./update-template-variables/update-template-variables.action";
 
 @Injectable({
     providedIn: 'root'
@@ -65,8 +66,9 @@ export class FieldLogicManager extends BaseActionManager<FieldLogicActionData> {
         updateValue: UpdateValueAction,
         updateFlexRelateModule: UpdateFlexRelateModuleAction,
         updateValueBackend: UpdateValueBackendAction,
-        dislayTypeBackend: DisplayTypeBackendAction,
-        updateEmailSignature: UpdateEmailSignatureAction
+        displayTypeBackend: DisplayTypeBackendAction,
+        updateEmailSignature: UpdateEmailSignatureAction,
+        updateTemplateVariables: UpdateTemplateVariablesAction
     ) {
         super();
         displayType.modes.forEach(mode => this.actions[mode][displayType.key] = displayType);
@@ -77,8 +79,9 @@ export class FieldLogicManager extends BaseActionManager<FieldLogicActionData> {
         updateFlexRelateModule.modes.forEach(mode => this.actions[mode][updateFlexRelateModule.key] = updateFlexRelateModule);
         updateValue.modes.forEach(mode => this.actions[mode][updateValue.key] = updateValue);
         updateValueBackend.modes.forEach(mode => this.actions[mode][updateValueBackend.key] = updateValueBackend);
-        dislayTypeBackend.modes.forEach(mode => this.actions[mode][dislayTypeBackend.key] = dislayTypeBackend);
+        displayTypeBackend.modes.forEach(mode => this.actions[mode][displayTypeBackend.key] = displayTypeBackend);
         updateEmailSignature.modes.forEach(mode => this.actions[mode][updateEmailSignature.key] = updateEmailSignature);
+        updateTemplateVariables.modes.forEach(mode => this.actions[mode][updateTemplateVariables.key] = updateTemplateVariables);
     }
 
     /**

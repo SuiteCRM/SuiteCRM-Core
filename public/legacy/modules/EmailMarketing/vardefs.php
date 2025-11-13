@@ -485,6 +485,9 @@ $dictionary['EmailMarketing'] = [
                         'dynamicHeightAdjustment' => -140,
                         'buttonLayout' => [
                             [
+                                'variables'
+                            ],
+                            [
                                 'bold',
                                 'italic',
                                 'underline',
@@ -521,7 +524,7 @@ $dictionary['EmailMarketing'] = [
                                 'clearFormatting',
                             ],
                             [
-                                'injectUnsubscribe'
+                                'injectUnsubscribe',
                             ],
                             [
                                 'html'
@@ -570,7 +573,8 @@ $dictionary['EmailMarketing'] = [
                                 'clearFormatting',
                             ],
                             [
-                                'injectUnsubscribe'
+                                'injectUnsubscribe',
+                                'variables'
                             ],
                             [
                                 'html'

@@ -322,6 +322,40 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             }),
         } as ButtonInterface;
 
+        const variables = {
+            key: 'variables',
+            type: 'tiered-menu',
+            icon: 'tags',
+            titleKey: 'LBL_INSERT_TEMPLATE_VARIABLE',
+            klass: 'squire-editor-button btn btn-sm ',
+            disabled: computed((): boolean => {
+                return this.editorMode() === 'code';
+            }),
+            metadata: {
+                modules: this.field?.metadata?.squire?.variables?.modules || [],
+                fieldDefs: this.field?.metadata?.squire?.variables?.fieldDefs || {},
+                openStatusEventEmitter: new EventEmitter(),
+            }
+        } as ButtonInterface;
+
+
+        variables.onClick = (variable: string) => {
+            variable = '$' + variable;
+
+
+            variables.metadata.openStatusEventEmitter.emit(false);
+            if (this.editorMode() === 'code') {
+                this.monacoEditor.editor.trigger('keyboard', 'type',
+                    {text: variable}
+                );
+                return;
+            }
+
+            this.editor.insertHTML(variable);
+        }
+
+        this.availableButtons.variables = variables;
+
         this.availableButtons.italic = {
             key: 'italic',
             type: 'button',
@@ -1026,6 +1060,9 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
     private getDefaultButtonLayout(): string[][] {
         return [
             [
+              'variables'
+            ],
+            [
                 'bold',
                 'italic',
                 'underline',
@@ -1234,6 +1271,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
 
         if (this.availableButtons) {
             this.availableButtons.insertLink.metadata.openStatusEventEmitter.emit(false);
+            this.availableButtons.variables.metadata.openStatusEventEmitter.emit(false);
         }
     }
 

@@ -131,6 +131,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
         this.initSettings();
         this.initAvailableButtons();
         this.initButtons();
+        this.initRebuildMetadataSignal();
         this.collapsedDropdownButton.set({
             'icon': 'down_carret',
             klass: 'squire-editor-button squire-editor-collapsed-button btn btn-sm',
@@ -1370,5 +1371,12 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
 
     initHtml() {
         this.editor.setHTML(this?.value ?? '');
+    }
+
+    protected initRebuildMetadataSignal() {
+        const trigger = this.field.loading();
+        this.initAvailableButtons();
+        this.initButtons();
+        this.calculateActiveButtons();
     }
 }

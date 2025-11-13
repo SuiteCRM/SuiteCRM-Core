@@ -105,7 +105,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
 
     @HostListener('window:message', ['$event'])
     onMessage(event) {
-        if (event.data !== 'iframe-clicked'){
+        if (event.data !== 'iframe-clicked') {
             return;
         }
 
@@ -168,11 +168,11 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             this.setMonacoEditor(newValue);
         }
 
-        if (this.editor.getHTML() === newValue) {
+        if ((this.editor?.getHTML() ?? '') === newValue) {
             return;
         }
 
-        this.editor.setHTML(newValue);
+        this.editor?.setHTML(newValue);
     }
 
     updateFieldValue(value): void {
@@ -292,13 +292,13 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             hotkey: 'ctrl+b',
             klass: 'squire-editor-button btn btn-sm ',
             onClick: () => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return;
                 }
                 const hasBold = this?.editor?.hasFormat('B');
                 if (hasBold) {
 
-                    if (this.styleSignal() === 'non-bold'){
+                    if (this.styleSignal() === 'non-bold') {
                         this.styleSignal.set('bold');
                     }
 
@@ -312,7 +312,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             dynamicClass: computed((): string => {
                 const path = this.currentEditorPath();
                 const trigger = this.styleSignal();
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
                 return this?.editor?.hasFormat('B') ? 'active squire-editor-button-active' : '';
@@ -330,13 +330,13 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             hotkey: 'ctrl+i',
             klass: 'squire-editor-button btn btn-sm ',
             onClick: () => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return;
                 }
                 const hasItalic = this?.editor?.hasFormat('I');
                 if (hasItalic) {
 
-                    if (this.styleSignal() === 'non-italic'){
+                    if (this.styleSignal() === 'non-italic') {
                         this.styleSignal.set('italic');
                     }
 
@@ -351,7 +351,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             dynamicClass: computed((): string => {
                 const path = this.currentEditorPath();
                 const trigger = this.styleSignal();
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
                 return this?.editor?.hasFormat('I') ? 'active squire-editor-button-active' : '';
@@ -369,13 +369,13 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             hotkey: 'ctrl+u',
             klass: 'squire-editor-button btn btn-sm ',
             onClick: () => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return;
                 }
                 const hasUnderline = this?.editor?.hasFormat('U');
                 if (hasUnderline) {
 
-                    if (this.styleSignal() === 'non-underline'){
+                    if (this.styleSignal() === 'non-underline') {
                         this.styleSignal.set('underline');
                     }
 
@@ -390,7 +390,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             dynamicClass: computed((): string => {
                 const path = this.currentEditorPath();
                 const trigger = this.styleSignal();
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
                 return this?.editor?.hasFormat('U') ? 'active squire-editor-button-active' : '';
@@ -408,13 +408,13 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             hotkey: 'ctrl+shift+7',
             klass: 'squire-editor-button btn btn-sm ',
             onClick: () => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return;
                 }
                 const hasStrikeThrough = this?.editor?.hasFormat('S');
                 if (hasStrikeThrough) {
 
-                    if (this.styleSignal() === 'non-strikethrough'){
+                    if (this.styleSignal() === 'non-strikethrough') {
                         this.styleSignal.set('strikethrough');
                     }
 
@@ -429,7 +429,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             dynamicClass: computed((): string => {
                 const path = this.currentEditorPath();
                 const trigger = this.styleSignal();
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
                 return this?.editor?.hasFormat('S') ? 'active squire-editor-button-active' : '';
@@ -444,7 +444,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             type: 'popup-button-list',
             icon: 'fonts',
             dynamicClass: computed((): string => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
             }),
@@ -505,7 +505,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             titleKey: 'LBL_TEXT_SIZE',
             klass: 'squire-editor-button btn btn-sm ',
             dynamicClass: computed((): string => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
             }),
@@ -568,7 +568,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
                 return this.editorMode() === 'code';
             }),
             dynamicClass: computed((): string => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
             })
@@ -584,7 +584,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             },
             klass: 'squire-editor-button btn btn-sm ',
             dynamicClass: computed((): string => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled ';
                 }
             }),
@@ -613,7 +613,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             dynamicClass: computed((): string => {
                 const path = this.currentEditorPath();
                 const trigger = this.styleSignal();
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
                 return this?.editor?.hasFormat('A') ? 'active squire-editor-button-active' : '';
@@ -627,13 +627,13 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
         } as DropdownButtonInterface;
 
         insertLink.onClick = () => {
-            if (this.editorMode() === 'code'){
+            if (this.editorMode() === 'code') {
                 return;
             }
             const isLink = this?.editor?.hasFormat('A');
             if (isLink) {
 
-                if (this.styleSignal() === 'non-link'){
+                if (this.styleSignal() === 'non-link') {
                     this.styleSignal.set('link');
                 }
 
@@ -696,13 +696,13 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
                 return this.editorMode() === 'code';
             }),
             onClick: () => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return;
                 }
                 const isUL = this?.editor?.hasFormat('UL');
                 if (isUL) {
 
-                    if (this.styleSignal() === 'non-unordered-list'){
+                    if (this.styleSignal() === 'non-unordered-list') {
                         this.styleSignal.set('unordered-list');
                     }
 
@@ -717,7 +717,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             dynamicClass: computed((): string => {
                 const path = this.currentEditorPath();
                 const trigger = this.styleSignal();
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
                 return this?.editor?.hasFormat('UL') ? 'active squire-editor-button-active' : '';
@@ -735,13 +735,13 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             klass: 'squire-editor-button btn btn-sm ',
             hotkey: 'ctrl+shift+9',
             onClick: () => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return;
                 }
                 const isOL = this?.editor?.hasFormat('OL');
                 if (isOL) {
 
-                    if (this.styleSignal() === 'non-ordered-list'){
+                    if (this.styleSignal() === 'non-ordered-list') {
                         this.styleSignal.set('ordered-list');
                     }
 
@@ -756,7 +756,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             dynamicClass: computed((): string => {
                 const path = this.currentEditorPath();
                 const trigger = this.styleSignal();
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
                 return this?.editor?.hasFormat('OL') ? 'active squire-editor-button-active' : '';
@@ -773,7 +773,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
                 return this.editorMode() === 'code';
             }),
             dynamicClass: computed((): string => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
             }),
@@ -790,7 +790,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
                 return this.editorMode() === 'code';
             }),
             dynamicClass: computed((): string => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
             }),
@@ -809,7 +809,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             onClick: () => this.editorMode() !== 'code' ? this?.editor?.setTextAlignment('left') : '',
             dynamicClass: computed((): string => {
                 const path = this.currentEditorPath();
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
                 const alignment = this.getTextAlignment(path);
@@ -829,7 +829,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             onClick: () => this.editorMode() !== 'code' ? this?.editor?.setTextAlignment('center') : '',
             dynamicClass: computed((): string => {
                 const path = this.currentEditorPath();
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
                 const alignment = this.getTextAlignment(path);
@@ -849,7 +849,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             onClick: () => this.editorMode() !== 'code' ? this?.editor?.setTextAlignment('right') : '',
             dynamicClass: computed((): string => {
                 const path = this.currentEditorPath();
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
                 const alignment = this.getTextAlignment(path);
@@ -866,7 +866,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             onClick: () => this.editorMode() !== 'code' ? this?.editor?.setTextAlignment('justify') : '',
             dynamicClass: computed((): string => {
                 const path = this.currentEditorPath();
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
                 const alignment = this.getTextAlignment(path);
@@ -889,7 +889,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             }),
             onClick: () => this.editorMode() !== 'code' ? this?.editor?.increaseQuoteLevel() : '',
             dynamicClass: computed((): string => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
             })
@@ -907,7 +907,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             hotkey: 'ctrl+[',
             onClick: () => this.editorMode() !== 'code' ? this?.editor?.decreaseQuoteLevel() : '',
             dynamicClass: computed((): string => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
             })
@@ -926,7 +926,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             onClick: () => this.editorMode() !== 'code' ? this?.editor?.setTextDirection('ltr') : '',
             dynamicClass: computed((): string => {
                 const path = this.currentEditorPath();
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
                 const direction = this.getTextDirection(path);
@@ -946,7 +946,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             onClick: () => this.editorMode() !== 'code' ? this?.editor?.setTextAlignment('rtl') : '',
             dynamicClass: computed((): string => {
                 const path = this.currentEditorPath();
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
                 const direction = this.getTextDirection(path);
@@ -965,7 +965,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             klass: 'squire-editor-button btn btn-sm',
             onClick: () => this.editorMode() !== 'code' ? this?.editor?.removeAllFormatting() : '',
             dynamicClass: computed((): string => {
-                if (this.editorMode() === 'code'){
+                if (this.editorMode() === 'code') {
                     return 'disabled';
                 }
             })

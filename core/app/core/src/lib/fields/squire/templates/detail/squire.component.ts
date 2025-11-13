@@ -126,11 +126,11 @@ export class SquireDetailFieldComponent extends BaseFieldComponent implements On
         this.value = newValue;
         this.field.value = newValue;
 
-        if (this.editor.getHTML() === newValue) {
+        if (this.editor?.getHTML() === newValue) {
             return;
         }
 
-        this.editor.setHTML(newValue);
+        this.editor?.setHTML(newValue);
     }
 
     initSettings(): void {

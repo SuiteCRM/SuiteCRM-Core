@@ -2233,6 +2233,7 @@ $app_strings = array(
     'LBL_NOTIFICATIONS_NONE' => 'No Current Notifications',
     'ERR_NOTIFICATIONS_MARK_AS_READ' => 'Error while trying to mark notifications as read',
     'ERR_FIELD_LOGIC_BACKEND_CALCULATION' => 'Error while trying to get the value',
+    'LBL_FAILED_TO_UPDATE_TEMPLATE_VARIABLES' => 'Failed to update template variables',
     'LBL_ALT_SORT_DESC' => 'Sorted Descending',
     'LBL_ALT_SORT_ASC' => 'Sorted Ascending',
     'LBL_ALT_SORT' => 'Sort',
@@ -4223,6 +4224,7 @@ $app_strings['LBL_COLOR_WHITE'] = 'White';
 
 $app_strings['LBL_BOLD'] = 'Bold';
 $app_strings['LBL_ITALIC'] = 'Italic';
+$app_strings['LBL_INSERT_TEMPLATE_VARIABLE'] = 'Insert Variable';
 $app_strings['LBL_UNDERLINE'] = 'Underline';
 $app_strings['LBL_STRIKETHROUGH'] = 'Strikethrough';
 $app_strings['LBL_FONT_FACE'] = 'Font Face';

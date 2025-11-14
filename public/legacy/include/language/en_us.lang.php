@@ -4106,6 +4106,7 @@ $app_strings['LBL_LINK_RELATIONSHIP_SUCCESS'] = 'Relationship linked successfull
 $app_strings['LBL_LINK_RELATIONSHIP_FAILED'] = 'There was an error linking this Relationship.';
 $app_strings['LBL_MODULE_NOT_FOUND'] = 'Module not found.';
 $app_strings['LBL_RECORD_NOT_FOUND'] = 'Unable to load record';
+$app_strings['LBL_FILE_NOT_FOUND'] = 'Unable to load file';
 $app_strings['LBL_RELATIONSHIP_LOAD_ERROR'] = 'Unable to load relationship';
 $app_strings['LBL_NOT_LINKED'] = 'Unable to unlink. Records are not linked';
 $app_strings['LBL_ACCESS_DENIED'] = 'Access Denied';

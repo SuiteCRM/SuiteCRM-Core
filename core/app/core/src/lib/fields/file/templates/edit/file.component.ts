@@ -68,6 +68,7 @@ export class FileEditFieldComponent extends BaseFileComponent {
     }
 
     ngOnInit() {
+        super.ngOnInit();
         this.storageType = this?.field?.metadata?.storage_type ?? '';
         this.compact = this.field.metadata?.compact ?? false;
         if (this.validStorageTypes.includes(this.storageType)) {
@@ -132,6 +133,7 @@ export class FileEditFieldComponent extends BaseFileComponent {
                 emitViewToModelChange: false
             }
         );
+        this.field.value = newValue?.id ?? '';
 
         this.field.formControl.markAsDirty();
     }

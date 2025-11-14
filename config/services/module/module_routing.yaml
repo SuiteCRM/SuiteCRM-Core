@@ -67,7 +67,7 @@ parameters:
     documents:
       index: true
       list: true
-      record: false
+      record: true
     cases:
       index: true
       list: true

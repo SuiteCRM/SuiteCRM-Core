@@ -57,18 +57,9 @@ $listViewDefs['Documents'] = array(
   array(
     'width' => '20%',
     'label' => 'LBL_FILENAME',
-    'link' => true,
+    'type' => 'file',
     'default' => true,
-    'bold' => false,
-    'displayParams' => array( 'module' => 'Documents', ),
     'sortable' => false,
-    'related_fields' =>
-    array(
-        0 => 'document_revision_id',
-        1 => 'doc_id',
-        2 => 'doc_type',
-        3 => 'doc_url',
-    ),
   ),
   'CATEGORY_ID' =>
   array(

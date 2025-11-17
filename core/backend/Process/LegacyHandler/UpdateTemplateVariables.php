@@ -97,22 +97,11 @@ class UpdateTemplateVariables extends LegacyHandler implements ProcessHandlerInt
     {
         $options = $process->getOptions();
 
-        $templateModules = $options['templateModules'] ?? [];
+        $baseModule = $options['baseModule'] ?? null;
+        $templateModules = $options['showOnlyModules'] ?? [];
 
-        if (!empty($templateModules)){
-            $modules = $this->calculateTemplateInjectorVariables->getModules($templateModules);
-            $fieldDefs = $this->calculateTemplateInjectorVariables->getFieldDefs($modules);
-
-            $process->setStatus('success');
-            $process->setData([
-                'modules' => $modules,
-                'fieldDefs' => $fieldDefs,
-            ]);
-            return;
-        }
-
-        $modules = $this->calculateTemplateInjectorVariables->getBaseModules();
-        $fieldDefs = $this->calculateTemplateInjectorVariables->getFieldDefs();
+        $modules = $this->calculateTemplateInjectorVariables->getModules($baseModule, $templateModules);
+        $fieldDefs = $this->calculateTemplateInjectorVariables->getFieldDefs($baseModule, $modules);
 
         $process->setStatus('success');
         $process->setData([

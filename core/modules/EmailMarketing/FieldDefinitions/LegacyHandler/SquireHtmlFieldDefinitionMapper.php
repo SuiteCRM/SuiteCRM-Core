@@ -86,12 +86,8 @@ class SquireHtmlFieldDefinitionMapper implements FieldDefinitionMapperInterface
 
             $legacyModuleName = $this->moduleNameMapper->toLegacy($definition->getId());
 
-            $module = [
-                $legacyModuleName => $legacyModuleName
-            ];
-
-            $moduleList = $this->calculateTemplateInjectorVariables->getModules($module);
-            $fieldDefs = $this->calculateTemplateInjectorVariables->getFieldDefs($moduleList);
+            $moduleList = $this->calculateTemplateInjectorVariables->getModules($legacyModuleName);
+            $fieldDefs = $this->calculateTemplateInjectorVariables->getFieldDefs($legacyModuleName, $moduleList);
 
             $fieldDefinition['metadata']['squire']['variables'] = [];
             $fieldDefinition['metadata']['squire']['variables']['modules'] = $moduleList;

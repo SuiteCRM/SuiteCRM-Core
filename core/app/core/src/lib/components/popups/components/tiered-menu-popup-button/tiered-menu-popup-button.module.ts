@@ -30,7 +30,7 @@ import {ButtonModule} from "../../../button/button.module";
 import {LabelModule} from "../../../label/label.module";
 import {PopupButtonModule} from "../popup-button/popup-button.module";
 import {ReactiveFormsModule} from "@angular/forms";
-import {SCRMTieredMenuModule} from "../../../tiered-menu/tiered-menu.module";
+import {TieredMenuModule} from "../../../tiered-menu/tiered-menu.module";
 
 @NgModule({
     declarations: [TieredMenuPopupButtonComponent],
@@ -43,7 +43,7 @@ import {SCRMTieredMenuModule} from "../../../tiered-menu/tiered-menu.module";
         LabelModule,
         PopupButtonModule,
         ReactiveFormsModule,
-        SCRMTieredMenuModule,
+        TieredMenuModule,
     ]
 })
 export class TieredMenuPopupButtonModule {

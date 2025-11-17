@@ -27,7 +27,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {TieredMenuComponent} from "./tiered-menu.component";
-import {TieredMenuModule} from "primeng/tieredmenu";
+import {TieredMenuModule as PrimengTieredMenuModule} from "primeng/tieredmenu";
 import {SearchBarModule} from "../search-bar/search-bar.module";
 import {LabelModule} from "../label/label.module";
 
@@ -38,11 +38,11 @@ import {LabelModule} from "../label/label.module";
     ],
     imports: [
         CommonModule,
-        TieredMenuModule,
+        PrimengTieredMenuModule,
         SearchBarModule,
         LabelModule,
     ]
 })
-export class SCRMTieredMenuModule {
+export class TieredMenuModule {
 }
 

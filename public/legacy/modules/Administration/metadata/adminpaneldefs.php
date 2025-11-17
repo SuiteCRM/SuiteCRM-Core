@@ -301,6 +301,13 @@ $admin_option_defs['Administration']['repair'] = [
     './index.php?module=Administration&action=Upgrade',
     'admin-repair'
 ];
+$admin_option_defs['Administration']['migrations'] = [
+    'Migrations',
+    'LBL_MANAGE_MANUAL_MIGRATION_TASKS',
+    'LBL_MANAGE_MANUAL_MIGRATION_TASKS_DESC',
+    'index.php?module=ManualMigrationTasks&action=index',
+    'admin-migrations'
+];
 if (!isset($GLOBALS['sugar_config']['hide_admin_backup']) || !$GLOBALS['sugar_config']['hide_admin_backup']) {
     $admin_option_defs['Administration']['backup_management'] = [
         'Backups',

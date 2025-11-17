@@ -513,6 +513,10 @@ $beanList['ExternalOAuthProvider'] = 'ExternalOAuthProvider';
 $beanFiles['ExternalOAuthProvider'] = 'modules/ExternalOAuthProvider/ExternalOAuthProvider.php';
 $modInvisList[] = 'ExternalOAuthProvider';
 
+$beanList['ManualMigrationTasks'] = 'ManualMigrationTask';
+$beanFiles['ManualMigrationTask'] = 'modules/ManualMigrationTasks/ManualMigrationTask.php';
+$modInvisList[] = 'ManualMigrationTasks';
+
 $beanList['TemplateSectionLine'] = 'TemplateSectionLine';
 $beanFiles['TemplateSectionLine'] = 'modules/TemplateSectionLine/TemplateSectionLine.php';
 $modules_exempt_from_availability_check['TemplateSectionLine'] = 'TemplateSectionLine';

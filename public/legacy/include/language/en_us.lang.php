@@ -784,6 +784,17 @@ $app_list_strings = array(
         'group' => 'Group',
     ],
 
+    'dom_manual_migration_tasks_types' => [
+        'background' => 'Background Process',
+        'immediate' => 'Immediate',
+    ],
+
+    'dom_manual_migration_tasks_statuses' => [
+        'pending' => 'Pending',
+        'running' => 'Running',
+        'done' => 'Done'
+    ],
+
     'dom_outbound_email_account_types' => [
         'user' => 'Personal',
         'group' => 'Group',
@@ -3797,6 +3808,7 @@ $app_strings['LBL_ROLE'] = 'Role';
 $app_list_strings['moduleList']['OutboundEmailAccounts'] = 'Outbound Email Accounts';
 $app_list_strings['moduleList']['ExternalOAuthConnection'] = 'External OAuth Connection';
 $app_list_strings['moduleList']['ExternalOAuthProvider'] = 'External OAuth Provider';
+$app_list_strings['moduleList']['ManualMigrationTasks'] = 'Migrations';
 
 //social
 $app_strings['FACEBOOK_USER_C'] = 'Facebook';

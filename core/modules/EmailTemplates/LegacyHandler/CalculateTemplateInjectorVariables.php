@@ -31,6 +31,7 @@ use App\Authentication\LegacyHandler\UserHandler;
 use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;
 use App\Languages\LegacyHandler\AppListStringsHandler;
+use App\Module\Service\ModuleRegistryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class CalculateTemplateInjectorVariables extends LegacyHandler
@@ -43,8 +44,13 @@ class CalculateTemplateInjectorVariables extends LegacyHandler
         string $defaultSessionName,
         LegacyScopeState $legacyScopeState,
         RequestStack $requestStack,
+        protected $variableInjectorBadFields,
+        protected $variableInjectorExcludedModules,
+        protected $variableInjectorMappedModuleLabels,
+        protected $variableInjectorShowOnlyModules,
         protected AppListStringsHandler $appListStringsHandler,
-        protected UserHandler $userHandler
+        protected UserHandler $userHandler,
+        protected ModuleRegistryInterface $moduleRegistry
     )
     {
         parent::__construct(
@@ -62,38 +68,36 @@ class CalculateTemplateInjectorVariables extends LegacyHandler
         return 'calculate-template-injector-variables';
     }
 
-    public function getModules(array $modules): array
+    public function getModules(string $baseModule, array $modulesToShow = []): array
     {
+        if (!empty($modulesToShow)) {
+            $mappedModules = [];
 
-        $mappedModules = [];
-
-        foreach ($modules as $key => $name) {
-            $associatedModules = $this->getAssociatedModules();
-            if (!isset($associatedModules[$name])) {
-                $mappedModules[$name] = $name;
-                continue;
+            foreach ($modulesToShow as $key => $name) {
+                $label = $this->getMappedLabel($baseModule, $name);
+                $mappedModules[$name] = $label ?? $name;
             }
 
-            foreach ($associatedModules[$name] as $associatedModule) {
-                $mappedModules[$associatedModule] = $associatedModule;
-            }
+            return $mappedModules;
         }
 
-        return $this->filterModules($mappedModules);
+        $modulesToShow = $this->getModulesToShow($baseModule);
+
+        return $this->filterModules($modulesToShow, $baseModule, false);
     }
 
-    public function getBaseModules(): array
+    public function getDefaultModules(): array
     {
         $moduleList = $this->getModuleList();
         return $this->filterModules($moduleList);
     }
 
-    public function getFieldDefs(array $moduleList = []): array
+    public function getFieldDefs(string $baseModule, $moduleList = []): array
     {
 
         $beanList = $this->getBeanList();
         $beanFiles = $this->getBeanFiles();
-        $badFields = $this->getBadFields();
+        $badFields = $this->getBadFields($baseModule);
 
         $modules = [];
         $prefixes = [];
@@ -104,10 +108,6 @@ class CalculateTemplateInjectorVariables extends LegacyHandler
 
         foreach ($moduleList as $key => $name) {
             if (!isset($beanList[$key]) || !isset($beanFiles[$beanList[$key]])) {
-                continue;
-            }
-
-            if (str_begin($key, 'AOW_')) {
                 continue;
             }
 
@@ -175,59 +175,22 @@ class CalculateTemplateInjectorVariables extends LegacyHandler
         return $appListStrings['moduleList'];
     }
 
-    protected function getBadFields(): array
+    protected function getBadFields(string $module): array
     {
-        return [
-            'account_description',
-            'contact_id',
-            'lead_id',
-            'opportunity_amount',
-            'opportunity_id',
-            'opportunity_name',
-            'opportunity_role_id',
-            'opportunity_role_fields',
-            'opportunity_role',
-            'campaign_id',
-            // User objects
-            'id',
-            'user_preferences',
-            'accept_status',
-            'user_hash',
-            'authenticate_id',
-            'sugar_login',
-            'reports_to_id',
-            'reports_to_name',
-            'employee_totp_secret',
-            'employee_backup_codes',
-            'totp_secret',
-            'backup_codes',
-            'is_admin',
-            'receive_notifications',
-            'modified_user_id',
-            'modified_by_name',
-            'created_by',
-            'created_by_name',
-            'accept_status_id',
-            'accept_status_name',
-        ];
-    }
+        $badFields = $this-> variableInjectorBadFields ?? [];
 
-    protected function getAssociatedModules(): array
-    {
-        return [
-            'EmailMarketing' => [
-                'Prospects',
-                'Contacts',
-                'Leads',
-                'Users',
-                'Accounts',
-            ],
-            'Contacts' => [
-                'Contacts',
-                'Leads',
-                'Prospects',
-            ],
-        ];
+        if (empty($badFields)) {
+            return [];
+        }
+
+        $badFieldsDefault = $badFields['default'] ?? [];
+        $moduleBadFields = $badFields[$module] ?? [];
+
+        if (empty($moduleBadFields)) {
+            return $badFieldsDefault;
+        }
+
+        return array_merge($badFieldsDefault, $moduleBadFields);
     }
 
     protected function getBeanList(): array
@@ -252,10 +215,11 @@ class CalculateTemplateInjectorVariables extends LegacyHandler
      * @param array $moduleList
      * @return array
      */
-    public function filterModules(array $moduleList): array
+    public function filterModules(array $moduleList, $baseModule = '', $checkExcludedModules = true): array
     {
         $beanFiles = $this->getBeanFiles();
         $beanList = $this->getBeanList();
+        $excludedModules = $this->getExcludedModules($baseModule);
 
         foreach ($moduleList as $key => $name) {
             if (!isset($beanList[$key]) || !isset($beanFiles[$beanList[$key]])) {
@@ -263,12 +227,11 @@ class CalculateTemplateInjectorVariables extends LegacyHandler
                 continue;
             }
 
-            if (str_begin($key, 'AOW_')) {
+            if ($checkExcludedModules && in_array($name, $excludedModules)) {
                 unset($moduleList[$key]);
-                continue;
             }
 
-            if (str_begin($key, 'zr2_')) {
+            if (!in_array($key, $this->moduleRegistry->getUserAccessibleModules())) {
                 unset($moduleList[$key]);
             }
         }
@@ -286,5 +249,102 @@ class CalculateTemplateInjectorVariables extends LegacyHandler
         return $this->appListStringsHandler->getAppListStrings($this->userHandler->getCurrentLanguage())->getItems();
     }
 
+    protected function getExcludedModules(string $module = ''): array
+    {
+        $excludedModules = $this-> variableInjectorExcludedModules ?? [];
 
+        if (empty($excludedModules)) {
+            return [];
+        }
+
+        $defaultExcludedModules = $excludedModules['default'] ?? [];
+
+        if (empty($module)) {
+            return $defaultExcludedModules;
+        }
+
+        if (!isset($excludedModules[$module])) {
+            return $defaultExcludedModules;
+        }
+
+        return array_merge($defaultExcludedModules, $excludedModules[$module]);
+
+    }
+
+    protected function getMappedModuleLabels($module = ''): array
+    {
+        $mappedModuleLabels = $this-> variableInjectorMappedModuleLabels ?? [];
+
+        if (empty($mappedModuleLabels)) {
+            return [];
+        }
+
+        if (empty($module)) {
+            return $mappedModuleLabels['default'] ?? [];
+        }
+
+        if (!isset($mappedModuleLabels[$module])) {
+            return $mappedModuleLabels['default'] ?? [];
+        }
+
+        return array_merge($mappedModuleLabels['default'] ?? [], $mappedModuleLabels[$module]);
+    }
+
+    protected function getModulesToShow(string $baseModule): array
+    {
+        $showOnlyModules = $this->variableInjectorShowOnlyModules ?? [];
+        $baseModules = $this->getDefaultModules();
+        if (empty($showOnlyModules)) {
+            return $baseModules;
+        }
+
+        if (!isset($showOnlyModules[$baseModule])) {
+            return $baseModules;
+        }
+
+        $mappedModules = [];
+
+        foreach ($showOnlyModules[$baseModule] as $module) {
+            $label = $this->getMappedLabel($baseModule, $module);
+            $mappedModules[$module] = $label ?? $module;
+        }
+
+        return $mappedModules;
+    }
+
+    protected function getMappedLabel(string $baseModule, mixed $module)
+    {
+        $appStrings = $this->getAppListStrings();
+        $mappedModuleLabels = $this->getMappedModuleLabels($baseModule);
+
+        if (!isset($mappedModuleLabels[$module])) {
+            return $appStrings['moduleListSingular'][$module] ?? $appStrings['moduleList'][$module] ?? $module;
+        }
+
+        $labelConfig = $mappedModuleLabels[$module];
+
+        if (isset($labelConfig['moduleLabel'])){
+            return $appStrings['moduleListSingular'][$labelConfig['moduleLabel']] ?? $module;
+        }
+
+        $labelKeys = $labelConfig['moduleLabels'] ?? [];
+        $separator = $labelConfig['separator'] ?? '/';
+
+        $label = '';
+        foreach ($labelKeys as $key) {
+            $part = $appStrings['moduleListSingular'][$key] ?? $key;
+            if (!empty($label)) {
+                $label .= $separator;
+            }
+            $label .= $part;
+        }
+
+
+        return $label;
+    }
+
+    protected function userHasAccessToModule(string $key): bool
+    {
+        $user = $this->userHandler->getCurrentUser();
+    }
 }

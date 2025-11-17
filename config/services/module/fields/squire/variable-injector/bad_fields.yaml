@@ -1,0 +1,33 @@
+parameters:
+  module.fields.squire.variable_injector.bad_fields:
+    default:
+      - account_description
+      - contact_id
+      - lead_id
+      - opportunity_amount
+      - opportunity_id
+      - opportunity_name
+      - opportunity_role_id
+      - opportunity_role_fields
+      - opportunity_role
+      - campaign_id
+      - id
+      - user_preferences
+      - accept_status
+      - user_hash
+      - sugar_login
+      - authenticate_id
+      - reports_to_id
+      - reports_to_name
+      - employee_totp_secret
+      - employee_backup_codes
+      - totp_secret
+      - backup_codes
+      - is_admin
+      - receive_notifications
+      - modified_user_id
+      - modified_by_name
+      - created_by
+      - created_by_name
+      - accept_status_id
+      - accept_status_name

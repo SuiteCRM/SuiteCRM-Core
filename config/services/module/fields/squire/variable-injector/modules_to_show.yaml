@@ -1,0 +1,8 @@
+parameters:
+  module.fields.squire.variable_injector.modules_to_show:
+    EmailMarketing:
+      - Accounts
+      - Contacts
+      - Leads
+      - Prospects
+      - Users

@@ -1,0 +1,9 @@
+parameters:
+  module.fields.squire.variable_injector.mapped_module_labels:
+    default:
+      Contacts:
+        separator: '/'
+        moduleLabels:
+          - Contacts
+          - Leads
+          - Prospects

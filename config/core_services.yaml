@@ -31,6 +31,10 @@ services:
       $cacheResetActions: '%legacy.cache_reset_actions%'
       $navigationTabLimits: '%themes.navigation_tab_limits%'
       $baseActions: '%module.base_actions%'
+      $variableInjectorBadFields: '%module.fields.squire.variable_injector.bad_fields%'
+      $variableInjectorExcludedModules: '%module.fields.squire.variable_injector.excluded_modules%'
+      $variableInjectorMappedModuleLabels: '%module.fields.squire.variable_injector.mapped_module_labels%'
+      $variableInjectorShowOnlyModules: '%module.fields.squire.variable_injector.modules_to_show%'
       $filterRangeSearchTypes: '%module.filter.range_search_types%'
       $listViewBulkActions: '%module.listview.bulk_action%'
       $listViewLineActions: '%module.listview.line_action%'
@@ -86,6 +90,9 @@ services:
       $entityRecordMapperRegistry: '@entity.record.mapper.registry'
       $entityFieldMapperRegistry: '@entity.field.mapper.registry'
       $entityFieldTypeMapperRegistry: '@entity.fieldType.mapper.registry'
+
+
+
 
   _instanceof:
     App\Process\Service\ProcessHandlerInterface:

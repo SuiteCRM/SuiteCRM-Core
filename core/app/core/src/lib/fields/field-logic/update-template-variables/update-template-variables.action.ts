@@ -61,14 +61,14 @@ export class UpdateTemplateVariablesAction extends FieldLogicActionHandler {
 
         const baseRecord = this.recordManager.getBaseRecord(record);
 
-        let templateModules = [];
+        let showOnlyModules = [];
 
-        if (Array.isArray(action?.params?.modules ?? []) && action?.params?.modules?.length > 0) {
-            templateModules = action.params.modules;
+        if (Array.isArray(action?.params?.showOnlyModules ?? []) && action?.params?.showOnlyModules?.length > 0) {
+            showOnlyModules = action.params.showOnlyModules;
         }
 
         if (baseRecord.attributes['parent_type']) {
-            templateModules.push(baseRecord.attributes['parent_type']);
+            showOnlyModules.push(baseRecord.attributes['parent_type']);
         }
 
         const options = {
@@ -77,8 +77,8 @@ export class UpdateTemplateVariablesAction extends FieldLogicActionHandler {
             record: baseRecord
         } as AsyncActionInput;
 
-        if (templateModules.length > 0) {
-            options['templateModules'] = templateModules;
+        if (showOnlyModules.length > 0) {
+            options['showOnlyModules'] = showOnlyModules;
         }
 
         field.loading.set(true)

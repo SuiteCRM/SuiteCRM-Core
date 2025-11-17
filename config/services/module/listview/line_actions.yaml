@@ -133,3 +133,6 @@ parameters:
     surveys:
       exclude:
         - modal-create
+    manual-migration-tasks:
+      exclude:
+        - modal-create

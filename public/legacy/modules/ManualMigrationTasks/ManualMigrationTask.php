@@ -46,4 +46,148 @@ class ManualMigrationTask extends Basic
     public $estimated_run_time;
     public $status;
     public $service_key;
+
+
+    /**
+     * @inheritDoc
+     */
+    public function retrieve($id = -1, $encode = true, $deleted = true)
+    {
+        $result = parent::retrieve($id, $encode, $deleted);
+
+        if (!empty($result) && !$this->hasAccess()) {
+            $this->logAccessDenied('retrieve');
+
+            return null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function save($check_notify = false)
+    {
+        if (!$this->hasAccess()) {
+            $this->logAccessDenied('save');
+            throw new RuntimeException('Access Denied');
+        }
+
+        $this->keepWriteOnlyFieldValues();
+
+
+        return parent::save($check_notify);
+    }
+
+    /**
+     * Check if user has access to personal account
+     * @return bool
+     */
+    public function hasAccess(): bool
+    {
+        global $current_user;
+
+        if (is_admin($current_user)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Log personal account access denied
+     * @param string $action
+     * @return void
+     */
+    public function logAccessDenied(string $action): void
+    {
+        global $log, $current_user;
+
+        $log->fatal("ManualMigrationTask | Access denied. Action: '" . $action . "' | Current user id: '" . $current_user->id . "' | record: '" . $this->id . "'");
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function bean_implements($interface)
+    {
+        if ($interface === 'ACL') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function ACLAccess($view, $is_owner = 'not_set', $in_group = 'not_set')
+    {
+        global $current_user;
+
+        $isNotAllowAction = $this->isNotAllowedAction($view);
+        if ($isNotAllowAction === true) {
+            return false;
+        }
+
+        if (!$this->hasAccess()) {
+            $this->logAccessDenied("ACLAccess-$view");
+
+            return false;
+        }
+
+        return parent::ACLAccess($view, $is_owner, $in_group);
+    }
+
+
+    /**
+     * Do not clear write only fields
+     * @return void
+     */
+    protected function keepWriteOnlyFieldValues(): void
+    {
+        if (empty($this->fetched_row)) {
+            return;
+        }
+
+        foreach ($this->field_defs as $field => $field_def) {
+            if (empty($field_def['display']) || $field_def['display'] !== 'writeonly') {
+                continue;
+            }
+
+            if (empty($this->fetched_row[$field])) {
+                continue;
+            }
+
+            if (!empty($this->$field)) {
+                continue;
+            }
+
+            $this->$field = $this->fetched_row[$field];
+        }
+    }
+
+
+    /**
+     * Get not allowed action
+     * @param string $view
+     * @return bool
+     */
+    protected function isNotAllowedAction(string $view): bool
+    {
+        $notAllowed = [
+            'export',
+            'import',
+            'massupdate',
+            'duplicate',
+            'edit',
+            'editview',
+            'delete',
+            'create',
+            'save'
+        ];
+
+        return in_array(strtolower($view), $notAllowed);
+    }
 }

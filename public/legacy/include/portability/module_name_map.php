@@ -218,6 +218,10 @@ $module_name_map = [
         'frontend' => 'external-oauth-connection',
         'core' => 'ExternalOAuthConnection'
     ],
+    'ManualMigrationTasks' => [
+        'frontend' => 'manual-migration-tasks',
+        'core' => 'ManualMigrationTasks'
+    ],
     'TemplateSectionLine' => [
         'frontend' => 'template-section-line',
         'core' => 'TemplateSectionLine'

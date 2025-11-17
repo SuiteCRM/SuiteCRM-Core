@@ -57,13 +57,6 @@ export class TieredMenuPopupButtonComponent implements OnInit {
         const fieldDefs = this.config.metadata.fieldDefs || {};
 
         Object.entries(modules).forEach(([key, value]) => {
-            const moduleListSingular = this.languageStore.getAppListString('moduleListSingular');
-            let label = (moduleListSingular && moduleListSingular[value as string]) || '';
-
-            if (label === 'Contact'){
-                label = this.getMergedLabel();
-            }
-
             const moduleFieldDefs = fieldDefs[value as string] || [];
             const subItems: MenuItem[] = moduleFieldDefs.map(fieldDef => ({
                 label: this.languageStore.getFieldLabel(fieldDef.value, this.moduleNameMapper.toFrontend(key)),
@@ -74,19 +67,11 @@ export class TieredMenuPopupButtonComponent implements OnInit {
             }))
 
             items.push({
-                label: label,
+                label: value as string,
                 items: subItems
             });
         });
 
         return items;
-    }
-
-    protected getMergedLabel() {
-        const contactLabel = this.languageStore.getAppListString('moduleListSingular')['Contact'] || 'Contact';
-        const leadLabel = this.languageStore.getAppListString('moduleListSingular')['Lead'] || 'Lead';
-        const prospectLabel = this.languageStore.getAppListString('moduleListSingular')['Prospect'] || 'Target';
-
-        return `${contactLabel}/${leadLabel}/${prospectLabel}`;
     }
 }

@@ -55,24 +55,24 @@ export class TieredMenuComponent implements OnInit {
             return;
         }
 
-        const filterItems = (items: MenuItem[]): MenuItem[] => {
-            return items.reduce((filtered: MenuItem[], item) => {
-                const matchesLabel = item.label?.toLowerCase().includes(searchTerm.toLowerCase());
-                const matchesBadge = item.badge?.toLowerCase().includes(searchTerm.toLowerCase());
-                const filteredSubItems = item.items ? filterItems(item.items) : [];
+        this.items.set(this.filterItems(this.itemsName || [], searchTerm));
+    }
 
-                if (matchesLabel || matchesBadge || filteredSubItems.length > 0) {
-                    filtered.push({
-                        ...item,
-                        items: filteredSubItems.length > 0 ? filteredSubItems : item.items
-                    });
-                }
 
-                return filtered;
-            }, []) as MenuItem[];
-        };
+    filterItems(items: MenuItem[], searchTerm): MenuItem[] {
+        return items.reduce((filtered: MenuItem[], item) => {
+            const matchesLabel = item.label?.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesBadge = item.badge?.toLowerCase().includes(searchTerm.toLowerCase());
+            const filteredSubItems = item.items ? this.filterItems(item.items, searchTerm) : [];
+            if (matchesLabel || matchesBadge || filteredSubItems.length > 0) {
+                filtered.push({
+                    ...item,
+                    items: filteredSubItems.length > 0 ? filteredSubItems : item.items
+                });
+            }
 
-        this.items.set(filterItems(this.itemsName || []));
+            return filtered;
+        }, []) as MenuItem[];
     }
 }
 

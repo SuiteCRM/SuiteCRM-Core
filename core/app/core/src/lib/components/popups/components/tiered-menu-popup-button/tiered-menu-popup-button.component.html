@@ -26,7 +26,7 @@
 */
 -->
 
-<div class="insert-link-popup-button">
+<div class="tiered-menu-popup-button">
     <scrm-popup-button [icon]="config?.icon"
                        class=""
                        [placement]="['bottom-left', 'bottom-right', 'bottom', 'top-right']"
@@ -35,7 +35,7 @@
                        [titleKey]="config.titleKey"
                        [popoverClass]="''"
     >
-        <div popup-content class="insert-link-popup-body d-flex flex-column container-popover scrollbar-thin p-1">
+        <div popup-content class="tiered-menu-popup-body d-flex flex-column container-popover scrollbar-thin p-1">
             <scrm-tiered-menu [itemsName]="items"></scrm-tiered-menu>
         </div>
     </scrm-popup-button>

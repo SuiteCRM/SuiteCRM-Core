@@ -264,3 +264,7 @@ parameters:
       index: true
       list: true
       record: true
+    manual-migration-tasks:
+      index: true
+      list: true
+      record: true

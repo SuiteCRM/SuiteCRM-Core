@@ -53,6 +53,7 @@ export class BaseRecordHeaderComponent implements OnInit, OnDestroy {
     backButtonConfig: ButtonInterface;
 
     protected subs: Subscription[] = [];
+    showFavoriteToggle: boolean = false;
 
     @HostListener('window:scroll') onScroll() {
         const scrollPosition = window.pageYOffset;
@@ -101,6 +102,8 @@ export class BaseRecordHeaderComponent implements OnInit, OnDestroy {
         this.subs.push(this.recordViewStore.validating$.subscribe(validating => {
             this.validating.set(validating);
         }))
+
+        this.showFavoriteToggle = this.recordViewStore.showFavoritesToggle();
 
     }
 

@@ -61,6 +61,7 @@ export interface ParentNavigation {
 
 export interface HeaderMetadata {
     backButton?: BackButtonConfig;
+    showFavoritesToggle?: boolean;
 
     [key: string]: any;
 }

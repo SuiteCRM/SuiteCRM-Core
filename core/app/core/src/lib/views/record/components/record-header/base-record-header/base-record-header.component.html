@@ -57,7 +57,7 @@
                 >
                     <div class="p-0 d-inline-block"
                          [ngClass]="isScrolled ? 'record-view-name-scrolled' : 'record-view-name'">
-                        <div *ngIf="record && record.fields && mode !== 'create'"
+                        <div *ngIf="record && record.fields && mode !== 'create' && showFavoriteToggle"
                              class="float-right align-items-top d-flex">
                             <scrm-favorite-toggle [record]="record"
                                                   class="h-100 lh-100"></scrm-favorite-toggle>

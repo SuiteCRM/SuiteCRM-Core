@@ -46,10 +46,11 @@ import {RecordSaveGQL} from '../../../../store/record/graphql/api.record.save';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {ModuleNavigation} from '../../../../services/navigation/module-navigation/module-navigation.service';
 import {
+    HeaderMetadata,
     Metadata,
     MetadataStore,
-    RecordViewSectionMetadata,
     RecordViewMetadata,
+    RecordViewSectionMetadata,
     SummaryTemplates
 } from '../../../../store/metadata/metadata.store.service';
 import {MessageService} from '../../../../services/message/message.service';
@@ -528,6 +529,13 @@ export class RecordViewStore extends ViewStore implements StateStore, BaseRecord
         const recordMeta = metadata.recordView || {} as RecordViewMetadata;
         const templates = recordMeta.summaryTemplates || {} as SummaryTemplates;
         return templates[this.getMode()] || '';
+    }
+
+    showFavoritesToggle(): boolean {
+        const metadata = this.metadata || {} as Metadata;
+        const recordMeta = metadata.recordView || {} as RecordViewMetadata;
+        const header = recordMeta.header || {} as HeaderMetadata;
+        return header?.showFavoritesToggle ?? true;
     }
 
 

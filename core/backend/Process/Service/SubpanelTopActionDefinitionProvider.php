@@ -96,7 +96,7 @@ class SubpanelTopActionDefinitionProvider extends ActionDefinitionProvider imple
      * @param string $actionKey
      * @return bool
      */
-    public function isActionAccessible(string $module, string $actionKey): bool
+    protected function isActionAccessible(string $module, string $actionKey): bool
     {
         return $this->isActionDefined($actionKey)
             && $this->isActionAvailable($module, $actionKey);
@@ -137,12 +137,11 @@ class SubpanelTopActionDefinitionProvider extends ActionDefinitionProvider imple
         }
 
         $mappedModule = $mappedButton['module'] ?? $module;
-        $mappedAcls = $mappedButton['acl'] ?? [];
 
-        foreach ($mappedAcls as $aclKey) {
-            if (!$this->isActionAccessible($mappedModule, $aclKey)) {
-                return [];
-            }
+        $actions = $this->getActions($mappedModule);
+
+        if (empty($actions[$mappedButton['action'] ?? ''])) {
+            return [];
         }
 
         $mappedButton['additionalFields'] = $topButton['additionalFields'] ?? [];

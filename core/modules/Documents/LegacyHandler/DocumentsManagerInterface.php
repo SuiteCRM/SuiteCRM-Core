@@ -7,4 +7,6 @@ interface DocumentsManagerInterface
     public function getLatestRevision(string $documentId): string;
 
     public function getLatestRevisionId(string $documentId): string;
+
+    public function getDocumentIdByRevisionId(mixed $recordId);
 }

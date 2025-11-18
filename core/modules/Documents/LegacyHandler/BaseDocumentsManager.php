@@ -71,4 +71,15 @@ class BaseDocumentsManager implements DocumentsManagerInterface
         return $this->preparedStatementHandler->createQueryBuilder();
     }
 
+     public function getDocumentIdByRevisionId(mixed $recordId)
+    {
+        $queryBuilder = $this->createQueryBuilder();
+        $queryBuilder->select('document_id')
+            ->from('document_revisions')
+            ->where('id = :id')
+            ->setParameter('id', $recordId)
+            ->setMaxResults(1);
+
+        return $queryBuilder->executeQuery()->fetchOne();
+    }
 }

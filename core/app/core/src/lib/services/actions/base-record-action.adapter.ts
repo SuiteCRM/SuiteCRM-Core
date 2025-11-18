@@ -39,6 +39,7 @@ import {take} from "rxjs/operators";
 import {FieldLogicManager} from "../../fields/field-logic/field-logic.manager";
 import {RecordManager} from "../record/record.manager";
 import {RecordMapperRegistry} from "../../common/record/record-mappers/record-mapper.registry";
+import {isString} from "lodash-es";
 
 @Injectable()
 export abstract class BaseRecordActionsAdapter<D extends RecordBasedActionData> extends BaseActionsAdapter<D> {
@@ -107,7 +108,18 @@ export abstract class BaseRecordActionsAdapter<D extends RecordBasedActionData> 
      * @param context
      */
     protected getActionName(action: Action, context: ActionContext = null) {
-        return `record-${action.key}`;
+
+        const prefix = action?.params?.asyncProcessKeyPrefix ?? 'record';
+
+        const keyFieldName = action?.params?.asyncProcessKeyField ?? '';
+        const record = context?.record ?? null;
+        const keyField = record.fields[keyFieldName ?? ''] ?? null;
+        const keyFieldValue = keyField?.value ?? null;
+        if (keyFieldValue && isString(keyFieldValue)) {
+            return `${prefix}-${keyFieldValue}`;
+        }
+
+        return `${prefix}-${action.key}`;
     }
 
     /**

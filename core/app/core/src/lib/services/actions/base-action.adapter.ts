@@ -186,8 +186,9 @@ export abstract class BaseActionsAdapter<D extends ActionData> implements Action
     /**
      * Get action name
      * @param action
+     * @param context
      */
-    protected getActionName(action: Action) {
+    protected getActionName(action: Action, context: ActionContext = null) {
         return `${action.key}`;
     }
 
@@ -288,7 +289,7 @@ export abstract class BaseActionsAdapter<D extends ActionData> implements Action
      * @param afterActionLogic
      */
     protected runAsyncAction(action: Action, context: ActionContext = null, afterActionLogic: AfterActionLogicDefinitions = null): void {
-        const actionName = this.getActionName(action);
+        const actionName = this.getActionName(action, context);
         const moduleName = this.getModuleName(context);
 
         this.message.removeMessages();

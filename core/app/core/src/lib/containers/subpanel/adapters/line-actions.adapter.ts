@@ -79,8 +79,9 @@ export class SubpanelLineActionsAdapter extends BaseActionsAdapter<SubpanelLineA
     /**
      * Get action name
      * @param action
+     * @param context
      */
-    protected getActionName(action: Action) {
+    protected getActionName(action: Action, context: ActionContext = null) {
         return `record-${action.key}`;
     }
 

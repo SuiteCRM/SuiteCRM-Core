@@ -106,8 +106,9 @@ export class RecordThreadListActionsAdapter extends BaseRecordActionsAdapter<Rec
     /**
      * Get action name
      * @param action
+     * @param context
      */
-    protected getActionName(action: Action) {
+    protected getActionName(action: Action, context: ActionContext = null) {
         return `record-thread-list-${action.key}`;
     }
 

@@ -66,4 +66,7 @@ $mod_strings = [
     'LBL_SERVICE_KEY' => 'Service Key',
 
     'LBL_OWNER' => 'Owner',
+
+    'LBL_RUN_MIGRATION' => 'Run Migration',
+    'LBL_RUN_MIGRATION_CONFIRMATION' => 'Are you sure you want to run this migration?',
 ];

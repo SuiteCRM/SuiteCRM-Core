@@ -48,6 +48,38 @@ $viewdefs[$module_name]['DetailView'] = [
         'showFavoritesToggle' => false,
     ],
     'recordActions' => [
+        'actions' => [
+            'run-migration' => [
+                'key' => 'run-migration',
+                'labelKey' => 'LBL_RUN_MIGRATION',
+                'asyncProcess' => true,
+                'priority' => 100,
+                'modes' => ['detail'],
+                'params' => [
+                    'asyncProcessKeyField' => 'service_key',
+                    'asyncProcessKeyPrefix' => 'migration-task',
+                    'expanded' => true,
+                    'disableOnRun' => true,
+                    'displayConfirmation' => true,
+                    'confirmationMessages' => ['LBL_RUN_MIGRATION_CONFIRMATION'],
+                ],
+                'displayLogic' => [
+                    'hide-on-running' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'activeOnFields' => [
+                                'status' => [
+                                    [
+                                        'operator' => 'not-equal',
+                                        'values' => ['pending']
+                                    ],
+                                ],
+                            ]
+                        ]
+                    ],
+                ],
+            ]
+        ],
         'exclude' => [
             'duplicate',
             'delete',
@@ -55,7 +87,8 @@ $viewdefs[$module_name]['DetailView'] = [
             'save',
             'saveNew',
             'saveContinue',
-            'edit'
+            'edit',
+            'create',
         ]
     ],
     'panels' => [

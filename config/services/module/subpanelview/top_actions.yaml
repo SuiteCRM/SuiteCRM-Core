@@ -60,3 +60,16 @@ parameters:
           modes:
             - list
           acl:
+    modules:
+      document-revisions:
+        actions:
+          create:
+            key: create
+            labelKey: LBL_QUICK_CREATE
+            action: create
+            aclModule: 'Documents'
+            params:
+            modes:
+              - list
+            acl:
+              - edit

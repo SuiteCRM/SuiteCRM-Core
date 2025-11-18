@@ -28,4 +28,21 @@ parameters:
             - list
           acl:
             - edit
-
+    modules:
+      document-revisions:
+        actions:
+          unlink:
+            key: unlink
+            labelKey: LBL_UNLINK_RECORD
+            action: unlink
+            icon: unlink
+            aclModule: 'Documents'
+            asyncProcess: true
+            routing: false
+            params:
+              displayConfirmation: true
+              confirmationLabel: LBL_UNLINK_RELATIONSHIP_CONFIRM
+            modes:
+              - list
+            acl:
+              - edit

@@ -4362,3 +4362,7 @@ $app_strings['LBL_UNABLE_TO_GET_DRAFT_ID'] = 'Unable to retrieve Draft ID.';
 $app_strings['LBL_UNABLE_TO_DELETE_DRAFT'] = 'Unable to delete draft.';
 $app_strings['LBL_EMAIL_NOT_DRAFT'] = 'Email is no longer a draft.';
 $app_strings['LBL_DRAFT_DELETED_SUCCESSFULLY'] = 'Draft Deleted Successfully.';
+
+$app_strings['LBL_CANNOT_DELETE_LATEST_REVISION'] = 'You cannot delete the latest revision of a document.';
+$app_strings['LBL_NO_DOCUMENT_ID_PROVIDED'] = 'Cannot find document to delete revision, no document id provided.';
+$app_strings['LBL_NO_RECORD_ID_PROVIDED'] = 'Cannot find docuemnt revision to delete, no record id provided.';

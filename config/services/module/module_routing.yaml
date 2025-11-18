@@ -68,6 +68,10 @@ parameters:
       index: true
       list: true
       record: true
+    document-revisions:
+      index: true
+      list: true
+      record: true
     cases:
       index: true
       list: true

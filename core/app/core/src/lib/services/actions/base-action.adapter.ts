@@ -99,7 +99,7 @@ export abstract class BaseActionsAdapter<D extends ActionData> implements Action
         const displayConfirmation = params.displayConfirmation || false;
         const confirmationLabel = params.confirmationLabel || '';
         const confirmationMessages = params.confirmationMessages || '';
-        const modalContext = params.context || {} as StringMap;
+        const modalContext = {module: context?.module ?? '', ...(params.context || {} as StringMap)} as StringMap;
         const fields = params.fields || {} as FieldMap;
 
         const selectModal = action.params && action.params.selectModal;

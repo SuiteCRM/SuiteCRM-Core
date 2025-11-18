@@ -33,14 +33,22 @@
     <div class="p-3" modal-body>
         <ng-container *ngIf="textKey">
             <div class="pb-1">
-                <scrm-dynamic-label [labelKey]="textKey" [fields]="fields"
-                                    [context]="context"></scrm-dynamic-label>
+                <scrm-dynamic-label [labelKey]="textKey"
+                                    [fields]="fields"
+                                    [context]="context"
+                                    [module]="context?.module ?? ''"
+                >
+                </scrm-dynamic-label>
             </div>
         </ng-container>
         <ng-container *ngFor="let labelKey of labelKeys">
             <div class="pb-1">
-                <scrm-dynamic-label [labelKey]="labelKey" [fields]="fields"
-                                    [context]="context"></scrm-dynamic-label>
+                <scrm-dynamic-label [labelKey]="labelKey"
+                                    [fields]="fields"
+                                    [context]="context"
+                                    [module]="context?.module ?? ''"
+                >
+                </scrm-dynamic-label>
             </div>
         </ng-container>
     </div>

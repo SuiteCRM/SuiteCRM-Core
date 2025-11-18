@@ -125,3 +125,13 @@ parameters:
       employees:
         exclude:
           - delete
+      manual-migration-tasks:
+        exclude:
+          - edit
+          - create
+          - duplicate
+          - delete
+          - duplicate-merge
+          - save
+          - saveNew
+          - saveContinue

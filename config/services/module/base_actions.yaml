@@ -1,6 +1,16 @@
 parameters:
   module.base_actions:
     modules:
+      manual-migration-tasks:
+        exclude:
+          - edit
+          - create
+          - duplicate
+          - delete
+          - duplicate-merge
+          - save
+          - saveNew
+          - saveContinue
       email-marketing:
         actions:
           edit:

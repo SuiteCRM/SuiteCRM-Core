@@ -115,6 +115,7 @@ export class BaseFieldHandler<T extends BaseField> implements FieldHandler<T> {
             action: processType,
             module: record.module ?? '',
             field: field.name,
+            attributes: record?.attributes ?? {},
         } as AsyncActionInput;
 
         field.loading.set(true);

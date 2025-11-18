@@ -27,6 +27,7 @@
 import {Injectable} from '@angular/core';
 import {ViewMode} from '../../../../common/views/view.model';
 import {RecordActionData, RecordActionHandler} from '../record.action';
+import {MessageService} from "../../../../services/message/message.service";
 
 @Injectable({
     providedIn: 'root'
@@ -36,11 +37,18 @@ export class RecordEditAction extends RecordActionHandler {
     key = 'edit';
     modes = ['detail' as ViewMode];
 
-    constructor() {
+    constructor(
+        protected message: MessageService
+    ) {
         super();
     }
 
     run(data: RecordActionData): void {
+        const checkAccess = this.checkRecordAccess(data, ['edit']);
+        if (!checkAccess) {
+            this.message.addDangerMessageByKey('ERR_UNAUTHORIZED_PAGE_ACCESS');
+            return;
+        }
         data.store.setMode('edit' as ViewMode);
     }
 

@@ -218,6 +218,7 @@ class RecordViewDefinitionHandler extends LegacyHandler
 
         $this->addTemplateMeta($recordViewDefs, $metadata);
         $this->addMetadata($recordViewDefs, $metadata);
+        $this->addHeaderMetadata($recordViewDefs, $metadata);
         $this->addTopWidgetConfig($module, $recordViewDefs, $metadata);
         $this->addSidebarWidgetConfig($module, $recordViewDefs, $metadata);
         $this->addBottomWidgetConfig($module, $recordViewDefs, $metadata);
@@ -434,6 +435,15 @@ class RecordViewDefinitionHandler extends LegacyHandler
     protected function addMetadata(array $viewDefs, array &$metadata): void
     {
         $metadata['metadata'] = $viewDefs['metadata'] ?? [];
+    }
+
+    /**
+     * @param array $viewDefs
+     * @param array $metadata
+     */
+    protected function addHeaderMetadata(array $viewDefs, array &$metadata): void
+    {
+        $metadata['header'] = $viewDefs['header'] ?? [];
     }
 
     /**

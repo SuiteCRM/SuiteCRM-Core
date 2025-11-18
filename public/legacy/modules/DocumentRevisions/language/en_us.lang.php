@@ -49,6 +49,9 @@ $mod_strings = array(
     'LNK_NEW_DOCUMENT' => 'Create Document',
     'LNK_DOCUMENT_LIST' => 'View Documents',
 
+    'LBL_OVERVIEW' => 'Overview',
+    'LBL_OTHER' => 'Other',
+
     //vardef labels
     'LBL_REVISION_NAME' => 'Revision Number',
     'LBL_FILENAME' => 'File:',

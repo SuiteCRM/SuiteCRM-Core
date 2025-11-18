@@ -44,6 +44,9 @@ $viewdefs[$module_name]['DetailView'] = [
             ],
         ],
     ],
+    'header' => [
+        'showFavoritesToggle' => false,
+    ],
     'recordActions' => [
         'exclude' => [
             'duplicate',

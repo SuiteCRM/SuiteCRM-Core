@@ -38,43 +38,72 @@
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
-$viewdefs['DocumentRevisions']['DetailView'] = array(
-    'templateMeta' => array('maxColumns' => '2',
-                            'form' => array(
-                                'buttons' => array(),
-                                'hidden'=>array('<input type="hidden" name="old_id" value="{$fields.document_revision_id.value}">')),
-                            'widths' => array(
-                                array('label' => '10', 'field' => '30'),
-                                array('label' => '10', 'field' => '30')
-                                ),
-        ),
-    'panels' =>
-    array(
-        '' =>
-        array(
-            array(
+$viewdefs['DocumentRevisions']['DetailView'] = [
+    'header' => [
+        'backButton' => [
+            'display' => true,
+            'navigate' => [
+                'parentId' => 'document_id',
+                'parentModule' => 'Documents',
+            ],
+        ]
+    ],
+    'summaryTemplates' => [
+        'edit' => 'LBL_REVISION_FILENAME',
+        'detail' => 'LBL_REVISION_FILENAME',
+    ],
+    'templateMeta' => ['maxColumns' => '2',
+        'useTabs' => true,
+        'tabDefs' => [
+            'LBL_OVERVIEW' => [
+                'newTab' => true,
+                'panelDefault' => 'expanded',
+            ],
+            'LBL_OTHER' => [
+                'newTab' => true,
+                'panelDefault' => 'expanded',
+            ],
+        ],
+        'form' => [
+            'buttons' => [],
+        ],
+        'widths' => [
+            ['label' => '10', 'field' => '30'],
+            ['label' => '10', 'field' => '30']
+        ],
+    ],
+    'recordActions' => [
+        'exclude' => [
+            'edit',
+            'delete',
+            'duplicate',
+        ]
+    ],
+    'panels' => [
+        'LBL_OVERVIEW' => [
+            [
                 'document_name',
                 'latest_revision',
-            ),
-            
-            array(
+            ],
+
+            [
                 'revision',
-            ),
-            
-            array(
+            ],
+
+            [
                 'filename',
-            ),
-            
-            array(
-                array(
+            ],
+            [
+                'change_log',
+            ],
+        ],
+        'LBL_OTHER' => [
+            [
+                [
                     'name' => 'date_entered',
                     'customCode' => '{$fields.date_entered.value} {$APP.LBL_BY} {$fields.created_by_name.value}',
-                ),
-            ),
-
-            array(
-                'change_log',
-            ),
-        ),
-    ),
-);
+                ],
+            ],
+        ]
+    ],
+];

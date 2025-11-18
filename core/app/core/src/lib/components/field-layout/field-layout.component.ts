@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, Input} from '@angular/core';
+import {Component, Input, signal, WritableSignal} from '@angular/core';
 import {FieldMap} from '../../common/record/field.model';
 import {Panel} from '../../common/metadata/metadata.model';
 import {Record} from '../../common/record/record.model';
@@ -44,6 +44,7 @@ export class FieldLayoutComponent extends BaseFieldGridComponent {
     layout: Panel;
     fields: FieldMap;
     record: Record;
+    showEditIcon: WritableSignal<boolean> = signal(true);
 
     baseColClass = {
         col: true,
@@ -80,6 +81,10 @@ export class FieldLayoutComponent extends BaseFieldGridComponent {
         }));
         this.subscriptions.push(this.dataSource.getRecord().subscribe(record => {
             this.record = {...record};
+
+            if (!Object.values(this.record.acls).includes('edit')) {
+                this.showEditIcon.set(false);
+            }
         }));
 
         super.ngOnInit();

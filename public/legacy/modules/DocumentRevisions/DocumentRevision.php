@@ -203,6 +203,17 @@ class DocumentRevision extends SugarBean
         }
     }
 
+    public function ACLAccess($view, $is_owner = 'not_set', $in_group = 'not_set')
+    {
+        $notAllowedActions = $this->getNotAllowedActions();
+
+        if (in_array($view, $notAllowedActions)) {
+            return false;
+        }
+
+        return parent::ACLAccess($view, $is_owner, $in_group);
+    }
+
     /**
      * Returns a filename based off of the logical (Sugar-side) Document name and combined with the revision. Tailor
      * this to needs created by email RFCs, filesystem name conventions, charset conventions etc.
@@ -341,6 +352,15 @@ class DocumentRevision extends SugarBean
             case 'FILE': return true;
         }
         return parent::bean_implements($interface);
+    }
+
+    protected function getNotAllowedActions(): array
+    {
+        return [
+            'duplicate',
+            'delete',
+            'list'
+        ];
     }
 }
 

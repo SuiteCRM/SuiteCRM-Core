@@ -9,6 +9,7 @@ parameters:
     default_theme: true
     module_name_map: true
     action_name_map: true
+    allow_latest_revision_delete: true
     system_name: true
     subpanel_pagination_type: true
     listview_pagination_type: true

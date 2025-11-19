@@ -30,6 +30,7 @@ use App\Data\Entity\Record;
 use App\Data\Service\Record\ApiRecordMappers\ApiRecordMapperInterface;
 use App\FieldDefinitions\Entity\FieldDefinition;
 use App\Module\Documents\LegacyHandler\DocumentsManagerInterface;
+use App\SystemConfig\Service\SystemConfigProviderInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
 #[Autoconfigure(lazy: true)]
@@ -38,6 +39,7 @@ class DocumentRevisionUnlinkMapper implements ApiRecordMapperInterface
 
     public function __construct(
         protected DocumentsManagerInterface $documentsManager,
+        protected SystemConfigProviderInterface $systemConfigProvider,
     )
     {
     }
@@ -70,9 +72,10 @@ class DocumentRevisionUnlinkMapper implements ApiRecordMapperInterface
             return;
         }
 
+        $allowDelete = $this->systemConfigProvider->getSystemConfig('allow_latest_revision_delete')->getValue() ?? false;
         $latestRevisionId = $this->documentsManager->getLatestRevisionId($documentId);
 
-        if ($attributes['id'] !== $latestRevisionId) {
+        if ($attributes['id'] !== $latestRevisionId && !$allowDelete) {
             return;
         }
 

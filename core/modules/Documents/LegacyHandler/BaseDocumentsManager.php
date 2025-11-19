@@ -38,6 +38,14 @@ class BaseDocumentsManager implements DocumentsManagerInterface
     {
     }
 
+    public function increaseRevisionNumber(string $revision): string
+    {
+        $revisionParts = explode('.', $revision);
+        $revisionParts[count($revisionParts) - 1] = (int)$revisionParts[count($revisionParts) - 1] + 1;
+        return implode('.', $revisionParts);
+    }
+
+
     public function getLatestRevision(string $documentId): string
     {
         $queryBuilder = $this->createQueryBuilder();
@@ -71,7 +79,7 @@ class BaseDocumentsManager implements DocumentsManagerInterface
         return $this->preparedStatementHandler->createQueryBuilder();
     }
 
-     public function getDocumentIdByRevisionId(mixed $recordId)
+     public function getDocumentIdByRevisionId(string $recordId): string
     {
         $queryBuilder = $this->createQueryBuilder();
         $queryBuilder->select('document_id')

@@ -103,9 +103,7 @@ class GetNewRevisionNumber implements ProcessHandlerInterface {
 
         $revisionNumber = $this->documentsHandler->getLatestRevision($documentId);
 
-        $revisionParts = explode('.', $revisionNumber);
-        $revisionParts[count($revisionParts) - 1] = (int)$revisionParts[count($revisionParts) - 1] + 1;
-        $newRevisionNumber = implode('.', $revisionParts);
+        $newRevisionNumber = $this->documentsHandler->increaseRevisionNumber($revisionNumber);
 
         $responseData = [
             'value' => $newRevisionNumber,

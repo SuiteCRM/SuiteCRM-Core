@@ -84,6 +84,10 @@ export class RecordSaveAction extends RecordActionHandler {
                     const recentlyViewed = this.recentlyViewedService.buildRecentlyViewed(moduleName, id);
                     this.recentlyViewedService.addRecentlyViewed(moduleName, recentlyViewed);
 
+                    if (data?.action?.params?.reloadSubpanels ?? true) {
+                        data.store.reloadSubpanels();
+                    }
+
                     const currentUrl = this.router.url;
 
                     if (currentUrl.includes('edit')) {

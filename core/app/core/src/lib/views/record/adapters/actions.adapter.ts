@@ -147,14 +147,7 @@ export class RecordActionsAdapter extends BaseRecordActionsAdapter<RecordActionD
 
     protected reload(action: Action, process: Process, context?: ActionContext): void {
         this.store.load(false).pipe(take(1)).subscribe();
-        Object.keys(this.store.getSubpanels()).forEach(key => {
-            const sub = this.store.getSubpanels()[key];
-            sub?.loadAllStatistics(false).pipe(take(1)).subscribe();
-
-            if (sub?.loaded()) {
-                sub.load(false).pipe(take(1)).subscribe();
-            }
-        });
+        this.store.reloadSubpanels();
     }
 
     protected shouldDisplay(actionHandler: ActionHandler<RecordActionData>, data: RecordActionData): boolean {

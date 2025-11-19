@@ -385,6 +385,18 @@ export class RecordViewStore extends ViewStore implements StateStore, BaseRecord
         this.subs = this.safeUnsubscription(this.subs);
     }
 
+    public reloadSubpanels(): void {
+        const subpanels = this.getSubpanels()
+        Object.keys(subpanels).forEach(key => {
+            const sub = subpanels[key];
+            sub?.loadAllStatistics(false).pipe(take(1)).subscribe();
+
+            if (sub?.loaded()) {
+                sub.load(false).pipe(take(1)).subscribe();
+            }
+        });
+    }
+
     /**
      * Get staging record
      *

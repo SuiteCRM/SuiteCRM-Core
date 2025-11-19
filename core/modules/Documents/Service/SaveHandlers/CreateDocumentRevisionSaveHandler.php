@@ -139,15 +139,11 @@ class CreateDocumentRevisionSaveHandler implements RecordFieldSaveHandlerInterfa
         $revisionId = $fieldDefinition->getVardef()['revision']['default'] ?? '1';
 
         if ($currentRevision && $currentRevision->getAttributes()['revision']){
-            $revisionParts = explode('.', $currentRevision->getAttributes()['revision']);
-            $revisionParts[count($revisionParts) - 1] = (int)$revisionParts[count($revisionParts) - 1] + 1;
-            $revisionId = implode('.', $revisionParts);
+            $revisionId = $this->documentsManager->increaseRevisionNumber($currentRevision->getAttributes()['revision']);
         }
 
 
-        $mimeTypes = new MimeTypes();
-        $extensions = $mimeTypes->getExtensions($mediaObject->getMimeType());
-        $extension = $extensions[0] ?? '';
+        $extension = $this->documentsManager->getExtensionFromMimeType($mediaObject->getMimeType() ?? '');
 
         $record = new Record();
         $record->setModule('document-revisions');

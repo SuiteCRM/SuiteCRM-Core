@@ -34,4 +34,6 @@ interface DocumentsManagerInterface
     public function getLatestRevisionId(string $documentId): string;
 
     public function increaseRevisionNumber(string $revision): string;
+
+    public function getExtensionFromMimeType(string $mimeType): string;
 }

@@ -29,6 +29,7 @@ namespace App\Module\Documents\LegacyHandler;
 
 use App\Data\LegacyHandler\PreparedStatementHandler;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Symfony\Component\Mime\MimeTypes;
 
 class BaseDocumentsManager implements DocumentsManagerInterface
 {
@@ -77,5 +78,12 @@ class BaseDocumentsManager implements DocumentsManagerInterface
     protected function createQueryBuilder(): QueryBuilder
     {
         return $this->preparedStatementHandler->createQueryBuilder();
+    }
+
+    public function getExtensionFromMimeType(string $mimeType): string
+    {
+        $mimeTypes = new MimeTypes();
+        $extensions = $mimeTypes->getExtensions($mimeType);
+        return $extensions[0] ?? '';
     }
 }

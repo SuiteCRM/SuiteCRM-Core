@@ -113,7 +113,7 @@ class CreateDocumentRevisionSaveHandler implements RecordFieldSaveHandlerInterfa
         $currentDocumentRevision = $this->getCurrentRevision($savedRecord->getId());
 
         if (empty($currentDocumentRevision?->getId())) {
-            $mediaObject = $this->getMediaObject($mediaObjectId, $fieldVardef['metadata']['storage_type'] ?? '');
+            $mediaObject = $this->getMediaObject($mediaObjectId, $fieldVardef['metadata']['storage_type'] ?? 'private-documents');
             $this->createDocumentRevision($savedRecord, $mediaObject, $fieldDefinition);
             return;
         }
@@ -124,7 +124,7 @@ class CreateDocumentRevisionSaveHandler implements RecordFieldSaveHandlerInterfa
             return;
         }
 
-        $mediaObject = $this->getMediaObject($mediaObjectId, $fieldVardef['metadata']['storage_type'] ?? '');
+        $mediaObject = $this->getMediaObject($mediaObjectId, $fieldVardef['metadata']['storage_type'] ?? 'private-documents');
 
         $this->createDocumentRevision($savedRecord, $mediaObject, $fieldDefinition, $currentDocumentRevision);
     }
@@ -200,7 +200,7 @@ class CreateDocumentRevisionSaveHandler implements RecordFieldSaveHandlerInterfa
     {
         $fieldDef = $this->fieldDefinitionsProvider->getFieldDefinition('document-revisions', 'filename');
 
-        $storageType = $fieldDef['metadata']['storage_type'] ?? '';
+        $storageType = $fieldDef['metadata']['storage_type'] ?? 'private-documents';
         if (empty($storageType)) {
             return '';
         }

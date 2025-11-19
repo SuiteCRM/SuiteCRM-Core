@@ -97,7 +97,7 @@ class DocumentNameRetrieveMapper implements ApiRecordFieldMapperInterface {
             return;
         }
 
-        $storageType = $revisionFieldDef['metadata']['storage_type'] ?? '';
+        $storageType = $revisionFieldDef['metadata']['storage_type'] ?? 'private-documents';
         if (empty($storageType)) {
             return;
         }

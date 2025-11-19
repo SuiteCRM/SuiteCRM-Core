@@ -347,6 +347,7 @@ function get_sugar_config_defaults(): array
         'export_delimiter' => ',',
         'export_excel_compatible' => false,
         'enable_record_pagination' => true,
+        'allow_latest_revision_delete' => false,
         'cache_dir' => 'cache/',
         'calculate_response_time' => true,
         'create_default_user' => false,

@@ -25,22 +25,25 @@
  * the words "Supercharged by SuiteCRM".
  */
 -->
-<div [class.uploaded-file]="!compact"
-     [class.uploaded-file-compact]="compact">
-    <div [class.d-flex]="compact"
-         [class.flex-grow-1]="compact">
-        <div class="uploaded-file-info-container">
-            <div class="uploaded-file-icon-container">
-                <div>
-                    <scrm-image [image]="'file-earmark-check'" class="uploaded-file-icon"></scrm-image>
-                </div>
-            </div>
-            <div class="uploaded-file-info">
-                <span class="uploaded-file-name pl-5 pr-5 pb-3 rounded box-loading">
-                </span>
-                <span class="uploaded-file-size mt-1 pb-2 w-25 rounded box-loading">
-                </span>
-            </div>
+<div class="pb-2 d-flex uploaded-image-container">
+    <div *ngIf="file?.status() === 'uploaded' || (file?.status() === 'saved' && file?.id.length > 0)" class="uploaded-image-wrapper">
+
+        <div *ngIf="allowClear" class="uploaded-image-hover-container">
+            <img *ngIf="file?.contentUrl"
+                 [src]="file?.contentUrl"
+                 alt="{{ file?.name || 'uploaded-image' }}"
+                 class="uploaded-image"
+                 [style.max-height]="maxHeight"
+            >
+            <scrm-button class="uploaded-image-hover-overlay" [config]="clearButtonConfig">
+            </scrm-button>
         </div>
+
+        <img *ngIf="!allowClear"
+             [src]="file?.contentUrl"
+             alt="{{ file?.name || 'uploaded-image' }}"
+             class="uploaded-image"
+             [style.max-height]="maxHeight"
+        >
     </div>
 </div>

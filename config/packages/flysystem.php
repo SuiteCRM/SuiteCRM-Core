@@ -33,7 +33,24 @@ return static function (ContainerConfigurator $containerConfig) {
     $env = $_ENV ?? [];
     $storages = $env['MEDIA_FLY_SYSTEM_STORAGES'] ?? '';
 
+    $sugar_config = [];
+    if (file_exists(__DIR__ . '/../../public/legacy/config.php')) {
+        require_once __DIR__ . '/../../public/legacy/config.php';
+    }
+
+    if (file_exists(__DIR__ . '/../../public/legacy/config_override.php')) {
+        require_once __DIR__ . '/../../public/legacy/config_override.php';
+    }
+
+    $legacyUploadDir = $sugar_config['upload_dir'] ?? 'upload';
+
     $defaultStorages = [
+        'legacy.documents.storage' => [
+            'adapter' => 'local',
+            'options' => [
+                'directory' => '%kernel.project_dir%/public/legacy/' . trim($legacyUploadDir, '/'),
+            ],
+        ],
         'private.documents.storage' => [
             'adapter' => 'local',
             'options' => [

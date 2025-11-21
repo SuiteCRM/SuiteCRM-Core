@@ -33,19 +33,18 @@ use App\Engine\Service\ActionAvailabilityChecker\ActionAvailabilityChecker;
 class BulkActionDefinitionProvider extends ActionDefinitionProvider implements BulkActionDefinitionProviderInterface
 {
     /**
-     * @var array
-     */
-    private $listViewBulkActions;
-
-    /**
      * BulkActionDefinitionProvider constructor.
      * @param array $listViewBulkActions
      * @param ActionAvailabilityChecker $availabilityChecker
+     * @param $actionAclModuleOverride
      */
-    public function __construct(array $listViewBulkActions, ActionAvailabilityChecker $availabilityChecker)
+    public function __construct(
+        protected array $listViewBulkActions,
+        ActionAvailabilityChecker $availabilityChecker,
+        protected $actionAclModuleOverride
+    )
     {
-        parent::__construct($availabilityChecker);
-        $this->listViewBulkActions = $listViewBulkActions;
+        parent::__construct($availabilityChecker, $this->actionAclModuleOverride);
     }
 
     /**

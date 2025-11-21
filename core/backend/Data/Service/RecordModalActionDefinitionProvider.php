@@ -34,19 +34,18 @@ use App\Process\Service\ActionDefinitionProvider;
 class RecordModalActionDefinitionProvider extends ActionDefinitionProvider implements RecordModalActionDefinitionProviderInterface
 {
     /**
-     * @var array
-     */
-    private $recordModalActions;
-
-    /**
      * BulkActionDefinitionProvider constructor.
      * @param array $recordModalActions
      * @param ActionAvailabilityChecker $actionChecker
+     * @param $actionAclModuleOverride
      */
-    public function __construct(array $recordModalActions, ActionAvailabilityChecker $actionChecker)
+    public function __construct(
+        protected array $recordModalActions,
+        ActionAvailabilityChecker $actionChecker,
+        protected $actionAclModuleOverride
+    )
     {
-        parent::__construct($actionChecker);
-        $this->recordModalActions = $recordModalActions;
+        parent::__construct($actionChecker, $this->actionAclModuleOverride);
     }
 
     /**

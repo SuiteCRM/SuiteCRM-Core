@@ -33,19 +33,18 @@ use App\Engine\Service\ActionAvailabilityChecker\ActionAvailabilityChecker;
 class TableActionDefinitionProvider extends ActionDefinitionProvider implements TableActionDefinitionProviderInterface
 {
     /**
-     * @var array
-     */
-    protected $listViewTableActions;
-
-    /**
      * TableActionDefinitionProvider constructor.
      * @param array $listViewTableActions
      * @param ActionAvailabilityChecker $availabilityChecker
+     * @param $actionAclModuleOverride
      */
-    public function __construct(array $listViewTableActions, ActionAvailabilityChecker $availabilityChecker)
+    public function __construct(
+        protected array $listViewTableActions,
+        ActionAvailabilityChecker $availabilityChecker,
+        protected $actionAclModuleOverride
+    )
     {
-        parent::__construct($availabilityChecker);
-        $this->listViewTableActions = $listViewTableActions;
+        parent::__construct($availabilityChecker, $this->actionAclModuleOverride);
     }
 
     /**

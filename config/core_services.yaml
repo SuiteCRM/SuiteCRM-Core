@@ -35,6 +35,7 @@ services:
       $variableInjectorExcludedModules: '%module.fields.squire.variable_injector.excluded_modules%'
       $variableInjectorMappedModuleLabels: '%module.fields.squire.variable_injector.mapped_module_labels%'
       $variableInjectorShowOnlyModules: '%module.fields.squire.variable_injector.modules_to_show%'
+      $actionAclModuleOverride: '%module.action_acl_module_override%'
       $filterRangeSearchTypes: '%module.filter.range_search_types%'
       $listViewBulkActions: '%module.listview.bulk_action%'
       $listViewLineActions: '%module.listview.line_action%'

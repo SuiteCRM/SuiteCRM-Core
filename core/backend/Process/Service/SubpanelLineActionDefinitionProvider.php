@@ -33,19 +33,18 @@ use App\Engine\Service\ActionAvailabilityChecker\ActionAvailabilityChecker;
 class SubpanelLineActionDefinitionProvider extends ActionDefinitionProvider implements SubpanelLineActionDefinitionProviderInterface
 {
     /**
-     * @var array
-     */
-    private $subpanelLineActions;
-
-    /**
      * SubpanelLineActionDefinitionProvider constructor.
      * @param array $subpanelLineActions
      * @param ActionAvailabilityChecker $actionChecker
+     * @param $actionAclModuleOverride
      */
-    public function __construct(array $subpanelLineActions, ActionAvailabilityChecker $actionChecker)
+    public function __construct(
+        protected array $subpanelLineActions,
+        ActionAvailabilityChecker $actionChecker,
+        protected $actionAclModuleOverride
+    )
     {
-        parent::__construct($actionChecker);
-        $this->subpanelLineActions = $subpanelLineActions;
+        parent::__construct($actionChecker, $this->actionAclModuleOverride);
     }
 
     /**

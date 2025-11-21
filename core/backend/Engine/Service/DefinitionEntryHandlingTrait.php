@@ -37,6 +37,7 @@ trait DefinitionEntryHandlingTrait
      * @param string $entryName
      * @param array $config
      * @param ActionAvailabilityChecker|null $actionAvailabilityChecker
+     * @param array|null $actionAclModuleOverride
      * @param array|null $context
      * @return array
      */
@@ -45,6 +46,7 @@ trait DefinitionEntryHandlingTrait
         string $entryName,
         array &$config,
         ?ActionAvailabilityChecker $actionAvailabilityChecker,
+        ?array $actionAclModuleOverride = null,
         ?array $context = []
     ): array {
         $defaults = $config['default'] ?? [];
@@ -61,7 +63,7 @@ trait DefinitionEntryHandlingTrait
                 continue;
             }
 
-            $aclModule = $entry['aclModule'] ?? $module;
+            $aclModule = $entry['aclModule'] ?? $actionAclModuleOverride[$module][$entryKey] ?? $module;
 
             if ($actionAvailabilityChecker && $this->checkAvailability($aclModule, $entry, $actionAvailabilityChecker, $context) === false) {
                 continue;

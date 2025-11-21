@@ -1,0 +1,7 @@
+parameters:
+  module.action_acl_module_override:
+    document-revisions:
+      edit: 'documents'
+      create: 'documents'
+      view: 'documents'
+      save: 'documents'

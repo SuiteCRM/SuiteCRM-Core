@@ -82,7 +82,7 @@ export class FieldLayoutComponent extends BaseFieldGridComponent {
         this.subscriptions.push(this.dataSource.getRecord().subscribe(record => {
             this.record = {...record};
 
-            if (!Object.values(this.record.acls).includes('edit')) {
+            if (!Object.values(this?.record?.acls ?? []).includes('edit')) {
                 this.showEditIcon.set(false);
             }
         }));

@@ -33,19 +33,18 @@ use App\Engine\Service\ActionAvailabilityChecker\ActionAvailabilityChecker;
 class BaseActionDefinitionProvider extends ActionDefinitionProvider implements BaseActionDefinitionProviderInterface
 {
     /**
-     * @var array
-     */
-    private $baseActions;
-
-    /**
      * BaseActionDefinitionProvider constructor.
      * @param array $baseActions
      * @param ActionAvailabilityChecker $actionChecker
+     * @param $actionAclModuleOverride
      */
-    public function __construct(array $baseActions, ActionAvailabilityChecker $actionChecker)
+    public function __construct(
+        protected array $baseActions,
+        ActionAvailabilityChecker $actionChecker,
+        protected $actionAclModuleOverride
+    )
     {
-        parent::__construct($actionChecker);
-        $this->baseActions = $baseActions;
+        parent::__construct($actionChecker, $this->actionAclModuleOverride);
     }
 
     /**

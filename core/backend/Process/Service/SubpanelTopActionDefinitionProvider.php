@@ -33,26 +33,18 @@ use App\Engine\Service\ActionAvailabilityChecker\ActionAvailabilityChecker;
 class SubpanelTopActionDefinitionProvider extends ActionDefinitionProvider implements SubpanelTopActionDefinitionProviderInterface
 {
     /**
-     * @var array
-     */
-    private $subpanelTopActions;
-
-    /**
-     * @var array
-     */
-    private $subpanelTopButtons;
-
-    /**
      * SubpanelTopActionDefinitionProvider constructor.
      * @param array $subpanelTopActions
      * @param array $subpanelTopButtons
      * @param ActionAvailabilityChecker $actionChecker
      */
-    public function __construct(array $subpanelTopActions, array $subpanelTopButtons, ActionAvailabilityChecker $actionChecker)
+    public function __construct(
+        protected array $subpanelTopActions,
+        protected array $subpanelTopButtons, ActionAvailabilityChecker $actionChecker,
+        protected $actionAclModuleOverride
+    )
     {
-        parent::__construct($actionChecker);
-        $this->subpanelTopActions = $subpanelTopActions;
-        $this->subpanelTopButtons = $subpanelTopButtons;
+        parent::__construct($actionChecker, $this->actionAclModuleOverride);
     }
 
     /**

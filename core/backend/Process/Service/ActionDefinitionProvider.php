@@ -37,17 +37,15 @@ class ActionDefinitionProvider
     use DefinitionEntryHandlingTrait;
 
     /**
-     * @var ActionAvailabilityChecker
-     */
-    protected $actionChecker;
-
-    /**
      * BulkActionDefinitionProvider constructor.
      * @param ActionAvailabilityChecker $actionChecker
+     * @param $actionAclModuleOverride
      */
-    public function __construct(ActionAvailabilityChecker $actionChecker)
+    public function __construct(
+        protected ActionAvailabilityChecker $actionChecker,
+        protected $actionAclModuleOverride,
+    )
     {
-        $this->actionChecker = $actionChecker;
     }
 
     /**
@@ -58,6 +56,6 @@ class ActionDefinitionProvider
      */
     public function filterActions(string $module, array &$config, ?array $context = []): array
     {
-        return $this->filterDefinitionEntries($module, 'actions', $config, $this->actionChecker, $context);
+        return $this->filterDefinitionEntries($module, 'actions', $config, $this->actionChecker, $this->actionAclModuleOverride, $context);
     }
 }

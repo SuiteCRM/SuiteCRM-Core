@@ -34,7 +34,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Data\Entity\DefaultRecordTrait;
-use App\MediaObjects\Repository\PrivateImageMediaObjectRepository;
+use App\MediaObjects\Repository\PrivateDocumentMediaObjectRepository;
 use App\MediaObjects\Validator\UploadValidator\UploadConstraint;
 use DateTime;
 use DateTimeInterface;
@@ -44,7 +44,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: PrivateImageMediaObjectRepository::class)]
+#[ORM\Entity(repositoryClass: PrivateDocumentMediaObjectRepository::class)]
 #[ORM\Table(name: 'private_documents_media_objects')]
 #[ApiResource(
     types: ['https://schema.org/MediaObject'],

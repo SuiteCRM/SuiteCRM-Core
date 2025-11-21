@@ -54,6 +54,10 @@ trait FileFieldApiMapperTrait
         $mediaObjects = $mediaObjectManager->getLinkedMediaObjects($type, $module, $record->getId(), $field);
 
         if (empty($mediaObjects)) {
+            $mediaObjects = $mediaObjectManager->getLinkedMediaObjects('legacy-documents', $module, $record->getId(), $field) ?? [];
+        }
+
+        if (empty($mediaObjects)) {
             return;
         }
 

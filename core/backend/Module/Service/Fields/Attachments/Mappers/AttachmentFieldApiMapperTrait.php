@@ -52,6 +52,14 @@ trait AttachmentFieldApiMapperTrait
             return [];
         }
 
+        if (empty($mediaObjects)) {
+            $mediaObjects = $mediaObjectManager->getLinkedMediaObjects('legacy-documents', $module, $record->getId(), $field) ?? [];
+        }
+
+        if (empty($mediaObjects)) {
+            return [];
+        }
+
         $injectedRecords = [];
 
         foreach ($mediaObjects as $mediaObject) {

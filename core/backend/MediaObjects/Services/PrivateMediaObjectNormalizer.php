@@ -28,6 +28,7 @@
 namespace App\MediaObjects\Services;
 
 use App\MediaObjects\Entity\ArchivedDocumentMediaObject;
+use App\MediaObjects\Entity\LegacyDocumentMediaObject;
 use App\MediaObjects\Entity\PrivateDocumentMediaObject;
 use App\MediaObjects\Entity\PrivateImageMediaObject;
 use App\MediaObjects\Repository\MediaObjectManagerInterface;
@@ -79,6 +80,7 @@ class PrivateMediaObjectNormalizer implements NormalizerInterface
             ArchivedDocumentMediaObject::class => true,
             PrivateDocumentMediaObject::class => true,
             PrivateImageMediaObject::class => true,
+            LegacyDocumentMediaObject::class => true,
         ];
     }
 }

@@ -130,6 +130,10 @@ import {AttachmentDetailFieldModule} from "./attachments/templates/detail/attach
 import {AttachmentDetailFieldComponent} from "./attachments/templates/detail/attachment.component";
 import {AttachmentListFieldModule} from "./attachments/templates/list/attachment.module";
 import {AttachmentListFieldComponent} from "./attachments/templates/list/attachment.component";
+import {ImageEditFieldComponent} from "./image/templates/edit/image.component";
+import {ImageEditFieldModule} from "./image/templates/edit/image.module";
+import {ImageDetailFieldComponent} from "./image/templates/detail/image.component";
+import {ImageDetailFieldModule} from "./image/templates/detail/image.module";
 
 export const baseFieldModules = [
     VarcharDetailFieldModule,
@@ -167,6 +171,8 @@ export const baseFieldModules = [
     DropdownEnumEditFieldModule,
     RadioEnumDetailFieldModule,
     RadioEnumEditFieldModule,
+    ImageEditFieldModule,
+    ImageDetailFieldModule,
     MultiEnumDetailFieldModule,
     MultiEnumEditFieldModule,
     MultiEnumFilterFieldModule,
@@ -225,6 +231,8 @@ export const baseFieldComponents = [
     DropdownEnumEditFieldComponent,
     RadioEnumDetailFieldComponent,
     RadioEnumEditFieldComponent,
+    ImageEditFieldComponent,
+    ImageDetailFieldComponent,
     MultiEnumDetailFieldComponent,
     MultiEnumEditFieldComponent,
     MultiEnumFilterFieldComponent,
@@ -309,6 +317,9 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'enum.detail': DropdownEnumDetailFieldComponent,
     'enum.edit': DropdownEnumEditFieldComponent,
     'enum.filter': MultiEnumFilterFieldComponent,
+    'image.edit': ImageEditFieldComponent,
+    'image.detail': ImageDetailFieldComponent,
+    'image.list': ImageDetailFieldComponent,
     'multienum.list': MultiEnumDetailFieldComponent,
     'multienum.detail': MultiEnumDetailFieldComponent,
     'multienum.edit': MultiEnumEditFieldComponent,

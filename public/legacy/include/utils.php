@@ -529,6 +529,7 @@ function get_sugar_config_defaults(): array
         ],
         'subpanel_pagination_type' => 'pagination',
         'listview_pagination_type' => 'pagination',
+        'image_field_height_default' => '150px',
         'valid_image_ext' => [
             'gif',
             'png',

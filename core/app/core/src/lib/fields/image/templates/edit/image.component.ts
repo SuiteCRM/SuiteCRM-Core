@@ -26,7 +26,6 @@
 
 import {Component, OnInit, signal, WritableSignal} from "@angular/core";
 import {MediaObjectsService} from "../../../../services/media-objects/media-objects.service";
-import {BaseFileComponent} from "../../../base/base-file.component";
 import {DataTypeFormatter} from "../../../../services/formatters/data-type.formatter.service";
 import {FieldLogicManager} from "../../../field-logic/field-logic.manager";
 import {FieldLogicDisplayManager} from "../../../field-logic-display/field-logic-display.manager";

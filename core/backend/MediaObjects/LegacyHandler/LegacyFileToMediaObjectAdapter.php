@@ -42,9 +42,7 @@ class LegacyFileToMediaObjectAdapter extends LegacyHandler
 
     public function findMediaObjectsForNote(string $parentId, string $parentField): array
     {
-        $parentType = 'Notes';
-
-        return $this->findMediaObjectsForBean($parentType, $parentId, $parentField);
+        return $this->findMediaObjectsForBean('Notes', $parentId, $parentField);
     }
 
     public function findMediaObjectsForDocument(string $parentId, string $parentField): array
@@ -54,9 +52,7 @@ class LegacyFileToMediaObjectAdapter extends LegacyHandler
 
     public function findMediaObjectsForDocumentRevision(string $parentId, string $parentField): array
     {
-        $parentType = 'DocumentRevisions';
-
-        return $this->findMediaObjectsForBean($parentType, $parentId, $parentField);
+        return $this->findMediaObjectsForBean('DocumentRevisions', $parentId, $parentField);
     }
 
     public function findMediaObjectsForProduct(string $parentId, string $parentField): array
@@ -78,7 +74,7 @@ class LegacyFileToMediaObjectAdapter extends LegacyHandler
             return [];
         }
 
-        $parts = explode('upload/', $parentBean->product_image);
+        $parts = explode(($sugar_config['upload_dir'] ?? 'upload/'), $parentBean->product_image);
         $filePath = $parts[1] ?? '';
         if (empty($filePath)) {
             $this->close();
@@ -123,6 +119,75 @@ class LegacyFileToMediaObjectAdapter extends LegacyHandler
         return $this->findMediaObjectsForBean($parentType, $parentId, $parentField);
     }
 
+    public function deleteNoteMediaObject(string $parentId, ?string $parentField): void
+    {
+        $this->deleteMediaObjectsForBean('Notes', $parentId, $parentField);
+    }
+
+    public function deleteDocumentRevisionMediaObject(string $parentId, ?string $parentField): void
+    {
+        $this->deleteMediaObjectsForBean('DocumentRevisions', $parentId, $parentField);
+    }
+
+    public function deleteProductMediaObject(?string $parentId, ?string $parentField): void
+    {
+        $this->init();
+        global $sugar_config;
+
+        $parentType = 'AOS_Products';
+
+        /** @var \AOS_Products $parentBean */
+        $parentBean = \BeanFactory::getBean($parentType, $parentId);
+        if (empty($parentBean)) {
+            $this->close();
+            return;
+        }
+
+        if (empty($parentBean->product_image)) {
+            $this->close();
+            return;
+        }
+
+        $parts = explode('upload/', $parentBean->product_image);
+        $filePath = $parts[1] ?? '';
+        if (empty($filePath)) {
+            $this->close();
+            return;
+        }
+
+        $path = ($sugar_config['upload_dir'] ?? 'upload/') . $filePath;
+        if (file_exists($path)) {
+            if (!unlink($path)) {
+                $GLOBALS['log']->error("*** Could not unlink() file: [ {$path} ]");
+            } else {
+                $parentBean->product_image = '';
+                $parentBean->save();
+            }
+        }
+
+        $this->close();
+    }
+
+    public function deleteFileFieldMediaObject(string $parentType, ?string $parentId, ?string $parentField): void
+    {
+        $this->deleteMediaObjectsForBean($parentType, $parentId, $parentField);
+    }
+
+    protected function deleteMediaObjectsForBean(string $parentType, string $parentId, string $parentField): void {
+        $this->init();
+        /** @var \DocumentRevision|\Note|\File $parentBean */
+        $parentBean = \BeanFactory::getBean($parentType, $parentId);
+        if (empty($parentBean)) {
+            $this->close();
+            return;
+        }
+
+        if (method_exists($parentBean, 'deleteAttachment')) {
+            $parentBean->deleteAttachment();
+        }
+
+        $this->close();
+    }
 
     /**
      * @param string $parentType
@@ -216,5 +281,4 @@ class LegacyFileToMediaObjectAdapter extends LegacyHandler
 
         return $mediaObject;
     }
-
 }

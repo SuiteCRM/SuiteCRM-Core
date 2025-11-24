@@ -113,6 +113,13 @@ class FileFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
                 // This will delete the media object from the repository and file system
                 $this->mediaObjectManager->deleteMediaObject($storageType, $currentMediaObject);
             }
+
+            $legacyMediaObjects = $this->mediaObjectManager->getLinkedMediaObjects('legacy-documents', $parentType, $parentId, $field) ?? [];
+            foreach ($legacyMediaObjects as $legacyMediaObject) {
+                // This will delete the media object from the repository and file system
+                $this->mediaObjectManager->deleteMediaObject('legacy-documents', $legacyMediaObject);
+            }
+
             return;
         }
 
@@ -131,6 +138,14 @@ class FileFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
             if ($currentMediaObject->getId() !== $mediaObject->getId()) {
                 // This will delete the media object from the repository and file system
                 $this->mediaObjectManager->deleteMediaObject($storageType, $currentMediaObject);
+            }
+        }
+
+        $legacyMediaObjects = $this->mediaObjectManager->getLinkedMediaObjects('legacy-documents', $parentType, $parentId, $field) ?? [];
+        foreach ($legacyMediaObjects as $legacyMediaObject) {
+            if ($legacyMediaObject->getId() !== $mediaObject->getId()) {
+                // This will delete the media object from the repository and file system
+                $this->mediaObjectManager->deleteMediaObject('legacy-documents', $legacyMediaObject);
             }
         }
 

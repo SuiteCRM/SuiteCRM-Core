@@ -96,6 +96,37 @@ class LegacyDocumentMediaObjectRepository extends RecordEntityRepository
         return $this->getFileForFieldDefinition($parentType, $parentId, $parentField);
     }
 
+    public function remove(object $entity, bool $flush = false): void
+    {
+        if (empty($entity) || !($entity instanceof LegacyDocumentMediaObject) || empty($entity->getFilePath()) ) {
+            return;
+        }
+        $parentType = $entity->getParentType();
+        $parentId = $entity->getParentId();
+        $parentField = $entity->getParentField();
+
+        if ($parentType === 'Notes') {
+            $this->legacyFileAdapter->deleteNoteMediaObject($parentId, $parentField);
+            return;
+        }
+
+        if ($parentType === 'DocumentRevisions') {
+            $this->legacyFileAdapter->deleteDocumentRevisionMediaObject($parentId, $parentField);
+            return;
+        }
+
+        if ($parentType === 'Products') {
+            $this->legacyFileAdapter->deleteProductMediaObject($parentId, $parentField);
+            return;
+        }
+
+        $this->legacyFileAdapter->deleteFileFieldMediaObject($parentType, $parentId, $parentField);
+    }
+
+    public function save(object $entity, bool $flush = false): void
+    {
+    }
+
     protected function getNoteFile(string $parentId, string $parentField): array
     {
         return $this->legacyFileAdapter->findMediaObjectsForNote($parentId, $parentField);

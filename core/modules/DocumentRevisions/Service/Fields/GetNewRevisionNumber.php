@@ -63,7 +63,22 @@ class GetNewRevisionNumber implements ProcessHandlerInterface {
      */
     public function getRequiredACLs(Process $process): array
     {
-        return [];
+        $options = $process->getOptions();
+        $module = 'documents';
+
+
+        return [
+            $module => [
+                [
+                    'action' => 'view',
+                    'record' => $options['id'] ?? ''
+                ],
+                [
+                    'action' => 'edit',
+                    'record' => $options['id'] ?? ''
+                ]
+            ],
+        ];
     }
 
     /**

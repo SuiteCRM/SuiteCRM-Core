@@ -1098,7 +1098,7 @@ class User extends Person implements EmailInterface
                 $this->setPreference('editor_type', $_REQUEST['editor_type']);
             } else {
                 $editorType = $this->getCurrentPreference('editor_type');
-                $this->setPreference('editor_type', $editorType ?? 'html', 0, 'global');
+                $this->setPreference('editor_type', $editorType ?? 'tinymce', 0, 'global');
             }
             if (isset($_REQUEST['email_show_counts'])) {
                 $this->setPreference('email_show_counts', $_REQUEST['email_show_counts'], 0, 'global');
@@ -1109,7 +1109,7 @@ class User extends Person implements EmailInterface
                 $this->setPreference('email_editor_option', $_REQUEST['email_editor_option'], 0, 'global');
             } else {
                 $emailEditorOption = $this->getCurrentPreference('email_editor_option');
-                $this->setPreference('email_editor_option', $emailEditorOption ?? 'html', 0, 'global');
+                $this->setPreference('email_editor_option', $emailEditorOption ?? 'tinymce', 0, 'global');
             }
             if (isset($_REQUEST['default_email_charset'])) {
                 $this->setPreference('default_email_charset', $_REQUEST['default_email_charset'], 0, 'global');

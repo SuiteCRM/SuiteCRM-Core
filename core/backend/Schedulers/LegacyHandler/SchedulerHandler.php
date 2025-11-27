@@ -157,7 +157,7 @@ class SchedulerHandler extends LegacyHandler
             }
 
             try {
-                if (str_contains($job->target, 'function::')) {
+                if (str_contains($job->target, 'function::') || str_contains($job->target, 'class::') || str_contains($job->target, 'url::')) {
                     $status = $this->legacySchedulerRunner->run($job);
                 } else {
                     $status = $this->schedulerRunner->run($job);

@@ -152,11 +152,13 @@ a.clickable.file-field-uploaded-link:hover {
         svg {
           width: 1em;
           height: 1em;
+          overflow: visible;
 
 
           @media (max-width: 480px) {
             width: 1.15em;
             height: 1.25em;
+            overflow: visible;
           }
         }
       }
@@ -292,6 +294,7 @@ a.clickable.file-field-uploaded-link:hover {
         svg {
           width: 1em;
           height: 1em;
+          overflow: visible;
         }
       }
 

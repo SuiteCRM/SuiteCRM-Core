@@ -25,31 +25,68 @@
  */
 
 
-import {Component, Input, OnInit, signal} from "@angular/core";
+import {Component, Input, OnDestroy, OnInit, signal} from "@angular/core";
 import {TableConfig} from "../table.model";
 import {ColumnDefinition} from "../../../common/metadata/list.metadata.model";
 import {SortDirectionDataSource} from "../../sort-button/sort-button.model";
-import {Observable} from "rxjs";
+import {Observable, Subscription} from "rxjs";
 import {SortDirection, SortingSelection} from "../../../common/views/list/list-navigation.model";
 import {map} from "rxjs/operators";
 import {ButtonInterface} from "../../../common/components/button/button.model";
+import {ActiveLineAction} from "../../../common/actions/action.model";
+import {
+    ScreenSize,
+    ScreenSizeObserverService
+} from "../../../services/ui/screen-size-observer/screen-size-observer.service";
 
 @Component({
     selector: 'scrm-table-body-skeleton',
     templateUrl: 'table-body-skeleton.component.html',
 })
-export class TableBodySkeletonComponent implements OnInit {
+export class TableBodySkeletonComponent implements OnInit, OnDestroy {
 
     @Input() config: TableConfig;
     @Input() columns: ColumnDefinition[] = [];
     @Input() displayedColumns: string[] = [];
     @Input() pageSize: number = 20;
+    @Input() activeLineAction: ActiveLineAction;
+
+    protected subs: Subscription[] = [];
+    isMobile = signal(false);
+
+    constructor(
+        protected screenSize: ScreenSizeObserverService,
+    ) {
+    }
 
     showMoreButton: ButtonInterface;
+    showActions: boolean = false;
 
     ngOnInit() {
         this.initButtons();
+        this.subs.push(this.screenSize.screenSize$.subscribe((size) => {
+            if (size === ScreenSize.XSmall && !this.isMobile()) {
+                this.isMobile.set(true);
+            } else if (size !== ScreenSize.XSmall && this.isMobile()) {
+                this.isMobile.set(false);
+            }
+        }));
+
+        this.subs.push(this.config.lineActions.getActions().pipe().subscribe((value) => {
+            if (value.length > 0) {
+                this.showActions = true;
+                return;
+            }
+
+            this.showActions = false;
+        }));
+
     }
+
+    ngOnDestroy() {
+        this.subs.forEach(sub => sub.unsubscribe());
+    }
+
 
     getDisplayedColumns(column) {
         return Object.values(this.displayedColumns).includes(column.name);

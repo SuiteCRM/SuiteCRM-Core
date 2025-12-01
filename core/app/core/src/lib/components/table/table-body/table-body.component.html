@@ -26,23 +26,23 @@
 */
 -->
 
-<ng-container *ngIf="(vm$ | async) as vm">
+<ng-container>
     <div class="position-relative d-flex flex-column table-body-wrapper">
-        <ng-container *ngIf="!loading() && !vm.loading">
+        <ng-container *ngIf="!loading() && !(fetching() && vm()?.records?.length === 0)">
             <table cdk-table [dataSource]="config.dataSource" [trackBy]="trackRecord"
                    aria-describedby="table-body"
                    class="list-view-table striped-table table">
 
-                <ng-container cdkColumnDef="checkbox" *ngIf="vm.selection">
+                <ng-container cdkColumnDef="checkbox" *ngIf="vm()?.selection">
 
                     <th cdk-header-cell scope="col" *cdkHeaderCellDef class="primary-table-header"></th>
 
                     <td cdk-cell *cdkCellDef="let record">
                         <label class="checkbox-container">
                             <input type="checkbox"
-                                   [checked]="(record['id'] && vm.selected[record['id']]) || allSelected(vm.selectionStatus) "
+                                   [checked]="(record['id'] && vm()?.selected[record['id']]) || allSelected(vm()?.selectionStatus) "
                                    (change)="toggleSelection(record['id'])"
-                                   [disabled]="allSelected(vm.selectionStatus)"
+                                   [disabled]="allSelected(vm()?.selectionStatus)"
                                    aria-hidden="true">
                             <span class="checkmark"></span>
                         </label>
@@ -62,7 +62,7 @@
 
                 </ng-container>
 
-                <ng-container *ngFor="let column of vm.columns" [cdkColumnDef]="column.name">
+                <ng-container *ngFor="let column of vm()?.columns" [cdkColumnDef]="column.name">
 
                     <th cdk-header-cell
                         *cdkHeaderCellDef
@@ -105,19 +105,22 @@
 
                 </ng-container>
 
-                <tr cdk-header-row *cdkHeaderRowDef="vm.displayedColumns"></tr>
-                <tr cdk-row *cdkRowDef="let row; columns: vm.displayedColumns;"></tr>
+                <tr cdk-header-row *cdkHeaderRowDef="vm()?.displayedColumns"></tr>
+                <tr cdk-row *cdkRowDef="let row; columns: vm()?.displayedColumns;"></tr>
 
             </table>
         </ng-container>
 
-        <ng-container *ngIf="loading() || vm.loading">
-            <scrm-table-body-skeleton [config]="config" [displayedColumns]="displayedColumns()"
-                                      [columns]="columns()" [pageSize]="pageSize">
+        <ng-container *ngIf="loading() || (fetching() && vm()?.records?.length === 0)">
+            <scrm-table-body-skeleton [config]="config"
+                                      [displayedColumns]="displayedColumns()"
+                                      [columns]="columns()"
+                                      [activeLineAction]="activeLineAction"
+                                      [pageSize]="pageSize">
             </scrm-table-body-skeleton>
         </ng-container>
 
-        <div *ngIf="!vm.loading && vm.records.length === 0">
+        <div *ngIf="!loading() && !fetching() && vm()?.records?.length === 0">
             <p class="lead text-center pt-3">
                 <scrm-label labelKey="MSG_LIST_VIEW_NO_RESULTS_BASIC"></scrm-label>
             </p>

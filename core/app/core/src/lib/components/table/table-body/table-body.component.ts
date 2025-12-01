@@ -60,6 +60,8 @@ export class TableBodyComponent implements OnInit, OnDestroy {
     protected activeAction$: Observable<string> = this.activeAction.asObservable();
 
     loading: WritableSignal<boolean> = signal(false);
+    fetching: WritableSignal<boolean> = signal(true);
+    vm: WritableSignal<TableViewModel> = signal(null);
     columns: WritableSignal<ColumnDefinition[]> = signal([]);
     displayedColumns: WritableSignal<string[]> = signal([]);
     activeLineAction: ActiveLineAction;
@@ -72,12 +74,13 @@ export class TableBodyComponent implements OnInit, OnDestroy {
 
     currentPage: number = 1;
     pageSize: number = 20;
+    records: Record[] = [];
 
     constructor(
         protected fieldManager: FieldManager,
         protected loadingBufferFactory: LoadingBufferFactory
     ) {
-        this.loadingBuffer = this.loadingBufferFactory.create('table_loading_display_delay', true);
+        this.loadingBuffer = this.loadingBufferFactory.create('table_loading_display_delay');
     }
 
     ngOnInit(): void {
@@ -102,16 +105,14 @@ export class TableBodyComponent implements OnInit, OnDestroy {
             this.currentPage = Math.ceil(pagination.pageLast / pagination.pageSize);
         }));
 
-        this.subs.push(this.config.dataSource.connect(null).subscribe(() => {
-            this.setLoading(true);
-            setTimeout(() => this.setLoading(false), 100);
+        this.subs.push(loading$.subscribe((loading) => {
+            this.setLoading(loading)
         }));
 
         this.vm$ = this.config.columns.pipe(
             combineLatestWith(
                 selection$,
                 this.config.maxColumns$,
-                this.config.dataSource.connect(null),
                 loading$
             ),
             map((
@@ -119,7 +120,6 @@ export class TableBodyComponent implements OnInit, OnDestroy {
                     columns,
                     selection,
                     maxColumns,
-                    records,
                     loading
                 ]
             ) => {
@@ -145,15 +145,6 @@ export class TableBodyComponent implements OnInit, OnDestroy {
                 const selected = selection && selection.selected || {};
                 const selectionStatus = selection && selection.status || SelectionStatus.NONE;
 
-                records.forEach((record, index) => {
-                    if (!record.metadata) {
-                        record.metadata = {};
-                    }
-
-                    record.metadata.queryParams = {
-                        offset: (index + 1) + ((this.currentPage - 1) * this.pageSize)
-                    };
-                });
 
                 this.columns.set(columns);
                 this.displayedColumns.set(displayedColumns);
@@ -164,11 +155,42 @@ export class TableBodyComponent implements OnInit, OnDestroy {
                     selected,
                     selectionStatus,
                     displayedColumns,
-                    records: records || [],
+                    records: [],
                     loading
                 };
             })
         );
+
+        this.subs.push(this.config.dataSource.connect(null).subscribe(records => {
+            const currentVm = this.vm();
+            if (!this.vm()) {
+                return;
+            }
+            this.setLoading(true);
+            records.forEach((record, index) => {
+                if (!record.metadata) {
+                    record.metadata = {};
+                }
+
+                record.metadata.queryParams = {
+                    offset: (index + 1) + ((this.currentPage - 1) * this.pageSize)
+                };
+            });
+
+            this.records = [...records];
+
+            this.vm.set({
+                ...currentVm,
+                records: records || []
+            });
+            setTimeout(() => {
+                this.setLoading(false);
+            }, 250);
+        }));
+
+        this.subs.push(this.vm$.subscribe((vm)=> {
+            this.vm.set(vm);
+        }));
     }
 
     ngOnDestroy() {
@@ -263,8 +285,15 @@ export class TableBodyComponent implements OnInit, OnDestroy {
 
         if (this.config.loading$) {
             this.subs.push(this.config.loading$.subscribe(loading => {
+                if (this.fetching() === true && loading === false && !this.records?.length) {
+                    setTimeout(() => {
+                        this.fetching.set(loading);
+                    }, 400);
+                    this.loadingBuffer.updateLoading(loading);
+                    return;
+                }
+                this.fetching.set(loading);
                 this.loadingBuffer.updateLoading(loading);
-                this.loading.set(loading);
             }));
 
             loading$ = this.loadingBuffer.loading$;

@@ -33,6 +33,7 @@ use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;
 use App\Engine\Service\ActionAvailabilityChecker\ActionAvailabilityChecker;
 use App\Engine\Service\DefinitionEntryHandlingTrait;
+use App\ViewDefinitions\LegacyHandler\Widgets\WidgetDefinitionParsers;
 use App\ViewDefinitions\Service\WidgetDefinitionProviderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -47,11 +48,6 @@ class WidgetDefinitionProvider extends LegacyHandler implements WidgetDefinition
     public const HANDLER_KEY = 'widget-definition-provider';
 
     /**
-     * @var ActionAvailabilityChecker
-     */
-    protected $actionChecker;
-
-    /**
      * SidebarWidgetDefinitionProvider constructor.
      * @param string $projectDir
      * @param string $legacyDir
@@ -60,6 +56,7 @@ class WidgetDefinitionProvider extends LegacyHandler implements WidgetDefinition
      * @param LegacyScopeState $legacyScopeState
      * @param RequestStack $session
      * @param ActionAvailabilityChecker $actionChecker
+     * @param WidgetDefinitionParsers $widgetDefinitionParsers
      */
     public function __construct(
         string $projectDir,
@@ -68,7 +65,8 @@ class WidgetDefinitionProvider extends LegacyHandler implements WidgetDefinition
         string $defaultSessionName,
         LegacyScopeState $legacyScopeState,
         RequestStack $session,
-        ActionAvailabilityChecker $actionChecker
+        protected ActionAvailabilityChecker $actionChecker,
+        protected WidgetDefinitionParsers $widgetDefinitionParsers
     ) {
         parent::__construct(
             $projectDir,
@@ -78,7 +76,6 @@ class WidgetDefinitionProvider extends LegacyHandler implements WidgetDefinition
             $legacyScopeState,
             $session
         );
-        $this->actionChecker = $actionChecker;
     }
 
     /**
@@ -161,6 +158,8 @@ class WidgetDefinitionProvider extends LegacyHandler implements WidgetDefinition
 
         $displayedWidgets = $this->filterAccessibleWidgets($widgets);
 
+        $displayedWidgets = $this->parseWidgetTypeMetadata($module, $displayedWidgets);
+
         return array_values($displayedWidgets);
     }
 
@@ -220,5 +219,37 @@ class WidgetDefinitionProvider extends LegacyHandler implements WidgetDefinition
         $this->close();
 
         return $access;
+    }
+
+    /**
+     * @param string $module
+     * @param array $displayedWidgets
+     * @return array
+     */
+    protected function parseWidgetTypeMetadata(string $module, array $displayedWidgets): array
+    {
+        if (empty($displayedWidgets)) {
+            return [];
+        }
+
+        foreach ($displayedWidgets as $index => $widget) {
+            if (empty($widget['type'])) {
+                continue;
+            }
+
+            $type = $widget['type'];
+
+            $parsers = $this->widgetDefinitionParsers->get($module ?? 'default', $type);
+            if (empty($parsers)) {
+                continue;
+            }
+
+            foreach ($parsers as $parser) {
+                $parsedWidget = $parser->parse($widget);
+                $displayedWidgets[$index] = $parsedWidget;
+            }
+        }
+
+        return $displayedWidgets;
     }
 }

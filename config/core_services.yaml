@@ -102,6 +102,8 @@ services:
       tags: [ 'view.definition.mapper' ]
     App\ViewDefinitions\LegacyHandler\ViewConfigMapperInterface:
       tags: [ 'view.config.mapper' ]
+    App\ViewDefinitions\LegacyHandler\Widgets\WidgetDefinitionParserInterface:
+      tags: [ 'widget.parser' ]
     App\Data\LegacyHandler\PresetListDataHandlerInterface:
       tags: [ 'app.data.preset.handler' ]
     App\Engine\Service\ActionAvailabilityChecker\ActionAvailabilityCheckerInterface:
@@ -328,10 +330,16 @@ services:
     arguments:
       - !tagged { tag: 'view.definition.mapper' }
       -
+
   App\ViewDefinitions\LegacyHandler\ViewConfigMappers:
     # inject all services tagged with view.config.mapper as first argument
     arguments:
       - !tagged { tag: 'view.config.mapper' }
+
+  App\ViewDefinitions\LegacyHandler\Widgets\WidgetDefinitionParsers:
+    # inject all services tagged with widget.parser as first argument
+    arguments:
+      - !tagged { tag: 'widget.parser' }
 
   App\Data\LegacyHandler\PresetListDataHandlers:
     # inject all services tagged with app.data.preset.handler as first argument

@@ -10,9 +10,10 @@ parameters:
             params:
               expanded: true
             acl:
-              - email-marketing-status-checker
+              - edit
             availability:
               - email-marketing-status-checker
+              - acls
     default:
       actions:
         index: &index

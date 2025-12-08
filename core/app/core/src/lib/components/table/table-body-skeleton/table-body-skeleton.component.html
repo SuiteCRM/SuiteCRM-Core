@@ -62,12 +62,13 @@
             <ng-container *ngFor="let column of columns">
                 <td *ngIf="getDisplayedColumns(column)"
                 [class]="('column-' + column?.name ?? '') + ' ' + ('column-type-' + column?.type ?? '')">
-                <div class="box-loading mb-1 mt-1 rounded pb-2 pt-1"></div>
+                <div class="box-loading skeleton-column rounded pb-2 pt-1"></div>
                 </td>
             </ng-container>
             <td *ngIf="showActions">
-                <div [class.pl-4]="!isMobile()"
-                     [class.pl-2]="isMobile()"
+                <div [class.pl-4]="!isMobile() && config.type !== 'subpanel'"
+                     [class.pl-2]="isMobile() && config.type !== 'subpanel'"
+                     [class.pl-1]="config.type === 'subpanel'"
                      class="box-loading skeleton-line-actions rounded pb-2 pt-1"></div>
             </td>
         </tr>

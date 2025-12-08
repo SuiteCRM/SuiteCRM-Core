@@ -38,6 +38,7 @@ import {
     ScreenSize,
     ScreenSizeObserverService
 } from "../../../services/ui/screen-size-observer/screen-size-observer.service";
+import {Record} from "../../../common/record/record.model";
 
 @Component({
     selector: 'scrm-table-body-skeleton',
@@ -72,7 +73,19 @@ export class TableBodySkeletonComponent implements OnInit, OnDestroy {
             }
         }));
 
-        this.subs.push(this.config.lineActions.getActions().pipe().subscribe((value) => {
+        this.subs.push(this?.config?.lineActions?.getActions({
+            record: {
+                id: '',
+                module: '',
+                attributes: [],
+                acls: [
+                    'edit',
+                    'view',
+                    'detail',
+                    'delete',
+                ],
+            } as Record
+        }).pipe().subscribe((value) => {
             if (value.length > 0) {
                 this.showActions = true;
                 return;
@@ -84,7 +97,7 @@ export class TableBodySkeletonComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.subs.forEach(sub => sub.unsubscribe());
+        this.subs.forEach(sub => sub?.unsubscribe());
     }
 
 

@@ -74,7 +74,7 @@ export class TableBodyComponent implements OnInit, OnDestroy {
 
     currentPage: number = 1;
     pageSize: number = 20;
-    records: Record[] = [];
+    records: WritableSignal<Record[]> = signal([]);
 
     constructor(
         protected fieldManager: FieldManager,
@@ -146,6 +146,7 @@ export class TableBodyComponent implements OnInit, OnDestroy {
                 const selectionStatus = selection && selection.status || SelectionStatus.NONE;
 
 
+                const records = this.records() ?? [];
                 this.columns.set(columns);
                 this.displayedColumns.set(displayedColumns);
 
@@ -155,17 +156,13 @@ export class TableBodyComponent implements OnInit, OnDestroy {
                     selected,
                     selectionStatus,
                     displayedColumns,
-                    records: [],
+                    records: records,
                     loading
                 };
             })
         );
 
         this.subs.push(this.config.dataSource.connect(null).subscribe(records => {
-            const currentVm = this.vm();
-            if (!this.vm()) {
-                return;
-            }
             this.setLoading(true);
             records.forEach((record, index) => {
                 if (!record.metadata) {
@@ -177,12 +174,9 @@ export class TableBodyComponent implements OnInit, OnDestroy {
                 };
             });
 
-            this.records = [...records];
+            this.records.set([...records])
+            this.vm.update(currentVm => currentVm ? {...currentVm, records: [...records]} : null);
 
-            this.vm.set({
-                ...currentVm,
-                records: records || []
-            });
             setTimeout(() => {
                 this.setLoading(false);
             }, 250);
@@ -194,7 +188,7 @@ export class TableBodyComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.subs.forEach(sub => sub.unsubscribe());
+        this.subs.forEach(sub => sub?.unsubscribe());
     }
 
     toggleSelection(id: string): void {

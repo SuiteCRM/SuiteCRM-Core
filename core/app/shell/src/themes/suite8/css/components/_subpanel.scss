@@ -347,6 +347,13 @@ div.widget-panel .panel-card .card-header {
 
 .sub-panels {
   padding: 0 1.25rem 1.25rem;
+
+  .table {
+    .skeleton-column {
+      margin-bottom: .451rem !important;
+      margin-top: .451rem !important;
+    }
+  }
 }
 
 .sub-panel-banner.accordion {

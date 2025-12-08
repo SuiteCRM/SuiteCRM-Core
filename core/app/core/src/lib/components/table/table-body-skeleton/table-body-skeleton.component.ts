@@ -53,6 +53,7 @@ export class TableBodySkeletonComponent implements OnInit, OnDestroy {
     @Input() activeLineAction: ActiveLineAction;
 
     protected subs: Subscription[] = [];
+    lineActionPadding: string = 'pl-4';
     isMobile = signal(false);
 
     constructor(
@@ -86,12 +87,25 @@ export class TableBodySkeletonComponent implements OnInit, OnDestroy {
                 ],
             } as Record
         }).pipe().subscribe((value) => {
-            if (value.length > 0) {
-                this.showActions = true;
+            if (value.length < 1) {
+                this.showActions = false;
                 return;
             }
 
-            this.showActions = false;
+            this.showActions = true;
+
+            if (this.isMobile()) {
+                this.lineActionPadding = 'pl-2';
+                return;
+            }
+
+            if (value.length > 2) {
+                this.lineActionPadding = 'pl-4';
+                return;
+            }
+
+            this.lineActionPadding = 'pl-1';
+
         }));
 
     }

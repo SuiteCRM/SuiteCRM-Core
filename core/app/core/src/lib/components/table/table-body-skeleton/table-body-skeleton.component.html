@@ -28,49 +28,46 @@
 
 <table class="list-view-table striped-table table">
     <thead>
-        <tr>
-            <th *ngIf="displayedColumns.includes('checkbox')" scope="col" class="primary-table-header"></th>
-            <th *ngIf="displayedColumns.includes('show-more')" scope="col" class="primary-table-header"></th>
-            <ng-container *ngFor="let column of columns">
-                <th *ngIf="getDisplayedColumns(column)"
-                    [class]="('primary-table-header ' + 'column-' + column?.name ?? '') + ' ' + ('column-type-' + column?.type ?? '')">
-                    <scrm-label [labelKey]="column.label" [module]="config.module || ''"></scrm-label>
-                    <scrm-sort-button *ngIf="column.sortable"
-                                    [state]="getFieldSort(column)"
-                                    [readonly]="column?.sortReadOnly ?? false"
-                    >
-                    </scrm-sort-button>
-                </th>
-            </ng-container>
-            <th *ngIf="showActions" scope="col" class="primary-table-header"></th>
-        </tr>
+    <tr>
+        <th *ngIf="displayedColumns.includes('checkbox')" scope="col" class="primary-table-header"></th>
+        <th *ngIf="displayedColumns.includes('show-more')" scope="col" class="primary-table-header"></th>
+        <ng-container *ngFor="let column of columns">
+            <th *ngIf="getDisplayedColumns(column)"
+                [class]="('primary-table-header ' + 'column-' + column?.name ?? '') + ' ' + ('column-type-' + column?.type ?? '')">
+                <scrm-label [labelKey]="column.label" [module]="config.module || ''"></scrm-label>
+                <scrm-sort-button *ngIf="column.sortable"
+                                  [state]="getFieldSort(column)"
+                                  [readonly]="column?.sortReadOnly ?? false"
+                >
+                </scrm-sort-button>
+            </th>
+        </ng-container>
+        <th *ngIf="showActions" scope="col" class="primary-table-header"></th>
+    </tr>
     </thead>
 
     <tbody>
-        <tr *ngFor="let item of [].constructor(pageSize); let i = index">
-            <td *ngIf="displayedColumns.includes('checkbox')">
-                <label class="checkbox-container">
-                    <input type="checkbox"
+    <tr *ngFor="let item of [].constructor(pageSize); let i = index">
+        <td *ngIf="displayedColumns.includes('checkbox')">
+            <label class="checkbox-container">
+                <input type="checkbox"
                        disabled
                        aria-hidden="true">
-                    <span class="checkmark"></span>
-                </label>
-            </td>
-            <td *ngIf="displayedColumns.includes('show-more')" class="show-more-column">
+                <span class="checkmark"></span>
+            </label>
+        </td>
+        <td *ngIf="displayedColumns.includes('show-more')" class="show-more-column">
             <scrm-button [config]="showMoreButton"></scrm-button>
-            </td>
-            <ng-container *ngFor="let column of columns">
-                <td *ngIf="getDisplayedColumns(column)"
+        </td>
+        <ng-container *ngFor="let column of columns">
+            <td *ngIf="getDisplayedColumns(column)"
                 [class]="('column-' + column?.name ?? '') + ' ' + ('column-type-' + column?.type ?? '')">
                 <div class="box-loading skeleton-column rounded pb-2 pt-1"></div>
-                </td>
-            </ng-container>
-            <td *ngIf="showActions">
-                <div [class.pl-4]="!isMobile() && config.type !== 'subpanel'"
-                     [class.pl-2]="isMobile() && config.type !== 'subpanel'"
-                     [class.pl-1]="config.type === 'subpanel'"
-                     class="box-loading skeleton-line-actions rounded pb-2 pt-1"></div>
             </td>
-        </tr>
+        </ng-container>
+        <td *ngIf="showActions">
+            <div class=" {{ lineActionPadding }} box-loading skeleton-line-actions rounded pb-2 pt-1"></div>
+        </td>
+    </tr>
     </tbody>
 </table>

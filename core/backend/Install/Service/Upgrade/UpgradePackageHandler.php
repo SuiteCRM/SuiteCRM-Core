@@ -265,26 +265,7 @@ class UpgradePackageHandler extends PackageHandler
             $destinationPath = $tmpFolder . '/' . $item;
 
             if (is_dir($sourcePath)) {
-                $dirContents = scandir($sourcePath);
-
-                foreach ($dirContents as $file) {
-                    if ($file === '.' || $file === '..') {
-                        continue;
-                    }
-
-                    if ($file !== 'en_us.lang.php') {
-                        $fileSourcePath = $sourcePath . '/' . $file;
-                        $fileDestinationPath = $destinationPath . '/' . $file;
-
-                        if (file_exists($fileSourcePath)) {
-                            if (!is_dir($destinationPath)) {
-                                mkdir($destinationPath, 0755, true);
-                            }
-
-                            $filesystem->copy($fileSourcePath, $fileDestinationPath);
-                        }
-                    }
-                }
+                $this->copyToReAddFolderContents($sourcePath, $destinationPath, $filesystem);
                 continue;
             }
 
@@ -311,26 +292,7 @@ class UpgradePackageHandler extends PackageHandler
 
             if (file_exists($tmpPath)) {
                 if (is_dir($tmpPath)) {
-                    $dirContents = scandir($tmpPath);
-
-                    foreach ($dirContents as $file) {
-                        if ($file === '.' || $file === '..') {
-                            continue;
-                        }
-
-                        $fileTmpPath = $tmpPath . '/' . $file;
-                        $fileFinalPath = $finalDestinationPath . '/' . $file;
-
-                        if ($file === 'en_us.lang.php' && file_exists($fileFinalPath)) {
-                            continue;
-                        }
-
-                        if (is_dir($fileTmpPath)) {
-                            $filesystem->mirror($fileTmpPath, $fileFinalPath);
-                        } else {
-                            $filesystem->copy($fileTmpPath, $fileFinalPath);
-                        }
-                    }
+                    $this->restoreToReAddTmpFolderContents($tmpPath, $finalDestinationPath, $filesystem);
                 } else {
                     if (basename($item) !== 'en_us.lang.php' || !file_exists($finalDestinationPath)) {
                         $filesystem->copy($tmpPath, $finalDestinationPath);
@@ -407,5 +369,70 @@ class UpgradePackageHandler extends PackageHandler
     public function getBackupPath(string $version): string
     {
         return $this->upgradePackageDir . '/' . $version . '-backup';
+    }
+
+    /**
+     * @param string $sourcePath
+     * @param string $destinationPath
+     * @param Filesystem $filesystem
+     * @return void
+     */
+    public function copyToReAddFolderContents(string $sourcePath, string $destinationPath, Filesystem $filesystem): void
+    {
+        $dirContents = scandir($sourcePath);
+
+        foreach ($dirContents as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            if ($file !== 'en_us.lang.php') {
+                $fileSourcePath = $sourcePath . '/' . $file;
+                $fileDestinationPath = $destinationPath . '/' . $file;
+
+                if (file_exists($fileSourcePath)) {
+                    if (!is_dir($destinationPath)) {
+                        mkdir($destinationPath, 0755, true);
+                    }
+
+                    if (is_dir($fileSourcePath)) {
+                        $this->copyToReAddFolderContents($fileSourcePath, $fileDestinationPath, $filesystem);
+                        continue;
+                    }
+
+                    $filesystem->copy($fileSourcePath, $fileDestinationPath);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $tmpPath
+     * @param string $finalDestinationPath
+     * @param Filesystem $filesystem
+     * @return void
+     */
+    public function restoreToReAddTmpFolderContents(string $tmpPath, string $finalDestinationPath, Filesystem $filesystem): void
+    {
+        $dirContents = scandir($tmpPath);
+
+        foreach ($dirContents as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            $fileTmpPath = $tmpPath . '/' . $file;
+            $fileFinalPath = $finalDestinationPath . '/' . $file;
+
+            if ($file === 'en_us.lang.php' && file_exists($fileFinalPath)) {
+                continue;
+            }
+
+            if (is_dir($fileTmpPath)) {
+                $this->restoreToReAddTmpFolderContents($fileTmpPath, $fileFinalPath, $filesystem);
+            } else {
+                $filesystem->copy($fileTmpPath, $fileFinalPath);
+            }
+        }
     }
 }

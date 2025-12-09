@@ -69,6 +69,7 @@ require_once('modules/DynamicFields/templates/Fields/TemplateEncrypt.php');
 require_once('modules/DynamicFields/templates/Fields/TemplateId.php');
 require_once('modules/DynamicFields/templates/Fields/TemplateImage.php');
 require_once('modules/DynamicFields/templates/Fields/TemplateDecimal.php');
+require_once('modules/DynamicFields/templates/Fields/TemplateFile.php');
 function get_widget($type)
 {
     $local_temp = null;
@@ -84,6 +85,8 @@ function get_widget($type)
 
             case 'float':
                         $local_temp = new TemplateFloat(); break;
+            case 'file':
+                        $local_temp = new TemplateFile(); break;
             case 'decimal':
                         $local_temp = new TemplateDecimal(); break;
             case 'int':

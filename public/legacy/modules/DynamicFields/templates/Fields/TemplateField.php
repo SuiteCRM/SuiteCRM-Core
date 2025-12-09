@@ -78,6 +78,7 @@ class TemplateField
     public $reportable = true;
     public $label_value = '';
     public $help = '';
+    public $metadata;
     public $formula = '';
     public $unified_search = 0;
     public $supports_unified_search = false;
@@ -106,11 +107,13 @@ class TemplateField
         'reportable' => 'reportable',
         'ext2'=>'ext2',
         'ext4'=>'ext4',
+        'source' => 'source',
         'ext3'=>'ext3',
         'labelValue' => 'label_value',
         'unified_search'=>'unified_search',
         'full_text_search'=>'full_text_search',
     );
+    public $metadataMap = array();
     // Bug #48826
     // fields to decode from post request
     public $decode_from_request_fields_map = array('formula', 'dependency');
@@ -539,6 +542,12 @@ class TemplateField
                 if ($vardef != $field) {
                     $this->$field = $this->$vardef;
                 }
+            }
+        }
+
+        foreach ($this->metadataMap as $vardef => $field) {
+            if (isset($_REQUEST[$vardef])) {
+                $this->$vardef = $_REQUEST[$vardef];
             }
         }
         $this->applyVardefRules();

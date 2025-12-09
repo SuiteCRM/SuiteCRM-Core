@@ -134,7 +134,7 @@ export class ImageEditFieldComponent extends BaseImageComponent implements OnIni
                 emitViewToModelChange: false
             }
         );
-
+        this.field.value = newValue.id;
         this.field.formControl.markAsDirty();
     }
 

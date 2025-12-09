@@ -66,6 +66,7 @@ $dictionary['FieldsMetaData'] = array(
         'ext2'=>array('name' =>'ext2', 'type' =>'varchar', 'len'=>'255', 'default'=>''),
         'ext3'=>array('name' =>'ext3', 'type' =>'varchar', 'len'=>'255', 'default'=>''),
         'ext4'=>array('name' =>'ext4', 'type' =>'text'),
+        'metadata'=>array('name' =>'metadata', 'type' =>'longtext'),
     ),
     'indices' => array(
         array('name' =>'fields_meta_datapk', 'type' =>'primary', 'fields' => array('id')),

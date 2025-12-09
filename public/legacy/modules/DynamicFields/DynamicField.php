@@ -182,12 +182,16 @@ class DynamicField
             if (empty($vardef ['source'])) {
                 $vardef ['source'] = 'custom_fields';
             }
+
+            $vardef['metadata'] = json_decode($row['metadata'], true) ?? [];
+
             if (empty($results [$row ['custom_module']])) {
                 $results [$row ['custom_module']] = array();
             }
             $results [$row ['custom_module']] [$row ['name']] = $vardef;
         }
-        if (empty($module)) {
+
+          if (empty($module)) {
             foreach ($results as $module => $result) {
                 $this->saveToVardef($module, $result, $saveCache);
             }
@@ -612,6 +616,7 @@ class DynamicField
         $fmd->custom_module = $object_name;
         $fmd->name = $db_name;
         $fmd->vname = $label;
+        $fmd->dbType = $field->dbType ?? null;
         $fmd->type = $field->type;
         $fmd->help = $field->help;
         if (!empty($field->len)) {
@@ -630,10 +635,17 @@ class DynamicField
         $fmd->audited = $field->audited;
         $fmd->inline_edit = $field->inline_edit;
         $fmd->reportable = ($field->reportable ? 1 : 0);
+        $metadata = [];
+        foreach ($field->metadataMap as $metaKey => $vardefKey) {
+            $metadata[$metaKey] = $field->$vardefKey;
+        }
+
+        $fmd->metadata = json_encode($metadata);
+
         if (!$is_update) {
             $fmd->new_with_id = true;
         }
-        if ($field) {
+        if ($field && $field->get_field_def()['source'] !== 'non-db') {
             if (!$is_update) {
                 //Do two SQL calls here in this case
                 //The first is to create the column in the custom table without the default value
@@ -667,6 +679,14 @@ class DynamicField
             $this->saveExtendedAttributes($field, array_keys($fmd->field_defs));
             // Fix #9119 - The cache/themes folder needs to be rebuilt after changing custom field properties.
             // https://github.com/salesagility/SuiteCRM/issues/9119
+            include_once('include/TemplateHandler/TemplateHandler.php');
+            TemplateHandler::clearCache($this->module);
+        }
+
+        if ($field->get_field_def()['source'] === 'non-db') {
+            $fmd->save();
+            $this->buildCache($this->module);
+            $this->saveExtendedAttributes($field, array_keys($fmd->field_defs));
             include_once('include/TemplateHandler/TemplateHandler.php');
             TemplateHandler::clearCache($this->module);
         }

@@ -73,6 +73,8 @@ class FieldsMetaData extends SugarBean
     public $inline_edit;
     public $duplicate_merge;
     public $reportable;
+    public $metadata;
+    public $dbType;
     public $required_fields =  array("name"=>1, "date_start"=>2, "time_start"=>3,);
 
     public $table_name = 'fields_meta_data';

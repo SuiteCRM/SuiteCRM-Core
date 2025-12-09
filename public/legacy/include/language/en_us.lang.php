@@ -621,6 +621,18 @@ $app_list_strings = array(
         'InboundEmail' => 'Email',
     ),
 
+    'file_field_storage_type_dom' => [
+        'private-documents' => 'Private Documents',
+        'public-documents' => 'Public Documents',
+        'archived-documents' => 'Archived Documents',
+    ],
+
+
+    'image_field_storage_type_dom' => [
+        'private-images' => 'Private Images',
+        'public-images' => 'Public Images',
+    ],
+
     'product_category_default_key' => '',
     'product_category_dom' => array(
         '' => '',

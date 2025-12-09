@@ -643,6 +643,7 @@ $mod_strings = array(
         'date' => 'Date',
         'phone' => 'Phone',
         'currency' => 'Currency',
+        'file' => 'File',
         'html' => 'ReadOnly HTML (deprecated, use TextBlock)',
         'radioenum' => 'Radio',
         'relate' => 'Relate',

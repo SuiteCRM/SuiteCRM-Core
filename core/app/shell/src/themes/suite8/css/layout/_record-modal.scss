@@ -160,6 +160,13 @@ body.modal-open.detached-modal-open {
     box-shadow: 0 0 0.8rem #0000005c !important;
     margin-left: 0.5rem;
 
+    &.maximized {
+      .modal-dialog {
+        .modal-content {
+          border-radius: 4px;
+        }
+      }
+    }
 
     &:first-child {
       margin-left: 0;
@@ -171,15 +178,35 @@ body.modal-open.detached-modal-open {
       .minimise-button {
         border: 0;
         outline: 0;
+        box-shadow: none;
         color: $white;
-        fill: $white;
-        background-color: transparent;
         margin: 0;
-        padding: .25rem .55rem;
+        padding: .4rem .5rem;
+        height: 29px;
+        width: 28px;
+      }
+
+      .maximize-button {
+        padding: .25rem .4rem;
+        margin: 0;
+        outline: 0;
+        box-shadow: none;
+        height: 29px;
+        width: 28px;
       }
 
       .close-button {
         color: $white;
+        outline: 0;
+        box-shadow: none;
+        padding: .5rem .25rem;
+        height: 29px;
+        width: 28px;
+      }
+
+      .close-button:hover {
+        background-color: $white;
+        color: #212529;
       }
 
       .modal-title {

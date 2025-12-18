@@ -43,6 +43,7 @@ use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: PublicImageMediaObjectRepository::class)]
 #[ORM\Table(name: 'public_images_media_objects')]
@@ -88,6 +89,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     normalizationContext: ['groups' => ['media_object:read']],
     security: "is_granted('ROLE_USER')"
 )]
+#[Vich\Uploadable]
 class PublicImageMediaObject implements MediaObjectInterface
 {
     use DefaultRecordTrait;
@@ -116,6 +118,13 @@ class PublicImageMediaObject implements MediaObjectInterface
 
     #[ApiProperty(writable: false)]
     #[ORM\Column(name: "file_path", type: "string", length: 255, nullable: true, options: ["default" => null])]
+    #[Vich\UploadableField(
+        mapping: 'public_images_media_object',
+        fileNameProperty: 'filePath',
+        size: 'size',
+        mimeType: 'mimeType',
+        dimensions: 'dimensions'
+    )]
     public ?string $filePath = null;
 
     #[ApiProperty(writable: false)]

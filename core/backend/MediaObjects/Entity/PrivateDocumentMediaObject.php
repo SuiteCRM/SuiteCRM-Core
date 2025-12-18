@@ -27,6 +27,7 @@
 
 namespace App\MediaObjects\Entity;
 
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -88,6 +89,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     normalizationContext: ['groups' => ['media_object:read']],
     security: "is_granted('ROLE_USER')"
 )]
+#[Vich\Uploadable]
 class PrivateDocumentMediaObject implements MediaObjectInterface
 {
     use DefaultRecordTrait;
@@ -112,6 +114,13 @@ class PrivateDocumentMediaObject implements MediaObjectInterface
 
     #[Assert\NotNull]
     #[UploadConstraint(storageType: 'private-documents')]
+    #[Vich\UploadableField(
+        mapping: 'private_documents_media_object',
+        fileNameProperty: 'filePath',
+        size: 'size',
+        mimeType: 'mimeType',
+        dimensions: 'dimensions'
+    )]
     public ?File $file = null;
 
     #[ApiProperty(writable: false)]

@@ -3420,6 +3420,7 @@ $app_list_strings['contract_status_list']['Signed'] = 'Signed';
 $app_list_strings['contract_type_list']['Type'] = 'Type';
 $app_strings['LBL_PRINT_AS_PDF'] = 'Print as PDF';
 $app_strings['LBL_SELECT_TEMPLATE'] = 'Please Select a Template';
+$app_string['LBL_PDF_GENERATION_FAILED'] = 'Unable to generate PDF document. See logs for more info.';
 $app_strings['LBL_NO_TEMPLATE'] = 'ERROR\nNo templates found.\nPlease go to the PDF templates module and create one';
 
 //aow

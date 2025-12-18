@@ -214,6 +214,44 @@ class BasePDFManager extends LegacyHandler
         return $this->createMediaObjectRecord(null, $storageType, $basePdf, $fileName);
     }
 
+    public function generatePdf(string $module, string $id, string $templateId, $options = [], $temp = false): ?Record
+    {
+        $validationResult = $this->validateBulkPdfInputs($templateId, $module, $id);
+        if ($validationResult === null) {
+            return null;
+        }
+
+        $legacyModuleName = $this->moduleNameMapper->toLegacy($module);
+        $moduleBean = $this->getBean($legacyModuleName, $id);
+        $templateBean = $this->getBean('AOS_PDF_Templates', $templateId);
+
+        $pdfConfig = $this->pdfLegacyHandler->buildPDFConfig($templateBean);
+        $fileName = $this->getPdfName($templateBean->name);
+        $objectArr = $this->setObjectArray($moduleBean);
+
+        [$header, $footer, $printable] = $this->pdfLegacyHandler->parseTemplate($templateBean, $objectArr, true);
+
+        $pdfContent = [
+            'header' => $header,
+            'footer' => $footer,
+            'printable' => $printable,
+        ];
+
+        $parentRecord = $options['parentRecord'] ?? null;
+
+        if ($parentRecord !== null) {
+            return $this->createPDFMediaObject($parentRecord, $fileName, $pdfConfig, $pdfContent, $temp);
+        }
+
+        if (isset($options['createNote']) && $options['createNote'] === true) {
+            $note = $this->createNote($moduleBean, $fileName);
+            return $this->createPDFMediaObject($note, $fileName, $pdfConfig, $pdfContent, $temp);
+        }
+
+        return $this->createPDFMediaObject(null, $fileName, $pdfConfig, $pdfContent, $temp);
+    }
+
+
     protected function validateBulkPdfInputs(string $templateId, string $module, $moduleId = null): ?array
     {
         $legacyModuleName = $this->moduleNameMapper->toLegacy($module);

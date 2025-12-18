@@ -56,7 +56,7 @@ export class ExportAsyncAction extends AsyncActionHandler {
             options.params = data.queryParams;
         }
 
-        this.download(data.url, data.formData);
+        this.download(data.url, data.formData, data?.method || 'post');
     }
 
     /**
@@ -67,12 +67,13 @@ export class ExportAsyncAction extends AsyncActionHandler {
      *
      * @param {string} url for download
      * @param {object} formData to submit
+     * @param method
      */
-    protected download(url: string, formData: { [key: string]: string }): void {
+    protected download(url: string, formData: { [key: string]: string }, method = 'post'): void {
 
         const form = document.createElement('form');
         form.setAttribute('id', 'export-download');
-        form.setAttribute('method', 'post');
+        form.setAttribute('method', method.toLowerCase());
         form.setAttribute('action', url);
         form.setAttribute('target', '_self');
         form.setAttribute('style', 'display: none;');

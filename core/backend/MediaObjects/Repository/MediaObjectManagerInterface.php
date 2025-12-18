@@ -129,10 +129,28 @@ interface MediaObjectManagerInterface
     public function buildContentUrl(string $type, mixed $object): string;
 
     /**
+     * Creates a media object instance from its type.
+     *
+     * @param string $type The type of media object (e.g., 'archived-document', 'private-document', etc.)
+     * @return ?MediaObjectInterface The media object instance or null if the type is invalid
+     */
+    public function createMediaObjectFromType(string $type): ?MediaObjectInterface;
+
+    /**
      * Returns the storage type for a given media object.
      *
      * @param mixed $object The media object to get the storage type for
      * @return string The storage type (e.g., 'archived-document', 'private-document', etc.)
      */
     public function getObjectStorageType(object $object): string;
+
+    /**
+     * Creates a media object instance from its type and attributes - (i.e parent_type, file etc.).
+     *
+     * @param string $storageType The type of media object (e.g., 'archived-document', 'private-document', etc.)
+     * @param array $attributes The attributes to set on the media object - including the file
+     * @return MediaObjectInterface The media object instance
+     */
+    public function createMediaObjectFromAttributes(string $storageType, array $attributes): MediaObjectInterface;
+
 }

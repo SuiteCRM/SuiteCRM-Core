@@ -117,6 +117,18 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
         }
     }
 
+    public function createMediaObjectFromType(string $type): ?MediaObjectInterface
+    {
+        $classMap = array_flip($this->objectTypeMap);
+        $className = $classMap[$type] ?? null;
+
+        if ($className === null || !class_exists($className)) {
+            return null;
+        }
+
+        return new $className();
+    }
+
     /**
      * Deletes a media object from the appropriate repository based on its type.
      *
@@ -369,5 +381,21 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
         }
 
         return '';
+    }
+
+    public function createMediaObjectFromAttributes(string $storageType, array $attributes): MediaObjectInterface
+    {
+        $mediaObject = $this->createMediaObjectFromType($storageType);
+
+        $mediaObject->setParentField($attributes['parent_field'] ?? 'file');
+        $mediaObject->setParentId($attributes['parent_id'] ?? null);
+        $mediaObject->setParentType($attributes['parent_type'] ?? null);
+        $mediaObject->setMimeType($attributes['mime_type'] ?? '');
+        $mediaObject->setName($attributes['name'] ?? '');
+        $mediaObject->setOriginalName($attributes['original_name'] ?? $attributes['name'] ?? '');
+        $mediaObject->setTemporary($attributes['temp'] ?? false);
+        $mediaObject->setFile($attributes['file'] ?? null);
+
+        return $mediaObject;
     }
 }

@@ -24,7 +24,17 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, ElementRef, Input, OnDestroy, OnInit, signal, ViewChild, WritableSignal} from '@angular/core';
+import {
+    Component,
+    ElementRef, EventEmitter,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    signal,
+    ViewChild,
+    WritableSignal
+} from '@angular/core';
 import {filter, take} from "rxjs/operators";
 import {CommonModule} from "@angular/common";
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
@@ -49,6 +59,7 @@ import {StringMap} from "../../../../common/types/string-map";
 import {FieldMap} from "../../../../common/record/field.model";
 import {deepClone} from "../../../../common/utils/object-utils";
 import {ConfirmationModalService} from "../../../../services/modals/confirmation-modal.service";
+import {ModalComponent} from "../../../../components/modal/components/modal/modal.component";
 
 @Component({
     selector: 'scrm-record-modal',
@@ -98,8 +109,11 @@ export class RecordModalComponent implements OnInit, OnDestroy {
     @Input() closeConfirmationMessages: string[] = [];
     @Input() closeConfirmationModal: boolean = false;
     @Input() modalOptions: any = null;
+    @Output() onMaximize: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @Output() onMinimize: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     @ViewChild('modalContainer') modalContainer: ElementRef;
+    @ViewChild('modalComponent') modalComponent: ModalComponent;
 
     validating: WritableSignal<boolean> = signal(false);
 
@@ -205,11 +219,19 @@ export class RecordModalComponent implements OnInit, OnDestroy {
         this.loading$ = this.modalStore.metadataLoading$;
     }
 
+    minimize(): void {
+        this?.modalComponent?.minimize();
+    }
+
     onMinimizeToggle(minimize: boolean): void {
         if (minimize === this.isMinimized()) {
             return;
         }
         this.isMinimized.set(minimize);
+
+        if (minimize) {
+            this.onMinimize.emit(minimize);
+        }
 
         if (this.modalExpandStatus === 'normal' && minimize) {
             this.modalExpandStatus = 'minimized';
@@ -227,6 +249,10 @@ export class RecordModalComponent implements OnInit, OnDestroy {
         }
     }
 
+    maximize(): void {
+        this?.modalComponent?.maximize();
+    }
+
     onMaximizeToggle(maximize: boolean): void {
         if (maximize === this.isMaximized()) {
             return;
@@ -239,13 +265,22 @@ export class RecordModalComponent implements OnInit, OnDestroy {
             return;
         }
 
+        const detachedModals = this.getDetachedModalsElement();
+
+        if (detachedModals == null) {
+            this.isMaximized.set(false);
+            return;
+        }
+
         if (maximize) {
             parent.classList.add('maximized');
             this.enableBackdrop();
         } else {
             parent.classList.remove('maximized');
-            this.disableBackdrop()
+            this.disableBackdrop();
         }
+
+        this.onMaximize.emit(maximize);
 
         this.isMaximized.set(maximize);
 
@@ -263,10 +298,15 @@ export class RecordModalComponent implements OnInit, OnDestroy {
             this.isMinimized.set(false);
             return;
         }
+
     }
 
     protected getParentModalWindowElement(): HTMLElement | null {
         return this.modalContainer?.nativeElement?.parentElement?.parentElement?.parentElement?.parentElement ?? null;
+    }
+
+    protected getDetachedModalsElement(): HTMLElement | null {
+        return this.modalContainer?.nativeElement?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement ?? null;
     }
 
     protected enableBackdrop(): void {

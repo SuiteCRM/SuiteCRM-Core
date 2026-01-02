@@ -127,6 +127,16 @@ export class ModalComponent implements OnInit, OnDestroy {
         }
     }
 
+    minimize(): void {
+        this.isMinimized.set(true);
+        this.onMinimizeToggle.emit(this.isMinimized());
+        this.initMinimiseStatus();
+        if (this.isMinimized()) {
+            this.isMaximized.set(false);
+            this.initMaximizeStatus();
+        }
+    }
+
     initMinimiseStatus(): void {
         if (this.isMinimized()) {
             this.minimiseStatus.set('minimised');
@@ -147,6 +157,16 @@ export class ModalComponent implements OnInit, OnDestroy {
 
     toggleMaximize(): void {
         this.isMaximized.set(!this.isMaximized());
+        this.onMaximizeToggle.emit(this.isMaximized());
+        this.initMaximizeStatus();
+        if (this.isMaximized()) {
+            this.isMinimized.set(false);
+            this.initMinimiseStatus();
+        }
+    }
+
+    maximize(): void {
+        this.isMaximized.set(true);
         this.onMaximizeToggle.emit(this.isMaximized());
         this.initMaximizeStatus();
         if (this.isMaximized()) {

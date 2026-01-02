@@ -154,6 +154,15 @@ body.modal-open.detached-modal-open {
   z-index: map-get($zindex, modal-low) !important;
   pointer-events: none;
 
+  &.has-maximized-modal {
+    .detached-modal:not(.maximized) {
+      z-index: 1070;
+    }
+    .detached-modal.maximized {
+      z-index: 1060;
+    }
+  }
+
   .detached-modal {
     position: relative;
     width: auto;

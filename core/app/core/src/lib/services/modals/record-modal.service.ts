@@ -127,6 +127,34 @@ export class RecordModalService {
         modal.componentInstance.closeConfirmationModal = recordModalOptions.closeConfirmationModal ?? false;
         modal.componentInstance.modalOptions = {...modalOptions ?? {}};
 
+        modal.componentInstance.onMaximize.subscribe((maximize) => {
+
+            const detachedModals = this.getDetachedModalsElement();
+
+            if (maximize) {
+                this.appState.getActiveModals().forEach(modalRef => {
+                    if (modalRef !== modal) {
+                        modalRef.componentInstance.minimize();
+                    }
+                });
+
+                if (detachedModals) {
+                    detachedModals.classList.add('has-maximized-modal');
+                }
+
+                return;
+            }
+
+            const hasMaximized = this.appState.getActiveModals().some(modalRef => modalRef !== modal && modalRef.componentInstance.modalExpandStatus === 'maximized');
+
+            if (!hasMaximized) {
+                if (detachedModals) {
+                    detachedModals.classList.remove('has-maximized-modal');
+                }
+            }
+
+        });
+
         modal.componentInstance.init();
 
         // Store modal reference to handle cleanup
@@ -137,6 +165,16 @@ export class RecordModalService {
             () => this.appState.removeModalRef(modal),
             () => this.appState.removeModalRef(modal)
         );
+    }
+
+    protected getDetachedModalsElement(): HTMLElement | null {
+        const detachedModals = window.document.body.querySelector('#detached-modals');
+
+        if (detachedModals) {
+            return detachedModals as HTMLElement;
+        }
+
+        return null;
     }
 
 

@@ -27,6 +27,7 @@
 -->
 <div class="record-modal-container" #modalContainer>
     <scrm-modal *ngIf="modalStore"
+                #modalComponent
                 [closable]="true"
                 [close]="closeButton"
                 [titleKey]="titleKey"

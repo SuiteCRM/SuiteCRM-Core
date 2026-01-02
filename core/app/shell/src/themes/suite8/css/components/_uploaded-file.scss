@@ -322,6 +322,15 @@ a.clickable.file-field-uploaded-link:hover {
         border-bottom: 1px solid $bright-purple;
         border-radius: 0;
         padding-bottom: 1px;
+
+        .uploaded-file-info-container  {
+          .uploaded-file-info {
+            a.clickable:hover {
+              text-decoration: none;
+            }
+          }
+
+        }
       }
     }
   }

@@ -113,13 +113,26 @@ class RecordViewGroupTypeMapper implements ViewDefinitionMapperInterface
 
             $type = $cell['type'] ?? '';
             $groupedType = $typesConfig[$type] ?? [];
+            $cellDefinition = $cell['fieldDefinition'] ?? [];
 
             if (empty($groupedType)) {
+                $typeName = $cellDefinition['type_name'] ?? '';
+                if ($typeName === 'parent_type') {
+                    $cellDefinition['metadata'] = array_merge(
+                        [
+                            'dynamicFieldLabel' => 'LBL_PARENT_FIELD_DYNAMIC_LABEL',
+                            'emptyFieldLabel' => 'LBL_RELATED_TO'
+                        ],
+                        $cellDefinition['metadata'] ?? [],
+                    );
+                }
+
+                $cell['fieldDefinition'] = $cellDefinition;
                 $cols[$cellKey] = $cell;
+
                 continue;
             }
 
-            $cellDefinition = $cell['fieldDefinition'] ?? [];
             $group = $cellDefinition['group'] ?? '';
             $groupDefinition = $vardefs[$group] ?? [];
 
@@ -157,6 +170,17 @@ class RecordViewGroupTypeMapper implements ViewDefinitionMapperInterface
                     array_keys($groupFields),
                     $vardefs,
                     $groupedType
+                );
+            }
+
+            $typeName = $cellDefinition['type_name'] ?? '';
+            if ($typeName === 'parent_type') {
+                $cellDefinition['metadata'] = array_merge(
+                    [
+                        'dynamicFieldLabel' => 'LBL_PARENT_FIELD_DYNAMIC_LABEL',
+                        'emptyFieldLabel' => 'LBL_RELATED_TO'
+                    ],
+                    $cellDefinition['metadata'] ?? [],
                 );
             }
 

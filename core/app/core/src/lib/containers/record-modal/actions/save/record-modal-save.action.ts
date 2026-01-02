@@ -79,6 +79,7 @@ export class RecordModalSaveAction extends RecordModalActionHandler {
                 });
 
                 this.modalService.dismissAll(this.key);
+                this.removeBackdrop();
                 return;
             }
             this.message.addWarningMessageByKey('LBL_VALIDATION_ERRORS');

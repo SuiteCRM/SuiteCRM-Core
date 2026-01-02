@@ -68,7 +68,10 @@ export class RecordModalCancelAction extends RecordModalActionHandler {
             {
                 labelKey: 'LBL_CANCEL',
                 klass: ['btn-secondary'],
-                onClick: activeModal => activeModal.dismiss()
+                onClick: activeModal => {
+                    activeModal.dismiss();
+                    this.removeBackdrop();
+                }
             } as ModalButtonInterface,
             {
                 labelKey: 'LBL_PROCEED',
@@ -76,6 +79,7 @@ export class RecordModalCancelAction extends RecordModalActionHandler {
                 onClick: activeModal => {
                     this.cancel();
                     activeModal.close();
+                    this.removeBackdrop();
                 }
             } as ModalButtonInterface,
         ];

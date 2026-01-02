@@ -171,6 +171,7 @@ export class RecordModalActionsAdapter extends BaseRecordActionsAdapter<RecordMo
         );
         if (this.shouldCloseModal(process)) {
             this.activeModal.close();
+            this.removeBackdrop();
         }
     }
 
@@ -180,5 +181,18 @@ export class RecordModalActionsAdapter extends BaseRecordActionsAdapter<RecordMo
      */
     protected shouldCloseModal(process: Process): boolean {
         return !!(process.data && process.data.closeModal);
+    }
+
+    protected removeBackdrop(): void {
+
+        const backdrops = document.body.getElementsByClassName('record-modal-backdrop');
+        if (!backdrops || backdrops.length < 1) {
+            return;
+        }
+
+        for (let i = 0; i < backdrops.length - 1; i++) {
+            const backdrop = backdrops[i];
+            document.body.removeChild(backdrop);
+        }
     }
 }

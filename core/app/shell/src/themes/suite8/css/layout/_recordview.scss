@@ -28,6 +28,26 @@
   padding-top: 3em;
   width: 100%;
   margin: 0;
+
+  .record-view-container {
+    .record-content {
+      .field-layout {
+        .field-layout-row {
+          .field-layout-col {
+            .field-layout-field-group-wrapper {
+              .field-layout-field-label-wrapper.label-container {
+                .dynamic-label {
+                  text-transform: uppercase;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+
 }
 
 .record-view-position-sticky {
@@ -74,16 +94,15 @@
 
   .record-view-name-header,
   .record-view-back-button-container,
-  .record-view-action-header
-  {
+  .record-view-action-header {
     justify-content: center;
   }
 
   .record-view-name,
   .record-view-name-scrolled {
-    justify-content:center;
+    justify-content: center;
     position: relative;
-    margin-right:10%;
+    margin-right: 10%;
   }
 
 }

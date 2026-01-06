@@ -59,6 +59,11 @@ export class BaseImageComponent extends BaseFileComponent {
         const maxHeight = this.field?.metadata?.maxHeight ?? null;
 
         if (maxHeight) {
+
+            if (!maxHeight.endsWith('px')) {
+                return maxHeight + 'px';
+            }
+
             return maxHeight;
         }
 

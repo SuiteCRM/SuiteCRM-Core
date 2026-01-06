@@ -39,7 +39,7 @@ import {SystemConfigStore} from "../../store/system-config/system-config.store";
 export class BaseImageComponent extends BaseFileComponent {
 
     maxHeight: string;
-    preview: boolean;
+    preview = true;
     storageType: string;
     loading: WritableSignal<boolean> = signal(false);
 

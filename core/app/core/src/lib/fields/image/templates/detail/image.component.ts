@@ -34,6 +34,7 @@ import {
 } from "../../../../services/navigation/legacy-entrypoint-link-builder/legacy-entrypoint-link-builder.service";
 import {SystemConfigStore} from "../../../../store/system-config/system-config.store";
 import {BaseImageComponent} from "../../../base/base-image.component";
+import {isTrue} from "../../../../common/utils/value-utils";
 
 @Component({
     selector: 'scrm-image-detail',
@@ -55,7 +56,7 @@ export class ImageDetailFieldComponent extends BaseImageComponent {
 
     ngOnInit() {
         this.maxHeight = this.getMaxHeight();
-        this.preview = this.field?.metadata?.preview ?? true;
+        this.preview = this.isAllowedPreview();
         const hasFile = this.field?.valueObject &&
             (this.field.valueObject.id || this.field.valueObject.value);
 
@@ -67,5 +68,13 @@ export class ImageDetailFieldComponent extends BaseImageComponent {
         }
 
         this.loading.set(false);
+    }
+
+    protected isAllowedPreview(): boolean {
+        const allowedPreview = this.systemConfigs.getConfigValue('allowed_preview') ?? [];
+        const mimeType = this.field?.valueObject?.attributes?.mime_type ?? '';
+        const ext = mimeType.split('/')[1] ?? '';
+
+        return allowedPreview.includes(ext.toLowerCase()) && (isTrue(this.field?.metadata?.preview ?? true));
     }
 }

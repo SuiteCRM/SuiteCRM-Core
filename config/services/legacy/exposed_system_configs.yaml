@@ -56,6 +56,7 @@ parameters:
     enable_record_pagination: true
     auth_type: true
     test_email_limit: true
+    allowed_preview: true
     jobs:
       max_retries: true
       timeout: true

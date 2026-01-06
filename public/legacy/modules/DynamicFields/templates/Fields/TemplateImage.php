@@ -50,6 +50,7 @@ class TemplateImage extends TemplateText
         'storage_type' => 'storage_type',
         'maxHeight' => 'maxHeight',
         'preview' => 'preview',
+        'upload_maxsize' => 'upload_maxsize',
     ];
 
 

@@ -69,6 +69,19 @@
 </tr>
 <tr>
 	<td class="mbLBL"></td>
+	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_UPLOAD_MAXSIZE"}:</td>
+	<td>
+		<input id="upload_maxsize" type="text" name="upload_maxsize"
+				{if !$vardef.metadata.upload_maxsize}
+					value=""
+				{else}
+					value="{$vardef.metadata.upload_maxsize}"
+				{/if}
+		>
+	</td>
+</tr>
+<tr>
+	<td class="mbLBL"></td>
 	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_ALLOW_PREVIEW"}:</td>
 	<td>
 		<input type="hidden" name="preview" value="0"/>

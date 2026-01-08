@@ -336,6 +336,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
                 modules: this.field?.metadata?.squire?.variables?.modules || [],
                 fieldDefs: this.field?.metadata?.squire?.variables?.fieldDefs || {},
                 openStatusEventEmitter: new EventEmitter(),
+                clearSearchEventEmitter: new EventEmitter()
             }
         } as ButtonInterface;
 
@@ -345,6 +346,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
 
 
             variables.metadata.openStatusEventEmitter.emit(false);
+            variables.metadata.clearSearchEventEmitter.emit(true);
             if (this.editorMode() === 'code') {
                 this.monacoEditor.editor.trigger('keyboard', 'type',
                     {text: variable}

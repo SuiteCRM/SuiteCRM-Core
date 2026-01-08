@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, Input, OnInit, signal, WritableSignal} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, signal, WritableSignal} from "@angular/core";
 import {MenuItem} from "primeng/api";
 
 @Component({
@@ -37,6 +37,7 @@ export class TieredMenuComponent implements OnInit {
 
     @Input() showSearch: boolean = true;
     @Input() itemsName: MenuItem[] | [];
+    @Input() clearSearchEventEmitter: EventEmitter<boolean>;
 
     isSearchBoxVisible: WritableSignal<boolean> = signal(true);
 

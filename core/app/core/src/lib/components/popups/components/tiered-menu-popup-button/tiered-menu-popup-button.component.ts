@@ -40,6 +40,7 @@ export class TieredMenuPopupButtonComponent implements OnInit {
     items: MenuItem[];
     @Input('config') config: ButtonInterface;
     @Input() openStatusEventEmitter: EventEmitter<boolean>;
+    @Input() clearSearchEventEmitter: EventEmitter<boolean>;
 
     constructor(
         protected languageStore: LanguageStore,

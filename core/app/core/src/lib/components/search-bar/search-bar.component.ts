@@ -52,6 +52,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     @Input() isMobile: boolean = false;
     @Input() clearSearchTermOnSearch: boolean = true;
     @Input() searchTrigger: 'enter' | 'input' = 'enter';
+    @Input() clearSearchTermEventEmitter: EventEmitter<boolean>;
     @Output() isSearchVisible = new EventEmitter<boolean>(false);
     @Output() searchExpression = new EventEmitter<string>();
 
@@ -92,6 +93,14 @@ export class SearchBarComponent implements OnInit, OnDestroy {
                 distinctUntilChanged(),
                 filter(searchString => searchString?.length > 1),
             ).subscribe((term: string) => this.searchWord = term));
+
+
+        if (this.clearSearchTermEventEmitter) {
+            this.subs.push(this.clearSearchTermEventEmitter?.subscribe(() => {
+                this.clearSearchTerm();
+            }));
+        }
+
     }
 
     ngOnDestroy(): void {

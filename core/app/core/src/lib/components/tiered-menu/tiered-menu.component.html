@@ -32,6 +32,7 @@
             [klass]="'tiered-menu-search-bar'"
             [searchTrigger]="'input'"
             [clearSearchTermOnSearch]="false"
+            [clearSearchTermEventEmitter]="clearSearchEventEmitter"
             (isSearchVisible)="closeSearchBox($event)"
             (searchExpression)="search($event)"
     ></scrm-search-bar>

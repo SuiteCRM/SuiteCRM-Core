@@ -36,7 +36,10 @@
                        [popoverClass]="''"
     >
         <div popup-content class="tiered-menu-popup-body d-flex flex-column container-popover scrollbar-thin p-1">
-            <scrm-tiered-menu [itemsName]="items"></scrm-tiered-menu>
+            <scrm-tiered-menu
+                    [itemsName]="items"
+                    [clearSearchEventEmitter]="clearSearchEventEmitter"
+            ></scrm-tiered-menu>
         </div>
     </scrm-popup-button>
 </div>

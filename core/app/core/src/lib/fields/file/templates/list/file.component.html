@@ -30,7 +30,7 @@
         {{ field.value }}
     </a>
 </ng-container>
-<ng-container *ngIf="!isLegacy">
+<ng-container *ngIf="!isLegacy && !isRecordLink">
     <a [href]="uploadedFile()?.contentUrl" class="clickable field-link d-inline-block file-field-uploaded-link" target="_blank">
         <scrm-uploaded-file
                 [file]="uploadedFile()"
@@ -40,4 +40,7 @@
         >
         </scrm-uploaded-file>
     </a>
+</ng-container>
+<ng-container *ngIf="isRecordLink">
+    {{ uploadedFile().name }}
 </ng-container>

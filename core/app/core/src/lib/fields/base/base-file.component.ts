@@ -44,6 +44,7 @@ export class BaseFileComponent extends BaseFieldComponent {
     filenameLink: string = '';
 
     isLegacy: boolean = true;
+    isRecordLink: boolean = false;
     compact: boolean = false;
     uploadedFile: WritableSignal<UploadedFile> = signal(null);
     uploadedFiles: WritableSignal<UploadedFile[]> = signal([]);
@@ -116,6 +117,7 @@ export class BaseFileComponent extends BaseFieldComponent {
                 this.initFileFromValueObject(this.field.valueObject);
             }));
         }
+
 
         this.filenameLink = this.legacyEntrypointLinkBuilder.getDownloadEntrypointLink(id, type);
     }

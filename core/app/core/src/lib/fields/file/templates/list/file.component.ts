@@ -52,6 +52,7 @@ export class FileListFieldComponent extends BaseFileComponent {
     }
 
     ngOnInit() {
+        this.isRecordLink = this.field?.metadata?.isRecordLink ?? false;
         this.initUploadedFile();
     }
 

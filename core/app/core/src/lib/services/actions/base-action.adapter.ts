@@ -298,7 +298,7 @@ export abstract class BaseActionsAdapter<D extends ActionData> implements Action
         action.isRunning?.set(true);
 
         this.asyncActionService.run(actionName, asyncData, null, null, actionData).pipe(take(1)).subscribe((process: Process) => {
-            action.isRunning.set(false);
+            action.isRunning?.set(false);
             this.afterAsyncAction(actionName, moduleName, asyncData, process, action, actionData, context, afterActionLogic);
         });
     }

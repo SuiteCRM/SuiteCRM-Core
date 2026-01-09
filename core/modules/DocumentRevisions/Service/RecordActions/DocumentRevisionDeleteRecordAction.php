@@ -59,15 +59,7 @@ class DocumentRevisionDeleteRecordAction extends DeleteRecordAction
             return;
         }
 
-        $documentId = $this->documentsManager->getDocumentIdByRevisionId($recordId);
-
-        if (!$documentId) {
-            $process->setStatus('error');
-            $process->setMessages(['LBL_NO_DOCUMENT_ID_PROVIDED']);
-            return;
-        }
-
-        $latestRevisionId = $this->documentsManager->getLatestRevisionId($documentId);
+        $latestRevisionId = $this->documentsManager->getLatestRevisionId($recordId);
 
         if ($recordId === $latestRevisionId) {
             $process->setStatus('error');

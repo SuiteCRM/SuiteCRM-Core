@@ -68,11 +68,44 @@ class AOS_InvoicesViewDetail extends ViewDetail
 				<div id="popupDivBack_ara" onclick="this.style.display=\'none\';document.getElementById(\'popupDiv_ara\').style.display=\'none\';" style="top:0px;left:0px;position:fixed;height:100%;width:100%;background-color:#E9E9E9;opacity:0.7;display:none;vertical-align:middle;text-align:center;z-index:9998;">
 				</div>
 				<script>
+				    function openEmailComposeModal(id, module) {
+                        const options = {
+                            type: "run-global-async-action",
+                            params: {
+                                action: {
+                                    key: "build-pdf-email",
+                                    asyncProcess: true,
+                                    params: {
+                                        recordId: id,
+                                        module: module,
+                                        selectModal: {
+                                            module: "AOS_PDF_Templates",
+                                        }
+                                    }
+                                }
+                            }
+                        };
+
+                        console.log(JSON.stringify(options));
+                        window.parent.postMessage(JSON.stringify(options));
+
+                        window.event.preventDefault();
+                        window.event.stopImmediatePropagation();
+                    }
+
 					function showPopup(task){
+
+                        const module = \'' . $this->bean->module_name . '\';
+						const id = \'' . $this->bean->id . '\';
+						if (task === \'emailpdf\') {
+                            openEmailComposeModal(id, module);
+                            return;
+}
+
 						var form=document.getElementById(\'popupForm\');
 						var ppd=document.getElementById(\'popupDivBack_ara\');
 						var ppd2=document.getElementById(\'popupDiv_ara\');
-						if('.count($templates).' == 1){
+						if('.count($templates).' == 1) {
 							form.task.value=task;
 							form.templateID.value=\''.$template.'\';
 							form.submit();

@@ -43,6 +43,7 @@ import {AppMetadataStore} from '../../store/app-metadata/app-metadata.store.serv
 import {AuthService} from '../auth/auth.service';
 import {RecordModalService} from "../modals/record-modal.service";
 import {RecordThreadModalService} from "../../store/record-thread-modal/record-thread-modal.service";
+import {GlobalActionsAdapter} from "../global-actions/adapters/actions.adapter";
 
 @Injectable({providedIn: 'root'})
 export class BaseModuleResolver extends BaseMetadataResolver {
@@ -61,6 +62,7 @@ export class BaseModuleResolver extends BaseMetadataResolver {
         protected appMetadata: AppMetadataStore,
         protected recordModalService: RecordModalService,
         protected recordThreadModalService: RecordThreadModalService,
+        protected globalAsyncActionAdapter: GlobalActionsAdapter,
         protected auth: AuthService
     ) {
         super(
@@ -75,6 +77,7 @@ export class BaseModuleResolver extends BaseMetadataResolver {
             appMetadata,
             recordModalService,
             recordThreadModalService,
+            globalAsyncActionAdapter,
             auth
         );
     }

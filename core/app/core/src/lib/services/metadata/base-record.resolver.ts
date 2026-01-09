@@ -45,6 +45,7 @@ import {AuthService} from '../auth/auth.service';
 import {RecentlyViewedService} from '../navigation/recently-viewed/recently-viewed.service';
 import {RecordModalService} from "../modals/record-modal.service";
 import {RecordThreadModalService} from "../../store/record-thread-modal/record-thread-modal.service";
+import {GlobalActionsAdapter} from "../global-actions/adapters/actions.adapter";
 
 @Injectable({providedIn: 'root'})
 export class BaseRecordResolver extends BaseModuleResolver {
@@ -65,6 +66,7 @@ export class BaseRecordResolver extends BaseModuleResolver {
         protected appMetadata: AppMetadataStore,
         protected recordModalService: RecordModalService,
         protected recordThreadModalService: RecordThreadModalService,
+        protected globalAsyncActionAdapter: GlobalActionsAdapter,
         protected auth: AuthService,
         protected recentlyViewed: RecentlyViewedService
     ) {
@@ -82,6 +84,7 @@ export class BaseRecordResolver extends BaseModuleResolver {
             appMetadata,
             recordModalService,
             recordThreadModalService,
+            globalAsyncActionAdapter,
             auth
         );
     }

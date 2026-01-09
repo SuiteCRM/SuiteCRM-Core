@@ -221,7 +221,7 @@ class SubPanelDefinitionHandler extends LegacyHandler implements SubPanelDefinit
 
             $vardefs = $this->getSubpanelModuleVardefs($headerModule);
 
-            $tabs[$key]['icon'] = $tab['module'];
+            $tabs[$key]['icon'] = $tab['icon'] ?? $tab['module'];
             $tabs[$key]['name'] = $key;
             $tabs[$key]['module'] = $this->moduleNameMapper->toFrontEnd($tab['module']);
             $tabs[$key]['legacyModule'] = $tab['module'];
@@ -509,7 +509,7 @@ class SubPanelDefinitionHandler extends LegacyHandler implements SubPanelDefinit
                             'justify' => 'end',
                             'cols' => [
                                 [
-                                    'icon' => $tab['module'],
+                                    'icon' => $tab['icon'] ?? $tab['module'],
                                 ],
                                 [
                                     'labelKey' => $tabs[$key]['title_key'],

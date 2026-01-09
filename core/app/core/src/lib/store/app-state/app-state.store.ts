@@ -99,6 +99,7 @@ export class AppStateStore implements StateStore {
         'refresh-drafts': this.refreshDraftsEventEmitter,
         'draft-opened': this.draftOpenedEventEmitter,
     };
+    asyncActionEventEmitter: EventEmitter<any> = new EventEmitter<any>();
 
     /**
      * ViewModel that resolves once all the data is ready (or updated)...

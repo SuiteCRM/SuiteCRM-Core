@@ -59,15 +59,19 @@ export class ClassicViewUiComponent implements OnInit, OnDestroy, AfterViewInit 
             return;
         }
 
-        if (isString(event.data)) {
+        const options = JSON.parse(event?.data) ?? '';
+
+        if (options === '' || !options.type) {
             return;
         }
 
-        const options = JSON.parse(event.data);
-
         if (options.type === 'record-modal') {
             const modalOptions = options.params as RecordModalOptions;
-            this.loadModal(modalOptions);
+            this.loadRecordModal(modalOptions);
+        }
+
+        if (options.type === 'run-global-async-action') {
+            this.runGlobalAsyncAction(options.params);
         }
     }
 
@@ -209,7 +213,7 @@ export class ClassicViewUiComponent implements OnInit, OnDestroy, AfterViewInit 
         );
     }
 
-    protected loadModal(options: RecordModalOptions): void {
+    protected loadRecordModal(options: RecordModalOptions): void {
         this.appStateStore.recordModalOpenEventEmitter.emit(options);
     }
 
@@ -274,5 +278,9 @@ export class ClassicViewUiComponent implements OnInit, OnDestroy, AfterViewInit 
         // if module action is excluded, don't re-direct
         const moduleExclusions = exclusions[routeInfo.module];
         return !(moduleExclusions && moduleExclusions.includes(routeInfo.action));
+    }
+
+    protected runGlobalAsyncAction(params): void {
+        this.appStateStore.asyncActionEventEmitter.emit(params);
     }
 }

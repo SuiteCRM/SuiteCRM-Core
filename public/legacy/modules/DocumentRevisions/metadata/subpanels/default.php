@@ -55,6 +55,9 @@ $subpanel_layout = [
         'filename' => [
             'vname' => 'LBL_REV_LIST_FILENAME',
             'width' => '15%',
+            'metadata' => [
+                'isRecordLink' => true,
+            ]
         ],
         'revision' => [
             'vname' => 'LBL_REV_LIST_REVISION',

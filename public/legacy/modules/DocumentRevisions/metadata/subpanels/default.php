@@ -54,7 +54,6 @@ $subpanel_layout = [
     'list_fields' => [
         'filename' => [
             'vname' => 'LBL_REV_LIST_FILENAME',
-            'widget_class' => 'SubPanelDetailViewLink',
             'width' => '15%',
         ],
         'revision' => [

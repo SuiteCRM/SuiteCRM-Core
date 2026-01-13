@@ -4355,6 +4355,7 @@ $app_strings['LBL_UPLOAD_IMAGE'] = 'Upload Image';
 $app_strings['LBL_DOWNLOAD_IMAGE'] = 'Download Image';
 $app_strings['LBL_PREVIEW_IMAGE'] = 'Preview Image';
 $app_strings['LBL_UPLOAD_IMAGE_DESCRIPTION'] = 'Click or drag an image here to upload';
+$app_strings['LBL_INVALID_PROCESS_OPTIONS'] = 'Invalid process options. See logs for more info.';
 $app_strings['LBL_TEMPORARY'] = 'Temporary';
 $app_strings['LBL_MAX_FILE_SIZE_EXCEEDED'] = 'The file exceeds the maximum allowed size.';
 $app_strings['LBL_UNSUPPORTED_IMAGE_TYPE'] = 'The image type is not supported.';

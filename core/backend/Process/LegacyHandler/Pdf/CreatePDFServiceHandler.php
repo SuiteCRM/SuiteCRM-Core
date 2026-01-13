@@ -38,11 +38,7 @@ class CreatePDFServiceHandler extends LegacyHandler
 {
     public const HANDLER_KEY = 'create-pdf-service-handler';
 
-    /**
-     * Lazy initialized mapper
-     * @var CreatePDFService
-     */
-    protected $mapper;
+    protected ?CreatePDFService $mapper = null;
 
     /**
      * @inheritDoc
@@ -132,7 +128,7 @@ class CreatePDFServiceHandler extends LegacyHandler
         $this->close();
     }
 
-    public function getUploadDir()
+    public function getUploadDir(): string
     {
         $this->init();
 

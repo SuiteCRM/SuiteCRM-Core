@@ -275,7 +275,7 @@ export class MultiRelateEditFieldComponent extends BaseRelateComponent {
         modal.componentInstance.module = this.getRelatedModule();
         modal.componentInstance.presetFilter = filter;
         modal.componentInstance.multiSelect = true;
-        modal.componentInstance.multiSelectButtonLabel = 'LBL_SAVE';
+        modal.componentInstance.multiSelectButtonLabelKey = 'LBL_SAVE';
         modal.componentInstance.showFilter = this.field?.definition?.showFilter ?? true;
         modal.componentInstance.selectedValues = (this?.selectedValues ?? []).map(item => item.id).join(',') ?? '';
 

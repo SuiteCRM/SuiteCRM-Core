@@ -64,7 +64,7 @@ export class RecordListModalComponent implements OnInit, OnDestroy {
     @Input() module: string;
     @Input() parentModule: string;
     @Input() multiSelect: boolean = false;
-    @Input() multiSelectButtonLabel = 'LBL_SAVE';
+    @Input() multiSelectButtonLabelKey = 'LBL_SAVE';
     @Input() adapter: RecordListModalTableAdapterInterface = null;
     @Input() filterAdapter: ModalRecordFilterAdapter = null;
     @Input() presetFilter: SavedFilter = {} as SavedFilter;
@@ -148,7 +148,7 @@ export class RecordListModalComponent implements OnInit, OnDestroy {
             onClick: () => {
                 this.linkSelectedRecords();
             },
-            labelKey: this.multiSelectButtonLabel
+            labelKey: this.multiSelectButtonLabelKey
         } as ButtonInterface;
     }
 

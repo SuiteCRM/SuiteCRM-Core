@@ -333,7 +333,7 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
 
         modal.componentInstance.module = this.getRelatedModule();
         modal.componentInstance.multiSelect = true;
-        modal.componentInstance.multiSelectButtonLabel = 'LBL_SAVE';
+        modal.componentInstance.multiSelectButtonLabelKey = 'LBL_SAVE';
         modal.componentInstance.selectedValues = selectedIds;
 
         modal.result.then((data: RecordListModalResult) => {

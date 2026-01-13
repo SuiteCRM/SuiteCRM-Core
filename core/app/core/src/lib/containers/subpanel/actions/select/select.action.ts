@@ -82,7 +82,7 @@ export class SubpanelSelectAction extends SubpanelActionHandler {
         modal.componentInstance.module = module;
         modal.componentInstance.parentModule = data?.parentModule ?? '';
         modal.componentInstance.multiSelect = true;
-        modal.componentInstance.multiSelectButtonLabel = 'LBL_SAVE';
+        modal.componentInstance.multiSelectButtonLabelKey = 'LBL_SAVE';
         modal.componentInstance.selectedValues = selectedValues;
 
         modal.result.then((result: RecordListModalResult) => {

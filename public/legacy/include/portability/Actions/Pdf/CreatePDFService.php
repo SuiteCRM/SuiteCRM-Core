@@ -130,9 +130,9 @@ class CreatePDFService {
         unlink($filePath);
     }
 
-    public function getUploadDir()
+    public function getUploadDir(): string
     {
         global $sugar_config;
-        return $sugar_config['upload_dir'];
+        return $sugar_config['upload_dir'] ?? '';
     }
 }

@@ -29,7 +29,7 @@ use SuiteCRM\PDF\Exceptions\PDFException;
 use SuiteCRM\PDF\PDFEngine;
 use SuiteCRM\PDF\PDFWrapper;
 
-require_once('modules/AOS_PDF_Templates/templateParser.php');
+require_once 'modules/AOS_PDF_Templates/templateParser.php';
 
 class CreatePDFService {
 
@@ -77,7 +77,7 @@ class CreatePDFService {
      * @param array $object_arr
      * @return array
      */
-    public function parseTemplate($template, array $object_arr): array
+    public function parseTemplate($template, array $objectArr, $userFormat): array
     {
         $search = array(
             '@<script[^>]*?>.*?</script>@si',        // Strip out javascript
@@ -117,9 +117,9 @@ class CreatePDFService {
         $footer = preg_replace($search, $replace, (string)$template->pdffooter);
 
 
-        $converted = templateParser::parse_template($text, $object_arr);
-        $header = templateParser::parse_template($header, $object_arr);
-        $footer = templateParser::parse_template($footer, $object_arr);
+        $converted = templateParser::parse_template($text, $objectArr, $userFormat);
+        $header = templateParser::parse_template($header, $objectArr, $userFormat);
+        $footer = templateParser::parse_template($footer, $objectArr, $userFormat);
 
         $printable = str_replace("\n", "<br />", (string)$converted);
         return [$header, $footer, $printable];

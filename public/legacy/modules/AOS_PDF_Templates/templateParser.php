@@ -30,11 +30,11 @@ use SuiteCRM\Utility\SuiteValidator as SuiteValidator;
 #[\AllowDynamicProperties]
 class templateParser
 {
-    public static function parse_template($string, $bean_arr)
+    public static function parse_template($string, $bean_arr, $userFormat = false)
     {
         foreach ($bean_arr as $bean_name => $bean_id) {
             $focus = BeanFactory::getBean($bean_name, $bean_id);
-            $string = templateParser::parse_template_bean($string, $focus->table_name, $focus);
+            $string = templateParser::parse_template_bean($string, $focus->table_name, $focus, $userFormat);
 
             foreach ($focus->field_defs as $focus_name => $focus_arr) {
                 if ($focus_arr['type'] == 'relate') {
@@ -42,7 +42,7 @@ class templateParser
                         $idName = $focus_arr['id_name'];
                         $relate_focus = BeanFactory::getBean($focus_arr['module'], $focus->$idName);
 
-                        $string = templateParser::parse_template_bean($string, $focus_arr['name'], $relate_focus);
+                        $string = templateParser::parse_template_bean($string, $focus_arr['name'], $relate_focus, $userFormat);
                     }
                 }
             }
@@ -57,7 +57,7 @@ class templateParser
      * @return mixed
      * @throws Exception
      */
-    public static function parse_template_bean($string, $key, &$focus)
+    public static function parse_template_bean($string, $key, &$focus, $userFormat = false)
     {
         global $app_strings, $sugar_config, $locale, $current_user;
         $repl_arr = array();
@@ -117,7 +117,7 @@ class templateParser
                     $repl_arr[$key . "_" . $fieldName] = html_entity_decode((string) $focus->{$fieldName},
                         ENT_COMPAT, 'UTF-8');
                 } elseif ($field_def['type'] == 'decimal' || $field_def['type'] == 'float') {
-                    if ($_REQUEST['entryPoint'] == 'formLetter') {
+                    if (($_REQUEST['entryPoint'] ?? '') == 'formLetter' || $userFormat) {
                         $value = formatDecimalInConfigSettings($focus->$fieldName, true);
                     } else {
                         $value = formatDecimalInConfigSettings($focus->$fieldName, false);

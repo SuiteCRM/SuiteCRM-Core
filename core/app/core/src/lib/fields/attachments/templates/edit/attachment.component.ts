@@ -37,6 +37,10 @@ import {
     LegacyEntrypointLinkBuilder
 } from "../../../../services/navigation/legacy-entrypoint-link-builder/legacy-entrypoint-link-builder.service";
 import {DropdownButtonComponent} from "../../../../components/dropdown-button/dropdown-button.component";
+import {SelectModalService} from "../../../../services/modals/select-modal.service";
+import {ProcessService} from "../../../../services/process/process.service";
+import {MessageService} from "../../../../services/message/message.service";
+import {isTrue} from "../../../../common/utils/value-utils";
 
 @Component({
     selector: 'scrm-attachments-edit',
@@ -76,7 +80,10 @@ export class AttachmentEditFieldComponent extends BaseAttachmentComponent implem
         protected logicDisplay: FieldLogicDisplayManager,
         protected mediaObjectsService: MediaObjectsService,
         protected legacyEntrypointLinkBuilder: LegacyEntrypointLinkBuilder,
-        protected systemConfigs: SystemConfigStore
+        protected systemConfigs: SystemConfigStore,
+        protected selectModalService: SelectModalService,
+        protected processService: ProcessService,
+        protected messageService: MessageService,
     ) {
         super(typeFormatter, logic, logicDisplay, mediaObjectsService, legacyEntrypointLinkBuilder, systemConfigs);
     }
@@ -114,12 +121,41 @@ export class AttachmentEditFieldComponent extends BaseAttachmentComponent implem
             icon: 'paperclip',
             klass: 'btn-sm btn btn-outline-main',
             items: [{
-                label: 'Upload from files',
+                labelKey: 'LBL_UPLOAD_FROM_FILES',
                 klass: 'btn-outline-main rounded',
                 onClick: (): void => {
                     this.uploadArea.triggerFileInput()
                 }
-            },],
+            },
+                {
+                    labelKey: 'LBL_ATTACH_DOCUMENTS',
+                    klass: 'btn-outline-main rounded',
+                    onClick: (): void => {
+                        const selectModalOptions = {
+                            multiSelect: true,
+                            multiSelectButtonLabelKey: 'LBL_EMAIL_ATTACHMENT',
+                        };
+
+                        this.selectModalService.showSelectModal('Documents', (records) => {
+                            this.processService.submit('attach-documents', {
+                                records: records,
+                            }).subscribe((process) => {
+
+                                if (isTrue(process.data?.failed_records ?? false)) {
+                                    this.messageService.addDangerMessage('LBL_SOME_ATTACHMENTS_FAILED');
+                                }
+
+                                Object.values(process?.data?.media_objects).forEach((file) => {
+                                    const mappedFile = this.mapFile(file);
+                                    const uploadedFiles = [mappedFile, ...this.uploadedFiles() ?? []];
+                                    this.setValue(uploadedFiles);
+                                    this.uploadedFiles.set([mappedFile, ...this.uploadedFiles() ?? []]);
+                                });
+                            });
+                        }, selectModalOptions);
+                    }
+                },
+            ],
 
         } as DropdownButtonInterface
     }

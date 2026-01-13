@@ -137,14 +137,14 @@ class BasePDFManager extends LegacyHandler
      */
     protected function setObjectArray(?SugarBean $moduleBean): array
     {
-        $object_arr = [];
-        $object_arr[$moduleBean->module_dir] = $moduleBean->id;
+        $objectArr = [];
+        $objectArr[$moduleBean->module_dir] = $moduleBean->id;
 
         if ($moduleBean->module_dir === 'Contacts') {
-            $object_arr['Accounts'] = $moduleBean->account_id;
+            $objectArr['Accounts'] = $moduleBean->account_id;
         }
 
-        return $object_arr;
+        return $objectArr;
     }
 
     /**
@@ -183,11 +183,9 @@ class BasePDFManager extends LegacyHandler
                 continue;
             }
 
-            $object_arr = $this->setObjectArray($moduleBean);
+            $objectArr = $this->setObjectArray($moduleBean);
 
-            $_REQUEST['entryPoint'] = 'formLetter';
-
-            [$header, $footer, $printable] = $this->pdfLegacyHandler->parseTemplate($templateBean, $object_arr);
+            [$header, $footer, $printable] = $this->pdfLegacyHandler->parseTemplate($templateBean, $objectArr, true);
 
             $pdfContent = [
                 'header' => $header,
@@ -252,11 +250,11 @@ class BasePDFManager extends LegacyHandler
     {
         $noteFieldDef = $this->fieldDefinitionsProvider->getFieldDefinition('notes', 'file');
         if (!$noteFieldDef) {
-            return false;
+            return null;
         }
 
         if (!isset($noteFieldDef['metadata'], $noteFieldDef['metadata']['storage_type'])) {
-            return false;
+            return null;
         }
 
         return $noteFieldDef['metadata']['storage_type'];

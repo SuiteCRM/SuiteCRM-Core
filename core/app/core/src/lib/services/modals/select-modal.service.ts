@@ -31,12 +31,15 @@ import {RecordListModalResult} from '../../containers/record-list-modal/componen
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageStore} from '../../store/language/language.store';
 import {MessageService} from '../message/message.service';
+import {isTrue} from "../../common/utils/value-utils";
 
 
 @Injectable({
     providedIn: 'root'
 })
 export class SelectModalService {
+
+    isMultiSelect: boolean = false;
 
     constructor(
         protected languageStore: LanguageStore,
@@ -49,18 +52,38 @@ export class SelectModalService {
     /**
      * Get Selected Record
      *
-     * @param {string} selectModule: The Modal module
+     * @param selectModule
      * @param onSelectCallback
+     * @param options
      * @returns {void}
      */
-    showSelectModal(selectModule: string, onSelectCallback: Function = null): void {
+    showSelectModal(selectModule: string, onSelectCallback: Function = null, options = {} as any): void {
 
         const modal = this.modalService.open(RecordListModalComponent, {size: 'xl', scrollable: true});
         modal.componentInstance.module = selectModule;
+
+        if (isTrue(options?.multiSelect ?? false)) {
+            this.isMultiSelect = true;
+            modal.componentInstance.multiSelect = true;
+            modal.componentInstance.multiSelectButtonLabelKey = options.multiSelectButtonLabelKey || 'LBL_SAVE';
+        }
+
+        modal.componentInstance.presetFilter = options?.presetFilter || null;
+        modal.componentInstance.showFilter = options?.showFilter || true;
+        modal.componentInstance.selectedValues = options?.selectedValues || null;
+
         modal.result.then(
             (result: RecordListModalResult) => {
 
                 if (!result || !result.selection || !result.selection.selected) {
+                    return;
+                }
+
+                if (this.isMultiSelect) {
+                    const records: Record[] = this.getSelectedRecords(result);
+                    if (onSelectCallback !== null) {
+                        onSelectCallback(records);
+                    }
                     return;
                 }
 
@@ -79,6 +102,28 @@ export class SelectModalService {
                 // Modal dismissed
             }
         );
+    }
+
+    /**
+     * Get Selected Record
+     *
+     * @param {object} data RecordListModalResult
+     */
+    protected getSelectedRecords(data: RecordListModalResult): Record[] {
+        let ids = [];
+        Object.keys(data?.selection?.selected).some(selected => {
+            ids[selected] = selected;
+        });
+
+        let records: Record[] = [];
+
+        data.records.some(rec => {
+            if (ids[rec?.id ?? '']) {
+                records.push(rec);
+            }
+        });
+
+        return records;
     }
 
     /**
@@ -106,5 +151,4 @@ export class SelectModalService {
 
         return record;
     }
-
 }

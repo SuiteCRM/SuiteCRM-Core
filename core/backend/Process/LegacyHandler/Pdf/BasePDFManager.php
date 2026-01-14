@@ -244,7 +244,7 @@ class BasePDFManager extends LegacyHandler
         }
 
         if (isset($options['createNote']) && $options['createNote'] === true) {
-            $note = $this->createNote($moduleBean, $fileName);
+            $note = $this->createNote($moduleBean, $fileName, $options);
             return $this->createPDFMediaObject($note, $fileName, $pdfConfig, $pdfContent, $temp);
         }
 

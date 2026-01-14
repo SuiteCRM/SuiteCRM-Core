@@ -27,185 +27,40 @@
 
 namespace App\Process\Service\RecordActions;
 
-use ApiPlatform\Exception\InvalidArgumentException;
 use App\Data\Entity\Record;
 use App\Data\Service\RecordProviderInterface;
-use App\MediaObjects\Repository\MediaObjectManagerInterface;
-use App\Process\Entity\Process;
-use App\Process\LegacyHandler\Pdf\BasePDFManager;
-use App\Process\Service\ProcessHandlerInterface;
-use Psr\Log\LoggerInterface;
 
-class BuildPDFEmail implements ProcessHandlerInterface
+abstract class BuildPDFEmail
 {
 
-    protected const MSG_OPTIONS_NOT_FOUND = 'Process options is not defined';
-    protected const PROCESS_TYPE = 'build-pdf-email';
-
+    /**
+     * BuildPDFEmail constructor.
+     */
     public function __construct(
         protected RecordProviderInterface $recordProvider,
-        protected BasePDFManager $pdfManager,
-        protected MediaObjectManagerInterface $mediaObjectManager,
-        protected LoggerInterface $logger
     )
     {
     }
 
-    public function getProcessType(): string
-    {
-        return self::PROCESS_TYPE;
-    }
-
-    public function requiredAuthRole(): string
-    {
-        return 'ROLE_USER';
-    }
-
-    public function getRequiredACLs(Process $process): array
-    {
-        $options = $process->getOptions();
-        $module = $options['module'] ?? '';
-
-
-        return [
-            $module => [
-                [
-                    'action' => 'detail',
-                    'record' => $options['id'] ?? ''
-                ]
-            ],
-        ];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function configure(Process $process): void
-    {
-        $process->setId(self::PROCESS_TYPE);
-        $process->setAsync(false);
-    }
-
-    /**
-     * @inheritDoc
-     *
-     */
-    public function validate(Process $process): void
-    {
-        if (empty($process->getOptions())) {
-            throw new InvalidArgumentException(self::MSG_OPTIONS_NOT_FOUND);
-        }
-    }
-
-
-    /**
-     * @throws \Exception
-     */
-    public function run(Process $process): void
-    {
-        $options = $process->getOptions();
-        $module = $options['params']['module'] ?? '';
-        $id = $options['params']['recordId'] ?? '';
-        $templateId = $options['params']['modalRecord']['id'] ?? '';
-
-        if (empty($module) || empty($id) || empty($templateId)) {
-            $this->logger->error('BuildPDFEmail process options are missing: module, record id or selected record id');
-            $process->setStatus('error');
-            $process->setMessages(['LBL_INVALID_PROCESS_OPTIONS']);
-            return;
-        }
-
-        $record = $this->recordProvider->getRecord($module, $id);
-
-        if ($record === null) {
-            $this->logger->error("BuildPDFEmail process: record $module with id $id not found");
-            $process->setStatus('error');
-            $process->setMessages(['LBL_RECORD_NOT_FOUND']);
-            return;
-        }
-
-        $to = $this->calculateToField($record);
-
-        $pdf = $this->pdfManager->generatePdf($module, $id, $templateId);
-
-        if ($pdf === null) {
-            $process->setStatus('error');
-            $process->setMessages(['LBL_PDF_GENERATION_FAILED']);
-            return;
-        }
-
-        $process->setStatus('success');
-        $baseOptions = $this->getEmailBaseOptions();
-
-        $data = [
-            'handler' => 'record-modal',
-            'params' => [
-                'record' => [
-                    'id' => '',
-                ],
-                ...$baseOptions,
-                'parentModule' => $module,
-                'parentId' => $id,
-                'mapFields' => [
-                    'default' => [
-                        'parent_type' => $module,
-                        'parent_id' => $id,
-                        'parent_name' => $pdf->getAttributes()['name'] ?? '',
-                        'email_attachments' => [$pdf->toArray()],
-                    ]
-                ]
-            ]
-        ];
-
-        if (!empty($to)){
-            $data['params']['mapFields']['default']['to_addrs_names'] = [$to];
-        }
-
-        $process->setData($data);
-    }
+    abstract protected function getToFieldKeys(string $module = ''): array;
 
     /**
      * @throws \Exception
      */
     protected function calculateToField(Record $record): array
     {
-        $contactKey = 'billing_contact';
-        $accountKey = 'billing_account';
-
-        if ($record->getModule() === 'AOS_Contracts') {
-            $contactKey = 'contact';
-            $accountKey = 'contract_account';
-        }
-
-        $contact = $this->getContact($record, $contactKey);
+        $keys = $this->getToFieldKeys($record->getModule());
+        $contact = $this->getRelatedRecordId($record, $keys['contactKey']);
         if ($contact) {
             return $this->buildToField('Contacts', $contact);
         }
 
-        $account = $this->getAccount($record, $accountKey);
+        $account = $this->getRelatedRecordId($record, $keys['contactKey']);
         if ($account) {
             return $this->buildToField('Accounts', $account);
         }
 
         return $this->buildToField($record->getModule(), $record->getId());
-    }
-
-    public function getHandlerKey(): string
-    {
-        return self::PROCESS_TYPE;
-    }
-
-    protected function getContact(Record $record, string $key): ?string
-    {
-        if (!isset($record->getAttributes()[$key])) {
-            return null;
-        }
-
-        if (!isset($record->getAttributes()[$key]['id'])) {
-            return null;
-        }
-
-        return $record->getAttributes()[$key]['id'] ?? null;
     }
 
     /**
@@ -233,7 +88,7 @@ class BuildPDFEmail implements ProcessHandlerInterface
         ];
     }
 
-    protected function getAccount(Record $record, string $key): ?string
+    protected function getRelatedRecordId(Record $record, string $key): ?string
     {
         if (!isset($record->getAttributes()[$key])) {
             return null;

@@ -74,8 +74,6 @@ parameters:
         detached: true
         headerClass: 'left-aligned-title'
         dynamicTitleKey: LBL_EMAIL_MODAL_DYNAMIC_TITLE
-        closeConfirmationModal: true
-        closeConfirmationLabel: 'LBL_CLOSE_EMAIL_MODAL'
         modalOptions:
           size: 'lg'
           scrollable: false

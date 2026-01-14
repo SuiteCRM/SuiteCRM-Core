@@ -45,8 +45,6 @@ parameters:
               modes: ['list']
               metadataView: 'modalComposeView'
               params:
-                closeConfirmationModal: true
-                closeConfirmationLabel: 'LBL_CLOSE_EMAIL_MODAL'
                 detached: true
                 headerClass: 'left-aligned-title'
                 dynamicTitleKey: 'LBL_EMAIL_MODAL_DYNAMIC_TITLE'

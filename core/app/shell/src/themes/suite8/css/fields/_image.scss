@@ -27,6 +27,10 @@
 .image-field-container {
   padding-bottom: .5rem;
 
+  .p-image {
+    display: inline-block;
+  }
+
   .uploaded-file {
     .uploaded-file-info-container {
       .uploaded-file-info {

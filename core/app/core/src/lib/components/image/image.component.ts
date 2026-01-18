@@ -34,7 +34,8 @@ import {
 } from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
 import {filter, map, tap} from 'rxjs/operators';
-import {ThemeImage, ThemeImageMap, ThemeImagesStore} from '../../store/theme-images/theme-images.store';
+import {ThemeImageMap, ThemeImagesStore} from '../../store/theme-images/theme-images.store';
+import {LanguageStore} from "../../store/language/language.store";
 
 @Component({
     selector: 'scrm-image',
@@ -45,6 +46,7 @@ import {ThemeImage, ThemeImageMap, ThemeImagesStore} from '../../store/theme-ima
 export class ImageComponent  implements OnInit, OnDestroy {
     @Input() klass = '';
     @Input() title = '';
+    @Input() titleKey = '';
     @Input() wrapperClass = 'sicon';
     @Input() set image(value: string) {
         this.imageName.set(value);
@@ -59,7 +61,7 @@ export class ImageComponent  implements OnInit, OnDestroy {
 
     protected subs: Subscription[] = [];
 
-    constructor(protected themeImagesStore: ThemeImagesStore) {
+    constructor(protected themeImagesStore: ThemeImagesStore, protected language: LanguageStore) {
     }
 
     ngOnInit(): void {
@@ -69,6 +71,10 @@ export class ImageComponent  implements OnInit, OnDestroy {
             tap(images => this.imageMap = {...images}),
             tap(() => this.getImage()),
         ).subscribe());
+
+        if (this?.titleKey && this?.titleKey?.length > 0) {
+            this.title = this.language.getFieldLabel(this.titleKey);
+        }
     }
 
     ngOnDestroy() {

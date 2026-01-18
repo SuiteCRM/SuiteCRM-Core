@@ -35,7 +35,7 @@
 </ng-container>
 
 
-<div *ngIf="storageType && validStorageTypes" class="d-flex image-field-container">
+<div *ngIf="storageType && isValidStorageType" class="d-flex image-field-container">
     <scrm-file-upload-area #uploadArea
                            [class.d-flex]="displayUploadArea()"
                            [class.d-none]="!displayUploadArea() || loading()"

@@ -30,6 +30,8 @@ import {ImageDetailFieldComponent} from "./image.component";
 import {UploadedImageComponent} from "../../../../components/uploaded-image/uploaded-image.component";
 import {ImageModule} from "primeng/image";
 import {FileSkeletonModule} from "../../../../components/file-skeleton/file-skeleton.module";
+import {ImageModule as SCRMImageModule} from "../../../../components/image/image.module";
+import {PrimeTemplate} from "primeng/api";
 
 @NgModule({
     declarations: [ImageDetailFieldComponent],
@@ -41,6 +43,9 @@ import {FileSkeletonModule} from "../../../../components/file-skeleton/file-skel
         UploadedImageComponent,
         ImageModule,
         FileSkeletonModule,
+        ImageModule,
+        PrimeTemplate,
+        SCRMImageModule,
     ]
 })
 export class ImageDetailFieldModule {

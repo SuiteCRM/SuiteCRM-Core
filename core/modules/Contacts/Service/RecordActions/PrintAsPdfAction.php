@@ -40,7 +40,7 @@ use Psr\Log\LoggerInterface;
 class PrintAsPdfAction implements ProcessHandlerInterface
 {
     protected const MSG_OPTIONS_NOT_FOUND = 'Process options is not defined';
-    protected const PROCESS_TYPE = 'record-print-as-pdf';
+    protected const PROCESS_TYPE = 'record-contact-print-as-pdf';
 
     /**
      * PrintAsPdfAction constructor.

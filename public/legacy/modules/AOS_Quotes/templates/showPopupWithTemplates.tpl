@@ -93,7 +93,7 @@
             type: 'run-global-async-action',
             params: {
                 action: {
-                    key: 'build-pdf-email',
+                    key: 'quote-build-pdf-email',
                     asyncProcess: true,
                     params: {
                         recordId: id,

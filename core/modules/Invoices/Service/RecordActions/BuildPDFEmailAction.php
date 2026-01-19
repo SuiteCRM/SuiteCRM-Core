@@ -40,7 +40,7 @@ class BuildPDFEmailAction extends BuildPDFEmail implements ProcessHandlerInterfa
 {
 
     protected const MSG_OPTIONS_NOT_FOUND = 'Process options is not defined';
-    protected const PROCESS_TYPE = 'build-pdf-email';
+    protected const PROCESS_TYPE = 'invoice-build-pdf-email';
 
     public function __construct(
         protected RecordProviderInterface $recordProvider,

@@ -100,6 +100,7 @@ class NavbarHandler extends LegacyHandler implements NavigationProviderInterface
      * @param RequestStack $session
      * @param array $moduleRouting
      * @param array $navbarAdministrationOverrides
+     * @param array $navbarOverrides
      * @param array $quickActions
      */
     public function __construct(

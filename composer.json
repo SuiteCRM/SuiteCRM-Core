@@ -84,6 +84,7 @@
     "slim/slim": "^3.8",
     "smarty/smarty": "^4",
     "soundasleep/html2text": "~0.5",
+    "symfony/amqp-messenger": "6.4.*",
     "symfony/asset": "6.4.*",
     "symfony/console": "6.4.*",
     "symfony/doctrine-messenger": "6.4.*",

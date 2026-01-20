@@ -12,7 +12,8 @@
   "config": {
     "vendor-dir": "vendor",
     "platform": {
-      "php": "8.1.0"
+      "php": "8.1.0",
+      "ext-amqp": "2.2.0"
     },
     "optimize-autoloader": true,
     "sort-packages": true,
@@ -28,7 +29,8 @@
   "minimum-stability": "stable",
   "prefer-stable": true,
   "suggest": {
-    "ext-imap": "Needed for emails module"
+    "ext-imap": "Needed for emails module",
+    "ext-amqp": "Needed for AMQP transport in Messenger"
   },
   "require": {
     "php": ">=8.1",

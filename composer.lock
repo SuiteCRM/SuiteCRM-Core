@@ -21349,7 +21349,8 @@
     },
     "platform-dev": {},
     "platform-overrides": {
-        "php": "8.1.0"
+        "php": "8.1.0",
+        "ext-amqp": "2.2.0"
     },
     "plugin-api-version": "2.9.0"
 }

@@ -13,7 +13,8 @@
     "vendor-dir": "vendor",
     "platform": {
       "php": "8.1.0",
-      "ext-amqp": "2.2.0"
+      "ext-amqp": "2.2.0",
+      "ext-redis": "6.3.0"
     },
     "optimize-autoloader": true,
     "sort-packages": true,
@@ -30,7 +31,8 @@
   "prefer-stable": true,
   "suggest": {
     "ext-imap": "Needed for emails module",
-    "ext-amqp": "Needed for AMQP transport in Messenger"
+    "ext-amqp": "Needed for AMQP transport in Messenger",
+    "ext-redis": "Needed for Redis transport in Messenger and Symfony Cache"
   },
   "require": {
     "php": ">=8.1",

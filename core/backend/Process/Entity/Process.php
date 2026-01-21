@@ -109,6 +109,39 @@ class Process
     protected ?bool $async;
 
     /**
+     * @var string|null
+     */
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'string',
+            'description' => 'async-handler-key',
+        ]
+    )]
+    protected ?string $asyncHandlerKey;
+
+    /**
+     * @var string|null
+     */
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'string',
+            'description' => 'async-runner-type',
+        ]
+    )]
+    protected ?string $asyncRunnerType;
+
+    /**
+     * @var string|null
+     */
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'string',
+            'description' => 'module',
+        ]
+    )]
+    protected ?string $module;
+
+    /**
      * @var array|null
      */
     #[ApiProperty(
@@ -232,6 +265,66 @@ class Process
     {
         $this->async = $async;
 
+        return $this;
+    }
+
+    /**
+     * Get Async handler key
+     * @return string|null
+     */
+    public function getAsyncHandlerKey(): ?string
+    {
+        return $this->asyncHandlerKey ?? null;
+    }
+
+    /**
+     * Set Async handler key
+     * @param string|null $asyncHandlerKey
+     * @return Process
+     */
+    public function setAsyncHandlerKey(?string $asyncHandlerKey): Process
+    {
+        $this->asyncHandlerKey = $asyncHandlerKey;
+        return $this;
+    }
+
+    /**
+     * Get Async runner type
+     * @return string|null
+     */
+    public function getAsyncRunnerType(): ?string
+    {
+        return $this->asyncRunnerType ?? null;
+    }
+
+    /**
+     * Set Async runner type
+     * @param string|null $asyncRunnerType
+     * @return Process
+     */
+    public function setAsyncRunnerType(?string $asyncRunnerType): Process
+    {
+        $this->asyncRunnerType = $asyncRunnerType;
+        return $this;
+    }
+
+    /**
+     * Get parent module
+     * @return string|null
+     */
+    public function getModule(): ?string
+    {
+        return $this->module ?? null;
+    }
+
+    /**
+     * Set parent module
+     * @param string|null $module
+     * @return Process
+     */
+    public function setModule(?string $module): Process
+    {
+        $this->module = $module;
         return $this;
     }
 

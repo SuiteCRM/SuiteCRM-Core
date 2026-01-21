@@ -172,6 +172,8 @@ services:
       tags: [ 'attachment.type.handler' ]
     App\MediaObjects\Validator\UploadValidator\UploadValidatorInterface:
       tags: [ 'media-object.upload.validator.registry' ]
+    App\AsyncTask\Service\TaskHandler\AsyncTaskHandlerInterface:
+      tags: [ 'app.async-task.handler' ]
 
   # makes classes in src/ available to be used as services
   # this creates a service per class whose id is the fully-qualified class name
@@ -502,6 +504,10 @@ services:
   App\Module\Service\Fields\Attachments\AttachmentTypeHandlers\AttachmentTypeHandlers:
     arguments:
       - !tagged { tag: 'attachment.type.handler' }
+
+  App\AsyncTask\Service\TaskHandler\AsyncTaskHandlerRegistry:
+    arguments:
+      - !tagged { tag: 'app.async-task.handler' }
 
   App\Security\Ldap\AppLdapUserProviderProxy:
     $ldapUserProvider: '@security.user.provider.concrete.ldap_users'

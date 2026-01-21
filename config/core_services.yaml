@@ -180,6 +180,8 @@ services:
       tags: [ 'app.async-task.completed.handler' ]
     App\AsyncTask\Service\TaskProgressedHandler\AsyncTaskProgressedHandlerInterface:
       tags: [ 'app.async-task.progressed.handler' ]
+    App\AsyncTask\Service\TaskFailureHandler\AsyncTaskFailureHandlerInterface:
+      tags: [ 'app.async-task.failure.handler' ]
 
   # makes classes in src/ available to be used as services
   # this creates a service per class whose id is the fully-qualified class name
@@ -523,6 +525,9 @@ services:
   App\AsyncTask\Service\TaskProgressedHandler\AsyncTaskProgressedHandlerRegistry:
     arguments:
       - !tagged { tag: 'app.async-task.progressed.handler' }
+  App\AsyncTask\Service\TaskFailureHandler\AsyncTaskFailureHandlerRegistry:
+    arguments:
+      - !tagged { tag: 'app.async-task.failure.handler' }
 
   App\Security\Ldap\AppLdapUserProviderProxy:
     $ldapUserProvider: '@security.user.provider.concrete.ldap_users'

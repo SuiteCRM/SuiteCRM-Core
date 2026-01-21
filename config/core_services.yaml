@@ -92,6 +92,8 @@ services:
       $entityRecordMapperRegistry: '@entity.record.mapper.registry'
       $entityFieldMapperRegistry: '@entity.field.mapper.registry'
       $entityFieldTypeMapperRegistry: '@entity.fieldType.mapper.registry'
+      $transportMapConfig: '%async-task.routes%'
+      $transportMapEnv: '%env(ASYNC_TASK_ROUTES)%'
 
 
 

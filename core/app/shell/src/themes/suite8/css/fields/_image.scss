@@ -29,6 +29,10 @@
 
   .p-image {
     display: inline-block;
+
+    img {
+      border-radius: .2em;
+    }
   }
 
   .uploaded-file {
@@ -46,12 +50,13 @@
       background-color: lightgrey;
       margin: 0;
        &:hover {
-         opacity: 0.4;
+         opacity: 0.7;
        }
 
       .sicon {
         color:$black;
         fill: $black;
+        font-size: large;
       }
 
       .p-image-preview-icon {
@@ -77,6 +82,7 @@
     .uploaded-image-wrapper {
       .uploaded-image {
         max-width: 100%;
+        border-radius: .2em;
       }
     }
   }
@@ -151,12 +157,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: .2em;
   cursor: pointer;
 }
 
 .uploaded-image-hover-container:hover .uploaded-image-hover-overlay {
   &:hover {
-    opacity: 0.6;
+    opacity: 0.7;
   }
-  opacity: 0.6;
+  opacity: 0.7;
+
+  .upload-clear-button {
+    font-size: large;
+    width: 1.5em;
+  }
 }

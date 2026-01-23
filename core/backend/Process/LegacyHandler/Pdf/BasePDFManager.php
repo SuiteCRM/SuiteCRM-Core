@@ -79,12 +79,13 @@ class BasePDFManager extends LegacyHandler
         return 'base-pdf-manager';
     }
 
-    public function createNote(SugarBean $bean, $fileName): Record
+    public function createNote(SugarBean $bean, $fileName, array $options = []): Record
     {
         $currentUser = $this->getCurrentUser();
         $note = new Record();
         $note->setModule('Notes');
-        $note->setAttributes([
+
+        $attributes = [
             'modified_user_id' => $currentUser->id,
             'created_by' => $currentUser->id,
             'name' => $fileName,
@@ -92,15 +93,18 @@ class BasePDFManager extends LegacyHandler
             'parent_id' => $bean->id,
             'file_mime_type' => 'application/pdf',
             'filename' => $fileName,
-        ]);
+        ];
 
-        if ($bean->module_dir !== 'Contacts') {
-            return $this->recordProvider->saveRecord($note);
+        foreach (($options['noteFields'] ?? []) as $field => $value) {
+            $attributes[$field] = $value;
         }
 
-        $note->setAttributes(['contact_id' => $bean->id]);
-        $note->setAttributes(['parent_type' => 'Accounts']);
-        $note->setAttributes(['parent_id' => $bean->account_id]);
+        foreach (($options['noteFieldsMap'] ?? []) as $key => $value) {
+            $attributes[$key] = $bean->$value;
+        }
+
+        $note->setAttributes($attributes);
+
         return $this->recordProvider->saveRecord($note);
     }
 
@@ -114,7 +118,7 @@ class BasePDFManager extends LegacyHandler
      * @return MediaObjectInterface|null
      */
     public function createPDFMediaObject(
-        ?SugarBean $moduleBean,
+        ?Record $parentRecord,
         string $fileName,
         array $pdfConfig,
         array $pdfContent,
@@ -125,10 +129,9 @@ class BasePDFManager extends LegacyHandler
         if (!$storageType) {
             return null;
         }
-        $note = $this->createNote($moduleBean, $fileName);
         $recordPdf = $this->pdfLegacyHandler->createPdf($pdfConfig);
         $recordPdf = $this->pdfLegacyHandler->writePDF($recordPdf, $pdfContent);
-        return $this->createMediaObjectRecord($note, $storageType, $recordPdf, $fileName, $temp);
+        return $this->createMediaObjectRecord($parentRecord, $storageType, $recordPdf, $fileName, $temp);
     }
 
     /**
@@ -158,7 +161,7 @@ class BasePDFManager extends LegacyHandler
     /**
      * @throws Exception
      */
-    public function generateBulkPdf(string $module, array $ids, string $templateId): ?Record
+    public function generateBulkPdf(string $module, array $ids, string $templateId, array $options = []): ?Record
     {
         $validationResult = $this->validateBulkPdfInputs($templateId, $module);
         if ($validationResult === null) {
@@ -177,7 +180,7 @@ class BasePDFManager extends LegacyHandler
 
         $count = 0;
         foreach ($ids as $id) {
-            $moduleBean->retrieve($id);
+            $moduleBean = $this->retrieveBean($moduleBean, $id);
             if (empty($moduleBean->id)) {
                 $this->logger->error('Record not found', ['module' => $module, 'id' => $id]);
                 continue;
@@ -194,7 +197,8 @@ class BasePDFManager extends LegacyHandler
             ];
 
             try {
-                $this->createPDFMediaObject($moduleBean, $fileName, $pdfConfig, $pdfContent, false);
+                $note = $this->createNote($moduleBean, $fileName, $options);
+                $this->createPDFMediaObject($note, $fileName, $pdfConfig, $pdfContent, false);
 
                 if ($count > 0) {
                     $basePdf->writeBlankPage();
@@ -260,7 +264,7 @@ class BasePDFManager extends LegacyHandler
         return $noteFieldDef['metadata']['storage_type'];
     }
 
-    protected function createMediaObjectRecord(?Record $note, string $storageType, PDFEngine $pdfEngine, string $fileName, bool $temp = true): Record
+    protected function createMediaObjectRecord(?Record $parentRecord, string $storageType, PDFEngine $pdfEngine, string $fileName, bool $temp = true): Record
     {
         $id = create_guid();
 
@@ -268,7 +272,7 @@ class BasePDFManager extends LegacyHandler
         $pdfEngine->outputPDF($tempFileName, 'F', $fileName);
         $uploadedFile = new ReplacingFile($this->projectDir . '/public/legacy/upload/' . $id);
 
-        $parentType = $note?->getModule() ?? null;
+        $parentType = $parentRecord?->getModule() ?? null;
 
         if ($parentType) {
             $parentType = $this->moduleNameMapper->toCore($parentType);
@@ -277,7 +281,7 @@ class BasePDFManager extends LegacyHandler
         $mediaObjectAttributes = [
             'file' => $uploadedFile,
             'parent_field' => 'file',
-            'parent_id' => $note?->getId() ?? null,
+            'parent_id' => $parentRecord?->getId() ?? null,
             'parent_type' => $parentType,
             'mime_type' => 'application/pdf',
             'name' => $fileName,
@@ -314,5 +318,14 @@ class BasePDFManager extends LegacyHandler
     protected function getPdfName(string $name): string
     {
         return str_replace(" ", "_", $name) . ".pdf";
+    }
+
+    protected function retrieveBean(SugarBean $moduleBean, string $id): ?SugarBean
+    {
+        $this->init();
+        $bean = $moduleBean->retrieve($id);
+        $this->close();
+
+        return $bean;
     }
 }

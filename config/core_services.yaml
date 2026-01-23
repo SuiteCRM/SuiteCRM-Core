@@ -166,6 +166,8 @@ services:
       tags: [ 'email.parser' ]
     App\Module\Campaigns\Service\Email\Parser\CampaignEmailParserInterface:
       tags: [ 'campaign.email.parser' ]
+    App\Module\Service\Fields\Attachments\AttachmentTypeHandlers\AttachmentTypeHandlerInterface:
+      tags: [ 'attachment.type.handler' ]
     App\MediaObjects\Validator\UploadValidator\UploadValidatorInterface:
       tags: [ 'media-object.upload.validator.registry' ]
 
@@ -494,6 +496,10 @@ services:
   App\Module\Campaigns\Service\Email\Targets\Validation\EmailTargetValidatorRegistry:
     arguments:
       - !tagged { tag: 'email.target.validator' }
+
+  App\Module\Service\Fields\Attachments\AttachmentTypeHandlers\AttachmentTypeHandlers:
+    arguments:
+      - !tagged { tag: 'attachment.type.handler' }
 
   App\Security\Ldap\AppLdapUserProviderProxy:
     $ldapUserProvider: '@security.user.provider.concrete.ldap_users'

@@ -35,6 +35,7 @@ import {
 } from "../../services/navigation/legacy-entrypoint-link-builder/legacy-entrypoint-link-builder.service";
 import {Attachment} from "../../components/uploaded-file/uploaded-file.model";
 import {SystemConfigStore} from "../../store/system-config/system-config.store";
+import {Record} from "../../common/record/record.model";
 
 @Component({template: ''})
 export class BaseAttachmentComponent extends BaseFileComponent {
@@ -76,8 +77,11 @@ export class BaseAttachmentComponent extends BaseFileComponent {
         this.attachments.set(uploadedFiles);
     }
 
-    mapFile(file): UploadedFile {
     mapFile(file): Attachment {
+
+        if (!file?.attributes?.attachmentType && !file?.attributes?.source_record_id) {
+            file.attributes.attachmentType = 'file';
+        }
 
         let contentUrl = file?.attributes?.contentUrl ?? '';
         if (contentUrl && (!contentUrl.startsWith('https://') && !contentUrl.startsWith('http://'))) {
@@ -89,6 +93,8 @@ export class BaseAttachmentComponent extends BaseFileComponent {
             name: file?.attributes?.original_name ?? '',
             size: file?.attributes?.size ?? 0,
             type: file?.attributes?.type ?? '',
+            attachmentType: file?.attributes?.attachmentType ?? 'file',
+            sourceRecordId: file?.attributes?.source_record_id ?? '',
             contentUrl: contentUrl,
             status: signal('saved'),
             progress: signal(100),
@@ -108,5 +114,22 @@ export class BaseAttachmentComponent extends BaseFileComponent {
         this.popoverLinkPosition = metadata?.popoverLinkPosition ?? modeConfig['popoverLinkPosition'] ?? 'bottom';
         this.storageType = this.field.metadata.storage_type ?? 'private-documents';
         this.minWidth = metadata?.minWidth ?? modeConfig['minWidth'] ?? '185px';
+    }
+
+    protected mapToRecord(uploadFile: Attachment): Record {
+        return {
+            id: uploadFile?.id ?? uploadFile?.name ?? '',
+            module: 'media-objects',
+            attributes: {
+                id: uploadFile?.id ?? uploadFile?.name ?? '',
+                name: uploadFile?.name ?? '',
+                attachmentType: uploadFile?.attachmentType ?? 'file',
+                source_record_id: uploadFile?.sourceRecordId ?? '',
+                size: uploadFile?.size ?? '',
+                type: uploadFile?.type ?? '',
+                contentUrl: uploadFile?.contentUrl ?? '',
+                original_name: uploadFile?.name ?? '',
+            }
+        } as Record;
     }
 }

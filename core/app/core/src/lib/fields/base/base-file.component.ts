@@ -140,6 +140,7 @@ export class BaseFileComponent extends BaseFieldComponent {
             name: valueObject?.attributes?.original_name ?? '',
             size: valueObject?.attributes?.size ?? 0,
             type: valueObject?.attributes?.type ?? '',
+            attachmentType: valueObject?.attributes?.attachmentType ?? 'file',
             contentUrl: contentUrl || '',
             status: signal('saved'),
             progress: signal(100),

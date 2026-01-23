@@ -25,24 +25,26 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-namespace App\Module\Documents\LegacyHandler;
+namespace App\Module\Service\Fields\Attachments\ProcessHandlers;
 
 use ApiPlatform\Exception\InvalidArgumentException;
 use App\FieldDefinitions\Service\FieldDefinitionsProviderInterface;
 use App\MediaObjects\Repository\MediaObjectManagerInterface;
+use App\Module\Service\Fields\Attachments\AttachmentTypeHandlers\AttachmentTypeHandlers;
 use App\Process\Entity\Process;
 use App\Process\Service\ProcessHandlerInterface;
 use Psr\Log\LoggerInterface;
 
-class AttachDocuments implements ProcessHandlerInterface {
+class RetrieveAttachmentMediaObjects implements ProcessHandlerInterface {
 
     protected const MSG_OPTIONS_NOT_FOUND = 'Process options is not defined';
-    protected const PROCESS_TYPE = 'attach-documents';
+    protected const PROCESS_TYPE = 'retrieve-attachment-media-objects';
 
     public function __construct(
         protected MediaObjectManagerInterface $mediaObjectManager,
         protected FieldDefinitionsProviderInterface $fieldDefinitionsProvider,
         protected LoggerInterface $logger,
+        protected AttachmentTypeHandlers $attachmentTypeHandlers,
     )
     {
     }
@@ -98,40 +100,27 @@ class AttachDocuments implements ProcessHandlerInterface {
         $mediaObjects = [];
 
         foreach ($records as $record) {
+            $type = $record['module'] ?? null;
+            $id = $record['id'] ?? null;
+            if (!$type || !$id) {
+                continue;
+            }
 
-            $attributes = $record['attributes'] ?? [];
-            $revisionId = $attributes['document_revision_id'] ?? null;
-            if (!$revisionId) {
-                $this->logger->warn('Cannot find revision id for document' . $record['id'] ?? '');
+            $attachmentTypeHandler = $this->attachmentTypeHandlers->getHandler($type);
+            if (!$attachmentTypeHandler) {
+                $this->logger->warn('No attachment type handler found for type ' . $type);
+                continue;
+            }
+
+            $attachments = $attachmentTypeHandler->getAttachments($type, $id);
+
+            if (!$attachments) {
+                $this->logger->warn('No attachment data found for record ' . ($record['id'] ?? 'unknown'));
                 $failedRecords = true;
                 continue;
             }
 
-            $storageType = $this->getStorageType();
-
-            if (!$storageType) {
-                $this->logger->warn('Unable to get storage type for Document Revisions');
-                $failedRecords = true;
-                continue;
-            }
-
-            $linkedMediaObject = $this->mediaObjectManager->getLinkedMediaObjects(
-                $storageType,
-                'DocumentRevisions',
-                $revisionId,
-                'filename',
-            );
-
-            if (empty($linkedMediaObject)) {
-                $this->logger->warn('Unable to retrieve linked media object for revision id ' . $revisionId);
-                $failedRecords = true;
-                continue;
-            }
-
-            $contentUrl = $this->mediaObjectManager->buildContentUrl($storageType, $linkedMediaObject[0]);
-            $linkedMediaObject[0]->setContentUrl($contentUrl);
-            $record = $this->mediaObjectManager->mapToRecord($storageType, $linkedMediaObject[0]);
-            $mediaObjects = [ ...$mediaObjects, $record->toArray()];
+            $mediaObjects = [...$mediaObjects, ...$attachments];
         }
 
         $data = [
@@ -143,18 +132,5 @@ class AttachDocuments implements ProcessHandlerInterface {
         $process->setData($data);
     }
 
-    protected function getStorageType(): ?string
-    {
-        $fieldDef = $this->fieldDefinitionsProvider->getFieldDefinition('document-revisions', 'filename');
-        if (!$fieldDef) {
-            return null;
-        }
 
-        $storageType = $fieldDef['metadata']['storage_type'] ?? '';
-        if (empty($storageType)) {
-            return null;
-        }
-
-        return $storageType;
-    }
 }

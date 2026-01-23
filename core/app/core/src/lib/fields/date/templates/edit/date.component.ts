@@ -76,6 +76,10 @@ export class DateEditFieldComponent extends BaseDateComponent implements OnInit,
         const parserFormatter = this.dateParserFormatter as DateParserFormatter;
         parserFormatter.setUserFormat(this.getDateFormat());
         this.dateModel = this.formatter.dateFormatToStruct(this.field.value, this.formatter.getInternalFormat());
+
+        this.initMinDate();
+        this.initMaxDate();
+
         this.subscribeValueChanges();
     }
 

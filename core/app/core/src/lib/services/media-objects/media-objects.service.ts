@@ -25,11 +25,11 @@
  */
 import {Injectable, signal} from "@angular/core";
 import {HttpClient, HttpEventType, HttpHeaders} from "@angular/common/http";
-import {UploadedFile} from "../../components/uploaded-file/uploaded-file.model";
+import {Attachment} from "../../components/uploaded-file/uploaded-file.model";
 import {MessageService} from "../message/message.service";
 
 export type UploadProgressCallback = (progress: number) => void;
-export type UploadSuccessCallback = (uploadFile: UploadedFile) => void;
+export type UploadSuccessCallback = (uploadFile: Attachment) => void;
 export type UploadErrorCallback = (error) => void;
 
 @Injectable({
@@ -51,7 +51,7 @@ export class MediaObjectsService {
         onProgress: UploadProgressCallback,
         onSuccess: UploadSuccessCallback,
         onError: UploadErrorCallback
-    ): UploadedFile {
+    ): Attachment {
 
         const formData = new FormData();
         formData.append('parentType', parentType ?? '');
@@ -65,7 +65,7 @@ export class MediaObjectsService {
             status: signal('uploading'),
             progress: signal(10),
             errorMessage: signal('')
-        } as UploadedFile;
+        } as Attachment;
 
         const headers = new HttpHeaders({});
 

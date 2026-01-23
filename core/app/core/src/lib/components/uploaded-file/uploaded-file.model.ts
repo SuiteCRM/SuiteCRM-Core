@@ -26,9 +26,9 @@
 
 import {WritableSignal} from "@angular/core";
 
-export type UploadedFileStatus = 'not-uploaded' | 'uploading' | 'uploaded' | 'saved' | 'error';
+export type AttachmentStatus = 'not-uploaded' | 'uploading' | 'uploaded' | 'saved' | 'error';
 
-export interface UploadedFile {
+export interface Attachment {
     id?: string;
     name?: string;
     size?: number;
@@ -36,7 +36,7 @@ export interface UploadedFile {
     contentUrl?: string;
     thumbnailUrl?: string;
     dateCreated?: string;
-    status?: WritableSignal<UploadedFileStatus>;
+    status?: WritableSignal<AttachmentStatus>;
     errorMessage?: WritableSignal<string>;
     progress?: WritableSignal<number>;
 }

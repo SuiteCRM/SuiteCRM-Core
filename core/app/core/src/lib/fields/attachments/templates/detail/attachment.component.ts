@@ -58,6 +58,6 @@ export class AttachmentDetailFieldComponent extends BaseAttachmentComponent impl
     ngOnInit() {
         super.ngOnInit();
         this.getValuesFromMetadata('detail');
-        this.initUploadedFiles();
+        this.initAttachments();
     }
 }

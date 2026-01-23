@@ -56,6 +56,6 @@ export class AttachmentListFieldComponent extends BaseAttachmentComponent implem
     ngOnInit() {
         super.ngOnInit();
         this.getValuesFromMetadata('list');
-        this.initUploadedFiles();
+        this.initAttachments();
     }
 }

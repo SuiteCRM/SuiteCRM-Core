@@ -32,6 +32,7 @@ import {LanguageStore} from '../language/language.store';
 import {MessageService} from '../../services/message/message.service';
 import {RecordListStore} from './record-list.store';
 import {LocalStorageService} from "../../services/local-storage/local-storage.service";
+import {RecordManager} from "../../services/record/record.manager";
 
 @Injectable({
     providedIn: 'root',
@@ -44,7 +45,8 @@ export class RecordListStoreFactory {
         protected preferencesStore: UserPreferenceStore,
         protected languageStore: LanguageStore,
         protected message: MessageService,
-        protected localStorageService: LocalStorageService
+        protected localStorageService: LocalStorageService,
+        protected recordManager: RecordManager,
     ) {
     }
 
@@ -55,7 +57,8 @@ export class RecordListStoreFactory {
             this.preferencesStore,
             this.languageStore,
             this.message,
-            this.localStorageService
+            this.localStorageService,
+            this.recordManager,
         );
     }
 }

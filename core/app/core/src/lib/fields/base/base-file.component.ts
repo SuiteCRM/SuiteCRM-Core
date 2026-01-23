@@ -26,7 +26,7 @@
 
 import {Component, signal, WritableSignal} from "@angular/core";
 import {BaseFieldComponent} from "./base-field.component";
-import {UploadedFile} from "../../components/uploaded-file/uploaded-file.model";
+import {Attachment} from "../../components/uploaded-file/uploaded-file.model";
 import {DataTypeFormatter} from "../../services/formatters/data-type.formatter.service";
 import {FieldLogicManager} from "../field-logic/field-logic.manager";
 import {FieldLogicDisplayManager} from "../field-logic-display/field-logic-display.manager";
@@ -46,8 +46,8 @@ export class BaseFileComponent extends BaseFieldComponent {
     isLegacy: boolean = true;
     isRecordLink: boolean = false;
     compact: boolean = false;
-    uploadedFile: WritableSignal<UploadedFile> = signal(null);
-    uploadedFiles: WritableSignal<UploadedFile[]> = signal([]);
+    uploadedFile: WritableSignal<Attachment> = signal(null);
+    attachments: WritableSignal<Attachment[]> = signal([]);
     isValidStorageType: boolean = false;
 
     validStorageTypes: string[] = [
@@ -68,7 +68,7 @@ export class BaseFileComponent extends BaseFieldComponent {
         super(typeFormatter, logic, logicDisplay);
     }
 
-    protected uploadFile(storageType: string, file: File, onUpload: UploadSuccessCallback): UploadedFile {
+    protected uploadFile(storageType: string, file: File, onUpload: UploadSuccessCallback): Attachment {
 
         const uploadedFile = this.mediaObjects.uploadFile(
             storageType,
@@ -77,7 +77,7 @@ export class BaseFileComponent extends BaseFieldComponent {
             this?.field?.name ?? '',
             (progress: number) => {
             },
-            (uploadFile: UploadedFile) => {
+            (uploadFile: Attachment) => {
                 onUpload(uploadFile);
             },
             (error) => {
@@ -90,7 +90,7 @@ export class BaseFileComponent extends BaseFieldComponent {
     protected subscribeValueChanges(): void {
     }
 
-    protected mapToRecord(uploadFile: UploadedFile): Record {
+    protected mapToRecord(uploadFile: Attachment): Record {
         return {
             id: uploadFile?.id ?? uploadFile?.name ?? '',
             module: 'media-objects',
@@ -144,6 +144,6 @@ export class BaseFileComponent extends BaseFieldComponent {
             status: signal('saved'),
             progress: signal(100),
             dateCreated: valueObject?.attributes?.date_entered || ''
-        } as UploadedFile);
+        } as Attachment);
     }
 }

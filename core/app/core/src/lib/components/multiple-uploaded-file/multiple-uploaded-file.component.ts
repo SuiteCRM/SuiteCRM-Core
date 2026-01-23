@@ -34,7 +34,7 @@ import {
     Output, signal, SimpleChanges,
     ViewChild, WritableSignal
 } from "@angular/core";
-import {UploadedFile} from "../uploaded-file/uploaded-file.model";
+import {Attachment} from "../uploaded-file/uploaded-file.model";
 import {SystemConfigStore} from "../../store/system-config/system-config.store";
 import {Subscription} from "rxjs";
 
@@ -54,7 +54,7 @@ export class MultipleUploadedFileComponent implements OnChanges, OnInit, AfterVi
     protected subs: Subscription[] = [];
     maxTextWidth: WritableSignal<string> = signal('');
 
-    @Input() files: UploadedFile[] = [];
+    @Input() files: Attachment[] = [];
     @Input() allowClear: boolean = true;
     @Input() compact: boolean = false;
     @Input() chunks: number;
@@ -67,7 +67,7 @@ export class MultipleUploadedFileComponent implements OnChanges, OnInit, AfterVi
     @Input() clickable: boolean = false;
     @Input() displayType: string = 'default';
     @ViewChild('popoverDefaultTarget') popoverDefaultTarget: ElementRef;
-    @Output('clear') clear: EventEmitter<UploadedFile> = new EventEmitter<UploadedFile>();
+    @Output('clear') clear: EventEmitter<Attachment> = new EventEmitter<Attachment>();
 
     constructor(
         protected systemConfigStore: SystemConfigStore,

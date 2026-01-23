@@ -29,7 +29,7 @@ import {ButtonModule} from "../button/button.module";
 import {ImageModule} from "../image/image.module";
 import {FileSizePipe} from "../../pipes/file-size/file-size.pipe";
 import {ButtonInterface} from "../../common/components/button/button.model";
-import {UploadedFile} from "./uploaded-file.model";
+import {Attachment} from "./uploaded-file.model";
 import {NgIf} from "@angular/common";
 import {LabelModule} from "../label/label.module";
 import {animate, style, transition, trigger} from "@angular/animations";
@@ -60,7 +60,7 @@ import {animate, style, transition, trigger} from "@angular/animations";
 })
 export class UploadedFileComponent implements OnInit {
 
-    @Input() file: UploadedFile;
+    @Input() file: Attachment;
     @Input() maxTextWidth: string;
     @Input() minWidth: string = '0px';
     @Input() allowClear: boolean = true;
@@ -70,10 +70,10 @@ export class UploadedFileComponent implements OnInit {
     @Input() errorIcon: string = 'file-earmark-x';
     @Input() compact: boolean = false;
     @Input() displaySize: boolean = true;
-    @Output('clear') clear: EventEmitter<UploadedFile> = new EventEmitter<UploadedFile>();
+    @Output('clear') clear: EventEmitter<Attachment> = new EventEmitter<Attachment>();
     clearButtonConfig: ButtonInterface;
     errorClearButtonConfig: ButtonInterface;
-    uploadedFile: WritableSignal<UploadedFile> = signal(null);
+    uploadedFile: WritableSignal<Attachment> = signal(null);
     textMaxWidth: WritableSignal<string> = signal('200px');
 
     constructor() {

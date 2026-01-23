@@ -33,7 +33,7 @@ import {MediaObjectsService} from "../../services/media-objects/media-objects.se
 import {
     LegacyEntrypointLinkBuilder
 } from "../../services/navigation/legacy-entrypoint-link-builder/legacy-entrypoint-link-builder.service";
-import {UploadedFile} from "../../components/uploaded-file/uploaded-file.model";
+import {Attachment} from "../../components/uploaded-file/uploaded-file.model";
 import {SystemConfigStore} from "../../store/system-config/system-config.store";
 
 @Component({template: ''})
@@ -58,25 +58,26 @@ export class BaseAttachmentComponent extends BaseFileComponent {
     }
 
     clearFile(event) {
-        const updatedFiles = this.uploadedFiles().filter((file) => file.id !== event.id);
-        this.field.valueObject = Object.values(this.field.valueObject).filter((file: UploadedFile) => file.id !== event.id);
-        this.uploadedFiles.set(updatedFiles);
+        const updatedFiles = this.attachments().filter((file) => file.id !== event.id);
+        this.field.valueObject = Object.values(this.field.valueObject).filter((file: Attachment) => file.id !== event.id);
+        this.attachments.set(updatedFiles);
     }
 
-    initUploadedFiles() {
+    initAttachments() {
         this.field.valueObject = this.field?.valueList ?? this.field?.valueObject ?? {};
 
-        const uploadedFiles: UploadedFile[] = [];
+        const uploadedFiles: Attachment[] = [];
 
         Object.values(this.field.valueObject).forEach((file) => {
             const mapped = this.mapFile(file);
             uploadedFiles.push(mapped);
         })
 
-        this.uploadedFiles.set(uploadedFiles);
+        this.attachments.set(uploadedFiles);
     }
 
     mapFile(file): UploadedFile {
+    mapFile(file): Attachment {
 
         let contentUrl = file?.attributes?.contentUrl ?? '';
         if (contentUrl && (!contentUrl.startsWith('https://') && !contentUrl.startsWith('http://'))) {
@@ -92,7 +93,7 @@ export class BaseAttachmentComponent extends BaseFileComponent {
             status: signal('saved'),
             progress: signal(100),
             dateCreated: file?.attributes?.date_entered || ''
-        } as UploadedFile;
+        } as Attachment;
     }
 
     protected getValuesFromMetadata(mode: string): void {

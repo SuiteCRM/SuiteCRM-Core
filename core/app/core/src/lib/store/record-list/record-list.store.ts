@@ -27,7 +27,13 @@
 import {deepClone} from '../../common/utils/object-utils';
 import {emptyObject} from '../../common/utils/object-utils';
 import {ObjectMap} from '../../common/types/object-map';
-import {Pagination, PageSelection, PaginationCount, SortDirection, SortingSelection} from '../../common/views/list/list-navigation.model';
+import {
+    Pagination,
+    PageSelection,
+    PaginationCount,
+    SortDirection,
+    SortingSelection
+} from '../../common/views/list/list-navigation.model';
 import {PaginationDataSource} from '../../common/components/pagination/pagination.model';
 import {Record} from '../../common/record/record.model';
 import {RecordSelection, SelectionStatus} from '../../common/views/list/record-selection.model';
@@ -45,6 +51,7 @@ import {LanguageStore} from '../language/language.store';
 import {MessageService} from '../../services/message/message.service';
 import {SavedFilter, SavedFilterMap} from "../saved-filters/saved-filter.model";
 import {LocalStorageService} from "../../services/local-storage/local-storage.service";
+import {RecordManager} from "../../services/record/record.manager";
 
 
 const initialFilter: SavedFilter = {
@@ -166,7 +173,8 @@ export class RecordListStore implements StateStore, DataSource<Record>, Selectio
         protected preferencesStore: UserPreferenceStore,
         protected languageStore: LanguageStore,
         protected message: MessageService,
-        protected localStorageService: LocalStorageService
+        protected localStorageService: LocalStorageService,
+        protected recordManager: RecordManager
     ) {
         this.records$ = this.state$.pipe(map(state => state.records), distinctUntilChanged());
         this.criteria$ = this.state$.pipe(map(state => state.criteria), distinctUntilChanged());
@@ -308,7 +316,11 @@ export class RecordListStore implements StateStore, DataSource<Record>, Selectio
         this.baseFilterMap = {'default': deepClone(filter)};
         this.baseFilter = deepClone(filter);
 
-        this.updateState({...this.internalState, activeFilters: deepClone(this.baseFilterMap), openFilter: deepClone(this.baseFilter)});
+        this.updateState({
+            ...this.internalState,
+            activeFilters: deepClone(this.baseFilterMap),
+            openFilter: deepClone(this.baseFilter)
+        });
 
 
     }

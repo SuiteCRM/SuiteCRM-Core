@@ -29,7 +29,7 @@ import {BaseAttachmentComponent} from "../../../base/base-attachment.component";
 import {DropdownButtonInterface} from "../../../../common/components/button/dropdown-button.model";
 import {MediaObjectsService} from "../../../../services/media-objects/media-objects.service";
 import {SystemConfigStore} from "../../../../store/system-config/system-config.store";
-import {UploadedFile} from "../../../../components/uploaded-file/uploaded-file.model";
+import {Attachment} from "../../../../components/uploaded-file/uploaded-file.model";
 import {DataTypeFormatter} from "../../../../services/formatters/data-type.formatter.service";
 import {FieldLogicManager} from "../../../field-logic/field-logic.manager";
 import {FieldLogicDisplayManager} from "../../../field-logic-display/field-logic-display.manager";
@@ -41,6 +41,8 @@ import {SelectModalService} from "../../../../services/modals/select-modal.servi
 import {ProcessService} from "../../../../services/process/process.service";
 import {MessageService} from "../../../../services/message/message.service";
 import {isTrue} from "../../../../common/utils/value-utils";
+import {RecordManager} from "../../../../services/record/record.manager";
+import {Record} from "../../../../common/record/record.model";
 
 @Component({
     selector: 'scrm-attachments-edit',
@@ -67,7 +69,7 @@ export class AttachmentEditFieldComponent extends BaseAttachmentComponent implem
         }
 
         this.buildButtonItems();
-        this.initUploadedFiles();
+        this.initAttachments();
     }
 
     ngAfterViewInit() {
@@ -78,6 +80,7 @@ export class AttachmentEditFieldComponent extends BaseAttachmentComponent implem
         protected typeFormatter: DataTypeFormatter,
         protected logic: FieldLogicManager,
         protected logicDisplay: FieldLogicDisplayManager,
+        protected recordManager: RecordManager,
         protected mediaObjectsService: MediaObjectsService,
         protected legacyEntrypointLinkBuilder: LegacyEntrypointLinkBuilder,
         protected systemConfigs: SystemConfigStore,
@@ -102,10 +105,10 @@ export class AttachmentEditFieldComponent extends BaseAttachmentComponent implem
                 this?.field?.name ?? '',
                 () => {
                 },
-                (uploadFile: UploadedFile) => {
-                    const uploadedFiles = [uploadFile, ...this.uploadedFiles() ?? []];
+                (uploadFile: Attachment) => {
+                    const uploadedFiles = [uploadFile, ...this.attachments() ?? []];
                     this.setValue(uploadedFiles);
-                    this.uploadedFiles.set(uploadedFiles);
+                    this.attachments.set(uploadedFiles);
                 },
                 () => {
                 }
@@ -120,16 +123,17 @@ export class AttachmentEditFieldComponent extends BaseAttachmentComponent implem
             labelKey: 'LBL_EMAIL_ATTACHMENT',
             icon: 'paperclip',
             klass: 'btn-sm btn btn-outline-main',
-            items: [{
-                labelKey: 'LBL_UPLOAD_FROM_FILES',
-                klass: 'btn-outline-main rounded',
-                onClick: (): void => {
-                    this.uploadArea.triggerFileInput()
-                }
-            },
+            items: [
+                {
+                    labelKey: 'LBL_UPLOAD_FROM_FILES',
+                    klass: 'btn-outline-main',
+                    onClick: (): void => {
+                        this.uploadArea.triggerFileInput()
+                    }
+                },
                 {
                     labelKey: 'LBL_ATTACH_DOCUMENTS',
-                    klass: 'btn-outline-main rounded',
+                    klass: 'btn-outline-main',
                     onClick: (): void => {
                         const selectModalOptions = {
                             multiSelect: true,
@@ -137,30 +141,35 @@ export class AttachmentEditFieldComponent extends BaseAttachmentComponent implem
                         };
 
                         this.selectModalService.showSelectModal('Documents', (records) => {
-                            this.processService.submit('attach-documents', {
-                                records: records,
+                            const mappedRecords = [];
+                            Object.values(records).forEach((record: Record) => {
+                                const baseRecord = this.recordManager.getBaseRecord(record)
+                                mappedRecords.push(baseRecord);
+                            });
+
+                            this.processService.submit('retrieve-attachment-media-objects', {
+                                records: mappedRecords,
                             }).subscribe((process) => {
 
                                 if (isTrue(process.data?.failed_records ?? false)) {
-                                    this.messageService.addDangerMessage('LBL_SOME_ATTACHMENTS_FAILED');
+                                    this.messageService.addDangerMessageByKey('LBL_SOME_ATTACHMENTS_FAILED');
                                 }
 
-                                Object.values(process?.data?.media_objects).forEach((file) => {
+                                Object.values(process?.data?.media_objects).forEach((file: Record) => {
                                     const mappedFile = this.mapFile(file);
-                                    const uploadedFiles = [mappedFile, ...this.uploadedFiles() ?? []];
+                                    const uploadedFiles = [mappedFile, ...this.attachments() ?? []];
                                     this.setValue(uploadedFiles);
-                                    this.uploadedFiles.set([mappedFile, ...this.uploadedFiles() ?? []]);
+                                    this.attachments.set([mappedFile, ...this.attachments() ?? []]);
                                 });
                             });
                         }, selectModalOptions);
                     }
                 },
             ],
-
-        } as DropdownButtonInterface
+        } as DropdownButtonInterface;
     }
 
-    protected setValue(uploadFile: UploadedFile[]): void {
+    protected setValue(uploadFile: Attachment[]): void {
 
         if (!uploadFile || !uploadFile.length) {
             this.field.valueObject = null;

@@ -28,7 +28,7 @@ import {Component, HostListener, signal, ViewChild, WritableSignal} from '@angul
 import {DataTypeFormatter} from '../../../../services/formatters/data-type.formatter.service';
 import {FieldLogicManager} from '../../../field-logic/field-logic.manager';
 import {FieldLogicDisplayManager} from "../../../field-logic-display/field-logic-display.manager";
-import {UploadedFile} from "../../../../components/uploaded-file/uploaded-file.model";
+import {Attachment} from "../../../../components/uploaded-file/uploaded-file.model";
 import {MediaObjectsService} from "../../../../services/media-objects/media-objects.service";
 import {BaseFileComponent} from "../../../base/base-file.component";
 import {FileUploadAreaComponent} from "../../../../components/file-upload-area/file-upload-area.component";
@@ -91,7 +91,7 @@ export class FileEditFieldComponent extends BaseFileComponent {
         const uploadedField = this.uploadFile(
             this.storageType,
             files[0],
-            (uploadFile: UploadedFile) => {
+            (uploadFile: Attachment) => {
                 this.setValue(uploadFile)
                 this.uploadedFile.set(uploadFile);
             }
@@ -113,7 +113,7 @@ export class FileEditFieldComponent extends BaseFileComponent {
         this.uploadArea.resetUploadArea();
     }
 
-    protected setValue(uploadFile: UploadedFile): void {
+    protected setValue(uploadFile: Attachment): void {
         const uploadFileRecord = this.mapToRecord(uploadFile);
 
         this.field.valueObject = uploadFileRecord;

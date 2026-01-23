@@ -98,6 +98,7 @@ export class BaseFileComponent extends BaseFieldComponent {
                 id: uploadFile?.id ?? uploadFile?.name ?? '',
                 name: uploadFile?.name ?? '',
                 size: uploadFile?.size ?? '',
+                attachmentType: uploadFile?.attachmentType ?? 'file',
                 type: uploadFile?.type ?? '',
                 contentUrl: uploadFile?.contentUrl ?? '',
                 original_name: uploadFile?.name ?? '',

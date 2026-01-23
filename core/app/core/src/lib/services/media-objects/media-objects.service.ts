@@ -62,6 +62,7 @@ export class MediaObjectsService {
             name: file.name,
             size: file.size,
             type: file.type,
+            attachmentType: 'file',
             status: signal('uploading'),
             progress: signal(10),
             errorMessage: signal('')

@@ -35,7 +35,7 @@ import {
     WritableSignal,
 } from '@angular/core';
 import {NgbCalendar, NgbDateStruct, NgbPopover, NgbPopoverConfig, NgbTimeStruct} from '@ng-bootstrap/ng-bootstrap';
-import {isVoid, isEmptyString} from '../../../../common/utils/value-utils';
+import {isEmptyString, isVoid} from '../../../../common/utils/value-utils';
 import {ButtonInterface} from '../../../../common/components/button/button.model';
 import {BaseDateTimeComponent} from '../../../base/datetime/base-datetime.component';
 import {DataTypeFormatter} from '../../../../services/formatters/data-type.formatter.service';
@@ -107,6 +107,9 @@ export class DateTimeEditFieldComponent extends BaseDateTimeComponent implements
         if ((this.userPreferences.getUserPreference('time_format') ?? '').includes('a')) {
             this.isMeridian.set(true);
         }
+
+        this.initMinDate();
+        this.initMaxDate();
 
         this.subscribeValueChanges();
     }

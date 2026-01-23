@@ -91,6 +91,9 @@ export class DateTimeFilterFieldComponent extends BaseDateTimeComponent implemen
             this.dateTimeModel.displaySeconds = true;
         }
 
+        this.initMinDate();
+        this.initMaxDate();
+
         this.subscribeValueChanges();
     }
 

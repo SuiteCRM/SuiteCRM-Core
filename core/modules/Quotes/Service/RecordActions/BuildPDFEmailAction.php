@@ -153,7 +153,7 @@ class BuildPDFEmailAction extends BuildPDFEmail implements ProcessHandlerInterfa
                     'default' => [
                         'parent_type' => $module,
                         'parent_id' => $id,
-                        'parent_name' => $pdf->getAttributes()['name'] ?? '',
+                        'parent_name' => $record->getAttributes()['name'] ?? '',
                         'email_attachments' => [$pdf->toArray()],
                     ]
                 ]

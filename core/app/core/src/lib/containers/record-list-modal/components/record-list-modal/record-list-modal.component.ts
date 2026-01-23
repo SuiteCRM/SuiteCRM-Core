@@ -44,6 +44,7 @@ import {RecordListModalResult} from './record-list-modal.model';
 import {UserPreferenceStore} from "../../../../store/user-preference/user-preference.store";
 import {SystemConfigStore} from "../../../../store/system-config/system-config.store";
 import {SavedFilter} from "../../../../store/saved-filters/saved-filter.model";
+import {Record} from "../../../../common/record/record.model";
 
 @Component({
     selector: 'scrm-record-list-modal',
@@ -69,7 +70,7 @@ export class RecordListModalComponent implements OnInit, OnDestroy {
     @Input() filterAdapter: ModalRecordFilterAdapter = null;
     @Input() presetFilter: SavedFilter = {} as SavedFilter;
     @Input() showFilter: boolean = true;
-    @Input() selectedValues: string = '';
+    @Input() selectedRecords: Record[] = [];
 
     loading$: Observable<boolean>;
 
@@ -107,6 +108,9 @@ export class RecordListModalComponent implements OnInit, OnDestroy {
 
         this.subs.push(this.store.recordList.criteria$.pipe(debounceTime(100)).subscribe(() => {
             if ((Object.entries(this?.store?.recordList?.criteria?.filters).length ?? 0) < 1) {
+                return;
+            }
+            if (Object.values(this.store.recordList.selection.selected).length > 0) {
                 return;
             }
             this.updateSelection();
@@ -198,13 +202,12 @@ export class RecordListModalComponent implements OnInit, OnDestroy {
 
     protected updateSelection(): void {
 
-        if (!this.selectedValues ?? false) {
+        if (!this.selectedRecords ?? false) {
             return;
         }
 
-        const selected = this.selectedValues.split(',');
-        Object.values(selected).forEach((record) => {
-            this.store.recordList.toggleSelection(record, false)
+        Object.values(this.selectedRecords).forEach((record) => {
+            this.store.recordList.toggleRecordSelection(record, false);
         });
     }
 }

@@ -32,6 +32,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageStore} from '../../store/language/language.store';
 import {MessageService} from '../message/message.service';
 import {isTrue} from "../../common/utils/value-utils";
+import {deepClone} from "../../common/utils/object-utils";
 
 
 @Injectable({
@@ -70,7 +71,7 @@ export class SelectModalService {
 
         modal.componentInstance.presetFilter = options?.presetFilter || null;
         modal.componentInstance.showFilter = options?.showFilter || true;
-        modal.componentInstance.selectedValues = options?.selectedValues || null;
+        modal.componentInstance.selectedRecords = options?.selectedRecords || null;
 
         modal.result.then(
             (result: RecordListModalResult) => {
@@ -110,20 +111,7 @@ export class SelectModalService {
      * @param {object} data RecordListModalResult
      */
     protected getSelectedRecords(data: RecordListModalResult): Record[] {
-        let ids = [];
-        Object.keys(data?.selection?.selected).some(selected => {
-            ids[selected] = selected;
-        });
-
-        let records: Record[] = [];
-
-        data.records.some(rec => {
-            if (ids[rec?.id ?? '']) {
-                records.push(rec);
-            }
-        });
-
-        return records;
+        return deepClone(data.selection.selectedRecords ?? {});
     }
 
     /**

@@ -95,6 +95,7 @@ const initialSelection: RecordSelection = {
     status: SelectionStatus.NONE,
     selected: {},
     touched: {},
+    selectedRecords: {},
     count: 0
 };
 
@@ -391,8 +392,8 @@ export class RecordListStore implements StateStore, DataSource<Record>, Selectio
         this.savePreference(module, 'current-sort', this.sort);
     }
 
-   public updatePaginationLocalStorage(): void {
-        if(this.pageKey === null) {
+    public updatePaginationLocalStorage(): void {
+        if (this.pageKey === null) {
             return;
         }
         const module = this.internalState.module;
@@ -535,7 +536,7 @@ export class RecordListStore implements StateStore, DataSource<Record>, Selectio
         ).subscribe();
     }
 
-    public setPagination(current: number): Observable<RecordList>  {
+    public setPagination(current: number): Observable<RecordList> {
         const pagination = {...this.internalState.pagination, current};
         this.updateState({...this.internalState, pagination});
 
@@ -677,6 +678,7 @@ export class RecordListStore implements StateStore, DataSource<Record>, Selectio
                 all: true,
                 status: SelectionStatus.ALL,
                 selected: {},
+                selectedRecords: {},
                 touched: {},
                 count: total
             }
@@ -686,12 +688,14 @@ export class RecordListStore implements StateStore, DataSource<Record>, Selectio
     selectPage(): void {
         const selected = {...this.internalState.selection.selected};
         const touched = {...this.internalState.selection.touched};
+        const selectedRecords = {...this.internalState.selection.selectedRecords};
 
         if (this.internalState.records && this.internalState.records.length) {
             this.internalState.records.forEach(value => {
                 if (value && value.id) {
                     selected[value.id] = value.id;
                     touched[value.id] = value.id;
+                    selectedRecords[value.id] = value;
                 }
             });
         }
@@ -703,8 +707,39 @@ export class RecordListStore implements StateStore, DataSource<Record>, Selectio
                 status: SelectionStatus.SOME,
                 touched,
                 selected,
+                selectedRecords,
                 count: Object.keys(selected).length
             }
+        });
+    }
+
+    toggleRecordSelection(record: Record, touched = true): void {
+        const selection = deepClone(this.internalState?.selection);
+        const id = record?.id;
+
+        if (touched) {
+            selection.touched[id] = id;
+        }
+
+        if (selection?.selected[id]) {
+            delete selection.selected[id];
+            delete selection.selectedRecords[id];
+        } else {
+            selection.selectedRecords[id] = this.recordManager.getBaseRecord(record);
+            selection.selected[id] = id;
+        }
+
+        selection.count = Object.keys(selection.selected).length;
+
+        if (selection.count === 0) {
+            selection.status = SelectionStatus.NONE;
+        } else {
+            selection.status = SelectionStatus.SOME;
+        }
+
+        this.updateState({
+            ...this.internalState,
+            selection
         });
     }
 
@@ -717,8 +752,13 @@ export class RecordListStore implements StateStore, DataSource<Record>, Selectio
 
         if (selection.selected[id]) {
             delete selection.selected[id];
+            delete selection.selectedRecords[id];
         } else {
-            selection.selected[id] = id;
+            const record = this.records?.find(record => record?.id === id);
+            if (record) {
+                selection.selectedRecords[id] = this.recordManager.getBaseRecord(record);
+                selection.selected[id] = id;
+            }
         }
 
         selection.count = Object.keys(selection.selected).length;
@@ -799,7 +839,7 @@ export class RecordListStore implements StateStore, DataSource<Record>, Selectio
                 return of({} as RecordList);
             }
 
-            if(isPaginationLoadMore) {
+            if (isPaginationLoadMore) {
                 pageToLoad = 0;
             }
 
@@ -843,15 +883,15 @@ export class RecordListStore implements StateStore, DataSource<Record>, Selectio
 
         this.preferencesSub = this.configStore.configs$.pipe(
             combineLatestWith(this.preferencesStore.userPreferences$),
-                tap(([configs, preferences]: [SystemConfigMap, UserPreferences]) => {
-                    const key = pageSizeConfigKey;
-                    const sizePreference = (preferences && preferences[key]) || null;
-                    const sizeConfig = (configs && configs[key] && configs[key].value) || null;
+            tap(([configs, preferences]: [SystemConfigMap, UserPreferences]) => {
+                const key = pageSizeConfigKey;
+                const sizePreference = (preferences && preferences[key]) || null;
+                const sizeConfig = (configs && configs[key] && configs[key].value) || null;
 
-                    this.determinePageSize(sizePreference, sizeConfig);
+                this.determinePageSize(sizePreference, sizeConfig);
 
-                })
-            ).subscribe();
+            })
+        ).subscribe();
     }
 
     /**

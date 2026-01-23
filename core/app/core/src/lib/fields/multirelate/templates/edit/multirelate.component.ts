@@ -277,7 +277,9 @@ export class MultiRelateEditFieldComponent extends BaseRelateComponent {
         modal.componentInstance.multiSelect = true;
         modal.componentInstance.multiSelectButtonLabelKey = 'LBL_SAVE';
         modal.componentInstance.showFilter = this.field?.definition?.showFilter ?? true;
-        modal.componentInstance.selectedValues = (this?.selectedValues ?? []).map(item => item.id).join(',') ?? '';
+        modal.componentInstance.selectedRecords = this.selectedValues?.map(item => {
+            return item?.attributes as Record;
+        }) ?? [];
 
         modal.result.then((data: RecordListModalResult) => {
 
@@ -286,10 +288,9 @@ export class MultiRelateEditFieldComponent extends BaseRelateComponent {
             }
 
             const records = this.getSelectedRecords(data);
-            const allRecords = data?.records ?? [];
             const selected = [];
 
-            records.forEach((record) => {
+            Object.values(records).forEach((record: Record) => {
                 selected.push(record.id);
                 const found = this.field.valueObjectArray.find(element => element.id === record.id);
 
@@ -298,12 +299,6 @@ export class MultiRelateEditFieldComponent extends BaseRelateComponent {
                 }
 
                 this.setItem(record);
-            });
-
-            allRecords.forEach((record) => {
-                if (!selected.includes(record.id)) {
-                    this.selectedValues = this.selectedValues.filter((value) => value.id !== record.id);
-                }
             });
 
             this.onAdd();
@@ -451,20 +446,7 @@ export class MultiRelateEditFieldComponent extends BaseRelateComponent {
     }
 
     protected getSelectedRecords(data: RecordListModalResult) {
-        let ids = [];
-        Object.keys(data.selection.selected).some(selected => {
-            ids[selected] = selected;
-        });
-
-        let records: Record[] = [];
-
-        data.records.some(rec => {
-            if (ids[rec.id]) {
-                records.push(rec);
-            }
-        });
-
-        return records;
+        return deepClone(data.selection.selectedRecords ?? {});
     }
 
     protected mapToItem(options: AttributeMap[]) {

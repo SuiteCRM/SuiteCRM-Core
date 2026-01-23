@@ -24,6 +24,8 @@
  * the words "Supercharged by SuiteCRM".
  */
 
+import {Record} from "../../record/record.model";
+
 export enum SelectionStatus {
     ALL = 'ALL',
     SOME = 'SOME',
@@ -36,5 +38,6 @@ export interface RecordSelection {
     status: SelectionStatus;
     touched?: { [key: string]: string };
     selected: { [key: string]: string };
+    selectedRecords: { [key: string]: Record };
     count: number;
 }

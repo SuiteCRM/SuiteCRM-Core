@@ -31,6 +31,7 @@ use App\Data\Entity\Record;
 use App\Data\Service\Record\RecordSaveHandlers\RecordFieldTypeSaveHandlerInterface;
 use App\FieldDefinitions\Entity\FieldDefinition;
 use App\MediaObjects\Repository\MediaObjectManagerInterface;
+use App\Module\Service\Fields\Attachments\AttachmentsManagerInterface;
 use App\Module\Service\ModuleNameMapperInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
@@ -40,7 +41,8 @@ class AttachmentFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
 {
     public function __construct(
         protected MediaObjectManagerInterface $mediaObjectManager,
-        protected ModuleNameMapperInterface $moduleNameMapper
+        protected ModuleNameMapperInterface $moduleNameMapper,
+        protected AttachmentsManagerInterface $attachmentsManager,
     ) {
     }
 
@@ -103,9 +105,21 @@ class AttachmentFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
 
         $parentType = $this->moduleNameMapper->toLegacy($savedRecord->getModule());
         $parentId = $savedRecord->getId();
-        $currentMediaObjects = $this->mediaObjectManager->getLinkedMediaObjects($storageType, $parentType, $parentId, $field) ?? [];
+        $this->saveMediaObjects($storageType, $parentType, $parentId, $field, $attributes[$field]);
+        $this->saveAttachments($storageType, $parentType, $parentId, $field, $attributes[$field]);
+    }
 
-        $attachments = $attributes[$field];
+    /**
+     * @param mixed $storageType
+     * @param string $parentType
+     * @param string|null $parentId
+     * @param string $field
+     * @param array $attachments
+     * @return void
+     */
+    public function saveMediaObjects(string $storageType, string $parentType, ?string $parentId, string $field, array $attachments): void
+    {
+        $currentMediaObjects = $this->mediaObjectManager->getLinkedMediaObjects($storageType, $parentType, $parentId, $field) ?? [];
 
         if (empty($attachments)) {
             foreach ($currentMediaObjects as $currentMediaObject) {
@@ -125,6 +139,10 @@ class AttachmentFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
         foreach ($attachments as $key => $attachment) {
             $id = $attachment['id'] ?? '';
             if (empty($id)) {
+                continue;
+            }
+
+            if ($attachment['attributes']['attachmentType'] !== 'file') {
                 continue;
             }
 
@@ -153,6 +171,60 @@ class AttachmentFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
             if (!isset($receivedItems[$currentMediaObject->getId()])) {
                 // This will delete the media object from the repository and file system
                 $this->mediaObjectManager->deleteMediaObject($storageType, $currentMediaObject);
+            }
+        }
+    }
+
+    protected function saveAttachments(string $storageType, string $parentType, ?string $parentId, string $parentField, array $attachments): void
+    {
+        $currentLinkedAttachments = $this->attachmentsManager->getLinkedAttachments($parentType, $parentId, $parentField);
+
+        if (empty($attachments)) {
+            foreach ($currentLinkedAttachments as $currentLinkedAttachment) {
+                $this->attachmentsManager->unlinkAttachment($storageType, $currentLinkedAttachment, $parentField, $parentType, $parentId);
+            }
+            return;
+        }
+
+        $currentLinkedAttachmentsMap = [];
+        foreach ($currentLinkedAttachments as $currentLinkedAttachment) {
+            $type = $currentLinkedAttachment['attributes']['attachmentType'];
+            $currentAttachmentTypeMap = $currentLinkedAttachmentsMap[$type] ?? [];
+            $currentAttachmentTypeMap[$currentLinkedAttachment['id']] = true;
+            $currentLinkedAttachmentsMap[$type] = $currentAttachmentTypeMap;
+        }
+
+        $receivedItems = [];
+
+        foreach ($attachments as $key => $attachment) {
+            $id = $attachment['id'] ?? '';
+            $sourceId = $attachment['attributes']['source_record_id'] ?? '';
+            $type = $attachment['attributes']['attachmentType'] ?? '';
+            if (empty($id) || empty($sourceId)) {
+                continue;
+            }
+
+
+            if ($type === 'file') {
+                continue;
+            }
+
+            $receivedItemsByType = $receivedItems[$type] ?? [];
+            $receivedItemsByType[$id] = true;
+            $receivedItems[$type] = $receivedItemsByType;
+
+
+            if (isset($currentLinkedAttachmentsMap[$type][$id])) {
+                continue;
+            }
+
+            $this->attachmentsManager->linkAttachmentByDocument($sourceId, $type, $parentType, $parentId, $parentField);
+        }
+
+        foreach ($currentLinkedAttachments as $currentLinkedAttachment) {
+            $type = $currentLinkedAttachment['attributes']['attachmentType'];
+            if (!isset($receivedItems[$type][$currentLinkedAttachment['id']])) {
+                $this->attachmentsManager->unlinkAttachment($storageType, $currentLinkedAttachment, $parentField, $parentType, $parentId);
             }
         }
     }

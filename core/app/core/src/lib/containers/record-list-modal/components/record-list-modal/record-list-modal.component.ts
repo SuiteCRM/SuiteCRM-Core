@@ -119,6 +119,9 @@ export class RecordListModalComponent implements OnInit, OnDestroy {
             if (Object.values(this.store.recordList.selection.selected).length > 0) {
                 return;
             }
+            if (Object.values(this.store.recordList.selection.selected).length > 0) {
+                return;
+            }
             this.updateSelection();
         }));
 

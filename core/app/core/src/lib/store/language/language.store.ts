@@ -36,6 +36,7 @@ import {LocalStorageService} from '../../services/local-storage/local-storage.se
 import {Process, ProcessService} from '../../services/process/process.service';
 import {SystemConfigStore} from '../system-config/system-config.store';
 import {isString} from 'lodash-es';
+import {ModuleNameMapper} from "../../services/navigation/module-name-mapper/module-name-mapper.service";
 
 export interface LanguageStringMap {
     [key: string]: string;
@@ -152,7 +153,8 @@ export class LanguageStore implements StateStore {
         protected recordGQL: EntityGQL,
         protected localStorage: LocalStorageService,
         protected processService: ProcessService,
-        protected configs: SystemConfigStore
+        protected configs: SystemConfigStore,
+        protected moduleNameMapper: ModuleNameMapper
     ) {
 
         this.appStrings$ = this.state$.pipe(map(state => state.appStrings), distinctUntilChanged());
@@ -308,7 +310,7 @@ export class LanguageStore implements StateStore {
         let label = '';
 
         if (module) {
-            label = languages.modStrings[module] && languages.modStrings[module][labelKey];
+            label = (languages.modStrings[module] && languages.modStrings[module][labelKey]) || languages.modStrings[this.moduleNameMapper.toFrontend(module)] && languages.modStrings[this.moduleNameMapper.toFrontend(module)][labelKey];
         }
 
         if (!label) {

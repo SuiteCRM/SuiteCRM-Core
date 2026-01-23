@@ -275,7 +275,11 @@ class EmailProcessProcessor extends LegacyHandler
         $this->init();
 
         $isSurvey = !empty($attributes['survey_id']);
-        $hasParent = isset($attributes['parent_type'], $attributes['parent_id']);
+        $hasParent = false;
+
+        if (!empty($attributes['parent_type']) && !empty($attributes['parent_id'])) {
+            $hasParent = true;
+        }
 
         $replaceEmpty = true;
 

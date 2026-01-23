@@ -393,7 +393,7 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
         $mediaObject->setMimeType($attributes['mime_type'] ?? '');
         $mediaObject->setName($attributes['name'] ?? '');
         $mediaObject->setOriginalName($attributes['original_name'] ?? $attributes['name'] ?? '');
-        $mediaObject->setTemporary($attributes['temp'] ?? false);
+        $mediaObject->setTemporary($attributes['temporary'] ?? false);
         $mediaObject->setFile($attributes['file'] ?? null);
 
         return $mediaObject;

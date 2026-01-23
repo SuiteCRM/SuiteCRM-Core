@@ -30,11 +30,14 @@ import {DataTypeFormatter} from '../../../services/formatters/data-type.formatte
 import {DatetimeFormatter} from '../../../services/formatters/datetime/datetime-formatter.service';
 import {FieldLogicManager} from '../../field-logic/field-logic.manager';
 import {FieldLogicDisplayManager} from '../../field-logic-display/field-logic-display.manager';
+import {NgbDateStruct} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({template: ''})
 export class BaseDateTimeComponent extends BaseFieldComponent {
 
     vm$ = this.formatter.format$;
+    minDate: NgbDateStruct;
+    maxDate: NgbDateStruct;
 
     constructor(
         protected formatter: DatetimeFormatter,
@@ -46,7 +49,7 @@ export class BaseDateTimeComponent extends BaseFieldComponent {
     }
 
     getDateTimeFormat(): string {
-        if(this.field?.metadata?.date_time_format) {
+        if (this.field?.metadata?.date_time_format) {
             return this.field.metadata.date_time_format
         }
 
@@ -56,6 +59,25 @@ export class BaseDateTimeComponent extends BaseFieldComponent {
     protected toInternalFormat(fieldType, value): string {
         return this.formatter.toInternalFormat(value, {fromFormat: this.getDateTimeFormat()});
 
+    }
+
+    protected initMinDate(): void {
+        const minDateMetadata = this.field?.metadata?.minDate ?? {} as { year?: number; month?: number; day?: number };
+        this.minDate = {
+            year: minDateMetadata?.year ?? 1900,
+            month: minDateMetadata?.month ?? 1,
+            day: minDateMetadata?.day ?? 1
+        } as NgbDateStruct
+    }
+
+    protected initMaxDate(): void {
+
+        const maxDateMetadata = this.field?.metadata?.maxDate ?? {} as { year?: number; month?: number; day?: number };
+        this.maxDate = {
+            year: maxDateMetadata?.year ?? 2100,
+            month: maxDateMetadata?.month ?? 1,
+            day: maxDateMetadata?.day ?? 1
+        } as NgbDateStruct
     }
 
 }

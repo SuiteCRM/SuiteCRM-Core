@@ -224,8 +224,20 @@
 
       .dropdown-item {
         background-color: inherit;
-        box-shadow: 0 .2rem 1rem #00000026 !important;
+
+        &:first-child {
+          border-top-left-radius: 0.25rem;
+          border-top-right-radius: 0.25rem;
+        }
+
+        &:last-child {
+          border-bottom-left-radius: 0.25rem;
+          border-bottom-right-radius: 0.25rem;
+          box-shadow: 0 .2rem 1rem #00000026 !important;
+        }
       }
+
+
     }
 
 

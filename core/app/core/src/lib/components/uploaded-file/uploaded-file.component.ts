@@ -33,6 +33,7 @@ import {Attachment} from "./uploaded-file.model";
 import {NgIf} from "@angular/common";
 import {LabelModule} from "../label/label.module";
 import {animate, style, transition, trigger} from "@angular/animations";
+import {ModuleNameMapper} from "../../services/navigation/module-name-mapper/module-name-mapper.service";
 
 
 @Component({
@@ -75,8 +76,11 @@ export class UploadedFileComponent implements OnInit {
     errorClearButtonConfig: ButtonInterface;
     uploadedFile: WritableSignal<Attachment> = signal(null);
     textMaxWidth: WritableSignal<string> = signal('200px');
+    attachmentIcon: string;
 
-    constructor() {
+    constructor(
+        protected moduleNameMapper: ModuleNameMapper
+    ) {
     }
 
     ngOnInit(): void {
@@ -84,6 +88,7 @@ export class UploadedFileComponent implements OnInit {
         this.initMaxWidth();
 
         if (this.file) {
+            this.getIcon()
             this.uploadedFile.set(this.file);
         }
     }
@@ -113,5 +118,13 @@ export class UploadedFileComponent implements OnInit {
                 this.clear.emit(this.uploadedFile());
             }
         } as ButtonInterface;
+    }
+
+    protected getIcon() {
+        if (this.file?.attachmentType === 'file') {
+            return;
+        }
+
+        this.attachmentIcon = this.moduleNameMapper.toLegacy(this.file?.attachmentType ?? '');
     }
 }

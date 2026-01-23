@@ -36,23 +36,33 @@
     >
         <div class="uploaded-file-info-container"
              [class.uploaded-file-error]="file?.status() === 'error'">
-            <div class="uploaded-file-icon-container">
-                <div *ngIf="file?.status() === 'saved'">
-                    <scrm-image [image]="savedIcon" class="uploaded-file-icon"></scrm-image>
+            <ng-container *ngIf="file?.attachmentType === 'file'">
+                <div class="uploaded-file-icon-container">
+                    <div *ngIf="file?.status() === 'saved'">
+                        <scrm-image [image]="savedIcon" class="uploaded-file-icon"></scrm-image>
+                    </div>
+                    <div *ngIf="file?.status() === 'uploading'">
+                        <scrm-image [image]="uploadingIcon" class="uploaded-file-icon"></scrm-image>
+                    </div>
+                    <div *ngIf="file?.status() === 'uploaded'" @scaleInOut>
+                        <scrm-image [image]="uploadedIcon" class="uploaded-file-icon"></scrm-image>
+                    </div>
+                    <div *ngIf="file?.status() === 'error'" @scaleInOut>
+                        <scrm-image [image]="errorIcon"
+                                    class="uploaded-file-icon uploaded-file-icon-error"></scrm-image>
+                    </div>
                 </div>
-                <div *ngIf="file?.status() === 'uploading'">
-                    <scrm-image [image]="uploadingIcon" class="uploaded-file-icon"></scrm-image>
+            </ng-container>
+            <ng-container *ngIf="file?.attachmentType !== 'file'">
+                <div class="uploaded-file-icon-container">
+                    <div @scaleInOut>
+                        <scrm-image [image]="attachmentIcon ?? ''" class="uploaded-file-icon"></scrm-image>
+                    </div>
                 </div>
-                <div *ngIf="file?.status() === 'uploaded'" @scaleInOut>
-                    <scrm-image [image]="uploadedIcon" class="uploaded-file-icon"></scrm-image>
-                </div>
-                <div *ngIf="file?.status() === 'error'" @scaleInOut>
-                    <scrm-image [image]="errorIcon"
-                                class="uploaded-file-icon uploaded-file-icon-error"></scrm-image>
-                </div>
-            </div>
+            </ng-container>
             <div class="uploaded-file-info">
-                <a [href]="file?.contentUrl" download class="d-flex pr-1 clickable" [style.max-width]="textMaxWidth()" target="_blank">
+                <a [href]="file?.contentUrl" download class="d-flex pr-1 clickable" [style.max-width]="textMaxWidth()"
+                   target="_blank">
                     <span class="uploaded-file-name" [title]="file?.name">
                         {{ file?.name }}
                     </span>

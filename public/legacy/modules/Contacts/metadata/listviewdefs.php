@@ -59,8 +59,8 @@ $viewdefs['Contacts'] = [
                         'max' => 200
                     ]
                 ],
-                'print-as-pdf' => [
-                    'key' => 'print-as-pdf',
+                'contacts-print-as-pdf' => [
+                    'key' => 'contacts-print-as-pdf',
                     'labelKey' => 'LBL_PRINT_AS_PDF',
                     'modes' => ['list'],
                     'acl' => ['view'],

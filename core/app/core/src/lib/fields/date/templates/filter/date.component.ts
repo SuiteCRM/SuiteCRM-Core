@@ -78,6 +78,9 @@ export class DateFilterFieldComponent extends DateEditFieldComponent implements 
 
         this.field.value = current ?? '';
 
+        this.initMinDate();
+        this.initMaxDate();
+
         super.ngOnInit();
     }
 

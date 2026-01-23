@@ -33,6 +33,8 @@
            [class.is-invalid]="validateOnlyOnSubmit ? isInvalid() : (field.formControl.invalid && field.formControl.touched)"
            [formControl]="field.formControl"
            [startDate]="dateModel"
+           [minDate]="minDate"
+           [maxDate]="maxDate"
            (ngModelChange)="setModel($event)"
            #datepicker="ngbDatepicker">
     <span class="input-group-append align-items-end">

@@ -319,7 +319,6 @@ $dictionary['Note'] = array(
                         'modes' => ['edit', 'create'],
                         'params' => [
                             'fieldDependencies' => [
-                                'parent_type',
                                 'parent_name',
                             ],
                             'targetValueField' => 'parent_name',

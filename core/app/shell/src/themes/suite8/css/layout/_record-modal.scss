@@ -535,6 +535,15 @@ div.record-modal-backdrop {
     left: 0;
     width: fit-content;
 
+    &.has-maximized-modal {
+      .detached-modal:not(.maximized) {
+        display: none !important;
+      }
+      .detached-modal.maximized {
+        display: block !important;
+      }
+    }
+
     .detached-modal {
       float: left;
       margin-left: 0rem;

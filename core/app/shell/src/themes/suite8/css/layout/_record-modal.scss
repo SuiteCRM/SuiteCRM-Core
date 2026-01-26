@@ -193,6 +193,12 @@ body.modal-open.detached-modal-open {
         padding: .4rem .5rem;
         height: 29px;
         width: 28px;
+        line-height: 100%;
+      }
+
+      .minimise-button:hover {
+        color: $gray-700;
+        background-color: #f8f9fa;
       }
 
       .maximize-button {
@@ -202,6 +208,12 @@ body.modal-open.detached-modal-open {
         box-shadow: none;
         height: 29px;
         width: 28px;
+        line-height: 100%;
+      }
+
+      .maximize-button:hover {
+        color: $gray-700;
+        background-color: #f8f9fa;
       }
 
       .close-button {
@@ -211,11 +223,12 @@ body.modal-open.detached-modal-open {
         padding: .5rem .25rem;
         height: 29px;
         width: 28px;
+        line-height: 1.2;
       }
 
       .close-button:hover {
-        background-color: $white;
-        color: #212529;
+        color: $gray-700;
+        background-color: #f8f9fa;
       }
 
       .modal-title {

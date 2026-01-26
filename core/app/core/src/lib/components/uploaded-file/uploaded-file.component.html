@@ -61,12 +61,19 @@
                 </div>
             </ng-container>
             <div class="uploaded-file-info">
-                <a [href]="file?.contentUrl" download class="d-flex pr-1 clickable" [style.max-width]="textMaxWidth()"
-                   target="_blank">
+                <ng-container *ngIf="titleLink">
+                    <a [href]="file?.contentUrl" download class="d-flex pr-1 clickable" [style.max-width]="textMaxWidth()" target="_blank">
                     <span class="uploaded-file-name" [title]="file?.name">
                         {{ file?.name }}
                     </span>
-                </a>
+                    </a>
+                </ng-container>
+                <ng-container *ngIf="!titleLink">
+                    <span class="uploaded-file-name" [title]="file?.name">
+                        {{ file?.name }}
+                    </span>
+                </ng-container>
+
                 <span *ngIf="displaySize" class="uploaded-file-size" [style.max-width]="textMaxWidth()">
                     ({{ file?.size | fileSize }})
                 </span>

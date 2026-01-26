@@ -71,6 +71,7 @@ export class UploadedFileComponent implements OnInit {
     @Input() errorIcon: string = 'file-earmark-x';
     @Input() compact: boolean = false;
     @Input() displaySize: boolean = true;
+    @Input() titleLink: boolean = true;
     @Output('clear') clear: EventEmitter<Attachment> = new EventEmitter<Attachment>();
     clearButtonConfig: ButtonInterface;
     errorClearButtonConfig: ButtonInterface;

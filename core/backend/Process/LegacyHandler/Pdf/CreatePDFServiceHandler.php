@@ -104,13 +104,13 @@ class CreatePDFServiceHandler extends LegacyHandler
         return $result;
     }
 
-    public function parseTemplate($template, array $objectArr, bool $userFormat): array
+    public function parseTemplate(SugarBean $moduleBean, $template, array $objectArr, bool $userFormat): array
     {
         $this->init();
 
         $mapper = $this->getMapper();
 
-        [$header, $footer, $printable] = $mapper->parseTemplate($template, $objectArr, $userFormat);
+        [$header, $footer, $printable] = $mapper->parseTemplate($moduleBean, $template, $objectArr, $userFormat);
 
         $this->close();
 

@@ -188,7 +188,7 @@ class BasePDFManager extends LegacyHandler
 
             $objectArr = $this->setObjectArray($moduleBean);
 
-            [$header, $footer, $printable] = $this->pdfLegacyHandler->parseTemplate($templateBean, $objectArr, true);
+            [$header, $footer, $printable] = $this->pdfLegacyHandler->parseTemplate($moduleBean, $templateBean, $objectArr, true);
 
             $pdfContent = [
                 'header' => $header,
@@ -229,7 +229,7 @@ class BasePDFManager extends LegacyHandler
         $fileName = $this->getPdfName($templateBean->name);
         $objectArr = $this->setObjectArray($moduleBean);
 
-        [$header, $footer, $printable] = $this->pdfLegacyHandler->parseTemplate($templateBean, $objectArr, true);
+        [$header, $footer, $printable] = $this->pdfLegacyHandler->parseTemplate($moduleBean, $templateBean, $objectArr, true);
 
         $pdfContent = [
             'header' => $header,

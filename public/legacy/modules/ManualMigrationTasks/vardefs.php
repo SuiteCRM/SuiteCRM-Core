@@ -129,6 +129,23 @@ $dictionary['ManualMigrationTask'] = [
             'exportable' => false,
             'unified_search' => false,
         ],
+        'description' => [
+            'name' => 'description',
+            'vname' => 'LBL_DESCRIPTION',
+            'type' => 'text',
+            'comment' => 'Full text of the note',
+            'rows' => 6,
+            'cols' => 80,
+            'required' => false,
+            'display' => 'readonly',
+            'duplicate_merge' => 'disabled',
+            'reportable' => false,
+            'massupdate' => false,
+            'inline_edit' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false,
+        ],
     ],
     'relationships' => [
     ]

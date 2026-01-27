@@ -33,6 +33,7 @@ import {Record} from '../../../../common/record/record.model';
 import {StandardValidationErrors, StandardValidatorFn} from '../../../../common/services/validators/validators.model';
 import {ViewFieldDefinition} from '../../../../common/metadata/metadata.model';
 import {Field} from "../../../../common/record/field.model";
+import {isArray} from "lodash-es";
 
 export const requiredValidator = (utils: FormControlUtils): StandardValidatorFn => (
     (control: AbstractControl): StandardValidationErrors | null => {
@@ -144,6 +145,70 @@ export const multiflexrelateRequiredValidator = (viewField: ViewFieldDefinition,
     }
 );
 
+export const fileRequiredValidator = (viewField: ViewFieldDefinition, record: Record, utils: FormControlUtils): StandardValidatorFn => (
+    (control: AbstractControl): StandardValidationErrors | null => {
+        const name = viewField.name || '';
+
+        if (!name || !record || !record.fields) {
+            return null;
+        }
+
+        const field = record?.fields[name] ?? {} as Field;
+
+        if (!field) {
+            return null;
+        }
+
+        if (field?.valueObject && field?.valueObject?.id) {
+            return null;
+        }
+        return {
+            required: {
+                required: true,
+                message: {
+                    labelKey: 'LBL_VALIDATION_ERROR_REQUIRED',
+                    context: {}
+                }
+            }
+        };
+    }
+);
+
+export const attachmentsRequiredValidator = (viewField: ViewFieldDefinition, record: Record, utils: FormControlUtils): StandardValidatorFn => (
+    (control: AbstractControl): StandardValidationErrors | null => {
+        const name = viewField.name || '';
+
+        if (!name || !record || !record.fields) {
+            return null;
+        }
+
+        const field = record?.fields[name] ?? {} as Field;
+
+        if (!field) {
+            return null;
+        }
+
+        let activeItems: any = field?.valueList ?? field?.valueObject ?? null;
+
+        if (activeItems && isArray(activeItems) && activeItems.length > 0) {
+            return null;
+        }
+
+        if (activeItems && Object.values(activeItems).length > 0) {
+            return null;
+        }
+
+        return {
+            required: {
+                required: true,
+                message: {
+                    labelKey: 'LBL_VALIDATION_ERROR_REQUIRED',
+                    context: {}
+                }
+            }
+        };
+    }
+);
 
 
 @Injectable({
@@ -183,6 +248,14 @@ export class RequiredValidator implements ValidatorInterface {
 
         if (type === 'multiflexrelate') {
             return [multiflexrelateRequiredValidator(viewField, record, this.utils)];
+        }
+
+        if (type === 'file') {
+            return [fileRequiredValidator(viewField, record, this.utils)];
+        }
+
+        if (type === 'attachment') {
+            return [attachmentsRequiredValidator(viewField, record, this.utils)];
         }
 
         return [requiredValidator(this.utils)];

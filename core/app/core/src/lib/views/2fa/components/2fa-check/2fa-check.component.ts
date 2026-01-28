@@ -33,6 +33,8 @@ import {isTrue} from '../../../../common/utils/value-utils';
 import {LanguageStore} from "../../../../store/language/language.store";
 import {ButtonCallback, ButtonInterface} from "../../../../common/components/button/button.model";
 import {BaseRouteService} from "../../../../services/base-route/base-route.service";
+import {DraftsStore} from "../../../../store/drafts/drafts.store";
+import {DraftsService} from "../../../../store/drafts/drafts.service";
 
 @Component({
     selector: 'scrm-2fa-check',
@@ -53,6 +55,8 @@ export class TwoFactorCheckComponent implements OnInit{
                 protected message: MessageService,
                 protected appState: AppStateStore,
                 protected notificationStore: NotificationStore,
+                protected draftStore: DraftsStore,
+                protected draftsService: DraftsService,
                 protected router: Router,
                 protected baseRoute: BaseRouteService,
                 protected languageStore: LanguageStore
@@ -89,6 +93,8 @@ export class TwoFactorCheckComponent implements OnInit{
                 this.authService.setCurrentUser(response);
                 this.notificationStore.enableNotifications();
                 this.notificationStore.refreshNotifications();
+                this.draftStore.initStore();
+                this.draftsService.init();
 
                 if (response?.redirect && response?.redirect?.route) {
                     this.router.navigate(

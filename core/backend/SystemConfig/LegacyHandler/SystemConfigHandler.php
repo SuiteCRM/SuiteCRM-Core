@@ -103,6 +103,7 @@ class SystemConfigHandler extends LegacyHandler implements SystemConfigProviderI
      * @param array $listViewLineActionsLimits
      * @param array $listViewUrlQueryFilterMapping
      * @param array $uiConfigs
+     * @param array $draftsConfigs
      * @param array $notificationsConfigs
      * @param array $notificationsReloadActions
      * @param array $globalRecentlyViewedReloadActions
@@ -110,6 +111,7 @@ class SystemConfigHandler extends LegacyHandler implements SystemConfigProviderI
      * @param array $logoutConfig
      * @param array $sessionExpiredConfig
      * @param array $recordViewConvertIgnore
+     * @param array $recordViewDuplicateIgnore
      * @param array $recordViewSubpanelButtonLimits
      * @param RequestStack $session
      * @param NavigationProviderInterface $navigation
@@ -140,6 +142,7 @@ class SystemConfigHandler extends LegacyHandler implements SystemConfigProviderI
         array $listViewLineActionsLimits,
         array $listViewUrlQueryFilterMapping,
         array $uiConfigs,
+        array $draftsConfigs,
         array $notificationsConfigs,
         array $notificationsReloadActions,
         array $globalRecentlyViewedReloadActions,
@@ -181,6 +184,7 @@ class SystemConfigHandler extends LegacyHandler implements SystemConfigProviderI
         $this->injectedSystemConfigs['listview_line_actions_limits'] = $listViewLineActionsLimits;
         $this->injectedSystemConfigs['listview_url_query_filter_mapping'] = $listViewUrlQueryFilterMapping;
         $this->injectedSystemConfigs['ui'] = $uiConfigs ?? [];
+        $this->injectedSystemConfigs['ui']['drafts'] = $draftsConfigs ?? [];
         $this->injectedSystemConfigs['ui']['notifications'] = $notificationsConfigs ?? [];
         $this->injectedSystemConfigs['ui']['notifications_reload_actions'] = $notificationsReloadActions ?? [];
         $this->injectedSystemConfigs['ui']['global_recently_viewed_reload_actions'] = $globalRecentlyViewedReloadActions ?? [];

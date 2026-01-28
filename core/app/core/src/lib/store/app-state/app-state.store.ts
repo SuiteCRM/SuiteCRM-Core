@@ -36,6 +36,7 @@ import {LoadingBuffer} from '../../services/ui/loading-buffer/loading-buffer.ser
 import {SystemConfigStore} from '../system-config/system-config.store';
 import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
 import {RecordModalOptions} from "../../services/modals/record-modal.model";
+import {RecordThreadModalModel} from "../../services/modals/record-thread-modal.model";
 
 export interface AppState {
     loading?: boolean;
@@ -69,6 +70,10 @@ const initialState: AppState = {
 
 let internalState: AppState = deepClone(initialState);
 
+interface EventEmitterMap {
+    [key: string]: EventEmitter<any>;
+}
+
 @Injectable({
     providedIn: 'root',
 })
@@ -85,6 +90,13 @@ export class AppStateStore implements StateStore {
     isSidebarVisible$: Observable<boolean>;
     activeNavbarDropdown$: Observable<number>;
     recordModalOpenEventEmitter: EventEmitter<RecordModalOptions> = new EventEmitter<RecordModalOptions>();
+    recordThreadModalOpenEventEmitter: EventEmitter<RecordThreadModalModel> = new EventEmitter<RecordThreadModalModel>();
+    refreshDraftsEventEmitter: EventEmitter<boolean> = new EventEmitter<boolean>();
+    eventEmitterMapper: EventEmitterMap = {
+        'open-record-modal': this.recordModalOpenEventEmitter,
+        'open-record-thread-modal': this.recordThreadModalOpenEventEmitter,
+        'refresh-drafts': this.refreshDraftsEventEmitter,
+    };
 
     /**
      * ViewModel that resolves once all the data is ready (or updated)...

@@ -34,6 +34,8 @@ import {CloseButtonModule} from '../../../close-button/close-button.module';
 import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {MinimiseButtonModule} from "../../../minimise-button/minimise-button.module";
 import {DynamicLabelModule} from "../../../dynamic-label/dynamic-label.module";
+import {ActionGroupMenuModule} from "../../../action-group-menu/action-group-menu.module";
+import {ImageModule} from "../../../image/image.module";
 import {MaximizeButtonModule} from "../../../maximize-button/maximize-button.module";
 
 @NgModule({
@@ -47,7 +49,9 @@ import {MaximizeButtonModule} from "../../../maximize-button/maximize-button.mod
         NgbModalModule,
         MinimiseButtonModule,
         MaximizeButtonModule,
-        DynamicLabelModule
+        DynamicLabelModule,
+        ActionGroupMenuModule,
+        ImageModule
     ]
 })
 export class ModalModule {

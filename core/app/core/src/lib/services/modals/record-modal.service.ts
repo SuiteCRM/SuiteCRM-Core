@@ -117,9 +117,13 @@ export class RecordModalService {
         modal.componentInstance.dynamicDescriptionKey = recordModalOptions?.dynamicDescriptionKey ??'';
         modal.componentInstance.dynamicDescriptionContext = recordModalOptions?.dynamicDescriptionContext ??'';
         modal.componentInstance.parentId = parentId ?? '';
+        modal.componentInstance.recordId = recordModalOptions?.recordId ?? '';
         modal.componentInstance.parentModule = parentModule ?? '';
+        modal.componentInstance.modalHeaderActionsKlass = recordModalOptions?.headerActionsKlass ?? '';
         modal.componentInstance.headerClass = recordModalOptions.headerClass ?? '';
         modal.componentInstance.bodyClass = recordModalOptions.bodyClass ?? '';
+        modal.componentInstance.closable = recordModalOptions.closable ?? true;
+        modal.componentInstance.headerActionsKlass = recordModalOptions.headerActionsKlass ?? '';
         modal.componentInstance.footerClass = recordModalOptions.footerClass ?? '';
         modal.componentInstance.wrapperClass = recordModalOptions.wrapperClass ?? '';
         modal.componentInstance.closeConfirmationMessages = recordModalOptions.closeConfirmationMessage ?? [];

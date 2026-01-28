@@ -27,8 +27,8 @@
 -->
 <div [class]="klass" [class.minimizable]="minimizable" [ngClass]="{'minimized': isMinimized()}">
     <div class="modal-header pt-0 pb-0 {{headerKlass}} d-flex align-items-center">
-        <div class="modal-title"
-             (click)="minimizable ? toggleMinimize() : null">
+        <div class="modal-title {{titleClass}}" (click)="minimizable ? toggleMinimize() : null">
+            <scrm-image *ngIf="titleIcon" image="{{ titleIcon }}"></scrm-image>
             <scrm-label class="mt-1" *ngIf="titleKey && !dynamicTitleKey" [labelKey]="titleKey"></scrm-label>
             <scrm-dynamic-label *ngIf="dynamicTitleKey"
                                 class="mt-1"
@@ -36,7 +36,8 @@
                                 [fields]="dynamicTitleFields()"
                                 [context]="dynamicTitleContext()"
             ></scrm-dynamic-label>
-            <scrm-label class="small text-muted mt-2" *ngIf="descriptionKey && !dynamicDescriptionKey" [labelKey]="descriptionKey"></scrm-label>
+            <scrm-label class="small text-muted mt-2" *ngIf="descriptionKey && !dynamicDescriptionKey"
+                        [labelKey]="descriptionKey"></scrm-label>
             <scrm-dynamic-label *ngIf="dynamicDescriptionKey"
                                 class="small text-muted mt-2"
                                 [labelKey]="dynamicDescriptionKey"
@@ -44,12 +45,19 @@
                                 [context]="dynamicDescriptionContext()"
             ></scrm-dynamic-label>
             <span *ngIf="limit" class="small text-muted mt-1">
-                <scrm-label [labelKey]="limitLabel" ></scrm-label>
-                {{limit}}
-                <scrm-label *ngIf="limitEndLabel" [labelKey]="limitEndLabel" ></scrm-label>
-            </span>
+                    <scrm-label [labelKey]="limitLabel"></scrm-label>
+                {{ limit }}
+                <scrm-label *ngIf="limitEndLabel" [labelKey]="limitEndLabel"></scrm-label>
+                </span>
         </div>
         <div>
+            <ng-container *ngIf="headerActionsAdapter">
+                <scrm-action-group-menu class="{{headerActionsKlass}}"
+                                        [config]="headerActionsAdapter"
+                                        [actionContext]="headerActionContext"
+                >
+                </scrm-action-group-menu>
+            </ng-container>
             <scrm-minimise-button *ngIf="minimizable"
                                   [config]="minimiseButton"
                                   [status]="minimiseStatus()"

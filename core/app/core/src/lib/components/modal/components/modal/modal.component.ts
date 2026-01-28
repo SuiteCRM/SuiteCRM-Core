@@ -31,6 +31,7 @@ import {Observable, Subscription} from "rxjs";
 import {StringMap} from "../../../../common/types/string-map";
 import {FieldMap} from "../../../../common/record/field.model";
 import {toObservable} from "@angular/core/rxjs-interop";
+import {ActionContext} from "../../../../common/actions/action.model";
 import {MaximizeButtonStatus} from "../../../maximize-button/maximize-button.component";
 
 @Component({
@@ -44,13 +45,20 @@ export class ModalComponent implements OnInit, OnDestroy {
     @Input() headerKlass = '';
     @Input() bodyKlass = '';
     @Input() footerKlass = '';
+    @Input() titleClass = '';
+    @Input() closeOnOutsideClick = false;
     @Input() titleKey = '';
+    @Input() titleIcon = '';
     @Input() dynamicTitleKey = '';
+    @Input() headerActionsKlass = '';
     @Input() dynamicTitleContext: WritableSignal<StringMap> = signal({});
     @Input() dynamicTitleFields: WritableSignal<FieldMap> = signal({});
     @Input() descriptionKey = '';
+    @Input() openMinimised = false;
     @Input() dynamicDescriptionKey = '';
     @Input() dynamicDescriptionContext: WritableSignal<StringMap> = signal({});
+    @Input() headerActionsAdapter: any = null;
+    @Input() headerActionContext: ActionContext;
     @Input() dynamicDescriptionFields: WritableSignal<FieldMap> = signal({});
     @Input() limit = '';
     @Input() limitEndLabel = '';
@@ -79,6 +87,11 @@ export class ModalComponent implements OnInit, OnDestroy {
     protected subs: Subscription[] = [];
 
     ngOnInit(): void {
+
+        if ((this?.openMinimised ?? false)) {
+            this.isMinimized.set(true);
+        }
+
         if (this.isMinimized$) {
             this.subs.push(this.isMinimized$.subscribe(minimize => {
                 this.isMinimized.set(minimize);

@@ -202,7 +202,7 @@ export class RecordManager {
                 }
 
                 if (type === 'relate') {
-                    const relate = {} as any;
+                    let relate = {} as any;
 
                     if (rname) {
                         relate[rname] = params[paramKey];
@@ -210,6 +210,10 @@ export class RecordManager {
 
                     if (idName && params[idName]) {
                         relate.id = params[idName];
+                    }
+
+                    if (params[paramKey + '_record'] ?? false) {
+                        relate = this.mapRelateAttributes(params[paramKey + '_record']?.attributes ?? {}, relate);
                     }
 
                     record.attributes[paramKey] = relate;
@@ -298,5 +302,16 @@ export class RecordManager {
             }
         });
 
+    }
+
+    protected mapRelateAttributes(param: [], relate: {}) {
+        Object.entries(param).forEach(([key, value]) => {
+            if (key === 'id') {
+                return;
+            }
+            relate[key] = value;
+        });
+
+        return relate;
     }
 }

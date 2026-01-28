@@ -79,6 +79,7 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
         this.valuePipes.applySuffix = (value: string, filterArguments: string[] = []): string => this.applySuffix(value, filterArguments);
         this.valuePipes.uppercase = (value: string): string => this.toUpperCase(value);
         this.valuePipes.lowercase = (value: string): string => this.toLowerCase(value);
+        this.valuePipes.default = (value: string, filterArguments: string[]): string => this.showDefault(value, filterArguments);
 
         this.fieldPipes.int = (value: Field): string => this.fieldTypeFormat('int', value);
         this.fieldPipes.float = (value: Field): string => this.fieldTypeFormat('float', value);
@@ -358,5 +359,13 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
 
     protected toLowerCase(value: string) {
         return value.toLowerCase();
+    }
+
+    protected showDefault(value: string, filterArguments?: string[]) {
+        if (!isVoid(value) && value !== '') {
+            return value;
+        }
+
+        return filterArguments ? filterArguments[0] : '';
     }
 }

@@ -26,7 +26,6 @@
 
 import {Component, OnInit} from '@angular/core';
 import {SearchCriteria} from '../../common/views/list/search-criteria.model';
-import {deepClone} from '../../common/utils/object-utils';
 import {of} from 'rxjs';
 import {LanguageStore} from '../../store/language/language.store';
 import {RecordThreadConfig} from '../record-thread/components/record-thread/record-thread.model';

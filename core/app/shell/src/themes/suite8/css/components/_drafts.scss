@@ -1,0 +1,271 @@
+/*!*
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+#drafts-container {
+  position: fixed !important;
+  right: 20px;
+  bottom: -5px;
+  margin: 0;
+  transform: translate(0) !important;
+  width: max-content;
+  display: flex;
+  align-items: flex-end;
+  z-index: 1040 !important;
+
+  .drafts-button {
+    max-width: 4.25em;
+    min-width: 4.25em;
+    padding: .375rem 0!important;
+    &:hover{
+        background-color: $bright-purple!important;
+    }
+  }
+
+  .detached-modal {
+    position: fixed;
+    overflow: visible;
+    min-height: 25em;
+    background-color: $white;
+    width: 17em;
+    top: -410px;
+    left: -210px;
+    box-shadow: 0 .125rem .25rem #00000040!important;
+    margin-left: 0.5rem;
+    border-radius: 3px;
+
+    .drafts-modal-wrapper {
+      min-height: 25em;
+    }
+
+    .drafts-modal-container {
+      min-height: 25em;
+    }
+
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    .modal-header {
+      background-color: $main;
+
+      .minimise-button {
+        border: 0;
+        outline: 0;
+        color: $white;
+        fill: $white;
+        background-color: transparent;
+        margin: 0;
+        padding: .25rem .55rem;
+      }
+
+      .close-button {
+        color: $midnight-blue;
+        font-size: x-large!important;
+      }
+
+      .modal-title {
+        color: $white;
+      }
+    }
+
+    .modal-dialog {
+      margin: 0;
+    }
+
+    .modal-content {
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+      animation: none;
+      box-shadow: none!important;
+    }
+
+    .record-modal {
+    }
+
+    .record-modal.minimized {
+      width: 300px;
+
+      .modal-header {
+        margin-bottom: 0;
+        border-bottom: 0 !important;
+
+        .modal-title {
+          max-width: 226px;
+          overflow: hidden;
+
+          span {
+            max-width: 215px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            line-height: 1;
+          }
+        }
+
+      }
+    }
+  }
+
+}
+
+.minimized {
+  .drafts-header {
+    background-color: $midnight-blue !important;
+
+    .minimise-button {
+      fill: #fff !important;
+    }
+
+    .drafts-modal-title {
+      color: #fff !important;
+    }
+  }
+}
+
+.drafts-header {
+  padding-bottom: .15rem !important;
+  padding-top: .15rem !important;
+  background-color: #fff !important;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+
+  .minimise-button {
+    fill: $midnight-blue !important;
+  }
+
+  .drafts-modal-title {
+    margin-left: 0;
+    margin-bottom: 0.75rem;
+    color: $midnight-blue !important;
+    font-weight: bold;
+    font-size: smaller;
+  }
+
+  .drafts-modal-actions {
+    .button-group-button {
+      color: #8d74cc !important;
+      font-weight: 600;
+    }
+  }
+}
+
+.drafts-modal {
+  min-width: 25em;
+  display: inline;
+
+  .draft-item {
+    padding: 0 .5rem !important;
+    width: 100% !important;
+    display: table !important;
+    .record-thread-item-body {
+      box-shadow: none !important;
+      background-color: transparent !important;
+      border-bottom: 1px solid lightgrey !important;
+      border-radius: 0 !important;
+      padding: 0 .5rem !important;
+
+      .containerClass {
+        display: table!important;
+        width: 100% !important;
+
+        .draft-column-header {
+          align-items: center!important;
+
+          .draft-to-icon {
+            .sicon {
+              font-size: smaller;
+            }
+          }
+
+          .draft-to {
+            font-size: 95%;
+            color: $midnight-blue!important;
+            padding-top: 0.375rem;
+          }
+          .draft-column {
+            display: inline-table!important;
+          }
+
+          .draft-module-icon {
+            .field-type-icon {
+              .sicon {
+                fill: $bright-purple !important;
+                stroke: none;
+              }
+            }
+          }
+        }
+      }
+
+      .record-flexbox-row {
+        .drafts-name {
+          color: $median-grey !important;
+          padding-left: 2.15em;
+          position: relative;
+          top: -5px;
+          font-size: 108%;
+          padding-top: 0.15em;
+        }
+
+        .drafts-date-modified {
+          padding-left: 2.9em;
+          color: #696969 !important;
+          top: -8px;
+          position: relative;
+        }
+
+        .draft-item-buttons {
+          flex-grow: 1;
+          .sicon {
+            color: $bright-purple !important;
+          }
+        }
+      }
+    }
+  }
+
+  .record-thread-load-more {
+    .load-more-button {
+      color: $bright-purple !important;
+    }
+  }
+}
+
+.draft-modal-action {
+  .action-group-menu {
+    .button-group-button {
+      padding: 0 0 0.2rem 0;
+      margin: 0;
+
+      .sicon {
+        font-size: x-small;
+        fill: #fff;
+      }
+    }
+  }
+}

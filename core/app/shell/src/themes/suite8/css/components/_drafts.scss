@@ -37,8 +37,18 @@
 
   .drafts-button {
     max-width: 4.25em;
-    min-width: 4.25em;
+    min-width: 3.75em;
     padding: .375rem 0!important;
+
+    .drafts-caret {
+      fill: $white;
+      font-size: 65%;
+      padding-left: .25rem;
+      top: -1px;
+      position: relative;
+    }
+
+
     &:hover{
         background-color: $bright-purple!important;
     }
@@ -51,7 +61,7 @@
     background-color: $white;
     width: 17em;
     top: -410px;
-    left: -210px;
+    left: -218px;
     box-shadow: 0 .125rem .25rem #00000040!important;
     margin-left: 0.5rem;
     border-radius: 3px;
@@ -170,6 +180,17 @@
     .button-group-button {
       color: #8d74cc !important;
       font-weight: 600;
+
+      &:focus-visible {
+        outline: none!important;
+        box-shadow: none!important;
+        border: none!important;
+      }
+      &:focus {
+        outline: none!important;
+        box-shadow: none!important;
+        border: none!important;
+      }
     }
   }
 }
@@ -206,9 +227,19 @@
             font-size: 95%;
             color: $midnight-blue!important;
             padding-top: 0.375rem;
+            top: 2px;
+            position: relative;
           }
           .draft-column {
             display: inline-table!important;
+
+            .dynamic-label {
+              display: inline-block;
+              max-width: 115px;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              overflow: hidden;
+            }
           }
 
           .draft-module-icon {
@@ -230,6 +261,14 @@
           top: -5px;
           font-size: 108%;
           padding-top: 0.15em;
+
+          scrm-varchar-detail {
+            display: inline-block;
+            max-width: 135px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+          }
         }
 
         .drafts-date-modified {

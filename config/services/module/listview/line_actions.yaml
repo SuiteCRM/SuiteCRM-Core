@@ -47,6 +47,8 @@ parameters:
               params:
                 detached: true
                 headerClass: 'left-aligned-title'
+                closable: false
+                headerActionsKlass: 'draft-modal-action'
                 dynamicTitleKey: 'LBL_EMAIL_MODAL_DYNAMIC_TITLE'
                 modalOptions:
                   size: 'lg'

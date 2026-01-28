@@ -34,8 +34,8 @@ import {ConfirmationModalService} from "../../../services/modals/confirmation-mo
 import {SelectModalService} from "../../../services/modals/select-modal.service";
 import {MessageService} from "../../../services/message/message.service";
 import {RecordActionDisplayTypeLogic} from "../../../views/record/action-logic/display-type/display-type.logic";
-import {RecordModalActionManager} from "../actions/record-modal-action-manager.service";
-import {RecordModalActionsAdapter} from "./record-modal-actions.adapter";
+import {RecordModalActionManager} from "../actions/record-actions/record-modal-record-action-manager.service";
+import {RecordModalRecordActionsAdapter} from "./record-modal-record-actions.adapter";
 import {FieldModalService} from "../../../services/modals/field-modal.service";
 import {RecordMapperRegistry} from "../../../common/record/record-mappers/record-mapper.registry";
 import {BaseSaveRecordMapper} from "../../../store/record/record-mappers/base-save.record-mapper";
@@ -46,7 +46,7 @@ import {RecordManager} from "../../../services/record/record.manager";
 @Injectable({
     providedIn: 'root',
 })
-export class RecordModalActionsAdapterFactory {
+export class RecordModalRecordActionsAdapterFactory {
 
     constructor(
         protected metadata: MetadataStore,
@@ -67,8 +67,8 @@ export class RecordModalActionsAdapterFactory {
         recordMappers.register('default', baseMapper.getKey(), baseMapper);
     }
 
-    create(store: RecordModalStore, activeModal: NgbActiveModal): RecordModalActionsAdapter {
-        return new RecordModalActionsAdapter(
+    create(store: RecordModalStore, activeModal: NgbActiveModal): RecordModalRecordActionsAdapter {
+        return new RecordModalRecordActionsAdapter(
             store,
             activeModal,
             this.metadata,

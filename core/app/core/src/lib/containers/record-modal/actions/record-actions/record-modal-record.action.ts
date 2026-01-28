@@ -24,17 +24,18 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {ModuleNavigation} from '../../../services/navigation/module-navigation/module-navigation.service';
-import {RecordModalStore} from "../store/record-modal/record-modal.store";
-import {Action, ActionHandler, RecordBasedActionData} from "../../../common/actions/action.model";
-import {Record} from "../../../common/record/record.model";
+import {ModuleNavigation} from '../../../../services/navigation/module-navigation/module-navigation.service';
+import {RecordModalStore} from "../../store/record-modal/record-modal.store";
+import {Action, ActionHandler, RecordBasedActionData} from "../../../../common/actions/action.model";
+import {Record} from "../../../../common/record/record.model";
 
 export interface RecordModalActionData extends RecordBasedActionData {
     store: RecordModalStore;
     action?: Action;
+    record?: Record;
 }
 
-export abstract class RecordModalActionHandler extends ActionHandler<RecordModalActionData> {
+export abstract class RecordModalRecordActionHandler extends ActionHandler<RecordModalActionData> {
 
     abstract run(data: RecordModalActionData): void;
 

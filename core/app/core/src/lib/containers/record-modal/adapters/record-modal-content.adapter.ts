@@ -32,7 +32,7 @@ import {RecordContentConfig, RecordContentDataSource} from "../../../components/
 import {RecordValidationHandler} from "../../../services/record/validation/record-validation.handler";
 import {RecordModalStore} from "../store/record-modal/record-modal.store";
 import {LanguageStore} from "../../../store/language/language.store";
-import {RecordModalActionManager} from "../actions/record-modal-action-manager.service";
+import {RecordModalActionManager} from "../actions/record-actions/record-modal-record-action-manager.service";
 import {Action} from "../../../common/actions/action.model";
 import {ViewMode} from "../../../common/views/view.model";
 import {Panel} from "../../../common/metadata/metadata.model";

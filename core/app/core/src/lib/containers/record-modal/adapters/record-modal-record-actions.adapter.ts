@@ -38,8 +38,8 @@ import {BaseRecordActionsAdapter} from '../../../services/actions/base-record-ac
 import {SelectModalService} from '../../../services/modals/select-modal.service';
 import {RecordModalStore} from "../store/record-modal/record-modal.store";
 import {RecordActionDisplayTypeLogic} from "../../../views/record/action-logic/display-type/display-type.logic";
-import {RecordModalActionManager} from "../actions/record-modal-action-manager.service";
-import {RecordModalActionData} from "../actions/record-modal.action";
+import {RecordModalActionManager} from "../actions/record-actions/record-modal-record-action-manager.service";
+import {RecordModalActionData} from "../actions/record-actions/record-modal-record.action";
 import {Action, ActionContext, ActionHandler} from "../../../common/actions/action.model";
 import {ViewMode} from "../../../common/views/view.model";
 import {
@@ -55,7 +55,7 @@ import {FieldLogicManager} from "../../../fields/field-logic/field-logic.manager
 import {RecordManager} from "../../../services/record/record.manager";
 
 @Injectable()
-export class RecordModalActionsAdapter extends BaseRecordActionsAdapter<RecordModalActionData> {
+export class RecordModalRecordActionsAdapter extends BaseRecordActionsAdapter<RecordModalActionData> {
 
     constructor(
         protected store: RecordModalStore,

@@ -26,15 +26,15 @@
 
 import {Injectable} from '@angular/core';
 import { NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {MessageModalComponent} from '../../../../components/modal/components/message-modal/message-modal.component';
-import {RecordModalActionData, RecordModalActionHandler} from "../record-modal.action";
-import {ViewMode} from "../../../../common/views/view.model";
-import {ModalButtonInterface} from "../../../../common/components/modal/modal.model";
+import {MessageModalComponent} from '../../../../../components/modal/components/message-modal/message-modal.component';
+import {RecordModalActionData, RecordModalRecordActionHandler} from "../record-modal-record.action";
+import {ViewMode} from "../../../../../common/views/view.model";
+import {ModalButtonInterface} from "../../../../../common/components/modal/modal.model";
 
 @Injectable({
     providedIn: 'root'
 })
-export class RecordModalCancelAction extends RecordModalActionHandler {
+export class RecordModalCancelAction extends RecordModalRecordActionHandler {
 
     key = 'cancel';
     modes = ['edit', 'create'] as ViewMode[];

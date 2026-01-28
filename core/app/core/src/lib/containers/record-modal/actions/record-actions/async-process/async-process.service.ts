@@ -25,25 +25,39 @@
  */
 
 import {Injectable} from '@angular/core';
-import {RecordModalActionData} from './record-modal.action';
-import {BaseActionManager} from '../../../services/actions/base-action-manager.service';
-import {RecordModalCancelAction} from "./cancel/record-modal-cancel.action";
-import {RecordModalSaveAction} from "./save/record-modal-save.action";
-import {AsyncProcessRecordModalAction} from "./async-process/async-process.service";
+import {RecordModalActionData, RecordModalRecordActionHandler} from "../record-modal-record.action";
+import {ALL_VIEW_MODES} from "../../../../../common/views/view.model";
 
 @Injectable({
-    providedIn: 'root',
+    providedIn: 'root'
 })
-export class RecordModalActionManager extends BaseActionManager<RecordModalActionData> {
+export class AsyncProcessRecordModalAction extends RecordModalRecordActionHandler {
 
-    constructor(
-        protected cancel: RecordModalCancelAction,
-        protected save: RecordModalSaveAction,
-        protected async: AsyncProcessRecordModalAction,
-    ) {
+    key = 'async-process';
+    modes = ALL_VIEW_MODES;
+
+    constructor() {
         super();
-        cancel.modes.forEach(mode => this.actions[mode][cancel.key] = cancel);
-        save.modes.forEach(mode => this.actions[mode][save.key] = save);
-        async.modes.forEach(mode => this.actions[mode][async.key] = async);
+    }
+
+    run(data: RecordModalActionData): void {
+    }
+
+    shouldDisplay(data: RecordModalActionData): boolean {
+        const defaultAcls = data?.action?.acl ?? [];
+        const aclModule = data?.action?.aclModule ?? '';
+        if (!defaultAcls.length) {
+            return true;
+        }
+
+        if (aclModule !== data?.store?.getModuleName()) {
+            return true
+        }
+
+        if (data?.store?.getMode() === 'create') {
+            return true;
+        }
+
+        return this.checkRecordAccess(data, defaultAcls);
     }
 }

@@ -29,7 +29,7 @@ import {RecordModalContentAdapter} from "./record-modal-content.adapter";
 import {MetadataStore} from "../../../store/metadata/metadata.store.service";
 import {LanguageStore} from "../../../store/language/language.store";
 import {RecordModalStore} from "../store/record-modal/record-modal.store";
-import {RecordModalActionManager} from "../actions/record-modal-action-manager.service";
+import {RecordModalActionManager} from "../actions/record-actions/record-modal-record-action-manager.service";
 import {RecordValidationHandler} from "../../../services/record/validation/record-validation.handler";
 
 @Injectable({

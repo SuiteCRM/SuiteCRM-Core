@@ -27,18 +27,18 @@
 import {Injectable} from '@angular/core';
 import {take} from 'rxjs/operators';
 import {Router} from "@angular/router";
-import {MessageService} from '../../../../services/message/message.service';
-import {ModuleNavigation} from '../../../../services/navigation/module-navigation/module-navigation.service';
-import {NotificationStore} from '../../../../store/notification/notification.store';
-import {RecordModalActionData, RecordModalActionHandler} from "../record-modal.action";
+import {MessageService} from '../../../../../services/message/message.service';
+import {ModuleNavigation} from '../../../../../services/navigation/module-navigation/module-navigation.service';
+import {NotificationStore} from '../../../../../store/notification/notification.store';
+import {RecordModalActionData, RecordModalRecordActionHandler} from "../record-modal-record.action";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {ViewMode} from "../../../../common/views/view.model";
-import {FieldMap} from "../../../../common/record/field.model";
+import {ViewMode} from "../../../../../common/views/view.model";
+import {FieldMap} from "../../../../../common/record/field.model";
 
 @Injectable({
     providedIn: 'root'
 })
-export class RecordModalSaveAction extends RecordModalActionHandler {
+export class RecordModalSaveAction extends RecordModalRecordActionHandler {
 
     key = 'save';
     modes = ['edit', 'create'] as ViewMode[];

@@ -65,7 +65,7 @@ export class ClassicViewUiComponent implements OnInit, OnDestroy, AfterViewInit 
 
         const options = JSON.parse(event.data);
 
-        if (options.type === 'record-modal'){
+        if (options.type === 'record-modal') {
             const modalOptions = options.params as RecordModalOptions;
             this.loadModal(modalOptions);
         }
@@ -135,6 +135,10 @@ export class ClassicViewUiComponent implements OnInit, OnDestroy, AfterViewInit 
         this.iframe = iframe;
 
         this.iframe.style.display = 'block';
+
+        this.iframe.contentWindow.addEventListener('click', () => {
+            window.parent.postMessage('iframe-clicked', '*');
+        });
 
         this.initObservers();
     }

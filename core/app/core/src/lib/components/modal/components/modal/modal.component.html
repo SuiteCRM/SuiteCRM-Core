@@ -25,7 +25,7 @@
 * the words "Supercharged by SuiteCRM".
 */
 -->
-<div [class]="klass" [class.minimizable]="minimizable" [ngClass]="{'minimized': isMinimized()}">
+<div #modal [class]="klass" [class.minimizable]="minimizable" [ngClass]="{'minimized': isMinimized()}">
     <div class="modal-header pt-0 pb-0 {{headerKlass}} d-flex align-items-center">
         <div class="modal-title {{titleClass}}" (click)="minimizable ? toggleMinimize() : null">
             <scrm-image *ngIf="titleIcon" image="{{ titleIcon }}"></scrm-image>

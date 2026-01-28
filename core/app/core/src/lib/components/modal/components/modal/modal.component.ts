@@ -24,7 +24,17 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal, WritableSignal} from '@angular/core';
+import {
+    Component, ElementRef,
+    EventEmitter,
+    HostListener,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    signal, ViewChild,
+    WritableSignal
+} from '@angular/core';
 import {ButtonInterface} from '../../../../common/components/button/button.model';
 import {MinimiseButtonStatus} from "../../../minimise-button/minimise-button.component";
 import {Observable, Subscription} from "rxjs";
@@ -74,6 +84,7 @@ export class ModalComponent implements OnInit, OnDestroy {
     @Output('onMinimizeToggle') onMinimizeToggle: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Output('onMaximizeToggle') onMaximizeToggle: EventEmitter<boolean> = new EventEmitter<boolean>();
 
+    @ViewChild('modal') modalDiv: ElementRef;
     isMinimized: WritableSignal<boolean> = signal(false);
     minimiseButton: ButtonInterface;
     minimiseStatus: WritableSignal<MinimiseButtonStatus> = signal('maximised');
@@ -83,6 +94,41 @@ export class ModalComponent implements OnInit, OnDestroy {
     maximizeButton: ButtonInterface;
     maximizeStatus: WritableSignal<MaximizeButtonStatus> = signal('inactive');
     maximizeStatus$: Observable<MaximizeButtonStatus> = toObservable(this.maximizeStatus);
+
+
+    @HostListener('window:click', ['$event'])
+    onWindowClick(event: MouseEvent): void {
+        if (this?.closeOnOutsideClick && this.closable) {
+            const clickedInside = this.modalDiv?.nativeElement.contains(event.target);
+
+            if (clickedInside){
+                return;
+            }
+
+            if (!this?.close?.onClick) {
+                return;
+            }
+
+            this.close.onClick();
+        }
+    }
+
+    @HostListener('window:message', ['$event'])
+    onMessage(event) {
+        if (event?.data !== 'iframe-clicked') {
+            return;
+        }
+
+        if (!this.closeOnOutsideClick || !this.closable) {
+            return;
+        }
+
+        if (!this?.close?.onClick) {
+            return;
+        }
+
+        this.close?.onClick();
+    }
 
     protected subs: Subscription[] = [];
 

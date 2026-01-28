@@ -156,6 +156,7 @@ body.modal-open.detached-modal-open {
   pointer-events: none;
 
   &.has-maximized-modal {
+    right: 0 !important;
     .detached-modal:not(.maximized) {
       z-index: 1070;
     }

@@ -66,6 +66,7 @@ services:
       $massupdate: '%massupdate%'
       $uiConfigs: '%ui%'
       $notificationsConfigs: '%notifications%'
+      $draftsConfigs: '%drafts%'
       $notificationsReloadActions: '%notifications_reload_actions%'
       $globalRecentlyViewedReloadActions: '%global_recently_viewed_reload_actions%'
       $systemSettings: '%system.settings%'

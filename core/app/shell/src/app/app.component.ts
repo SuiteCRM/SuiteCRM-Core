@@ -37,7 +37,6 @@ import {
 import {AppState, AppStateStore, StateManager, SystemConfigStore, NotificationStore, RecentlyViewedService, DraftsService} from 'core';
 import {Observable} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
-import {Field} from "common";
 
 @Component({
     selector: 'app-root',
@@ -120,23 +119,31 @@ export class AppComponent implements OnInit {
         const countValue = this.draftsService?.draftsCount();
         const count = countValue > 10 ? '10+' : String(countValue);
 
+        const caretSignal = signal(
+            this.draftsService?.modal?.componentInstance ? 'arrow_down_filled' : 'arrow_up_filled'
+        );
+
         return {
             icon: 'send',
             klass: 'btn drafts-button btn-main',
             iconKlass: 'pr-1',
             dynamicLabelKey: 'LBL_DRAFTS_TOTAL',
+            dynamicEndIcon: caretSignal,
+            endIconKlass: 'drafts-caret',
             dynamicLabelFields: {
                 count: {
                     value: count,
                     type: 'varchar',
-                } as Field
+                }
             },
             onClick: () => {
                 if (this.draftsService?.modal?.componentInstance) {
                     this.draftsService?.closeModal();
+                    caretSignal.set('arrow_up_filled');
                     return;
                 }
                 this.draftsService.showModal();
+                caretSignal.set('arrow_down_filled');
             }
         };
     }

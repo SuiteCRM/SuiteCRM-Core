@@ -35,6 +35,8 @@ import {AsyncActionInput} from "../../services/process/processes/async-action/as
 import {BaseRecordContainerStoreInterface} from "../containers/record/record-container.store.model";
 import {WritableSignal} from "@angular/core";
 
+export declare type ActionCallback = (...args) => void;
+
 export interface ActionData {
     [key: string]: any;
 
@@ -93,6 +95,7 @@ export interface Action {
     titleKey?: string;
     descriptionKey?: string;
     label?: string;
+    preActionOnClick?: ActionCallback;
     icon?: string;
     klass?: string[];
     status?: string;

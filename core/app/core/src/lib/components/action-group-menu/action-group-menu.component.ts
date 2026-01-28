@@ -282,6 +282,9 @@ export class ActionGroupMenuComponent implements OnInit, AfterViewInit, OnDestro
                 if (inlineConfirmation) {
                     this.triggerTemporaryLoading();
                     const callback = (): void => {
+                        if (action?.preActionOnClick) {
+                            action.preActionOnClick();
+                        }
                         this.config.runAction(action, this.actionContext);
                     }
                     this.initInlineConfirmation(action, callback);
@@ -289,6 +292,9 @@ export class ActionGroupMenuComponent implements OnInit, AfterViewInit, OnDestro
                     return;
                 }
 
+                if (action?.preActionOnClick) {
+                    action.preActionOnClick();
+                }
                 this.config.runAction(action, this.actionContext);
             }
         } as ButtonInterface;

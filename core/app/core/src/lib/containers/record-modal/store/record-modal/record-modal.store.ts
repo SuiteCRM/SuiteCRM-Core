@@ -210,6 +210,24 @@ export class RecordModalStore implements StateStore, BaseRecordContainerStoreInt
                 blankRecord,
                 true
             );
+        } else if (mode === 'edit') {
+            const blankRecord = deepClone({
+                id: recordID ?? '',
+                type: '',
+                module: module,
+                attributes: {
+                    assigned_user_id: this?.appStateStore?.getCurrentUser().id,
+                    assigned_user_name: {
+                        id: this.appStateStore?.getCurrentUser()?.id,
+                        user_name: this.appStateStore?.getCurrentUser()?.userName
+                    },
+                },
+            } as Record);
+
+            this.recordManager.injectParamFields(params, blankRecord, this.getVardefs());
+            this.recordStore.init(
+                blankRecord,
+            );
         } else {
             this.load().pipe(
                 take(1)).subscribe();

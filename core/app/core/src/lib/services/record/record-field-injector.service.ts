@@ -62,6 +62,8 @@ export class RecordFieldInjector {
         if (isObject(path)) {
             return this.mapValueObject(path, parentRecord);
         }
+
+        return path;
     }
 
     private mapValueArray(configArray: any[], parentRecord: Record) {

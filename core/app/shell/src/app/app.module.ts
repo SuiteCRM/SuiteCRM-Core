@@ -63,6 +63,7 @@ import {
     RecordModalComponent,
     RecordModule,
     SidebarComponent,
+    ButtonModule,
     TableModule
 } from 'core';
 
@@ -91,6 +92,7 @@ export const initializeApp = (appInitService: AppInit) => (): Promise<any> => ap
         ListModule,
         RecordModule,
         CreateRecordModule,
+        ButtonModule,
         InstallViewModule,
         TableModule,
         ModuleTitleModule,
@@ -101,6 +103,7 @@ export const initializeApp = (appInitService: AppInit) => (): Promise<any> => ap
         ImageModule,
         BrowserAnimationsModule,
         NgbModule,
+        ButtonModule,
         FullPageSpinnerModule,
         MessageModalModule,
         RecordListModalModule,

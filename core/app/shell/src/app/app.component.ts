@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, ViewChild, ViewContainerRef} from '@angular/core';
+import {Component, OnInit, signal, ViewChild, ViewContainerRef, WritableSignal} from '@angular/core';
 import {
     Event,
     NavigationCancel,
@@ -34,18 +34,22 @@ import {
     Router,
     RouterEvent
 } from '@angular/router';
-import {AppState, AppStateStore, StateManager, SystemConfigStore, NotificationStore, RecentlyViewedService} from 'core';
+import {AppState, AppStateStore, StateManager, SystemConfigStore, NotificationStore, RecentlyViewedService, DraftsService} from 'core';
 import {Observable} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
+import {Field} from "common";
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
     @ViewChild('mainOutlet', {read: ViewContainerRef, static: true})
     mainOutlet: ViewContainerRef | undefined;
     appState$: Observable<AppState> = this.appStateStore.vm$.pipe(debounceTime(0));
+
+    draftsButton: WritableSignal<{}> = signal({});
+    showDrafts: WritableSignal<boolean> = signal(false);
 
     constructor(
         private router: Router,
@@ -53,9 +57,15 @@ export class AppComponent {
         protected stateManager: StateManager,
         protected systemConfigs: SystemConfigStore,
         protected notificationStore: NotificationStore,
-        protected recentlyViewed: RecentlyViewedService
+        protected recentlyViewed: RecentlyViewedService,
+        protected draftsService: DraftsService
     ) {
         router.events.subscribe((routerEvent: Event | RouterEvent) => this.checkRouterEvent(routerEvent));
+    }
+
+
+    ngOnInit(): void {
+        this.initDraftsConfig();
     }
 
     protected checkRouterEvent(routerEvent: Event | RouterEvent): void {
@@ -103,6 +113,39 @@ export class AppComponent {
                 this.stateManager.clearBackendCacheable();
                 return true;
             }
+        });
+    }
+
+    protected initDraftsButton() {
+        const countValue = this.draftsService?.draftsCount();
+        const count = countValue > 10 ? '10+' : String(countValue);
+
+        return {
+            icon: 'send',
+            klass: 'btn drafts-button btn-main',
+            iconKlass: 'pr-1',
+            dynamicLabelKey: 'LBL_DRAFTS_TOTAL',
+            dynamicLabelFields: {
+                count: {
+                    value: count,
+                    type: 'varchar',
+                } as Field
+            },
+            onClick: () => {
+                if (this.draftsService?.modal?.componentInstance) {
+                    this.draftsService?.closeModal();
+                    return;
+                }
+                this.draftsService.showModal();
+            }
+        };
+    }
+
+    protected initDraftsConfig() {
+        this.showDrafts = this.draftsService.showDrafts;
+        this.draftsButton.set(this.initDraftsButton());
+        this.draftsService.draftsCount$.pipe().subscribe(() => {
+            this.draftsButton.set(this.initDraftsButton());
         });
     }
 }

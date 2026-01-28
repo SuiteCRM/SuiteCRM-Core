@@ -42,6 +42,32 @@ $viewdefs['Emails']['ModalComposeView'] = [
             ['label' => '10', 'field' => '30']
         ],
     ],
+    'recordModalActions' => [
+        'actions' => [
+            'close-draft' => [
+                'key' => 'close-draft',
+                'icon' => 'cross',
+                'klass' => ['btn btn-sm'],
+                'asyncProcess' => true,
+                'params' => [
+                    'expanded' => true,
+                    'closeModal' => true,
+                ],
+                'modes' => ['detail', 'edit', 'create'],
+            ],
+        ],
+        'exclude' => [
+            'delete',
+            'edit',
+            'save',
+            'saveNew',
+            'saveContinue',
+            'saveSchedule',
+            'duplicate',
+            'cancel',
+            'cancelCreate',
+        ]
+    ],
     'recordActions' => [
         'actions' => [
             'insert-email-template' => [

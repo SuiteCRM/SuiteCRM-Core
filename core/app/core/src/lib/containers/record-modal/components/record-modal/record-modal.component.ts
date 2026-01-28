@@ -60,6 +60,7 @@ import {FieldMap} from "../../../../common/record/field.model";
 import {deepClone} from "../../../../common/utils/object-utils";
 import {ConfirmationModalService} from "../../../../services/modals/confirmation-modal.service";
 import {ModalComponent} from "../../../../components/modal/components/modal/modal.component";
+import {RecordModalHeaderActionsAdapterFactory} from "../../adapters/record-modal-header-actions.adapter.factory";
 
 @Component({
     selector: 'scrm-record-modal',
@@ -96,9 +97,12 @@ export class RecordModalComponent implements OnInit, OnDestroy {
     @Input() recordId: string = '';
     @Input() parentId: string = '';
     @Input() parentModule: string = '';
+    @Input() closable: boolean = true;
+    @Input() modalHeaderActionsKlass: string = '';
     @Input() mappedFields: ObjectMap = null;
     @Input() contentAdapter: any = null;
     @Input() actionsAdapter: any = null;
+    @Input() modalHeaderActionsAdapter: any = null;
     @Input() headerClass: string = '';
     @Input() bodyClass: string = '';
     @Input() footerClass: string = '';
@@ -137,13 +141,12 @@ export class RecordModalComponent implements OnInit, OnDestroy {
         protected storeFactory: RecordModalStoreFactory,
         protected confirmation: ConfirmationModalService,
         protected recordModalContentAdapterFactory: RecordModalContentAdapterFactory,
-        protected recordModalActionsAdapterFactory: RecordModalActionsAdapterFactory
+        protected recordModalActionsAdapterFactory: RecordModalRecordActionsAdapterFactory,
+        protected recordModalModalActionsActionsAdapterFactory: RecordModalHeaderActionsAdapterFactory,
     ) {
     }
 
     ngOnInit(): void {
-
-
         this.closeButton = {
             klass: ['btn', 'btn-outline-light', 'btn-sm'],
             icon: 'x',
@@ -172,8 +175,9 @@ export class RecordModalComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.subs.forEach(sub => sub.unsubscribe());
-        this.contentAdapter = null
-        this.actionsAdapter = null
+        this.contentAdapter = null;
+        this.actionsAdapter = null;
+        this.modalHeaderActionsAdapter = null;
 
         this.disableBackdrop();
 
@@ -187,12 +191,14 @@ export class RecordModalComponent implements OnInit, OnDestroy {
         this.subs = [];
         this.contentAdapter = null;
         this.actionsAdapter = null;
+        this.modalHeaderActionsAdapter = null;
         this.modalStore = null;
 
 
         this.modalStore = this.storeFactory.create(this.metadataView);
         this.contentAdapter = this.recordModalContentAdapterFactory.create(this.modalStore);
         this.actionsAdapter = this.recordModalActionsAdapterFactory.create(this.modalStore, this.activeModal);
+        this.modalHeaderActionsAdapter = this.recordModalModalActionsActionsAdapterFactory.create(this.modalStore, this.activeModal);
 
         this.subs.push(
             this.modalStore.loadMetadata(this.module).pipe(take(1)).subscribe(() => {

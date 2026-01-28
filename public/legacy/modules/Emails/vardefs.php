@@ -297,6 +297,16 @@ $dictionary['Email'] = array(
             'inline_edit' => false,
 
         ),
+        'addrs_metadata' => array(
+            'name' => 'addrs_metadata',
+            'type' => 'text',
+        ),
+        'to_icon_type' => [
+            'name' => 'to_icon_type',
+            'type' => 'varchar',
+            'source' => 'non-db',
+            'inline_edit' => false,
+        ],
         'parent_id' => array(
             'name' => 'parent_id',
             'vname' => 'LBL_PARENT_ID',

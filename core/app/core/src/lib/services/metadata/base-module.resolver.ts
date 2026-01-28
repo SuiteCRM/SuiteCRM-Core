@@ -42,6 +42,7 @@ import {RouteConverter} from "../navigation/route-converter/route-converter.serv
 import {AppMetadataStore} from '../../store/app-metadata/app-metadata.store.service';
 import {AuthService} from '../auth/auth.service';
 import {RecordModalService} from "../modals/record-modal.service";
+import {RecordThreadModalService} from "../../store/record-thread-modal/record-thread-modal.service";
 
 @Injectable({providedIn: 'root'})
 export class BaseModuleResolver extends BaseMetadataResolver {
@@ -59,6 +60,7 @@ export class BaseModuleResolver extends BaseMetadataResolver {
         protected routeConverter: RouteConverter,
         protected appMetadata: AppMetadataStore,
         protected recordModalService: RecordModalService,
+        protected recordThreadModalService: RecordThreadModalService,
         protected auth: AuthService
     ) {
         super(
@@ -72,6 +74,7 @@ export class BaseModuleResolver extends BaseMetadataResolver {
             messageService,
             appMetadata,
             recordModalService,
+            recordThreadModalService,
             auth
         );
     }

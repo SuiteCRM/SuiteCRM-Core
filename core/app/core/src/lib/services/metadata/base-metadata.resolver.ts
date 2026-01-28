@@ -40,6 +40,7 @@ import {ModuleNameMapper} from '../navigation/module-name-mapper/module-name-map
 import {AppMetadataStore} from '../../store/app-metadata/app-metadata.store.service';
 import {AuthService} from '../auth/auth.service';
 import {RecordModalService} from "../modals/record-modal.service";
+import {RecordThreadModalService} from "../../store/record-thread-modal/record-thread-modal.service";
 
 
 @Injectable({providedIn: 'root'})
@@ -56,6 +57,7 @@ export class BaseMetadataResolver  {
         protected messageService: MessageService,
         protected appMetadata: AppMetadataStore,
         protected recordModalService: RecordModalService,
+        protected recordThreadModalService: RecordThreadModalService,
         protected auth: AuthService
     ) {
     }
@@ -69,6 +71,11 @@ export class BaseMetadataResolver  {
                         this.appMetadata.loadModuleMetadata(module).pipe(take(1)).subscribe(() => {
                             if (!this.recordModalService.initialized) {
                                 this.recordModalService.init();
+                            }
+
+
+                            if (!this.recordThreadModalService.initialized){
+                                this.recordThreadModalService.init();
                             }
                         });
                     }, 0)

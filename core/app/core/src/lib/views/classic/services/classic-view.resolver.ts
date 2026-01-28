@@ -43,6 +43,7 @@ import {RecentlyViewedService} from '../../../services/navigation/recently-viewe
 import {forkJoin} from 'rxjs';
 import {MetadataStore} from '../../../store/metadata/metadata.store.service';
 import {RecordModalService} from "../../../services/modals/record-modal.service";
+import {RecordThreadModalService} from "../../../store/record-thread-modal/record-thread-modal.service";
 
 @Injectable({providedIn: 'root'})
 export class ClassicViewResolver extends BaseMetadataResolver {
@@ -61,6 +62,7 @@ export class ClassicViewResolver extends BaseMetadataResolver {
         protected auth: AuthService,
         protected recentlyViewed: RecentlyViewedService,
         protected recordModalService: RecordModalService,
+        protected recordThreadModalService: RecordThreadModalService,
         protected metadataStore: MetadataStore,
     ) {
         super(
@@ -74,6 +76,7 @@ export class ClassicViewResolver extends BaseMetadataResolver {
             messageService,
             appMetadata,
             recordModalService,
+            recordThreadModalService,
             auth
         );
     }

@@ -44,6 +44,7 @@ import {concatMap, tap} from 'rxjs/operators';
 import {AuthService} from '../auth/auth.service';
 import {RecentlyViewedService} from '../navigation/recently-viewed/recently-viewed.service';
 import {RecordModalService} from "../modals/record-modal.service";
+import {RecordThreadModalService} from "../../store/record-thread-modal/record-thread-modal.service";
 
 @Injectable({providedIn: 'root'})
 export class BaseRecordResolver extends BaseModuleResolver {
@@ -63,6 +64,7 @@ export class BaseRecordResolver extends BaseModuleResolver {
         protected router: Router,
         protected appMetadata: AppMetadataStore,
         protected recordModalService: RecordModalService,
+        protected recordThreadModalService: RecordThreadModalService,
         protected auth: AuthService,
         protected recentlyViewed: RecentlyViewedService
     ) {
@@ -79,6 +81,7 @@ export class BaseRecordResolver extends BaseModuleResolver {
             routeConverter,
             appMetadata,
             recordModalService,
+            recordThreadModalService,
             auth
         );
     }

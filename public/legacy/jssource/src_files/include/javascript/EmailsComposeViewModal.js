@@ -106,6 +106,8 @@
         module: 'emails',
         metadataView: 'modalComposeView',
         detached: true,
+        closable: false,
+        headerActionsKlass: 'draft-modal-action',
         headerClass: 'left-aligned-title',
         dynamicTitleKey: 'LBL_EMAIL_MODAL_DYNAMIC_TITLE',
         modalOptions: {

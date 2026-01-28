@@ -224,6 +224,7 @@ class RecordViewDefinitionHandler extends LegacyHandler
         $this->addHeaderWidgetConfig($module, $recordViewDefs, $metadata);
         $this->addPanelDefinitions($recordViewDefs, $editViewDefs, $vardefs, $metadata);
         $this->addActionConfig($module, $recordViewDefs, $metadata);
+        $this->addModalActionConfig($module, $recordViewDefs, $metadata);
         $this->addSummaryTemplates($recordViewDefs, $metadata);
         $this->addBackButton($recordViewDefs, $metadata);
 
@@ -787,6 +788,14 @@ class RecordViewDefinitionHandler extends LegacyHandler
         $definition['fieldDefinition'] = $fieldDefinitions;
 
         return $definition;
+    }
+
+    protected function addModalActionConfig(string $module, array $detailViewDefs, array &$metadata): void
+    {
+        $recordActions = $detailViewDefs['recordModalActions'] ?? [];
+        $actions = $this->actionDefinitionProvider->getActions($module, $recordActions) ?? [];
+
+        $metadata['modalHeaderActions'] = array_values($actions);
     }
 
 }

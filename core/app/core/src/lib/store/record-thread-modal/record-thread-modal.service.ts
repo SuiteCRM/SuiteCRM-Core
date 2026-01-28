@@ -140,8 +140,16 @@ export class RecordThreadModalService {
                 () => this.appState.removeModalRef(modal),
                 () => this.appState.removeModalRef(modal)
             );
+
+            return modal;
         }
 
+        window.document.body.classList.add('detached-modal-open');
+
+        modal.result.then(
+            () => window.document.body.classList.add('detached-modal-open'),
+            () => window.document.body.classList.add('detached-modal-open')
+        );
 
         return modal;
     }

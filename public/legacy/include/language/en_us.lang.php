@@ -1424,7 +1424,7 @@ $app_strings = array(
     'LBL_EMAIL_SAVE' => 'Save',
     'LBL_EMAIL_SAVE_AND_REPLY' => 'Save & Reply',
     'LBL_EMAIL_SAVE_DRAFT' => 'Save Draft',
-    'LBL_EMAIL_DRAFT_SAVED' => 'Draft has been saved',
+    'LBL_EMAIL_DRAFT_SAVED' => 'Draft has been saved.',
 
     'LBL_EMAIL_SEARCH' => SugarThemeRegistry::current()->getImage('Search', 'align=absmiddle border=0', null, null,    '.gif', ''),
     'LBL_EMAIL_SEARCH_SHORT' => SugarThemeRegistry::current()->getImage('Search', 'align=absmiddle border=0', null,        null, '.gif', ''),
@@ -4341,3 +4341,14 @@ $app_strings['LBL_DEFAULT_OUTBOUND_NOT_CONFIGURED'] = 'Outbound Email Account no
 
 $app_strings['LBL_CRON_UNRECOMMENDED_USER'] = 'You are currently running as root, this is NOT recommended, would you like to continue (y,n)? ';
 $app_strings['LBL_UNKNOWN_USER'] = 'Unknown User';
+
+$app_strings['LBL_DRAFTS'] = 'Drafts';
+$app_strings['LBL_DRAFT_ITEM_LAST_MODIFIED'] = '{{fields.date_modified.value}}';
+$app_strings['LBL_DRAFT_ITEM_TO'] = '{{fields.to_addrs_names.valueList[0].name|default:\'No Recipient(s)\'}}';
+$app_strings['LBL_DRAFT_ITEM_TO_ICON'] = '{{fields.to_icon_type.value}}';
+$app_strings['LBL_DRAFTS_TOTAL'] = '{{fields.count.value}}';
+$app_strings['LBL_DRAFTS_DELETED_SUCCESSFULLY'] = 'Drafts Deleted Successfully.';
+$app_strings['LBL_DRAFTS_DELETED_UNSUCCESSFULLY'] = 'Drafts Not Deleted Successfully. See logs for more info.';
+$app_strings['LBL_OPEN_DRAFT'] = 'Open Draft';
+$app_strings['LBL_UNABLE_TO_DELETE_DRAFT'] = 'Unable to delete draft.';
+$app_strings['LBL_DRAFT_DELETED_SUCCESSFULLY'] = 'Draft Deleted Successfully.';

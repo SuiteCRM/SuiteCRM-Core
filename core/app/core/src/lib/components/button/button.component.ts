@@ -40,6 +40,7 @@ export class ButtonComponent implements OnInit, OnDestroy {
     isRunning: Signal<boolean> = signal(false);
     dynamicClass: Signal<string> = signal('');
     dynamicIcon: Signal<string> = signal('');
+    dynamicEndIcon: Signal<string> = signal('');
     disabled: Signal<boolean> = signal(false);
     clickCallBack: ButtonCallback;
     protected clickBuffer = new Subject<any>();
@@ -60,6 +61,10 @@ export class ButtonComponent implements OnInit, OnDestroy {
 
         if (this.config?.dynamicIcon) {
             this.dynamicIcon = this.config?.dynamicIcon;
+        }
+
+        if (this.config?.dynamicEndIcon) {
+            this.dynamicEndIcon = this.config?.dynamicEndIcon;
         }
 
         if (this.config?.disabled) {

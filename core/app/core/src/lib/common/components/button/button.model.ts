@@ -47,7 +47,10 @@ export interface ButtonInterface {
     icon?: string;
     showPopup?: PopoverValidation;
     dynamicIcon?: Signal<string>;
+    dynamicEndIcon?: Signal<string>;
     iconKlass?: string;
+    endIconTitleKey?: string;
+    endIconKlass?: string;
     labelModule?: string;
     section?: string;
     disabled?: Signal<boolean>;

@@ -34,20 +34,26 @@
         [style.max-width]="config?.maxWidth ? config?.maxWidth + 'px': null"
         [title]="(language.getFieldLabel(config.titleKey) || config?.title) || ''">
     <ng-container *ngIf="!isRunning()">
-    <scrm-image *ngIf="config.icon"
-                [image]="config.icon"
-                [klass]="config.iconKlass || ''"
-                [title]="language.getFieldLabel(config.titleKey || '')"></scrm-image>
-    <scrm-image *ngIf="dynamicIcon()"
-                [image]="dynamicIcon()"
-                [klass]="config.iconKlass || ''"
-                [title]="language.getFieldLabel(config.titleKey || '')"></scrm-image>
-    <ng-container *ngIf="!config.labelKey">{{ config.label || '' }}</ng-container>
-    <scrm-label *ngIf="config.labelKey" [labelKey]="config.labelKey" [module]="config.labelModule ?? ''"></scrm-label>
-    <scrm-dynamic-label *ngIf="config.dynamicLabelKey"
-                        [labelKey]="config.dynamicLabelKey"
-                        [module]="config.labelModule ?? ''"
-                        [fields]="config?.dynamicLabelFields"></scrm-dynamic-label>
+        <scrm-image *ngIf="config.icon"
+                    [image]="config.icon"
+                    [klass]="config.iconKlass || ''"
+                    [title]="language.getFieldLabel(config.titleKey || '')"></scrm-image>
+        <scrm-image *ngIf="dynamicIcon()"
+                    [image]="dynamicIcon()"
+                    [klass]="config.iconKlass || ''"
+                    [title]="language.getFieldLabel(config.titleKey || '')"></scrm-image>
+        <ng-container *ngIf="!config.labelKey">{{ config.label || '' }}</ng-container>
+        <scrm-label *ngIf="config.labelKey" [labelKey]="config.labelKey"
+                    [module]="config.labelModule ?? ''"></scrm-label>
+        <scrm-dynamic-label *ngIf="config.dynamicLabelKey"
+                            [labelKey]="config.dynamicLabelKey"
+                            [module]="config.labelModule ?? ''"
+                            [fields]="config?.dynamicLabelFields"></scrm-dynamic-label>
+        <scrm-image *ngIf="dynamicEndIcon()"
+                    [image]="dynamicEndIcon()"
+                    [klass]="config?.endIconKlass || ''"
+                    [title]="language.getFieldLabel(config.endIconTitleKey || '')"></scrm-image>
+        <ng-content></ng-content>
     </ng-container>
     <ng-content></ng-content>
     <ng-container *ngIf="isRunning()">

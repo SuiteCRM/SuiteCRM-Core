@@ -114,7 +114,7 @@ export class ModalComponent implements OnInit, OnDestroy {
     }
 
     @HostListener('window:message', ['$event'])
-    onMessage(event) {
+    onMessage(event): void {
         if (event?.data !== 'iframe-clicked') {
             return;
         }

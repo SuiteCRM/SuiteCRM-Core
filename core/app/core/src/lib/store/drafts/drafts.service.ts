@@ -88,7 +88,7 @@ export class DraftsService {
         this.draftsStore.getRecordThreadStore()?.load();
     }
 
-    showModal() {
+    showModal(): void {
 
         if (this?.modal?.componentInstance) {
             return;
@@ -104,7 +104,7 @@ export class DraftsService {
         })
     }
 
-    closeModal() {
+    closeModal(): void {
         if (this?.modal?.componentInstance) {
             this.modal.close();
         }

@@ -304,7 +304,7 @@ export class RecordManager {
 
     }
 
-    protected mapRelateAttributes(param: [], relate: {}) {
+    protected mapRelateAttributes(param: [], relate: {}): {} {
         Object.entries(param).forEach(([key, value]) => {
             if (key === 'id') {
                 return;

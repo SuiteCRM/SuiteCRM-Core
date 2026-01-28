@@ -160,7 +160,7 @@ export class RecordModalHeaderActionsAdapter extends BaseModalActionsAdapter<Rec
         actionData: RecordModalActionData,
         context: ActionContext,
         afterActionLogic: AfterActionLogicDefinitions = null
-    ) {
+    ): void {
         super.afterAsyncAction(
             actionName,
             moduleName,
@@ -182,7 +182,7 @@ export class RecordModalHeaderActionsAdapter extends BaseModalActionsAdapter<Rec
      * @param mode
      * @param context
      */
-    protected parseModeActions(declaredActions: Action[], mode: ViewMode, context: ActionContext = null) {
+    protected parseModeActions(declaredActions: Action[], mode: ViewMode, context: ActionContext = null): any[] {
         if (!declaredActions) {
             return [];
         }

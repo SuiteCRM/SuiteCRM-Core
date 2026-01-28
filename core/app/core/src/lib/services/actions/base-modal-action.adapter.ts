@@ -105,7 +105,7 @@ export abstract class BaseModalActionsAdapter<D extends RecordBasedActionData> e
      * Get action name
      * @param action
      */
-    protected getActionName(action: Action) {
+    protected getActionName(action: Action): string {
         return `modal-${action.key}`;
     }
 

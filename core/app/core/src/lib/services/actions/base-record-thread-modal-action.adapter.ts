@@ -105,7 +105,7 @@ export abstract class BaseRecordThreadModalActionAdapter<D extends RecordBasedAc
      * Get action name
      * @param action
      */
-    protected getActionName(action: Action) {
+    protected getActionName(action: Action): string {
         return `record-thread-modal-${action.key}`;
     }
 

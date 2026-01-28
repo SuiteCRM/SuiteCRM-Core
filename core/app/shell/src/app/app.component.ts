@@ -115,7 +115,7 @@ export class AppComponent implements OnInit {
         });
     }
 
-    protected initDraftsButton() {
+    protected initDraftsButton(): {} {
         const countValue = this.draftsService?.draftsCount();
         const count = countValue > 10 ? '10+' : String(countValue);
 
@@ -148,7 +148,7 @@ export class AppComponent implements OnInit {
         };
     }
 
-    protected initDraftsConfig() {
+    protected initDraftsConfig(): void {
         this.showDrafts = this.draftsService.showDrafts;
         this.draftsButton.set(this.initDraftsButton());
         this.draftsService.draftsCount$.pipe().subscribe(() => {

@@ -160,7 +160,7 @@ export class RecordThreadModalHeaderActionsAdapter extends BaseRecordThreadModal
         actionData: RecordThreadModalActionData,
         context: ActionContext,
         afterActionLogic: AfterActionLogicDefinitions = null
-    ) {
+    ): void {
         super.afterAsyncAction(
             actionName,
             moduleName,
@@ -182,8 +182,7 @@ export class RecordThreadModalHeaderActionsAdapter extends BaseRecordThreadModal
      * @param mode
      * @param context
      */
-    protected parseModeActions(declaredActions: Action[], mode: ViewMode, context: ActionContext = null) {
-        console.log('actually inside parse mode actions');
+    protected parseModeActions(declaredActions: Action[], mode: ViewMode, context: ActionContext = null): any[] {
         if (!declaredActions) {
             return [];
         }

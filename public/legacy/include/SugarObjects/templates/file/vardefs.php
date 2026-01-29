@@ -89,6 +89,9 @@ $vardefs = array(
             'vname' => 'LBL_FILE_UPLOAD',
             'type' => 'file',
             'source' => 'non-db',
+            'metadata' => [
+                'storage_type' => 'private-documents',
+            ],
         ),
 
         'active_date' => array(

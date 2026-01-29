@@ -54,6 +54,10 @@ trait ImageFieldApiMapperTrait
         $mediaObjects = $mediaObjectManager->getLinkedMediaObjects($type, $module, $record->getId(), $field);
 
         if (empty($mediaObjects)) {
+            $mediaObjects = $mediaObjectManager->getLinkedMediaObjects('legacy-images', $module, $record->getId(), $field) ?? [];
+        }
+
+        if (empty($mediaObjects)) {
             return;
         }
 

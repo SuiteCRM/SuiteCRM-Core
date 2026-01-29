@@ -56,6 +56,7 @@ export class ImageDetailFieldComponent extends BaseImageComponent {
 
     ngOnInit() {
         this.maxHeight = this.getMaxHeight();
+        this.maxWidth = this.getMaxWidth();
         this.preview = this.isAllowedPreview();
         const hasFile = this.field?.valueObject &&
             (this.field.valueObject.id || this.field.valueObject.value);

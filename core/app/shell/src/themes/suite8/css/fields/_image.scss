@@ -45,16 +45,20 @@
       }
     }
   }
+
   .p-image-preview-container {
     .p-image-preview-indicator {
       background-color: lightgrey;
       margin: 0;
-       &:hover {
-         opacity: 0.7;
-       }
+      padding: 0;
+      width: 100%;
+
+      &:hover {
+        opacity: 0.7;
+      }
 
       .sicon {
-        color:$black;
+        color: $black;
         fill: $black;
         font-size: large;
       }

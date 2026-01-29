@@ -39,6 +39,7 @@ import {SystemConfigStore} from "../../store/system-config/system-config.store";
 export class BaseImageComponent extends BaseFileComponent {
 
     maxHeight: string;
+    maxWidth: string;
     preview = true;
     storageType: string;
     loading: WritableSignal<boolean> = signal(false);
@@ -74,6 +75,22 @@ export class BaseImageComponent extends BaseFileComponent {
         }
 
         return '150px';
+    }
+
+    getMaxWidth(): string {
+
+        const maxWidth = this.field?.metadata?.maxWidth ?? null;
+
+        if (maxWidth) {
+
+            if (!maxWidth.endsWith('px')) {
+                return maxWidth + 'px';
+            }
+
+            return maxWidth;
+        }
+
+        return '100%';
     }
 
     setLoading(value: boolean, delay: boolean = false) {

@@ -1,6 +1,6 @@
 /**
  * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
- * Copyright (C) 2025 SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -24,32 +24,34 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {NgModule} from "@angular/core";
-import {CommonModule} from "@angular/common";
-import {ImageDetailFieldComponent} from "./image.component";
-import {UploadedImageComponent} from "../../../../components/uploaded-image/uploaded-image.component";
-import {ImageModule} from "primeng/image";
-import {FileSkeletonModule} from "../../../../components/file-skeleton/file-skeleton.module";
-import {ImageModule as SCRMImageModule} from "../../../../components/image/image.module";
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {ImageModule} from '../image/image.module';
+import {ImageSkeletonComponent} from "./image-skeleton.component";
+import {ButtonModule} from "../button/button.module";
+import {FileSizePipe} from "../../pipes/file-size/file-size.pipe";
+import {LabelModule} from "../label/label.module";
+import {FileSkeletonModule} from "../file-skeleton/file-skeleton.module";
+import {ImageModule as PrimeImageModule} from "primeng/image";
 import {PrimeTemplate} from "primeng/api";
-import {ImageSkeletonModule} from "../../../../components/image-skeleton/image-skeleton.module";
 
 @NgModule({
-    declarations: [ImageDetailFieldComponent],
+    declarations: [
+        ImageSkeletonComponent
+    ],
     exports: [
-        ImageDetailFieldComponent
+        ImageSkeletonComponent
     ],
     imports: [
         CommonModule,
-        UploadedImageComponent,
         ImageModule,
+        ButtonModule,
+        FileSizePipe,
+        LabelModule,
         FileSkeletonModule,
-        ImageModule,
+        PrimeImageModule,
         PrimeTemplate,
-        SCRMImageModule,
-        ImageSkeletonModule,
     ]
 })
-export class ImageDetailFieldModule {
-
+export class ImageSkeletonModule {
 }

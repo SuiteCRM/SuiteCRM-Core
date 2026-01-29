@@ -1,6 +1,7 @@
+<!--
 /**
  * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
- * Copyright (C) 2025 SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -23,33 +24,10 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Supercharged by SuiteCRM".
  */
-
-import {NgModule} from "@angular/core";
-import {CommonModule} from "@angular/common";
-import {ImageDetailFieldComponent} from "./image.component";
-import {UploadedImageComponent} from "../../../../components/uploaded-image/uploaded-image.component";
-import {ImageModule} from "primeng/image";
-import {FileSkeletonModule} from "../../../../components/file-skeleton/file-skeleton.module";
-import {ImageModule as SCRMImageModule} from "../../../../components/image/image.module";
-import {PrimeTemplate} from "primeng/api";
-import {ImageSkeletonModule} from "../../../../components/image-skeleton/image-skeleton.module";
-
-@NgModule({
-    declarations: [ImageDetailFieldComponent],
-    exports: [
-        ImageDetailFieldComponent
-    ],
-    imports: [
-        CommonModule,
-        UploadedImageComponent,
-        ImageModule,
-        FileSkeletonModule,
-        ImageModule,
-        PrimeTemplate,
-        SCRMImageModule,
-        ImageSkeletonModule,
-    ]
-})
-export class ImageDetailFieldModule {
-
-}
+-->
+<div class="image-field-container">
+    <div [ngStyle]="{ 'height': height, 'width': width }"
+         class="d-flex align-items-center justify-content-center">
+        <div class="h-100 flex-grow-1 text-break rounded box-loading skeleton-field-content"></div>
+    </div>
+</div>

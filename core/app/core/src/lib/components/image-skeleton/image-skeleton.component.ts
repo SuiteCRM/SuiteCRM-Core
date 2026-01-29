@@ -1,6 +1,6 @@
 /**
  * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
- * Copyright (C) 2025 SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -24,32 +24,27 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {NgModule} from "@angular/core";
-import {CommonModule} from "@angular/common";
-import {ImageDetailFieldComponent} from "./image.component";
-import {UploadedImageComponent} from "../../../../components/uploaded-image/uploaded-image.component";
-import {ImageModule} from "primeng/image";
-import {FileSkeletonModule} from "../../../../components/file-skeleton/file-skeleton.module";
-import {ImageModule as SCRMImageModule} from "../../../../components/image/image.module";
-import {PrimeTemplate} from "primeng/api";
-import {ImageSkeletonModule} from "../../../../components/image-skeleton/image-skeleton.module";
+import {Component, Input, OnInit} from '@angular/core';
 
-@NgModule({
-    declarations: [ImageDetailFieldComponent],
-    exports: [
-        ImageDetailFieldComponent
-    ],
-    imports: [
-        CommonModule,
-        UploadedImageComponent,
-        ImageModule,
-        FileSkeletonModule,
-        ImageModule,
-        PrimeTemplate,
-        SCRMImageModule,
-        ImageSkeletonModule,
-    ]
+@Component({
+    selector: 'scrm-image-skeleton',
+    templateUrl: 'image-skeleton.component.html'
 })
-export class ImageDetailFieldModule {
+export class ImageSkeletonComponent implements OnInit {
+    @Input() width: string = '';
+    @Input() height: string = '115px';
+
+    constructor() {
+    }
+
+    ngOnInit(): void {
+        if (!this.height) {
+            this.height = '115px';
+        }
+
+        if (!this.width) {
+            this.width = 'calc(' + this.height + ' * 0.75)';
+        }
+    }
 
 }

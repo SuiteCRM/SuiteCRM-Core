@@ -79,7 +79,9 @@
                     </th>
 
                     <td cdk-cell *cdkCellDef="let record"
-                        [class]="('column-' + column?.name ?? '') + ' ' + ('column-type-' + column?.type ?? '')">
+                        [class]="('column-' + column?.name ?? '') + ' ' + ('column-type-' + column?.type ?? '')"
+                        [ngStyle]="{width: column?.metadata?.maxWidth ? column?.metadata?.maxWidth : 'auto'}"
+                    >
                         <scrm-field [mode]="'list'"
                                     [type]="column.type"
                                     [field]="getField(column, record)"

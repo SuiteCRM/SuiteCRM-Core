@@ -31,6 +31,7 @@ use App\Data\Entity\Record;
 use App\Data\Service\Record\Repository\RecordEntityRepository;
 use App\MediaObjects\Entity\ArchivedDocumentMediaObject;
 use App\MediaObjects\Entity\LegacyDocumentMediaObject;
+use App\MediaObjects\Entity\LegacyImageMediaObject;
 use App\MediaObjects\Entity\MediaObjectInterface;
 use App\MediaObjects\Entity\PrivateDocumentMediaObject;
 use App\MediaObjects\Entity\PrivateImageMediaObject;
@@ -50,6 +51,7 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
         protected PublicDocumentMediaObjectRepository $publicDocumentRepository,
         protected PublicImageMediaObjectRepository $publicImageRepository,
         protected LegacyDocumentMediaObjectRepository $legacyDocumentRepository,
+        protected LegacyImageMediaObjectRepository $legacyImageRepository,
         protected StorageInterface $storage
     ) {
 
@@ -60,6 +62,7 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
             'public-documents' => $publicDocumentRepository,
             'public-images' => $publicImageRepository,
             'legacy-documents' => $legacyDocumentRepository,
+            'legacy-images' => $legacyImageRepository,
         ];
 
         $this->objectTypeMap = [
@@ -69,6 +72,7 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
             PublicDocumentMediaObject::class => 'public-documents',
             PublicImageMediaObject::class => 'public-images',
             LegacyDocumentMediaObject::class => 'legacy-documents',
+            LegacyImageMediaObject::class => 'legacy-images',
         ];
     }
 
@@ -313,7 +317,8 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
             'archived-documents' => true,
             'private-documents' => true,
             'private-images' => true,
-            'legacy-documents' => true
+            'legacy-documents' => true,
+            'legacy-images' => true
         ];
         if ($privateTypes[$type] ?? false) {
             $prefix = $this->getPath($object);
@@ -342,7 +347,8 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
             ArchivedDocumentMediaObject::class => '/media/archived/',
             PrivateDocumentMediaObject::class => '/media/documents/',
             PrivateImageMediaObject::class => '/media/images/',
-            LegacyDocumentMediaObject::class => '/media/legacy/',
+            LegacyDocumentMediaObject::class => '/media/legacy/documents/',
+            LegacyImageMediaObject::class => '/media/legacy/images/',
         ];
 
         foreach ($prefixMap as $type => $prefix) {

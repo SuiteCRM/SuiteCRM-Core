@@ -41,6 +41,7 @@ require_once __DIR__ . '/TypeMappers/BooleanMapper.php';
 require_once __DIR__ . '/TypeMappers/HtmlMapper.php';
 require_once __DIR__ . '/TypeMappers/TextMapper.php';
 require_once __DIR__ . '/TypeMappers/CurrencyMapper.php';
+require_once __DIR__ . '/TypeMappers/ImageMapper.php';
 require_once __DIR__ . '/TypeMappers/FileMapper.php';
 require_once __DIR__ . '/ApiBeanModuleMappers.php';
 require_once __DIR__ . '/ModuleMappers/SavedSearch/SavedSearchMappers.php';
@@ -94,6 +95,7 @@ class ApiBeanMapper
         $this->typeMappers[HtmlMapper::getType()] = new HtmlMapper();
         $this->typeMappers[TextMapper::getType()] = new TextMapper();
         $this->typeMappers[CurrencyMapper::getType()] = new CurrencyMapper();
+        $this->typeMappers[ImageMapper::getType()] = new ImageMapper();
         $this->typeMappers[FileMapper::getType()] = new FileMapper();
         $this->moduleMappers[SavedSearchMappers::getModule()] = new SavedSearchMappers();
         $this->typeMappers[DateTimeComboMapper::getType()] = new DateTimeMapper();

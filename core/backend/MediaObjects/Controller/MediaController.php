@@ -30,10 +30,12 @@ namespace App\MediaObjects\Controller;
 use App\Engine\LegacyHandler\AclHandler;
 use App\MediaObjects\Entity\ArchivedDocumentMediaObject;
 use App\MediaObjects\Entity\LegacyDocumentMediaObject;
+use App\MediaObjects\Entity\LegacyImageMediaObject;
 use App\MediaObjects\Entity\PrivateDocumentMediaObject;
 use App\MediaObjects\Entity\PrivateImageMediaObject;
 use App\MediaObjects\Repository\ArchivedDocumentMediaObjectRepository;
 use App\MediaObjects\Repository\LegacyDocumentMediaObjectRepository;
+use App\MediaObjects\Repository\LegacyImageMediaObjectRepository;
 use App\MediaObjects\Repository\PrivateDocumentMediaObjectRepository;
 use App\MediaObjects\Repository\PrivateImageMediaObjectRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -51,11 +53,29 @@ class MediaController extends AbstractController
         protected PrivateDocumentMediaObjectRepository $privateDocumentRepository,
         protected PrivateImageMediaObjectRepository $privateImageRepository,
         protected LegacyDocumentMediaObjectRepository $legacyDocumentRepository,
+        protected LegacyImageMediaObjectRepository $legacyImageRepository,
         protected AclHandler $aclHandler
     ) {
     }
 
-    #[Route('/media/legacy/{id}', name: 'legacy_documents', methods: ["GET"], stateless: false)]
+    #[Route('/media/legacy/images/{id}', name: 'legacy_images', methods: ["GET"], stateless: false)]
+    #[isGranted('IS_AUTHENTICATED_FULLY')]
+    public function downloadLegacyImage(string $id, Request $request, DownloadHandler $downloadHandler): Response
+    {
+        $mediaObject = $this->legacyImageRepository->find($id);
+
+        if (!$mediaObject) {
+            throw $this->createNotFoundException('Media object not found');
+        }
+
+        if (!empty($mediaObject->parentId) && !empty($mediaObject->parentType) && !$this->aclHandler->checkRecordAccess($mediaObject->parentType, 'view', $mediaObject->parentId)) {
+            throw $this->createNotFoundException('Media object not found');
+        }
+
+        return $downloadHandler->downloadObject($mediaObject, 'file', LegacyImageMediaObject::class, $mediaObject->originalName);
+    }
+
+    #[Route('/media/legacy/documents/{id}', name: 'legacy_documents', methods: ["GET"], stateless: false)]
     #[isGranted('IS_AUTHENTICATED_FULLY')]
     public function downloadLegacyDocument(string $id, Request $request, DownloadHandler $downloadHandler): Response
     {

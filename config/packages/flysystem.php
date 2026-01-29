@@ -51,6 +51,12 @@ return static function (ContainerConfigurator $containerConfig) {
                 'directory' => '%kernel.project_dir%/public/legacy/' . trim($legacyUploadDir, '/'),
             ],
         ],
+        'legacy.images.storage' => [
+            'adapter' => 'local',
+            'options' => [
+                'directory' => '%kernel.project_dir%/public/legacy/' . trim($legacyUploadDir, '/'),
+            ],
+        ],
         'private.documents.storage' => [
             'adapter' => 'local',
             'options' => [

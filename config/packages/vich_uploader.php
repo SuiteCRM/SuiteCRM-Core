@@ -138,7 +138,12 @@ return static function (ContainerConfigurator $containerConfig) {
             ]
         ],
         'legacy_documents_media_object' => [
-            'uri_prefix' => '/media/legacy-documents',
+            'uri_prefix' => '/media/legacy/documents',
+            'upload_destination' => 'legacy.documents.storage',
+            'namer' => 'App\MediaObjects\Services\UuidMediaObjectFileNamer'
+        ],
+        'legacy_images_media_object' => [
+            'uri_prefix' => '/media/legacy/images',
             'upload_destination' => 'legacy.documents.storage',
             'namer' => 'App\MediaObjects\Services\UuidMediaObjectFileNamer'
         ],

@@ -197,10 +197,10 @@ export class RelateEditFieldComponent extends BaseRelateComponent implements Aft
         const rname = this.field?.definition?.rname ?? 'name';
 
         if (this.field?.metadata?.relateSearchField) {
-            this.field.valueObject[this.field.metadata.relateSearchField] = this.field.valueObject[rname];
+            this.field.valueObject[this.field.metadata.relateSearchField] = this.field.valueObject[rname] ?? this.field.valueObject['name'] ?? '';
         }
 
-        const relateValue = this.field.valueObject[rname];
+        const relateValue = this.field.valueObject[rname] ?? this.field.valueObject['name'] ?? '';
         const id = this.field.valueObject.id;
 
         if (relateValue) {

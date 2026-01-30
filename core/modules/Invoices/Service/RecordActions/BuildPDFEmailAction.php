@@ -129,7 +129,7 @@ class BuildPDFEmailAction extends BuildPDFEmail implements ProcessHandlerInterfa
 
         $to = $this->calculateToField($record);
 
-        $pdf = $this->pdfManager->generatePdf($module, $id, $templateId);
+        $pdf = $this->pdfManager->generatePdf($module, $id, $templateId, [],true);
 
         if ($pdf === null) {
             $process->setStatus('error');

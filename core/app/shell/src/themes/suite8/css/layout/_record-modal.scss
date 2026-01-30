@@ -25,7 +25,7 @@
  */
 
 .record-modal {
-  background-color: $white;
+  background-color: transparent;
 
   &.minimizable {
     .modal-title {
@@ -72,6 +72,7 @@
   }
 
   .modal-body {
+    background-color: $white;
     padding-top: 0;
     overflow-y: auto;
     max-height: 80vh;
@@ -172,7 +173,6 @@ body.modal-open.detached-modal-open {
     &.maximized {
       .modal-dialog {
         .modal-content {
-          border-radius: 4px;
         }
       }
     }
@@ -244,6 +244,7 @@ body.modal-open.detached-modal-open {
       border-bottom-right-radius: 0;
       border-bottom-left-radius: 0;
       animation: none;
+      background-color: transparent;
     }
 
     .record-modal {
@@ -463,7 +464,7 @@ div.record-modal-backdrop {
                   height: 100%;
 
                   .modal-body {
-                    max-height: calc(94vh - 84px) !important;
+                    max-height: calc(94vh - 5.05rem) !important;
 
                     .record-content.panel-layout {
                       .row:first-child {
@@ -488,8 +489,8 @@ div.record-modal-backdrop {
                                   max-width: 94vw;
 
                                   iframe {
-                                    height: calc(94vh - 286px) !important;
-                                    max-height: calc(94vh - 286px) !important;
+                                    height: calc(94vh - 17.6rem) !important; //17.6875
+                                    max-height: calc(94vh - 17.6rem) !important;
                                     min-height: 20vh !important;
                                   }
 

@@ -428,12 +428,9 @@ div.record-modal-backdrop {
 @media (min-width: 576px) {
 
   #detached-modals {
+    margin-right: 45px;
 
     .detached-modal {
-
-      &:not(.maximized):last-child {
-        margin-right: 45px;
-      }
 
       &.maximized {
         position: fixed;

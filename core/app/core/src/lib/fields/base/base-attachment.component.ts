@@ -84,7 +84,7 @@ export class BaseAttachmentComponent extends BaseFileComponent {
         }
 
         let contentUrl = file?.attributes?.contentUrl ?? '';
-        if (contentUrl && (!contentUrl.startsWith('https://') && !contentUrl.startsWith('http://'))) {
+        if (contentUrl && (!contentUrl.startsWith('https://') && !contentUrl.startsWith('http://')) && !contentUrl.startsWith('.')) {
             contentUrl = '.' + contentUrl ?? '';
         }
 

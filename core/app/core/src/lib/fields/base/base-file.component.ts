@@ -132,7 +132,7 @@ export class BaseFileComponent extends BaseFieldComponent {
 
         let contentUrl = valueObject?.attributes?.contentUrl ?? '';
 
-        if (contentUrl && (!contentUrl.startsWith('https://') && !contentUrl.startsWith('http://'))) {
+        if (contentUrl && (!contentUrl.startsWith('https://') && !contentUrl.startsWith('http://')) && !contentUrl.startsWith('.')) {
             contentUrl = '.' + contentUrl ?? '';
         }
 

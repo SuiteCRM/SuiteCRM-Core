@@ -139,6 +139,7 @@ export class RecordModalService {
                 });
 
                 if (detachedModals) {
+                    window.dispatchEvent(new Event('resize'));
                     detachedModals.classList.add('has-maximized-modal');
                 }
 
@@ -149,6 +150,7 @@ export class RecordModalService {
 
             if (!hasMaximized) {
                 if (detachedModals) {
+                    window.dispatchEvent(new Event('resize'));
                     detachedModals.classList.remove('has-maximized-modal');
                 }
             }

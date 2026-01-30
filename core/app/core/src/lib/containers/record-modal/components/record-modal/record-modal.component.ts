@@ -146,6 +146,7 @@ export class RecordModalComponent implements OnInit, OnDestroy {
 
         this.closeButton = {
             klass: ['btn', 'btn-outline-light', 'btn-sm'],
+            icon: 'x',
             onClick: (): void => {
 
                 if (this.closeConfirmationModal) {

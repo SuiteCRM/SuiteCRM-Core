@@ -26,5 +26,5 @@
 */
 -->
 <scrm-button *ngIf="config" [config]="getConfig()">
-    <span aria-hidden="true">&times;</span>
+    <span *ngIf="!(config?.icon ?? false)" aria-hidden="true">&times;</span>
 </scrm-button>

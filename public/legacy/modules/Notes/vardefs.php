@@ -328,6 +328,29 @@ $dictionary['Note'] = array(
                             ]
                         ]
                     ],
+                ],
+                'displayLogic' => [
+                    'hide-on-contact-parent' => [
+                        'key' => 'displayType',
+                        'modes' => [
+                            'detail',
+                            'edit',
+                            'create',
+                        ],
+                        'params' => [
+                            'fieldDependencies' => [
+                                'parent_type',
+                            ],
+                            'activeOnFields' => [
+                                'parent_type' => [
+                                    [
+                                        'operator' => 'is-equal',
+                                        'values' => ['Contacts']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
                 ]
             ],
 

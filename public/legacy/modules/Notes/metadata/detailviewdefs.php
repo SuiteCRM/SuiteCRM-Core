@@ -67,19 +67,16 @@ $viewdefs ['Notes'] = [
         'panels' => [
             'lbl_note_information' => [
                 [
-                    'contact_name',
-                    'parent_name'
-                ],
-                [
                     [
                         'name' => 'name',
                         'label' => 'LBL_SUBJECT',
                     ],
+                    'assigned_user_name'
+
                 ],
                 [
-                    [
-                        'name' => 'file',
-                    ],
+                    'parent_name',
+                    'contact_name'
                 ],
                 [
                     [
@@ -88,7 +85,8 @@ $viewdefs ['Notes'] = [
                     ],
                 ],
                 [
-                    'assigned_user_name',
+                    'file',
+                    ''
                 ],
             ],
             'LBL_PANEL_ASSIGNMENT' => [

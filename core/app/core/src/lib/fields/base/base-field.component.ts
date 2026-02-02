@@ -26,10 +26,9 @@
 
 import {Component, computed, inject, Input, OnDestroy, OnInit, signal, Signal} from '@angular/core';
 import {FieldComponentInterface} from './field.interface';
-import {AttributeDependency} from '../../common/record/field.model';
+import {AttributeDependency, Field} from '../../common/record/field.model';
 import {ObjectMap} from '../../common/types/object-map';
 import {isVoid} from '../../common/utils/value-utils';
-import {Field} from '../../common/record/field.model';
 import {ViewMode} from '../../common/views/view.model';
 import {Record} from '../../common/record/record.model';
 import {BehaviorSubject, Observable, Subscription} from 'rxjs';
@@ -103,9 +102,9 @@ export class BaseFieldComponent implements FieldComponentInterface, OnInit, OnDe
         this.initDependencyHandlers();
 
         this.validateOnlyOnSubmit = this.record?.metadata?.validateOnlyOnSubmit;
-        if(this.record?.validationTriggered) {
+        if (this.record?.validationTriggered) {
             this.isInvalid = computed(() => {
-                if(this.record?.metadata?.validateOnlyOnSubmit && this.record?.validationTriggered() && this.field.formControl?.invalid) {
+                if (this.record?.metadata?.validateOnlyOnSubmit && this.record?.validationTriggered() && this.field.formControl?.invalid) {
                     return true;
                 }
                 return false;
@@ -121,68 +120,122 @@ export class BaseFieldComponent implements FieldComponentInterface, OnInit, OnDe
             return;
         }
         const fieldKeys = (this.record.fields && Object.keys(this.record.fields)) || [];
-        if (fieldKeys.length > 1) {
-            this.calculateDependentFields(fieldKeys);
-            this.field.previousValue = this.field.value;
+        if (!fieldKeys?.length) {
+            return;
+        }
 
-            if ((this.dependentFields && Object.keys(this.dependentFields).length) || this.dependentAttributes.length) {
+        this.calculateDependentFields(fieldKeys);
+        this.field.previousValue = this.field.value;
+
+        this.runOnInitializeLogic();
+
+        if (this.field.valueChanges$ && ((this.dependentFields && Object.keys(this.dependentFields).length) || this.dependentAttributes.length)) {
+            this.subs.push(this.field.valueChanges$.pipe(debounceTime(500)).subscribe((data) => {
                 Object.keys(this.dependentFields).forEach(fieldKey => {
+                    const dependentFieldKey = this.dependentFields[fieldKey];
                     const field = this.record.fields[fieldKey] || null;
+                    const dependentField = this.record.fields[dependentFieldKey.field] || null;
                     if (!field) {
                         return;
                     }
 
-                    const types = this.dependentFields[fieldKey].type ?? [];
+                    if (this.field.previousValue != data.value) {
+                        const types = dependentFieldKey.type ?? [];
 
-                    if (types.includes('logic')) {
-                        this.logic.runLogic(field, this.originalMode as ViewMode, this.record, 'onFieldInitialize');
-                    }
+                        if (types.includes('logic')) {
+                            this.logic.runLogic(field, this.originalMode as ViewMode, this.record, 'onDependencyChange', dependentField);
+                        }
 
-                    if (types.includes('displayLogic')) {
-                        this.logicDisplay.runAll(field, this.record, this.originalMode as ViewMode);
+                        if (types.includes('displayLogic')) {
+                            this.logicDisplay.runAll(field, this.record, this.originalMode as ViewMode);
+                        }
                     }
                 });
-            }
+                this.field.previousValue = data.value;
 
-            if (this.field.valueChanges$ && ((this.dependentFields && Object.keys(this.dependentFields).length) || this.dependentAttributes.length)) {
-                this.subs.push(this.field.valueChanges$.pipe(debounceTime(500)).subscribe((data) => {
-                    Object.keys(this.dependentFields).forEach(fieldKey => {
-                        const dependentFieldKey = this.dependentFields[fieldKey];
-                        const field = this.record.fields[fieldKey] || null;
-                        const dependentField = this.record.fields[dependentFieldKey.field] || null;
-                        if (!field) {
-                            return;
-                        }
+                this.dependentAttributes.forEach(dependency => {
+                    const field = this.record.fields[dependency.field] || {} as Field;
+                    const attribute = (field && field.attributes && field.attributes[dependency.attribute]) || null;
 
-                        if (this.field.previousValue != data.value) {
-                            const types = dependentFieldKey.type ?? [];
+                    if (!attribute) {
+                        return;
+                    }
 
-                            if (types.includes('logic')) {
-                                this.logic.runLogic(field, this.originalMode as ViewMode, this.record, 'onDependencyChange', dependentField);
-                            }
+                    this.logic.runLogic(attribute, this.mode as ViewMode, this.record, 'onAttributeChange');
+                });
 
-                            if (types.includes('displayLogic')) {
-                                this.logicDisplay.runAll(field, this.record, this.originalMode as ViewMode);
-                            }
-                        }
-                    });
-                    this.field.previousValue = data.value;
-
-                    this.dependentAttributes.forEach(dependency => {
-                        const field = this.record.fields[dependency.field] || {} as Field;
-                        const attribute = (field && field.attributes && field.attributes[dependency.attribute]) || null;
-
-                        if (!attribute) {
-                            return;
-                        }
-
-                        this.logic.runLogic(attribute, this.mode as ViewMode, this.record, 'onAttributeChange');
-                    });
-
-                }));
-            }
-
+            }));
         }
+
+    }
+
+    /**
+     * Run on initialize logic
+     * @protected
+     */
+    protected runOnInitializeLogic(): void {
+        this.runSelfOnInitializeLogic();
+        this.triggerDependentOnInitializeLogic();
+    }
+
+    /**
+     * Run initialize logic on the current field
+     * @protected
+     */
+    protected runSelfOnInitializeLogic(): void {
+        const fieldDependencies = this?.field?.fieldDependencies ?? {};
+        const attributeDependencies = this?.field?.attributeDependencies ?? [];
+        if (!Object.keys(fieldDependencies).length && !attributeDependencies.length) {
+            return;
+        }
+
+        const isToRunLogic = Object.keys(fieldDependencies).some(fieldKey => {
+            const types = fieldDependencies[fieldKey]?.type ?? [];
+            return types.includes('logic');
+        });
+
+        if (isToRunLogic) {
+            this.logic.runLogic(this.field, this.originalMode as ViewMode, this.record, 'onFieldInitialize');
+        }
+
+        const isToRunDisplayLogic = Object.keys(fieldDependencies).some(fieldKey => {
+            const types = fieldDependencies[fieldKey]?.type ?? [];
+            return types.includes('displayLogic');
+        });
+
+        if (isToRunDisplayLogic) {
+            this.logicDisplay.runAll(this.field, this.record, this.originalMode as ViewMode, 'onFieldInitialize');
+        }
+    }
+
+    /**
+     * Trigger initialize logic on dependent fields on
+     * @protected
+     */
+    protected triggerDependentOnInitializeLogic(): void {
+        const dependentFields = this?.dependentFields ?? {};
+        const dependentAttributes = this?.dependentAttributes ?? [];
+
+        if (!Object.keys(dependentFields)?.length && !dependentAttributes?.length) {
+            return;
+        }
+
+        Object.keys(this.dependentFields).forEach(fieldKey => {
+            const field = this.record.fields[fieldKey] || null;
+            if (!field) {
+                return;
+            }
+
+            const types = this.dependentFields[fieldKey].type ?? [];
+
+            if (types.includes('logic')) {
+                this.logic.runLogic(field, this.originalMode as ViewMode, this.record, 'onFieldInitialize');
+            }
+
+            if (types.includes('displayLogic')) {
+                this.logicDisplay.runAll(field, this.record, this.originalMode as ViewMode, 'onFieldInitialize');
+            }
+        });
     }
 
     /**
@@ -281,7 +334,7 @@ export class BaseFieldComponent implements FieldComponentInterface, OnInit, OnDe
                     dependentAttributes.push({
                         field: fieldKey,
                         attribute: attributeKey,
-                        types:  (dependentFields[name] ?? {})['types'] ?? []
+                        types: (dependentFields[name] ?? {})['types'] ?? []
                     });
                 }
             }

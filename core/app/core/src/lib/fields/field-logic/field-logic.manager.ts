@@ -93,9 +93,11 @@ export class FieldLogicManager extends BaseActionManager<FieldLogicActionData> {
      * @param dependentField
      */
     runLogic(field: Field, mode: ViewMode, record: Record, triggeringStatus: string = '', dependentField: Field = {} as Field): void {
-        if (!field.logic) {
+        const onInitFieldLogicExecuted = field?.onInitFieldLogicExecuted ?? false
+        if (!field.logic || (onInitFieldLogicExecuted && triggeringStatus === 'onFieldInitialize')) {
             return;
         }
+        field.onInitFieldLogicExecuted = true;
 
         const actions = Object.keys(field.logic).map(key => field.logic[key]);
 

@@ -230,6 +230,9 @@ export interface Field {
     initDefaultValue?: DefaultValueInitCallback;
     initDefaultValueObject?: DefaultValueInitCallback;
     initValueSignal?: InitValueSignalFunction;
+
+    onInitFieldLogicExecuted?: boolean;
+    onInitFieldDisplayLogicExecuted?: boolean;
 }
 
 export class BaseField implements Field {
@@ -278,6 +281,9 @@ export class BaseField implements Field {
     protected valueObjectArrayState?: ObjectMap[];
     defaultValueInitialized: boolean = false;
     defaultValueObjectInitialized: boolean = false;
+
+    onInitFieldLogicExecuted: boolean = false;
+    onInitFieldDisplayLogicExecuted: boolean = false;
 
     constructor() {
         this.valueSubject = new BehaviorSubject<FieldValueChanges>({} as FieldValueChanges);

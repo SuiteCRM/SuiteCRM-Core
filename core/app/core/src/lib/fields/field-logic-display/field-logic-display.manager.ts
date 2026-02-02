@@ -45,12 +45,14 @@ export class FieldLogicDisplayManager extends BaseActionManager<FieldLogicDispla
         displayType.modes.forEach(mode => this.actions[mode][displayType.key] = displayType);
     }
 
-    runAll(field: Field, record: Record, mode: ViewMode): void {
+    runAll(field: Field, record: Record, mode: ViewMode, triggeringStatus: string = ''): void {
         let toDisplay: DisplayType = 'show';
+        const onInitFieldDisplayLogicExecuted = field?.onInitFieldDisplayLogicExecuted ?? false
 
-        if(!field.displayLogic) {
+        if(!field.displayLogic || (onInitFieldDisplayLogicExecuted && triggeringStatus === 'onFieldInitialize')) {
             return;
         }
+        field.onInitFieldDisplayLogicExecuted = true;
 
         const validModeLogic = Object.values(field.displayLogic).filter(logic => {
             const allowedModes = logic['modes'] ?? [];

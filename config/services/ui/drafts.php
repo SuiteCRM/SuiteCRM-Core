@@ -75,8 +75,8 @@ return static function (ContainerConfigurator $containerConfig) {
                     'filters' => [
                         'orderBy' => 'date_modified',
                         'sortOrder' => 'desc',
-                        'static' => [
-                            'type' => 'draft',
+                        'preset' => [
+                            'type' => 'drafts',
                         ],
                     ],
                     'create' => null,

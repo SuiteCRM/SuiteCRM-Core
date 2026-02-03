@@ -53,6 +53,7 @@
     "google/recaptcha": "^1.1",
     "gymadarasz/ace": "^1.2",
     "gymadarasz/imagesloaded": "^4.1",
+    "imagine/imagine": "1.5.2",
     "javanile/php-imap2": "^0.1.10",
     "jeroendesloovere/vcard": "^1.7",
     "justinrainbow/json-schema": "^5.2",

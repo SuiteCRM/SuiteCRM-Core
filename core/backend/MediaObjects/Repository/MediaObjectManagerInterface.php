@@ -153,4 +153,25 @@ interface MediaObjectManagerInterface
      */
     public function createMediaObjectFromAttributes(string $storageType, array $attributes): MediaObjectInterface;
 
+    /**
+     * @param string $storageType
+     * @param MediaObjectInterface $mediaObject
+     * @return MediaObjectInterface|null
+     */
+    public function getCompressedMediaObject(string $storageType, MediaObjectInterface $mediaObject): ?MediaObjectInterface;
+
+
+    /**
+     * @param string $storageType
+     * @param ?MediaObjectInterface $currentMediaObject
+     * @return void
+     */
+    public function deleteCompressedMediaObject(string $storageType, ?MediaObjectInterface $currentMediaObject): void;
+
+    /**
+     * @param string $storageType
+     * @param MediaObjectInterface $currentMediaObject
+     * @return void
+     */
+    public function setCompressedMediaObjectToDeleted(string $storageType, MediaObjectInterface $currentMediaObject): void;
 }

@@ -117,6 +117,22 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
         }
     }
 
+    public function getCompressedMediaObject(string $storageType, MediaObjectInterface $mediaObject): ?MediaObjectInterface
+    {
+        if ($mediaObject->getId() === null) {
+            return null;
+        }
+
+        $linkedMediaObjects = $this->getLinkedMediaObjects(
+            $storageType,
+            'MediaObject',
+            $mediaObject->getId(),
+            'file'
+        );
+
+        return !empty($linkedMediaObjects) ? $linkedMediaObjects[0] : null;
+    }
+
     public function createMediaObjectFromType(string $type): ?MediaObjectInterface
     {
         $classMap = array_flip($this->objectTypeMap);
@@ -398,4 +414,24 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
 
         return $mediaObject;
     }
+
+    public function deleteCompressedMediaObject(string $storageType, ?MediaObjectInterface $currentMediaObject): void
+    {
+        $mediaObject = $this->getCompressedMediaObject($storageType, $currentMediaObject);
+        if ($mediaObject === null) {
+            return;
+        }
+        $this->deleteMediaObject($storageType, $mediaObject);
+    }
+
+    public function setCompressedMediaObjectToDeleted(string $storageType, MediaObjectInterface $currentMediaObject): void
+    {
+        $compressedMediaObject = $this->getCompressedMediaObject($storageType, $currentMediaObject);
+        if ($compressedMediaObject === null) {
+            return;
+        }
+
+        $compressedMediaObject->setDeleted(true);
+    }
+
 }

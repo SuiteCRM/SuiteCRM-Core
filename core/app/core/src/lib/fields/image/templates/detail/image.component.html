@@ -39,13 +39,7 @@
                     alt="{{ uploadedFile()?.name || 'uploaded-image' }}"
                     [preview]="preview">
                 <ng-template pTemplate="indicator">
-                    <div class="d-flex flex-row align-items-center justify-content-around w-100">
-                        <scrm-image [image]="'eye'" [titleKey]="'LBL_PREVIEW_IMAGE'"></scrm-image>
-                        <a [href]="uploadedFile()?.contentUrl" download class="d-flex pl-3 clickable" target="_blank"
-                           (click)="$event.stopPropagation()">
-                            <scrm-image [image]="'download-arrow'" [titleKey]="'LBL_DOWNLOAD_IMAGE'"></scrm-image>
-                        </a>
-                    </div>
+                    <ng-container *ngTemplateOutlet="preview"></ng-container>
                 </ng-template>
             </p-image>
         </ng-container>
@@ -60,13 +54,7 @@
                     [preview]="preview">
 
                 <ng-template pTemplate="indicator">
-                    <div class="d-flex flex-row align-items-center justify-content-around w-100">
-                        <scrm-image [image]="'eye'" [titleKey]="'LBL_PREVIEW_IMAGE'"></scrm-image>
-                        <a [href]="uploadedFile()?.contentUrl" download class="d-flex pl-3 clickable" target="_blank"
-                           (click)="$event.stopPropagation()">
-                            <scrm-image [image]="'download-arrow'" [titleKey]="'LBL_DOWNLOAD_IMAGE'"></scrm-image>
-                        </a>
-                    </div>
+                    <ng-container *ngTemplateOutlet="preview"></ng-container>
                 </ng-template>
             </p-image>
         </ng-container>
@@ -78,3 +66,13 @@
         <scrm-image-skeleton [height]="maxHeight" ></scrm-image-skeleton>
     </ng-container>
 </div>
+
+<ng-template #preview>
+    <div class="d-flex flex-row align-items-center justify-content-around w-100">
+        <scrm-image [image]="'eye'" [titleKey]="'LBL_PREVIEW_IMAGE'"></scrm-image>
+        <a [href]="uploadedFile()?.contentUrl" download class="d-flex pl-3 clickable" target="_blank"
+           (click)="$event.stopPropagation()">
+            <scrm-image [image]="'download-arrow'" [titleKey]="'LBL_DOWNLOAD_IMAGE'"></scrm-image>
+        </a>
+    </div>
+</ng-template>

@@ -27,7 +27,7 @@
 
 import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {Attachment} from "../uploaded-file/uploaded-file.model";
-import {NgIf} from "@angular/common";
+import {NgIf, NgTemplateOutlet} from "@angular/common";
 import {ButtonModule} from "../button/button.module";
 import {ButtonInterface} from "../../common/components/button/button.model";
 import {LabelModule} from "../label/label.module";
@@ -40,7 +40,8 @@ import {ImageModule} from "../image/image.module";
         NgIf,
         ButtonModule,
         LabelModule,
-        ImageModule
+        ImageModule,
+        NgTemplateOutlet
     ],
     templateUrl: './uploaded-image.component.html',
 })
@@ -48,6 +49,7 @@ export class UploadedImageComponent implements OnInit {
     @Input() file: Attachment;
     @Input() maxHeight: string = '100px';
     @Input() allowClear: boolean = true;
+    @Input() showThumbnail: boolean = true;
 
     @Output('clear') clear: EventEmitter<Attachment> = new EventEmitter<Attachment>();
 
@@ -55,7 +57,7 @@ export class UploadedImageComponent implements OnInit {
     errorClearButtonConfig: ButtonInterface;
 
     ngOnInit() {
-        this.buildClearButtonConfig()
+        this.buildClearButtonConfig();
     }
 
     protected buildClearButtonConfig(): void {

@@ -214,6 +214,7 @@ export class RecordThreadModalService {
         store.setListMetadata({actions: config.listActions});
 
         const filter = {};
+        const preset = options?.filters?.preset ?? {};
         const fields = options?.filters?.static ?? [];
 
         Object.keys(fields).forEach((field) => {
@@ -228,6 +229,7 @@ export class RecordThreadModalService {
         const filters = {
             orderBy: options?.filters?.orderBy ?? 'date_entered',
             sortOrder: options?.filters?.sortOrder ?? 'asc',
+            preset: preset,
             filters: filter,
         } as SearchCriteria;
 

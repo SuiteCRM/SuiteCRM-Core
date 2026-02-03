@@ -24,10 +24,8 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {BehaviorSubject, Observable, of} from 'rxjs';
-import {distinctUntilChanged, map, shareReplay} from 'rxjs/operators';
+import {Observable, Subscription} from 'rxjs';
 import {StateStore} from "../state";
-import {deepClone} from "../../common/utils/object-utils";
 import {RecordThreadStore} from "../../containers/record-thread/store/record-thread/record-thread.store";
 import {AppStateStore} from "../app-state/app-state.store";
 import {SystemConfigStore} from "../system-config/system-config.store";
@@ -49,6 +47,7 @@ export class RecordThreadModalStore implements StateStore, BaseRecordContainerSt
 
 
     protected recordThreadStore: RecordThreadStore;
+    protected subs: Subscription[] = [];
 
     constructor(
         protected appStateStore: AppStateStore,
@@ -68,6 +67,8 @@ export class RecordThreadModalStore implements StateStore, BaseRecordContainerSt
         this.clear();
         this.recordThreadStore.clear();
         this.recordThreadStore = null;
+        this.subs.forEach(sub => sub.unsubscribe());
+        this.subs = [];
     }
 
     public init(): void {
@@ -95,7 +96,7 @@ export class RecordThreadModalStore implements StateStore, BaseRecordContainerSt
         const options = this.config?.recordThreadConfig?.recordThreadOptions ?? {};
 
         this.recordThreadStore = this.recordThreadModalService.buildRecordThreadStore();
-        this.recordThreadModalService.initRecordThreadStore(options, this.recordThreadStore).subscribe((records) => {
+        this.subs.push(this.recordThreadModalService.initRecordThreadStore(options, this.recordThreadStore).subscribe((records) => {
             if (records?.length) {
                 const options = {
                     ...this.config.modalConfig,
@@ -105,7 +106,7 @@ export class RecordThreadModalStore implements StateStore, BaseRecordContainerSt
                     addToAppState: false,
                 })
             }
-        });
+        }));
 
     }
     /**

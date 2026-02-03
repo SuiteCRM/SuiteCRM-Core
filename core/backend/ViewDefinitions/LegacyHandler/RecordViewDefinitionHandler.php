@@ -792,7 +792,7 @@ class RecordViewDefinitionHandler extends LegacyHandler
 
     protected function addModalActionConfig(string $module, array $detailViewDefs, array &$metadata): void
     {
-        $recordActions = $detailViewDefs['recordModalActions'] ?? [];
+        $recordActions = $detailViewDefs['recordModalHeaderActions'] ?? [];
         $actions = $this->actionDefinitionProvider->getActions($module, $recordActions) ?? [];
 
         $metadata['modalHeaderActions'] = array_values($actions);

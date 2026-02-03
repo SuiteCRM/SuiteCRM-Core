@@ -69,9 +69,17 @@ trait ImageFieldApiMapperTrait
             return;
         }
 
+        if (!$showThumbnail) {
+            $recordAttributes = $record->getAttributes();
+            $recordAttributes[$field] = $mediaObjectRecord->toArray();
+
+            $record->setAttributes($recordAttributes);
+            return;
+        }
+
         $compressedMediaObject = $mediaObjectManager->getCompressedMediaObject($type, $mediaObjects[0]);
 
-        if (!$showThumbnail || $compressedMediaObject === null) {
+        if ($compressedMediaObject === null) {
             $recordAttributes = $record->getAttributes();
             $recordAttributes[$field] = $mediaObjectRecord->toArray();
 

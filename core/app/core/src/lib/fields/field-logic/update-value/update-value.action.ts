@@ -90,18 +90,20 @@ export class UpdateValueAction extends FieldLogicActionHandler {
             value = targetValue;
 
             const targetField = record?.fields[targetValueField] ?? null;
-            let targetFieldValue = fieldHandler?.getValue(targetField, record) ?? null;
-            if (targetFieldValue) {
-                if (field.type === 'relate') {
-                    targetFieldValue = {
-                        'id': targetFieldValue.id ?? '',
-                        'name': targetFieldValue[this.getRelateFieldName(field)] ?? value?.name ?? ''
+            if (targetValueField) {
+                let targetFieldValue = fieldHandler?.getValue(targetField, record) ?? null;
+                if (targetFieldValue) {
+                    if (field.type === 'relate') {
+                        targetFieldValue = {
+                            'id': targetFieldValue.id ?? '',
+                            'name': targetFieldValue[this.getRelateFieldName(field)] ?? value?.name ?? ''
+                        }
+
+                        targetFieldValue[this.getRelateFieldName(field)] = targetFieldValue['name'] ?? '';
                     }
 
-                    targetFieldValue[this.getRelateFieldName(field)] = targetFieldValue['name'] ?? '';
+                    value = targetFieldValue;
                 }
-
-                value = targetFieldValue;
             }
         }
 

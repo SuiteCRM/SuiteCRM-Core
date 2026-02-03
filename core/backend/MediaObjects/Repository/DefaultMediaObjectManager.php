@@ -497,6 +497,11 @@ class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectMana
             return null;
         }
 
+        if ($this->getImagine() === null) {
+            $this->logger->error('No image library available to create thumbnail.');
+            return null;
+        }
+
         [$uploadedFile, $path] = $this->createThumbnail($mediaObject, $contents, $options);
 
         if (empty($path)) {
@@ -522,8 +527,6 @@ class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectMana
         $contentUrl = $this->buildContentUrl($storageType, $compressedMediaObject);
         $compressedMediaObject->setContentUrl($contentUrl);
 
-        $this->saveMediaObject($storageType, $compressedMediaObject);
-
         unlink($path);
 
         return $compressedMediaObject;
@@ -543,11 +546,6 @@ class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectMana
 
         $id = create_guid();
         $imagine = $this->getImagine();
-
-        if ($imagine === null) {
-            $this->logger->error('No image library available to create thumbnail.');
-            return [new ReplacingFile(''), ''];
-        }
 
         $ext = $this->getExtension($mediaObject);
         $path = $this->projectDir . '/' . $this->getThumbnailTmpPath() . $id . $ext;

@@ -29,7 +29,7 @@
 <div class="image-field-container">
     <ng-container *ngIf="!loading() && uploadedFile()">
 
-        <ng-container *ngIf="showThumbnail && uploadedFile()?.thumbnailUrl !== ''">
+        <div class="thumbnail-image" *ngIf="showThumbnail && uploadedFile()?.thumbnailUrl !== ''">
             <p-image
                     [height]="maxHeight"
                     [loading]="'lazy'"
@@ -42,7 +42,7 @@
                     <ng-container *ngTemplateOutlet="preview"></ng-container>
                 </ng-template>
             </p-image>
-        </ng-container>
+        </div>
 
         <ng-container *ngIf="!showThumbnail || uploadedFile()?.thumbnailUrl === ''">
             <p-image

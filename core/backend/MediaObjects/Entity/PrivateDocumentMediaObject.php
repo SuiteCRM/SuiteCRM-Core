@@ -119,6 +119,7 @@ class PrivateDocumentMediaObject implements MediaObjectInterface
         fileNameProperty: 'filePath',
         size: 'size',
         mimeType: 'mimeType',
+        originalName: 'originalName',
         dimensions: 'dimensions'
     )]
     public ?File $file = null;

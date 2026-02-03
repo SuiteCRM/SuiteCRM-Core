@@ -71,12 +71,4 @@ export class ImageDetailFieldComponent extends BaseImageComponent {
 
         this.loading.set(false);
     }
-
-    protected isAllowedPreview(): boolean {
-        const allowedPreview = this.systemConfigs.getConfigValue('allowed_preview') ?? [];
-        const mimeType = this.field?.valueObject?.attributes?.mime_type ?? '';
-        const ext = mimeType.split('/')[1] ?? '';
-
-        return allowedPreview.includes(ext.toLowerCase()) && (isTrue(this.field?.metadata?.preview ?? true));
-    }
 }

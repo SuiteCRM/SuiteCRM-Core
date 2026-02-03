@@ -34,6 +34,7 @@ import {
     LegacyEntrypointLinkBuilder
 } from "../../services/navigation/legacy-entrypoint-link-builder/legacy-entrypoint-link-builder.service";
 import {SystemConfigStore} from "../../store/system-config/system-config.store";
+import {isTrue} from "../../common/utils/value-utils";
 
 @Component({template: ''})
 export class BaseImageComponent extends BaseFileComponent {
@@ -42,6 +43,7 @@ export class BaseImageComponent extends BaseFileComponent {
     maxWidth: string;
     preview = true;
     storageType: string;
+    showThumbnail: boolean = true;
     loading: WritableSignal<boolean> = signal(false);
 
     constructor(
@@ -91,6 +93,14 @@ export class BaseImageComponent extends BaseFileComponent {
         }
 
         return '100%';
+    }
+
+    protected isAllowedPreview(): boolean {
+        const allowedPreview = this.systemConfigs.getConfigValue('allowed_preview') ?? [];
+        const mimeType = this.field?.valueObject?.attributes?.mime_type ?? '';
+        const ext = mimeType.split('/')[1] ?? '';
+
+        return allowedPreview.includes(ext.toLowerCase()) && (isTrue(this.field?.metadata?.preview ?? true));
     }
 
     setLoading(value: boolean, delay: boolean = false) {

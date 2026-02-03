@@ -132,8 +132,6 @@ class ImageFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
             return;
         }
 
-        $compressedMediaObject = $this->mediaObjectManager->getCompressedMediaObject($storageType, $mediaObject);
-
         $mediaObject->setParentType($parentType);
         $mediaObject->setParentId($parentId);
         $mediaObject->setParentField($field);
@@ -157,11 +155,9 @@ class ImageFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
 
         $this->mediaObjectManager->saveMediaObject($storageType, $mediaObject);
 
+        $compressedMediaObject = $this->mediaObjectManager->getCompressedMediaObject($storageType, $mediaObject);
+
         if ($compressedMediaObject !== null || ($fieldVardef['metadata']['createThumbnail'] ?? true) === false) {
-            $compressedMediaObject->setParentType('MediaObject');
-            $compressedMediaObject->setParentId($mediaObject->getId());
-            $compressedMediaObject->setTemporary(false);
-            $this->mediaObjectManager->saveMediaObject($storageType, $compressedMediaObject);
             return;
         }
 

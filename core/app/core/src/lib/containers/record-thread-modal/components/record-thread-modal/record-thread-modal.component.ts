@@ -39,6 +39,8 @@ import {RecordThreadModalStoreFactory} from "../../../../store/record-thread-mod
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {SearchCriteria} from "../../../../common/views/list/search-criteria.model";
 import {ButtonInterface} from "../../../../common/components/button/button.model";
+import {ActionGroupMenuModule} from "../../../../components/action-group-menu/action-group-menu.module";
+import {NgIf} from "@angular/common";
 
 @Component({
     selector: 'scrm-record-thread-modal',
@@ -47,15 +49,12 @@ import {ButtonInterface} from "../../../../common/components/button/button.model
     imports: [
         ModalModule,
         RecordThreadModule,
+        ActionGroupMenuModule,
+        NgIf,
     ],
     styleUrls: [],
 })
 export class RecordThreadModalComponent implements OnInit {
-
-    recordThreadConfig: RecordThreadConfig;
-    recordThreadModalOptions: any = {};
-    closeButton: ButtonInterface;
-
 
     @Input() closable: boolean = true;
     @Input() titleKey = '';
@@ -81,8 +80,11 @@ export class RecordThreadModalComponent implements OnInit {
     @Input() dynamicTitleContext: WritableSignal<StringMap> = signal({});
     @Input() dynamicTitleFields: WritableSignal<FieldMap> = signal({});
 
-    protected subs: Subscription[] = [];
+    recordThreadConfig: RecordThreadConfig;
+    recordThreadModalOptions: any = {};
+    closeButton: ButtonInterface;
 
+    protected subs: Subscription[] = [];
 
     constructor(
         protected activeModal: NgbActiveModal,

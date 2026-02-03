@@ -29,9 +29,6 @@
     <scrm-modal *ngIf="modalStore"
                 #modalComponent
                 [closable]="closable"
-                [headerActionsAdapter]="modalHeaderActionsAdapter"
-                [headerActionContext]="viewContext"
-                [headerActionsKlass]="modalHeaderActionsKlass"
                 [close]="closeButton"
                 [titleKey]="titleKey"
                 [descriptionKey]="descriptionKey"
@@ -50,6 +47,15 @@
                 footerKlass="border-0 {{footerClass}}"
                 headerKlass="border-bottom {{headerClass}} "
                 klass="record-modal rounded {{wrapperClass}}">
+        <ng-container modal-header-actions>
+            <ng-container *ngIf="modalHeaderActionsAdapter">
+                <scrm-action-group-menu class="{{modalHeaderActionsKlass}}"
+                                        [config]="modalHeaderActionsAdapter"
+                                        [actionContext]="viewContext"
+                >
+                </scrm-action-group-menu>
+            </ng-container>
+        </ng-container>
         <div modal-body>
 
             <ng-container *ngIf="!isMinimized()">

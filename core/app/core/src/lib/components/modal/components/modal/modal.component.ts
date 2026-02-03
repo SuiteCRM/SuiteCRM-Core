@@ -60,15 +60,12 @@ export class ModalComponent implements OnInit, OnDestroy {
     @Input() titleKey = '';
     @Input() titleIcon = '';
     @Input() dynamicTitleKey = '';
-    @Input() headerActionsKlass = '';
     @Input() dynamicTitleContext: WritableSignal<StringMap> = signal({});
     @Input() dynamicTitleFields: WritableSignal<FieldMap> = signal({});
     @Input() descriptionKey = '';
     @Input() openMinimised = false;
     @Input() dynamicDescriptionKey = '';
     @Input() dynamicDescriptionContext: WritableSignal<StringMap> = signal({});
-    @Input() headerActionsAdapter: any = null;
-    @Input() headerActionContext: ActionContext;
     @Input() dynamicDescriptionFields: WritableSignal<FieldMap> = signal({});
     @Input() limit = '';
     @Input() limitEndLabel = '';

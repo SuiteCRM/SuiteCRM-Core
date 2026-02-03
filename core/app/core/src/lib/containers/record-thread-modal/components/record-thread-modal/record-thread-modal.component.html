@@ -29,10 +29,8 @@
 <scrm-modal [closable]="closable"
             [closeOnOutsideClick]="closeOnOutsideClick"
             [close]="closeButton"
-            [headerActionsAdapter]="modalHeaderActionsAdapter"
             [openMinimised]="openMinimised"
             [titleIcon]="titleIcon"
-            [headerActionsKlass]="modalHeaderActionKlass"
             [titleClass]="titleClass"
             [titleKey]="titleKey"
             [descriptionKey]="descriptionKey"
@@ -42,6 +40,14 @@
             headerKlass="border-bottom {{headerClass}} "
             klass="rounded {{wrapperClass}}"
 >
+    <div modal-header-actions>
+        <ng-container *ngIf="modalHeaderActionsAdapter">
+            <scrm-action-group-menu class="{{modalHeaderActionKlass}}"
+                                    [config]="modalHeaderActionsAdapter"
+            >
+            </scrm-action-group-menu>
+        </ng-container>
+    </div>
     <div modal-body>
         <scrm-record-thread [config]="recordThreadConfig">
 

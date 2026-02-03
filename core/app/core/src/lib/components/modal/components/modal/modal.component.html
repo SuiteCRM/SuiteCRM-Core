@@ -50,14 +50,8 @@
                 <scrm-label *ngIf="limitEndLabel" [labelKey]="limitEndLabel"></scrm-label>
                 </span>
         </div>
-        <div>
-            <ng-container *ngIf="headerActionsAdapter">
-                <scrm-action-group-menu class="{{headerActionsKlass}}"
-                                        [config]="headerActionsAdapter"
-                                        [actionContext]="headerActionContext"
-                >
-                </scrm-action-group-menu>
-            </ng-container>
+        <div class="modal-header-actions-container">
+            <ng-content select="[modal-header-actions]"></ng-content>
             <scrm-minimise-button *ngIf="minimizable"
                                   [config]="minimiseButton"
                                   [status]="minimiseStatus()"

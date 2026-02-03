@@ -99,6 +99,7 @@ class ImageFieldHardDeleteHandler  implements RecordFieldTypeDeleteHandlerInterf
         foreach ($currentMediaObjects as $currentMediaObject) {
             // This will delete the media object from the repository and file system
             $this->mediaObjectManager->deleteMediaObject($storageType, $currentMediaObject);
+            $this->mediaObjectManager->deleteCompressedMediaObject($storageType, $currentMediaObject);
         }
     }
 

@@ -97,6 +97,7 @@ class ImageFieldSoftDeleteHandler  implements RecordFieldTypeDeleteHandlerInterf
 
         foreach ($currentMediaObjects as $currentMediaObject) {
             $currentMediaObject->setDeleted(true);
+            $this->mediaObjectManager->setCompressedMediaObjectToDeleted($storageType, $currentMediaObject);
             $this->mediaObjectManager->saveMediaObject($storageType, $currentMediaObject);
         }
     }

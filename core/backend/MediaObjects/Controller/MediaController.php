@@ -137,6 +137,10 @@ class MediaController extends AbstractController
             throw $this->createNotFoundException('Media object not found');
         }
 
+        if ($mediaObject->parentType === 'MediaObject' && $this->privateImageRepository->find($mediaObject->parentId) !== null) {
+            return $downloadHandler->downloadObject($mediaObject, 'file', PrivateImageMediaObject::class, $mediaObject->originalName);
+        }
+
         if (!empty($mediaObject->parentId) && !empty($mediaObject->parentType) && !$this->aclHandler->checkRecordAccess($mediaObject->parentType, 'view', $mediaObject->parentId)) {
             throw $this->createNotFoundException('Media object not found');
         }

@@ -36,13 +36,13 @@ use App\Module\EmailMarketing\Service\Actions\DeleteTestMailMarketingEntriesServ
 use App\Module\Service\ModuleNameMapperInterface;
 use App\Process\Entity\Process;
 use App\Process\Service\ProcessHandlerInterface;
-use SuiteCRM\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class CloseDraftAction extends LegacyHandler implements ProcessHandlerInterface
 {
     protected const MSG_OPTIONS_NOT_FOUND = 'Process options is not defined';
-    protected const PROCESS_TYPE = 'modal-close-draft';
+    protected const PROCESS_TYPE = 'modal-close-draft-email';
 
     public function __construct(
         protected array $draftsConfigs,
@@ -101,7 +101,7 @@ class CloseDraftAction extends LegacyHandler implements ProcessHandlerInterface
             return [
                 $module => [
                     [
-                        'action' => 'save',
+                        'action' => 'edit',
                         'record' => $id
                     ],
                 ],
@@ -110,7 +110,7 @@ class CloseDraftAction extends LegacyHandler implements ProcessHandlerInterface
 
         return [
             $module => [
-                [ 'action' => 'save', ],
+                ['action' => 'edit'],
             ],
         ];
     }
@@ -131,9 +131,22 @@ class CloseDraftAction extends LegacyHandler implements ProcessHandlerInterface
      */
     public function validate(Process $process): void
     {
-        if (empty($process->getOptions())) {
+        $options = $process->getOptions();
+
+        if (empty($options)) {
             throw new InvalidArgumentException(self::MSG_OPTIONS_NOT_FOUND);
         }
+
+        $module = $options['module'] ?? '';
+
+        if (empty($module)) {
+            throw new InvalidArgumentException('Process option "module" is not defined');
+        }
+
+        if ($module !== 'emails'){
+            throw new InvalidArgumentException('Module is not supported for draft saving');
+        }
+
     }
 
     /**

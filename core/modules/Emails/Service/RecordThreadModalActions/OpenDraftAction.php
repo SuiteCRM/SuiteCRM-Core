@@ -28,7 +28,7 @@
 
 namespace App\Module\Emails\Service\RecordThreadModalActions;
 
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use App\Data\Entity\Record;
 use App\Data\Service\RecordProviderInterface;
 use App\Process\Entity\Process;
@@ -97,8 +97,20 @@ class OpenDraftAction implements ProcessHandlerInterface
      */
     public function validate(Process $process): void
     {
-        if (empty($process->getOptions())) {
+        $options = $process->getOptions();
+
+        if (empty($options)) {
             throw new InvalidArgumentException(self::MSG_OPTIONS_NOT_FOUND);
+        }
+
+        $module = $options['module'] ?? '';
+
+        if (empty($module)) {
+            throw new InvalidArgumentException('Process option "module" is not defined');
+        }
+
+        if ($module !== 'emails'){
+            throw new InvalidArgumentException('Module is not supported for draft saving');
         }
     }
 

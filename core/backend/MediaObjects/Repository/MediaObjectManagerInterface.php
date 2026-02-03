@@ -160,6 +160,19 @@ interface MediaObjectManagerInterface
      */
     public function getCompressedMediaObject(string $storageType, MediaObjectInterface $mediaObject): ?MediaObjectInterface;
 
+    /**
+     * @param string $storageType
+     * @param MediaObjectInterface $mediaObject
+     * @param array $options
+     * @return MediaObjectInterface|null
+     */
+    public function createCompressedMediaObject(string $storageType, MediaObjectInterface $mediaObject, array $options): ?MediaObjectInterface;
+
+    /**
+     * @param MediaObjectInterface $mediaObject
+     * @return string
+     */
+    public function getExtension(MediaObjectInterface $mediaObject): string;
 
     /**
      * @param string $storageType
@@ -169,9 +182,21 @@ interface MediaObjectManagerInterface
     public function deleteCompressedMediaObject(string $storageType, ?MediaObjectInterface $currentMediaObject): void;
 
     /**
+     * @param string $type
+     * @return string|null
+     */
+    public function getMediaObjectClassFromType(string $type): ?string;
+
+    /**
      * @param string $storageType
      * @param MediaObjectInterface $currentMediaObject
      * @return void
      */
     public function setCompressedMediaObjectToDeleted(string $storageType, MediaObjectInterface $currentMediaObject): void;
+
+    /**
+     * @param string $className
+     * @return ?string
+     */
+    public function getStorageTypeFromClass(string $className): ?string;
 }

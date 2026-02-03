@@ -29,6 +29,8 @@ namespace App\MediaObjects\Repository;
 
 use App\Data\Entity\Record;
 use App\Data\Service\Record\Repository\RecordEntityRepository;
+use App\Engine\LegacyHandler\LegacyHandler;
+use App\Engine\LegacyHandler\LegacyScopeState;
 use App\MediaObjects\Entity\ArchivedDocumentMediaObject;
 use App\MediaObjects\Entity\LegacyDocumentMediaObject;
 use App\MediaObjects\Entity\LegacyImageMediaObject;
@@ -37,14 +39,34 @@ use App\MediaObjects\Entity\PrivateDocumentMediaObject;
 use App\MediaObjects\Entity\PrivateImageMediaObject;
 use App\MediaObjects\Entity\PublicDocumentMediaObject;
 use App\MediaObjects\Entity\PublicImageMediaObject;
+use App\SystemConfig\Service\SystemConfigProviderInterface;
+use Imagine\Gd\Imagine;
+use Imagine\Gmagick\Imagine as GmagickImagine;
+use Imagine\Imagick\Imagine as ImagickImagine;
+use Imagine\Image\Box;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Mime\MimeTypes;
+use Vich\UploaderBundle\FileAbstraction\ReplacingFile;
 use Vich\UploaderBundle\Storage\StorageInterface;
 
-class DefaultMediaObjectManager implements MediaObjectManagerInterface
+class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectManagerInterface
 {
     protected array $typeMap = [];
     protected array $objectTypeMap;
 
+    public function getHandlerKey(): string
+    {
+        return 'default-media-object-manager';
+    }
+
     public function __construct(
+        string $projectDir,
+        string $legacyDir,
+        string $legacySessionName,
+        string $defaultSessionName,
+        LegacyScopeState $legacyScopeState,
+        RequestStack $requestStack,
         protected ArchivedDocumentMediaObjectRepository $archivedDocumentRepository,
         protected PrivateDocumentMediaObjectRepository $privateDocumentRepository,
         protected PrivateImageMediaObjectRepository $privateImageRepository,
@@ -52,8 +74,19 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
         protected PublicImageMediaObjectRepository $publicImageRepository,
         protected LegacyDocumentMediaObjectRepository $legacyDocumentRepository,
         protected LegacyImageMediaObjectRepository $legacyImageRepository,
+        protected SystemConfigProviderInterface $systemConfigProvider,
+        protected LoggerInterface $logger,
         protected StorageInterface $storage
-    ) {
+    )
+    {
+        parent::__construct(
+            $projectDir,
+            $legacyDir,
+            $legacySessionName,
+            $defaultSessionName,
+            $legacyScopeState,
+            $requestStack
+        );
 
         $this->typeMap = [
             'archived-documents' => $archivedDocumentRepository,
@@ -143,6 +176,18 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
         }
 
         return new $className();
+    }
+
+    public function getMediaObjectClassFromType(string $type): ?string
+    {
+        $classMap = array_flip($this->objectTypeMap);
+        $className = $classMap[$type] ?? null;
+
+        if ($className === null || !class_exists($className)) {
+            return null;
+        }
+
+        return $className;
     }
 
     /**
@@ -415,6 +460,14 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
         return $mediaObject;
     }
 
+    public function getExtension(MediaObjectInterface $mediaObject): string
+    {
+        $mimeType = $mediaObject->getMimeType();
+        $mimeTypes = new MimeTypes();
+        $extensions = $mimeTypes->getExtensions($mimeType);
+        return !empty($extensions) ? '.' . $extensions[0] : '.jpg';
+    }
+
     public function deleteCompressedMediaObject(string $storageType, ?MediaObjectInterface $currentMediaObject): void
     {
         $mediaObject = $this->getCompressedMediaObject($storageType, $currentMediaObject);
@@ -434,4 +487,121 @@ class DefaultMediaObjectManager implements MediaObjectManagerInterface
         $compressedMediaObject->setDeleted(true);
     }
 
+
+    public function createCompressedMediaObject(string $storageType, MediaObjectInterface $mediaObject, array $options): ?MediaObjectInterface
+    {
+        $contents = $this->getFieldContents($storageType, $mediaObject);
+
+        if ($contents === false) {
+            $this->logger->warn('Could not get media object contents for id ' . $mediaObject?->getId());
+            return null;
+        }
+
+        [$uploadedFile, $path] = $this->createThumbnail($mediaObject, $contents, $options);
+
+        if (empty($path)) {
+            $this->logger->error('Could not create thumbnail for media object id ' . $mediaObject?->getId());
+            return null;
+        }
+
+        $compressedMediaObjectAttributes = [
+            'file' => $uploadedFile,
+            'parent_field' => 'file',
+            'parent_id' => $mediaObject->getId() ?? null,
+            'parent_type' => 'MediaObject',
+            'mime_type' => $mediaObject->getMimeType(),
+            'name' => ($mediaObject->getName() ?? $mediaObject->getOriginalName()) . ' (compressed)',
+            'original_name' => ($mediaObject->getOriginalName() ?? $mediaObject->getName()) . ' (compressed)',
+            'temporary' => $options['temporary'] ?? false,
+        ];
+
+        $compressedMediaObject = $this->createMediaObjectFromAttributes($storageType, $compressedMediaObjectAttributes);
+
+        $this->saveMediaObject($storageType, $compressedMediaObject);
+
+        $contentUrl = $this->buildContentUrl($storageType, $compressedMediaObject);
+        $compressedMediaObject->setContentUrl($contentUrl);
+
+        $this->saveMediaObject($storageType, $compressedMediaObject);
+
+        unlink($path);
+
+        return $compressedMediaObject;
+    }
+
+    protected function getFieldContents(string $storageType, MediaObjectInterface $mediaObject): bool|string
+    {
+        $stream = $this->storage->resolveStream($mediaObject, 'file', $this->getMediaObjectClassFromType($storageType) ?? null);
+        rewind($stream);
+        return stream_get_contents($stream);
+    }
+
+    protected function createThumbnail(MediaObjectInterface $mediaObject, string $contents, array $options): array
+    {
+        $height = $this->getThumbnailHeight($options['height'] ?? 0);
+        $width = $this->getThumbnailWidth($options['width'] ?? 0);
+
+        $id = create_guid();
+        $imagine = $this->getImagine();
+
+        if ($imagine === null) {
+            $this->logger->error('No image library available to create thumbnail.');
+            return [new ReplacingFile(''), ''];
+        }
+
+        $ext = $this->getExtension($mediaObject);
+        $path = $this->projectDir . '/' . $this->getThumbnailTmpPath() . $id . $ext;
+
+        $imagine->load($contents)->resize(new Box($width, $height))->save($path);
+        return [new ReplacingFile($path), $path];
+    }
+
+    protected function getThumbnailHeight(int $height): int
+    {
+        $defaultHeight = $this->systemConfigProvider->getSystemConfig('image_thumbnail_height_default')->getValue() ?? 50;
+
+        if (empty($height)) {
+            return (int)$defaultHeight;
+        }
+
+        return $height;
+    }
+
+    protected function getThumbnailWidth(int $width): int
+    {
+        $defaultHeight = $this->systemConfigProvider->getSystemConfig('image_thumbnail_width_default')->getValue() ?? 50;
+
+        if (empty($width)) {
+            return (int)$defaultHeight;
+        }
+
+        return $width;
+    }
+
+    protected function getThumbnailTmpPath(): string
+    {
+        return $this->systemConfigProvider->getSystemConfig('image_thumbnail_tmp_path')->getValue() ?? 'tmp/';
+    }
+
+    public function getStorageTypeFromClass(string $className): ?string
+    {
+        return $this->objectTypeMap[$className] ?? null;
+    }
+
+    protected function getImagine(): ImagickImagine|Imagine|GmagickImagine|null
+    {
+        if (extension_loaded('gd')) {
+            return new Imagine();
+        }
+
+        if (extension_loaded('imagick')) {
+            return new ImagickImagine();
+        }
+
+        if (extension_loaded('gmagick')) {
+            return new GmagickImagine();
+        }
+
+        return null;
+    }
 }

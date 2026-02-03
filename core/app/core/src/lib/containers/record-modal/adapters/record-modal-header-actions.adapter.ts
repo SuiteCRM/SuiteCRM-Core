@@ -50,13 +50,13 @@ import {FieldModalService} from "../../../services/modals/field-modal.service";
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {FieldLogicManager} from "../../../fields/field-logic/field-logic.manager";
 import {RecordManager} from "../../../services/record/record.manager";
-import {BaseModalActionsAdapter} from "../../../services/actions/base-modal-action.adapter";
+import {BaseModalHeaderActionsAdapter} from "../../../services/actions/base-modal-header-action.adapter";
 import {isTrue} from "../../../common/utils/value-utils";
 import {RecordMapperRegistry} from "../../../common/record/record-mappers/record-mapper.registry";
 import {RecordModalHeaderActionManager} from "../actions/header-actions/record-modal-header-action-manager.service";
 
 @Injectable()
-export class RecordModalHeaderActionsAdapter extends BaseModalActionsAdapter<RecordModalActionData> {
+export class RecordModalHeaderActionsAdapter extends BaseModalHeaderActionsAdapter<RecordModalActionData> {
 
     constructor(
         protected store: RecordModalStore,

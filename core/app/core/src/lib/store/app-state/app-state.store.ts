@@ -189,6 +189,10 @@ export class AppStateStore implements StateStore {
         this.updateState({...internalState, currentUser: user});
     }
 
+    public addEventEmitter(key: string, emitter: EventEmitter<any>): void {
+        this.eventEmitterMapper[key] = emitter;
+    }
+
     public addModalRef(modalRef: NgbModalRef): void {
         this.activeModals.push(modalRef);
         if (this.activeModals.length > 0) {

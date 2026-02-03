@@ -41,7 +41,7 @@ import {RecordManager} from "../record/record.manager";
 import {RecordMapperRegistry} from "../../common/record/record-mappers/record-mapper.registry";
 
 @Injectable()
-export abstract class BaseModalActionsAdapter<D extends RecordBasedActionData> extends BaseActionsAdapter<D> {
+export abstract class BaseModalHeaderActionsAdapter<D extends RecordBasedActionData> extends BaseActionsAdapter<D> {
 
     protected constructor(
         protected actionManager: ActionManager<D>,

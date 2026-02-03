@@ -54,10 +54,11 @@ export class ImageDetailFieldComponent extends BaseImageComponent {
         super(typeFormatter, logic, logicDisplay, mediaObjects, legacyEntrypointLinkBuilder, systemConfigs);
     }
 
-    ngOnInit() {
+    ngOnInit(): void {
         this.maxHeight = this.getMaxHeight();
         this.maxWidth = this.getMaxWidth();
         this.preview = this.isAllowedPreview();
+        this.showThumbnail = this.field.metadata?.showThumbnail ?? true;
         const hasFile = this.field?.valueObject &&
             (this.field.valueObject.id || this.field.valueObject.value);
 

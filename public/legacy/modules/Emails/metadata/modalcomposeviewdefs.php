@@ -42,10 +42,10 @@ $viewdefs['Emails']['ModalComposeView'] = [
             ['label' => '10', 'field' => '30']
         ],
     ],
-    'recordModalActions' => [
+    'recordModalHeaderActions' => [
         'actions' => [
-            'close-draft' => [
-                'key' => 'close-draft',
+            'close-draft-email' => [
+                'key' => 'close-draft-email',
                 'icon' => 'cross',
                 'klass' => ['btn btn-sm'],
                 'asyncProcess' => true,

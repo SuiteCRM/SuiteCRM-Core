@@ -100,6 +100,7 @@ export class BaseFileComponent extends BaseFieldComponent {
                 size: uploadFile?.size ?? '',
                 attachmentType: uploadFile?.attachmentType ?? 'file',
                 type: uploadFile?.type ?? '',
+                thumbnailUrl: uploadFile?.thumbnailUrl ?? '',
                 contentUrl: uploadFile?.contentUrl ?? '',
                 original_name: uploadFile?.name ?? '',
             }
@@ -132,20 +133,31 @@ export class BaseFileComponent extends BaseFieldComponent {
 
         let contentUrl = valueObject?.attributes?.contentUrl ?? '';
 
-        if (contentUrl && (!contentUrl.startsWith('https://') && !contentUrl.startsWith('http://')) && !contentUrl.startsWith('.')) {
-            contentUrl = '.' + contentUrl ?? '';
-        }
+        contentUrl = this.checkUrl(contentUrl);
+
+        let thumbnailUrl = valueObject?.attributes?.thumbnailUrl ?? '';
+
+        thumbnailUrl = this.checkUrl(thumbnailUrl);
 
         this.uploadedFile.set({
             id: valueObject?.id ?? '',
             name: valueObject?.attributes?.original_name ?? '',
             size: valueObject?.attributes?.size ?? 0,
             type: valueObject?.attributes?.type ?? '',
+            thumbnailUrl: thumbnailUrl || '',
             attachmentType: valueObject?.attributes?.attachmentType ?? 'file',
             contentUrl: contentUrl || '',
             status: signal('saved'),
             progress: signal(100),
             dateCreated: valueObject?.attributes?.date_entered || ''
         } as Attachment);
+    }
+
+    protected checkUrl(url: string): string {
+        if (url && (!url.startsWith('https://') && !url.startsWith('http://')) && !url.startsWith('.')) {
+            url = '.' + url ?? '';
+        }
+
+        return url;
     }
 }

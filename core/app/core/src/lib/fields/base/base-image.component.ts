@@ -59,6 +59,10 @@ export class BaseImageComponent extends BaseFileComponent {
 
     getMaxHeight(): string {
 
+        if (this.showThumbnail && this?.uploadedFile()?.thumbnailUrl !== '') {
+            return this.getThumbnailMaxHeight();
+        }
+
         const maxHeight = this.field?.metadata?.maxHeight ?? null;
 
         if (maxHeight) {
@@ -80,6 +84,10 @@ export class BaseImageComponent extends BaseFileComponent {
     }
 
     getMaxWidth(): string {
+
+        if (this.showThumbnail && this?.uploadedFile()?.thumbnailUrl !== '') {
+            return this.getThumbnailMaxWidth();
+        }
 
         const maxWidth = this.field?.metadata?.maxWidth ?? null;
 
@@ -112,5 +120,38 @@ export class BaseImageComponent extends BaseFileComponent {
         setTimeout(() => {
             this.loading.set(value);
         }, 600);
+    }
+
+    protected getThumbnailMaxHeight(): string {
+        const thumbnailHeight = this.field?.metadata?.thumbnailHeight ?? null;
+
+        if (thumbnailHeight) {
+            return thumbnailHeight.endsWith('px') ? thumbnailHeight : thumbnailHeight + 'px';
+        }
+
+        const configValue = this.systemConfigs.getConfigValue('image_thumbnail_height_default') ?? null;
+
+        if (configValue) {
+            return configValue.endsWith('px') ? configValue : configValue + 'px';
+        }
+
+        return '100px';
+    }
+
+    protected getThumbnailMaxWidth(): string {
+        const thumbnailHeight = this.field?.metadata?.thumbnailWidth ?? null;
+
+        if (thumbnailHeight){
+            return thumbnailHeight + 'px';
+        }
+
+        const configValue = this.systemConfigs.getConfigValue('image_thumbnail_width_default') ?? null;
+
+
+        if (configValue) {
+            return configValue + 'px';
+        }
+
+        return '100px';
     }
 }

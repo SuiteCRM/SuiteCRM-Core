@@ -130,6 +130,7 @@ export class RecordThreadModalComponent implements OnInit {
             filters$: of({
                 orderBy: this?.recordThreadModalOptions?.filters?.orderBy ?? 'date_entered',
                 sortOrder: this?.recordThreadModalOptions?.filters?.sortOrder ?? 'asc',
+                preset: this?.recordThreadModalOptions?.filters?.preset ?? {},
                 filters: filter,
             } as SearchCriteria),
             module: this.recordThreadModalOptions?.module ?? '',

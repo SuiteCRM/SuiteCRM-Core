@@ -28,7 +28,8 @@
 
 namespace App\Module\Emails\Service\RecordThreadModalHeaderActions;
 
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use App\Authentication\LegacyHandler\UserHandler;
 use App\Data\LegacyHandler\PreparedStatementHandler;
 use App\Data\Service\RecordDeletionServiceInterface;
 use App\Data\Service\RecordProviderInterface;
@@ -36,7 +37,7 @@ use App\Process\Entity\Process;
 use App\Process\Service\ProcessHandlerInterface;
 use Psr\Log\LoggerInterface;
 
-class DismissAllDrafts implements ProcessHandlerInterface
+class DismissAllEmailDrafts implements ProcessHandlerInterface
 {
     protected const MSG_OPTIONS_NOT_FOUND = 'Process options is not defined';
     protected const PROCESS_TYPE = 'record-thread-modal-dismiss-all-drafts';
@@ -45,6 +46,7 @@ class DismissAllDrafts implements ProcessHandlerInterface
         protected RecordProviderInterface $recordProvider,
         protected PreparedStatementHandler $preparedStatementHandler,
         protected RecordDeletionServiceInterface $recordDeleteHandler,
+        protected UserHandler $userHandler,
         protected LoggerInterface $logger,
     )
     {
@@ -76,7 +78,12 @@ class DismissAllDrafts implements ProcessHandlerInterface
      */
     public function getRequiredACLs(Process $process): array
     {
-        return [];
+        $module = 'Emails';
+        return [
+            $module => [
+                'action' => 'delete',
+            ]
+        ];
     }
 
     /**
@@ -94,7 +101,9 @@ class DismissAllDrafts implements ProcessHandlerInterface
      */
     public function validate(Process $process): void
     {
-        if (empty($process->getOptions())) {
+        $options = $process->getOptions();
+
+        if (empty($options)) {
             throw new InvalidArgumentException(self::MSG_OPTIONS_NOT_FOUND);
         }
     }
@@ -110,10 +119,12 @@ class DismissAllDrafts implements ProcessHandlerInterface
             ->from('emails')
             ->where('type = :type')
             ->andWhere('status = :status')
+            ->andWhere('created_by = :created_by')
             ->andWhere('deleted = 0')
             ->setParameters([
                 'type' => 'draft',
                 'status' => 'draft',
+                'created_by' => $this->userHandler->getCurrentUser()?->id,
             ]);
 
         $result = $queryBuilder->fetchAllAssociative();

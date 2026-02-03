@@ -68,6 +68,7 @@ export class RecordModalService {
             modalOptions.windowClass = 'detached-modal';
             modalOptions.animation = true;
             modalOptions.container = '#detached-modals';
+            modalOptions.keyboard = false;
         }
 
         const modal = this.modalService.open(RecordModalComponent, modalOptions);

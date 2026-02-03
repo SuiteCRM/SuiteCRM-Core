@@ -32,6 +32,7 @@ use App\Data\Service\Record\RecordSaveHandlers\RecordFieldTypeSaveHandlerInterfa
 use App\FieldDefinitions\Entity\FieldDefinition;
 use App\MediaObjects\Repository\MediaObjectManagerInterface;
 use App\Module\Service\ModuleNameMapperInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
 
@@ -40,7 +41,8 @@ class ImageFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
 {
     public function __construct(
         protected MediaObjectManagerInterface $mediaObjectManager,
-        protected ModuleNameMapperInterface $moduleNameMapper
+        protected ModuleNameMapperInterface $moduleNameMapper,
+        protected LoggerInterface $logger
     ) {
     }
 
@@ -112,6 +114,7 @@ class ImageFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
             foreach ($currentMediaObjects as $currentMediaObject) {
                 // This will delete the media object from the repository and file system
                 $this->mediaObjectManager->deleteMediaObject($storageType, $currentMediaObject);
+                $this->mediaObjectManager->deleteCompressedMediaObject($storageType, $currentMediaObject);
             }
 
             $legacyMediaObjects = $this->mediaObjectManager->getLinkedMediaObjects('legacy-images', $parentType, $parentId, $field) ?? [];
@@ -129,6 +132,8 @@ class ImageFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
             return;
         }
 
+        $compressedMediaObject = $this->mediaObjectManager->getCompressedMediaObject($storageType, $mediaObject);
+
         $mediaObject->setParentType($parentType);
         $mediaObject->setParentId($parentId);
         $mediaObject->setParentField($field);
@@ -138,6 +143,7 @@ class ImageFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
             if ($currentMediaObject->getId() !== $mediaObject->getId()) {
                 // This will delete the media object from the repository and file system
                 $this->mediaObjectManager->deleteMediaObject($storageType, $currentMediaObject);
+                $this->mediaObjectManager->deleteCompressedMediaObject($storageType, $currentMediaObject);
             }
         }
 
@@ -150,7 +156,25 @@ class ImageFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
         }
 
         $this->mediaObjectManager->saveMediaObject($storageType, $mediaObject);
-    }
 
+        if ($compressedMediaObject !== null || ($fieldVardef['metadata']['createThumbnail'] ?? true) === false) {
+            $compressedMediaObject->setParentType('MediaObject');
+            $compressedMediaObject->setParentId($mediaObject->getId());
+            $compressedMediaObject->setTemporary(false);
+            $this->mediaObjectManager->saveMediaObject($storageType, $compressedMediaObject);
+            return;
+        }
+
+        $options = [
+            'width' => $fieldVardef['metadata']['thumbnailWidth'] ?? 0,
+            'height' => $fieldVardef['metadata']['thumbnailHeight'] ?? 0
+        ];
+
+        $newCompressedMediaObject = $this->mediaObjectManager->createCompressedMediaObject($storageType, $mediaObject, $options);
+
+        if ($newCompressedMediaObject === null) {
+            $this->logger->error('Failed to create compressed media object for media object ID: ' . $mediaObject->getId());
+        }
+    }
 
 }

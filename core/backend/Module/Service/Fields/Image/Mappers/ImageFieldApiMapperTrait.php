@@ -46,8 +46,10 @@ trait ImageFieldApiMapperTrait
         string $field,
         string $type,
         MediaObjectManagerInterface $mediaObjectManager,
-        ModuleNameMapperInterface $moduleNameMapper
-    ): void {
+        ModuleNameMapperInterface $moduleNameMapper,
+        bool $showThumbnail = true
+    ): void
+    {
 
         $module = $moduleNameMapper->toLegacy($record->getModule());
 
@@ -66,6 +68,26 @@ trait ImageFieldApiMapperTrait
         if (!$mediaObjectRecord) {
             return;
         }
+
+        $compressedMediaObject = $mediaObjectManager->getCompressedMediaObject($type, $mediaObjects[0]);
+
+        if (!$showThumbnail || $compressedMediaObject === null) {
+            $recordAttributes = $record->getAttributes();
+            $recordAttributes[$field] = $mediaObjectRecord->toArray();
+
+            $record->setAttributes($recordAttributes);
+            return;
+        }
+
+        $thumbnailUrl = $compressedMediaObject->getContentUrl();
+
+        if (empty($thumbnailUrl)) {
+            $thumbnailUrl = $mediaObjectManager->buildContentUrl($type, $compressedMediaObject);
+        }
+
+        $mediaObjectAttributes = $mediaObjectRecord->getAttributes();
+        $mediaObjectAttributes['thumbnailUrl'] = $thumbnailUrl ?? null;
+        $mediaObjectRecord->setAttributes($mediaObjectAttributes);
 
         $recordAttributes = $record->getAttributes();
         $recordAttributes[$field] = $mediaObjectRecord->toArray();

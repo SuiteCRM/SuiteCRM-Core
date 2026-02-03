@@ -84,6 +84,6 @@ class ImageFieldListApiMapper implements ApiRecordFieldTypeMapperInterface
         if (empty($storageType)) {
             return;
         }
-        $this->injectMediaObject($record, $field, $storageType, $this->mediaObjectManager, $this->moduleNameMapper);
+        $this->injectMediaObject($record, $field, $storageType, $this->mediaObjectManager, $this->moduleNameMapper, $fieldDefs['metadata']['show_thumbnail'] ?? true);
     }
 }

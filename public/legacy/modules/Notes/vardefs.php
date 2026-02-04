@@ -314,6 +314,58 @@ $dictionary['Note'] = array(
                 'module'=>'Contacts',
                 'source'=>'non-db',
                 'logic' => [
+                    'set-contact-name-blank-on-newvalue' => [
+                        'key' => 'setEmpty',
+                        'modes' => ['edit', 'create'],
+                        'triggeringStatus' => ['onValueChange'],
+                        'params' => [
+                            'fieldDependencies' => [
+                                'parent_type',
+                            ],
+                            'activeOnFields' => [
+                                'parent_type' => [
+                                    [
+                                        'operator' => 'previous-value-equal',
+                                        'values' => [
+                                            'Contacts'
+                                        ]
+                                    ],
+                                    [
+                                        'operator' => 'not-equal',
+                                        'values' => [
+                                            'Contacts'
+                                        ]
+                                    ]
+                                ],
+                            ]
+                        ]
+                    ],
+                    'set-contact-name-blank-on-previous-value' => [
+                        'key' => 'setEmpty',
+                        'modes' => ['edit', 'create'],
+                        'triggeringStatus' => ['onValueChange'],
+                        'params' => [
+                            'fieldDependencies' => [
+                                'parent_type',
+                            ],
+                            'activeOnFields' => [
+                                'parent_type' => [
+                                    [
+                                        'operator' => 'previous-value-not-equal',
+                                        'values' => [
+                                            'Contacts'
+                                        ]
+                                    ],
+                                    [
+                                        'operator' => 'is-equal',
+                                        'values' => [
+                                            'Contacts'
+                                        ]
+                                    ]
+                                ],
+                            ]
+                        ]
+                    ],
                     'update-value' => [
                         'key' => 'updateValue',
                         'modes' => ['edit', 'create'],
@@ -324,7 +376,7 @@ $dictionary['Note'] = array(
                             'targetValueField' => 'parent_name',
                             'activeOnFields' => [
                                 'parent_type' => ['Contacts'],
-                                'parent_name' => ['operator' => 'any-value'],
+                                'parent_name' => [['operator' => 'any-value']],
                             ]
                         ]
                     ],

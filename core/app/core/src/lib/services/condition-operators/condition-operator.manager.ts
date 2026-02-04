@@ -35,6 +35,8 @@ import {NotEqualAction} from './not-equal/not-equal.action';
 import {AnyValueAction} from "./any-value/any-value.action";
 import {IsTrueAction} from './is-true/is-true.action';
 import {IsFalseAction} from './is-false/is-false.action';
+import {PreviousValueNotEqualAction} from "./previous-value-not-equal/previous-value-not-equal.action";
+import {PreviousValueEqualAction} from "./previous-value-equal/previous-value-equal.action";
 
 @Injectable({
     providedIn: 'root'
@@ -50,7 +52,9 @@ export class ConditionOperatorManager {
         public notEqualAction: NotEqualAction,
         public anyValueAction: AnyValueAction,
         public isTrueAction: IsTrueAction,
-        public isFalseAction: IsFalseAction
+        public isFalseAction: IsFalseAction,
+        public previousValueEqualAction: PreviousValueEqualAction,
+        public previousValueNotEqualAction: PreviousValueNotEqualAction
     ) {
     }
 
@@ -64,7 +68,9 @@ export class ConditionOperatorManager {
             'not-equal': this.notEqualAction,
             'any-value': this.anyValueAction,
             'is-true': this.isTrueAction,
-            'is-false': this.isFalseAction
+            'is-false': this.isFalseAction,
+            'previous-value-equal': this.previousValueEqualAction,
+            'previous-value-not-equal': this.previousValueNotEqualAction
         };
 
         return operatorMap[key];

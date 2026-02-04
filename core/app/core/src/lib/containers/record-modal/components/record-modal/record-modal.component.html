@@ -69,16 +69,26 @@
             </ng-container>
 
         </div>
-        <div modal-footer>
-            <div *ngIf="record && modalStore" class="h-100 d-flex justify-content-end">
-                <scrm-action-group-menu
-                        [config]="actionsAdapter"
-                        [actionContext]="viewContext"
-                        buttonClass="settings-button"
-                        [isRunning]="validating"
-                >
-                </scrm-action-group-menu>
-            </div>
+        <div modal-footer class="d-flex flex-grow-1 justify-content-between">
+            <ng-container *ngIf="record &&  modalStore">
+                <ng-container *ngIf="modalFooterActionsAdapter">
+                    <scrm-action-group-menu class="{{modalFooterActionsKlass}}"
+                                            [config]="modalFooterActionsAdapter"
+                                            [actionContext]="viewContext"
+                    >
+                    </scrm-action-group-menu>
+                </ng-container>
+
+                <div class="h-100 d-flex justify-content-end">
+                    <scrm-action-group-menu
+                            [config]="actionsAdapter"
+                            [actionContext]="viewContext"
+                            buttonClass="settings-button"
+                            [isRunning]="validating"
+                    >
+                    </scrm-action-group-menu>
+                </div>
+            </ng-container>
         </div>
     </scrm-modal>
 </div>

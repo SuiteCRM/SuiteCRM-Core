@@ -72,6 +72,7 @@ export interface RecordViewMetadata {
     headerWidgets?: WidgetMetadata[];
     actions?: Action[];
     modalHeaderActions?: Action[];
+    modalFooterActions?: Action[];
     templateMeta?: RecordTemplateMetadata;
     panels?: Panel[];
     summaryTemplates?: SummaryTemplates;

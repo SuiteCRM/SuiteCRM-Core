@@ -60,8 +60,10 @@ import {FieldMap} from "../../../../common/record/field.model";
 import {deepClone} from "../../../../common/utils/object-utils";
 import {ConfirmationModalService} from "../../../../services/modals/confirmation-modal.service";
 import {ModalComponent} from "../../../../components/modal/components/modal/modal.component";
-import {RecordModalHeaderActionsAdapterFactory} from "../../adapters/record-modal-header-actions.adapter.factory";
 import {RecordModalHeaderActionsAdapterFactory} from "../../adapters/header-actions/record-modal-header-actions.adapter.factory";
+import {
+    RecordModalFooterActionsAdapterFactory
+} from "../../adapters/footer-actions/record-modal-footer-actions.adapter.factory";
 
 @Component({
     selector: 'scrm-record-modal',
@@ -100,10 +102,12 @@ export class RecordModalComponent implements OnInit, OnDestroy {
     @Input() parentModule: string = '';
     @Input() closable: boolean = true;
     @Input() modalHeaderActionsKlass: string = '';
+    @Input() modalFooterActionsKlass: string = '';
     @Input() mappedFields: ObjectMap = null;
     @Input() contentAdapter: any = null;
     @Input() actionsAdapter: any = null;
     @Input() modalHeaderActionsAdapter: any = null;
+    @Input() modalFooterActionsAdapter: any = null;
     @Input() headerClass: string = '';
     @Input() bodyClass: string = '';
     @Input() footerClass: string = '';
@@ -143,7 +147,8 @@ export class RecordModalComponent implements OnInit, OnDestroy {
         protected confirmation: ConfirmationModalService,
         protected recordModalContentAdapterFactory: RecordModalContentAdapterFactory,
         protected recordModalActionsAdapterFactory: RecordModalRecordActionsAdapterFactory,
-        protected recordModalModalActionsActionsAdapterFactory: RecordModalHeaderActionsAdapterFactory,
+        protected recordModalHeaderActionsActionsAdapterFactory: RecordModalHeaderActionsAdapterFactory,
+        protected recordModalFooterActionsActionsAdapterFactory: RecordModalFooterActionsAdapterFactory,
     ) {
     }
 
@@ -179,6 +184,7 @@ export class RecordModalComponent implements OnInit, OnDestroy {
         this.contentAdapter = null;
         this.actionsAdapter = null;
         this.modalHeaderActionsAdapter = null;
+        this.modalFooterActionsAdapter = null;
 
         this.disableBackdrop();
 
@@ -193,13 +199,15 @@ export class RecordModalComponent implements OnInit, OnDestroy {
         this.contentAdapter = null;
         this.actionsAdapter = null;
         this.modalHeaderActionsAdapter = null;
+        this.modalFooterActionsAdapter = null;
         this.modalStore = null;
 
 
         this.modalStore = this.storeFactory.create(this.metadataView);
         this.contentAdapter = this.recordModalContentAdapterFactory.create(this.modalStore);
         this.actionsAdapter = this.recordModalActionsAdapterFactory.create(this.modalStore, this.activeModal);
-        this.modalHeaderActionsAdapter = this.recordModalModalActionsActionsAdapterFactory.create(this.modalStore, this.activeModal);
+        this.modalHeaderActionsAdapter = this.recordModalHeaderActionsActionsAdapterFactory.create(this.modalStore, this.activeModal);
+        this.modalFooterActionsAdapter = this.recordModalFooterActionsActionsAdapterFactory.create(this.modalStore, this.activeModal);
 
         this.subs.push(
             this.modalStore.loadMetadata(this.module).pipe(take(1)).subscribe(() => {

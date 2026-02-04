@@ -224,7 +224,8 @@ class RecordViewDefinitionHandler extends LegacyHandler
         $this->addHeaderWidgetConfig($module, $recordViewDefs, $metadata);
         $this->addPanelDefinitions($recordViewDefs, $editViewDefs, $vardefs, $metadata);
         $this->addActionConfig($module, $recordViewDefs, $metadata);
-        $this->addModalActionConfig($module, $recordViewDefs, $metadata);
+        $this->addModalHeaderActionConfig($module, $recordViewDefs, $metadata);
+        $this->addModalFooterActionConfig($module, $recordViewDefs, $metadata);
         $this->addSummaryTemplates($recordViewDefs, $metadata);
         $this->addBackButton($recordViewDefs, $metadata);
 
@@ -790,7 +791,7 @@ class RecordViewDefinitionHandler extends LegacyHandler
         return $definition;
     }
 
-    protected function addModalActionConfig(string $module, array $detailViewDefs, array &$metadata): void
+    protected function addModalHeaderActionConfig(string $module, array $detailViewDefs, array &$metadata): void
     {
         $recordActions = $detailViewDefs['recordModalHeaderActions'] ?? [];
         $actions = $this->actionDefinitionProvider->getActions($module, $recordActions) ?? [];
@@ -798,4 +799,11 @@ class RecordViewDefinitionHandler extends LegacyHandler
         $metadata['modalHeaderActions'] = array_values($actions);
     }
 
+    protected function addModalFooterActionConfig(string $module, array $detailViewDefs, array &$metadata): void
+    {
+        $recordActions = $detailViewDefs['recordModalFooterActions'] ?? [];
+        $actions = $this->actionDefinitionProvider->getActions($module, $recordActions) ?? [];
+
+        $metadata['modalFooterActions'] = array_values($actions);
+    }
 }

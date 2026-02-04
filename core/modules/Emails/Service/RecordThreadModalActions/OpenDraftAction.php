@@ -191,6 +191,8 @@ class OpenDraftAction implements ProcessHandlerInterface
             'cc_addrs_names' => $recipients['cc_addrs_names'],
             'bcc_addrs_names' => $recipients['bcc_addrs_names'],
             'outbound_email_name' => $fromName,
+            'type' => $attributes['type'] ?? '',
+            'status' => $attributes['status'] ?? '',
             'outbound_email_name_record' => $this->getOutboundEmailRecord($outboundEmailId, $fromName),
             'parent_name' => $attributes['parent_name']['name'] ?? '',
             'parent_type' => $attributes['parent_type'] ?? '',

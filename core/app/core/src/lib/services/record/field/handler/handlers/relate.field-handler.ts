@@ -23,7 +23,7 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Supercharged by SuiteCRM".
  */
-import {isObject} from "lodash-es";
+import {isObject, isString} from "lodash-es";
 import {Injectable} from "@angular/core";
 import {AttributeMap, Record} from '../../../../../common/record/record.model';
 import {BaseFieldHandler} from "./base.field-handler";
@@ -50,7 +50,7 @@ export class RelateFieldHandler extends BaseFieldHandler<RelateField> {
 
     updateValue(field: RelateField, value: any, record: Record): void {
 
-        if (!isObject(value) || !value['id']) {
+        if (!value || !isObject(value) || !isString(value['id'] ?? null)) {
             return;
         }
 

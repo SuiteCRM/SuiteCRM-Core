@@ -42,6 +42,7 @@ import {UpdateValueBackendAction} from './update-value-backend/update-value-back
 import {DisplayTypeBackendAction} from './display-type-backend/display-type-backend.action';
 import {UpdateEmailSignatureAction} from "./update-email-signature/update-email-signature.action";
 import {UpdateTemplateVariablesAction} from "./update-template-variables/update-template-variables.action";
+import {SetEmptyAction} from "./set-empty/set-empty.action";
 
 @Injectable({
     providedIn: 'root'
@@ -68,7 +69,8 @@ export class FieldLogicManager extends BaseActionManager<FieldLogicActionData> {
         updateValueBackend: UpdateValueBackendAction,
         displayTypeBackend: DisplayTypeBackendAction,
         updateEmailSignature: UpdateEmailSignatureAction,
-        updateTemplateVariables: UpdateTemplateVariablesAction
+        updateTemplateVariables: UpdateTemplateVariablesAction,
+        setEmpty: SetEmptyAction
     ) {
         super();
         displayType.modes.forEach(mode => this.actions[mode][displayType.key] = displayType);
@@ -82,6 +84,7 @@ export class FieldLogicManager extends BaseActionManager<FieldLogicActionData> {
         displayTypeBackend.modes.forEach(mode => this.actions[mode][displayTypeBackend.key] = displayTypeBackend);
         updateEmailSignature.modes.forEach(mode => this.actions[mode][updateEmailSignature.key] = updateEmailSignature);
         updateTemplateVariables.modes.forEach(mode => this.actions[mode][updateTemplateVariables.key] = updateTemplateVariables);
+        setEmpty.modes.forEach(mode => this.actions[mode][setEmpty.key] = setEmpty);
     }
 
     /**

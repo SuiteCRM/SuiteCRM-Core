@@ -24,6 +24,12 @@
  * the words "Supercharged by SuiteCRM".
  */
 
+.delete-draft-btn {
+  border: none;
+  margin: 0;
+  font-size: 1em;
+}
+
 #drafts-container {
   position: fixed !important;
   right: 20px;

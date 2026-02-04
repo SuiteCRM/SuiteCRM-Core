@@ -26,8 +26,9 @@
  */
 
 
-namespace App\Process\Service\ModalActions;
+namespace App\Module\Emails\Service\ModalHeaderActions;
 
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use App\Data\Entity\Record;
 use App\Data\Service\RecordProviderInterface;
 use App\Engine\LegacyHandler\LegacyHandler;
@@ -36,7 +37,6 @@ use App\Module\EmailMarketing\Service\Actions\DeleteTestMailMarketingEntriesServ
 use App\Module\Service\ModuleNameMapperInterface;
 use App\Process\Entity\Process;
 use App\Process\Service\ProcessHandlerInterface;
-use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class CloseDraftAction extends LegacyHandler implements ProcessHandlerInterface

@@ -1,6 +1,6 @@
 /**
  * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
- * Copyright (C) 2025 SuiteCRM Ltd.
+ * Copyright (C) 2025-2026 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -27,32 +27,32 @@
 import {Injectable} from '@angular/core';
 import {combineLatestWith, Observable} from 'rxjs';
 import {map, take} from 'rxjs/operators';
-import {MetadataStore, RecordViewMetadata} from '../../../store/metadata/metadata.store.service';
-import {AsyncActionInput, AsyncActionService,} from '../../../services/process/processes/async-action/async-action';
-import {AppMetadataStore} from "../../../store/app-metadata/app-metadata.store.service";
-import {LanguageStore} from '../../../store/language/language.store';
-import {MessageService} from '../../../services/message/message.service';
-import {Process} from '../../../services/process/process.service';
-import {ConfirmationModalService} from '../../../services/modals/confirmation-modal.service';
-import {BaseRecordActionsAdapter} from '../../../services/actions/base-record-action.adapter';
-import {SelectModalService} from '../../../services/modals/select-modal.service';
-import {RecordModalStore} from "../store/record-modal/record-modal.store";
-import {RecordActionDisplayTypeLogic} from "../../../views/record/action-logic/display-type/display-type.logic";
-import {RecordModalActionManager} from "../actions/record-actions/record-modal-record-action-manager.service";
-import {RecordModalActionData} from "../actions/record-actions/record-modal-record.action";
-import {Action, ActionContext, ActionHandler} from "../../../common/actions/action.model";
-import {ViewMode} from "../../../common/views/view.model";
+import {MetadataStore, RecordViewMetadata} from '../../../../store/metadata/metadata.store.service';
+import {AsyncActionInput, AsyncActionService,} from '../../../../services/process/processes/async-action/async-action';
+import {AppMetadataStore} from "../../../../store/app-metadata/app-metadata.store.service";
+import {LanguageStore} from '../../../../store/language/language.store';
+import {MessageService} from '../../../../services/message/message.service';
+import {Process} from '../../../../services/process/process.service';
+import {ConfirmationModalService} from '../../../../services/modals/confirmation-modal.service';
+import {BaseRecordActionsAdapter} from '../../../../services/actions/base-record-action.adapter';
+import {SelectModalService} from '../../../../services/modals/select-modal.service';
+import {RecordModalStore} from "../../store/record-modal/record-modal.store";
+import {RecordActionDisplayTypeLogic} from "../../../../views/record/action-logic/display-type/display-type.logic";
+import {RecordModalActionManager} from "../../actions/record-actions/record-modal-record-action-manager.service";
+import {RecordModalActionData} from "../../actions/record-actions/record-modal-record.action";
+import {Action, ActionContext, ActionHandler} from "../../../../common/actions/action.model";
+import {ViewMode} from "../../../../common/views/view.model";
 import {
     LogicDefinitions,
     Panel,
     AfterActionLogicDefinitions
-} from "../../../common/metadata/metadata.model";
-import {Record} from "../../../common/record/record.model";
-import {FieldModalService} from "../../../services/modals/field-modal.service";
-import {RecordMapperRegistry} from "../../../common/record/record-mappers/record-mapper.registry";
+} from "../../../../common/metadata/metadata.model";
+import {Record} from "../../../../common/record/record.model";
+import {FieldModalService} from "../../../../services/modals/field-modal.service";
+import {RecordMapperRegistry} from "../../../../common/record/record-mappers/record-mapper.registry";
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
-import {FieldLogicManager} from "../../../fields/field-logic/field-logic.manager";
-import {RecordManager} from "../../../services/record/record.manager";
+import {FieldLogicManager} from "../../../../fields/field-logic/field-logic.manager";
+import {RecordManager} from "../../../../services/record/record.manager";
 
 @Injectable()
 export class RecordModalRecordActionsAdapter extends BaseRecordActionsAdapter<RecordModalActionData> {

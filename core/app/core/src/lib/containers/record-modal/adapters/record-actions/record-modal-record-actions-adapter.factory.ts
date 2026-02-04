@@ -1,6 +1,6 @@
 /**
  * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
- * Copyright (C) 2025 SuiteCRM Ltd.
+ * Copyright (C) 2025-2026 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -25,23 +25,23 @@
  */
 
 import {Injectable} from '@angular/core';
-import {AppMetadataStore} from "../../../store/app-metadata/app-metadata.store.service";
-import {MetadataStore} from "../../../store/metadata/metadata.store.service";
-import {LanguageStore} from "../../../store/language/language.store";
-import {RecordModalStore} from "../store/record-modal/record-modal.store";
-import {AsyncActionService} from "../../../services/process/processes/async-action/async-action";
-import {ConfirmationModalService} from "../../../services/modals/confirmation-modal.service";
-import {SelectModalService} from "../../../services/modals/select-modal.service";
-import {MessageService} from "../../../services/message/message.service";
-import {RecordActionDisplayTypeLogic} from "../../../views/record/action-logic/display-type/display-type.logic";
-import {RecordModalActionManager} from "../actions/record-actions/record-modal-record-action-manager.service";
+import {AppMetadataStore} from "../../../../store/app-metadata/app-metadata.store.service";
+import {MetadataStore} from "../../../../store/metadata/metadata.store.service";
+import {LanguageStore} from "../../../../store/language/language.store";
+import {RecordModalStore} from "../../store/record-modal/record-modal.store";
+import {AsyncActionService} from "../../../../services/process/processes/async-action/async-action";
+import {ConfirmationModalService} from "../../../../services/modals/confirmation-modal.service";
+import {SelectModalService} from "../../../../services/modals/select-modal.service";
+import {MessageService} from "../../../../services/message/message.service";
+import {RecordActionDisplayTypeLogic} from "../../../../views/record/action-logic/display-type/display-type.logic";
+import {RecordModalActionManager} from "../../actions/record-actions/record-modal-record-action-manager.service";
 import {RecordModalRecordActionsAdapter} from "./record-modal-record-actions.adapter";
-import {FieldModalService} from "../../../services/modals/field-modal.service";
-import {RecordMapperRegistry} from "../../../common/record/record-mappers/record-mapper.registry";
-import {BaseSaveRecordMapper} from "../../../store/record/record-mappers/base-save.record-mapper";
+import {FieldModalService} from "../../../../services/modals/field-modal.service";
+import {RecordMapperRegistry} from "../../../../common/record/record-mappers/record-mapper.registry";
+import {BaseSaveRecordMapper} from "../../../../store/record/record-mappers/base-save.record-mapper";
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
-import {FieldLogicManager} from "../../../fields/field-logic/field-logic.manager";
-import {RecordManager} from "../../../services/record/record.manager";
+import {FieldLogicManager} from "../../../../fields/field-logic/field-logic.manager";
+import {RecordManager} from "../../../../services/record/record.manager";
 
 @Injectable({
     providedIn: 'root',

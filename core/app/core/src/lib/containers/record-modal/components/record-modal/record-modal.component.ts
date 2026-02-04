@@ -45,7 +45,7 @@ import {RecordModalStore} from "../../store/record-modal/record-modal.store";
 import {ModalModule} from "../../../../components/modal/components/modal/modal.module";
 import {RecordModalStoreFactory} from "../../store/record-modal/record-modal.store.factory";
 import {RecordModalContentAdapterFactory} from "../../adapters/record-modal-content.adapter.factory";
-import {RecordModalRecordActionsAdapterFactory} from "../../adapters/record-modal-record-actions-adapter.factory";
+import {RecordModalRecordActionsAdapterFactory} from "../../adapters/record-actions/record-modal-record-actions-adapter.factory";
 import {RecordContentModule} from "../../../../components/record-content/record-content.module";
 import {LoadingSpinnerModule} from "../../../../components/loading-spinner/loading-spinner.module";
 import {ActionGroupMenuModule} from "../../../../components/action-group-menu/action-group-menu.module";
@@ -61,6 +61,7 @@ import {deepClone} from "../../../../common/utils/object-utils";
 import {ConfirmationModalService} from "../../../../services/modals/confirmation-modal.service";
 import {ModalComponent} from "../../../../components/modal/components/modal/modal.component";
 import {RecordModalHeaderActionsAdapterFactory} from "../../adapters/record-modal-header-actions.adapter.factory";
+import {RecordModalHeaderActionsAdapterFactory} from "../../adapters/header-actions/record-modal-header-actions.adapter.factory";
 
 @Component({
     selector: 'scrm-record-modal',

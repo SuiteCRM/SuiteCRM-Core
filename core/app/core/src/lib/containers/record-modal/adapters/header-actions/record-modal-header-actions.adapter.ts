@@ -27,33 +27,33 @@
 import {Injectable, signal} from '@angular/core';
 import {combineLatestWith, Observable} from 'rxjs';
 import {map, take} from 'rxjs/operators';
-import {MetadataStore, RecordViewMetadata} from '../../../store/metadata/metadata.store.service';
-import {AsyncActionInput, AsyncActionService,} from '../../../services/process/processes/async-action/async-action';
-import {AppMetadataStore} from "../../../store/app-metadata/app-metadata.store.service";
-import {LanguageStore} from '../../../store/language/language.store';
-import {MessageService} from '../../../services/message/message.service';
-import {Process} from '../../../services/process/process.service';
-import {ConfirmationModalService} from '../../../services/modals/confirmation-modal.service';
-import {SelectModalService} from '../../../services/modals/select-modal.service';
-import {RecordModalStore} from "../store/record-modal/record-modal.store";
-import {RecordActionDisplayTypeLogic} from "../../../views/record/action-logic/display-type/display-type.logic";
-import {RecordModalActionData} from "../actions/record-actions/record-modal-record.action";
-import {Action, ActionContext, ActionHandler, ModeActions} from "../../../common/actions/action.model";
-import {ViewMode} from "../../../common/views/view.model";
+import {MetadataStore, RecordViewMetadata} from '../../../../store/metadata/metadata.store.service';
+import {AsyncActionInput, AsyncActionService,} from '../../../../services/process/processes/async-action/async-action';
+import {AppMetadataStore} from "../../../../store/app-metadata/app-metadata.store.service";
+import {LanguageStore} from '../../../../store/language/language.store';
+import {MessageService} from '../../../../services/message/message.service';
+import {Process} from '../../../../services/process/process.service';
+import {ConfirmationModalService} from '../../../../services/modals/confirmation-modal.service';
+import {SelectModalService} from '../../../../services/modals/select-modal.service';
+import {RecordModalStore} from "../../store/record-modal/record-modal.store";
+import {RecordActionDisplayTypeLogic} from "../../../../views/record/action-logic/display-type/display-type.logic";
+import {RecordModalActionData} from "../../actions/record-actions/record-modal-record.action";
+import {Action, ActionContext, ActionHandler, ModeActions} from "../../../../common/actions/action.model";
+import {ViewMode} from "../../../../common/views/view.model";
 import {
     LogicDefinitions,
     Panel,
     AfterActionLogicDefinitions
-} from "../../../common/metadata/metadata.model";
-import {Record} from "../../../common/record/record.model";
-import {FieldModalService} from "../../../services/modals/field-modal.service";
+} from "../../../../common/metadata/metadata.model";
+import {Record} from "../../../../common/record/record.model";
+import {FieldModalService} from "../../../../services/modals/field-modal.service";
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
-import {FieldLogicManager} from "../../../fields/field-logic/field-logic.manager";
-import {RecordManager} from "../../../services/record/record.manager";
-import {BaseModalHeaderActionsAdapter} from "../../../services/actions/base-modal-header-action.adapter";
-import {isTrue} from "../../../common/utils/value-utils";
-import {RecordMapperRegistry} from "../../../common/record/record-mappers/record-mapper.registry";
-import {RecordModalHeaderActionManager} from "../actions/header-actions/record-modal-header-action-manager.service";
+import {FieldLogicManager} from "../../../../fields/field-logic/field-logic.manager";
+import {RecordManager} from "../../../../services/record/record.manager";
+import {BaseModalHeaderActionsAdapter} from "../../../../services/actions/base-modal-header-action.adapter";
+import {isTrue} from "../../../../common/utils/value-utils";
+import {RecordMapperRegistry} from "../../../../common/record/record-mappers/record-mapper.registry";
+import {RecordModalHeaderActionManager} from "../../actions/header-actions/record-modal-header-action-manager.service";
 
 @Injectable()
 export class RecordModalHeaderActionsAdapter extends BaseModalHeaderActionsAdapter<RecordModalActionData> {

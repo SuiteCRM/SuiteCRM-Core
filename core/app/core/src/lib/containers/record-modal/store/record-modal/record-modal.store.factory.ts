@@ -36,7 +36,7 @@ import {MessageService} from "../../../../services/message/message.service";
 import {NavigationStore} from "../../../../store/navigation/navigation.store";
 import {ModuleNavigation} from "../../../../services/navigation/module-navigation/module-navigation.service";
 import {RecordValidationHandler} from "../../../../services/record/validation/record-validation.handler";
-import {RecordModalFieldActionsAdapterFactory} from "../../adapters/record-modal-field-actions.adapter.factory";
+import {RecordModalFieldActionsAdapterFactory} from "../../adapters/field-actions/record-modal-field-actions.adapter.factory";
 import {RecordManager} from "../../../../services/record/record.manager";
 
 @Injectable({

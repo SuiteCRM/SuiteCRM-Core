@@ -1,6 +1,6 @@
 /**
  * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
- * Copyright (C) 2025 SuiteCRM Ltd.
+ * Copyright (C) 2025-2026 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -25,17 +25,17 @@
  */
 
 import {Injectable} from '@angular/core';
-import {AsyncActionService} from '../../../services/process/processes/async-action/async-action';
-import {MessageService} from '../../../services/message/message.service';
-import {ConfirmationModalService} from '../../../services/modals/confirmation-modal.service';
-import {SelectModalService} from '../../../services/modals/select-modal.service';
-import {LanguageStore} from '../../../store/language/language.store';
-import {MetadataStore} from '../../../store/metadata/metadata.store.service';
-import {AppMetadataStore} from "../../../store/app-metadata/app-metadata.store.service";
-import {FieldModalService} from "../../../services/modals/field-modal.service";
-import {FieldActionManager} from "../../../components/field-layout/actions/field-action-manager.service";
+import {AsyncActionService} from '../../../../services/process/processes/async-action/async-action';
+import {MessageService} from '../../../../services/message/message.service';
+import {ConfirmationModalService} from '../../../../services/modals/confirmation-modal.service';
+import {SelectModalService} from '../../../../services/modals/select-modal.service';
+import {LanguageStore} from '../../../../store/language/language.store';
+import {MetadataStore} from '../../../../store/metadata/metadata.store.service';
+import {AppMetadataStore} from "../../../../store/app-metadata/app-metadata.store.service";
+import {FieldModalService} from "../../../../services/modals/field-modal.service";
+import {FieldActionManager} from "../../../../components/field-layout/actions/field-action-manager.service";
 import {RecordModalFieldActionsAdapter} from "./record-modal-field-actions.adapter";
-import {FieldLogicManager} from "../../../fields/field-logic/field-logic.manager";
+import {FieldLogicManager} from "../../../../fields/field-logic/field-logic.manager";
 
 @Injectable({
     providedIn: 'root',

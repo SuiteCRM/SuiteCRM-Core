@@ -55,7 +55,7 @@ import {isVoid} from "../../../../common/utils/value-utils";
 import {Field, FieldDefinitionMap, FieldMetadata} from "../../../../common/record/field.model";
 import {FieldLogicMap} from "../../../../common/actions/field-logic-action.model";
 import {ObjectMap} from "../../../../common/types/object-map";
-import {RecordModalFieldActionsAdapterFactory} from "../../adapters/record-modal-field-actions.adapter.factory";
+import {RecordModalFieldActionsAdapterFactory} from "../../adapters/field-actions/record-modal-field-actions.adapter.factory";
 import {BaseRecordContainerStoreInterface} from "../../../../common/containers/record/record-container.store.model";
 import {ActionDataSource, ActionDataSourceBuilderFunction} from "../../../../common/actions/action.model";
 import {RecordManager} from "../../../../services/record/record.manager";

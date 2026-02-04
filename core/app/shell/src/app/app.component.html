@@ -37,6 +37,8 @@
 </div>
 <scrm-footer-ui></scrm-footer-ui>
 <div id="detached-modals"></div>
-<div id="drafts-container" *ngIf="showDrafts()">
-    <scrm-button [config]="draftsButton()"></scrm-button>
+<div id="drafts-container">
+    <ng-container *ngIf="showDrafts()">
+        <scrm-button [config]="draftsButton()"></scrm-button>
+    </ng-container>
 </div>

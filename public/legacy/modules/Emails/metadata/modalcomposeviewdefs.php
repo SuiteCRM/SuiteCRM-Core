@@ -131,6 +131,49 @@ $viewdefs['Emails']['ModalComposeView'] = [
         ]
 
     ],
+    'recordModalFooterActions' => [
+        'actions' => [
+            'dismiss-draft-email' => [
+                'key' => 'dismiss-draft-email',
+                'icon' => 'trash-filled',
+                'titleKey' => 'LBL_DELETE_DRAFT',
+                'klass' => ['btn btn-sm btn btn-outline-main delete-draft-btn'],
+                'asyncProcess' => true,
+                'params' => [
+                    'expanded' => true,
+                    'closeModal' => true,
+                ],
+                'modes' => ['detail', 'edit', 'create'],
+                'acl' => ['delete'],
+                'displayLogic' => [
+                    'hide-non-draft' => [
+                        'modes' => ['edit', 'detail', 'create'],
+                        'params' => [
+                            'activeOnFields' => [
+                                'type' => [
+                                    [
+                                        'operator' => 'not-equal',
+                                        'values' => ['draft']
+                                    ],
+                                ],
+                            ]
+                        ]
+                    ],
+                ],
+            ],
+        ],
+        'exclude' => [
+            'delete',
+            'edit',
+            'save',
+            'saveNew',
+            'saveContinue',
+            'saveSchedule',
+            'duplicate',
+            'cancel',
+            'cancelCreate',
+        ]
+    ],
     'panels' => [
         'LBL_COMPOSE_MODULE_NAME' => [
             [

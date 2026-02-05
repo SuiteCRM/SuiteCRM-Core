@@ -35,6 +35,44 @@ export interface ConditionOperatorActionData extends ActionData {
 
 export abstract class ConditionOperatorActionHandler {
 
-    abstract run(record:Record, field: Field, opsConfig: LogicRuleValues): boolean;
+    abstract run(record: Record, field: Field, opsConfig: LogicRuleValues): boolean;
 
+    protected getComparisonValues(opsConfig: LogicRuleValues, record: Record): string[] {
+        if (this.isFieldComparison(opsConfig)) {
+            return this.getFieldComparisonValues(record, opsConfig);
+        }
+
+        return this.getStaticComparisonValue(opsConfig);
+    }
+
+    protected getFieldComparisonValues(record: Record, opsConfig: LogicRuleValues): string[] {
+        const compField = record.fields[opsConfig?.field ?? ''] ?? null;
+        if (compField === null) {
+            return null;
+        }
+
+        const compFieldValue = compField?.value ?? null;
+        if (compFieldValue !== null) {
+            return [compField.toString()];
+        }
+
+        return [];
+    }
+
+    protected getStaticComparisonValue(opsConfig: LogicRuleValues): string[] {
+        if (Array.isArray(opsConfig.values)) {
+            return opsConfig.values.filter(value => value !== undefined && value !== null).map(value => value.toString());
+        }
+
+        const value = opsConfig?.value ?? null
+        if (value === null) {
+            return [];
+        }
+
+        return [value].map(value => value.toString());
+    }
+
+    protected isFieldComparison(opsConfig: LogicRuleValues): boolean {
+        return !!opsConfig?.field;
+    }
 }

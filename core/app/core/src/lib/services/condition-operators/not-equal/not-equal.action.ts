@@ -30,6 +30,7 @@ import {Field} from '../../../common/record/field.model';
 import {Record} from '../../../common/record/record.model';
 import {LogicRuleValues} from '../../../common/metadata/metadata.model';
 import {ConditionOperatorModel} from '../condition-operator.model';
+import {isArray} from "lodash-es";
 
 @Injectable({
     providedIn: 'root'
@@ -43,10 +44,13 @@ export class NotEqualAction extends ConditionOperatorActionHandler implements Co
     }
 
     run(record: Record, field: Field, opsConfig: LogicRuleValues): boolean {
-        const comparisonValue = opsConfig.field ? [record.fields[opsConfig.field].value] : (Array.isArray(opsConfig.values) ? opsConfig.values : [opsConfig.value]).map(value => value.toString());
-        if(comparisonValue) {
-            return !comparisonValue.includes(field.value.toString());
+        let comparisonValues = this.getComparisonValues(opsConfig, record);
+
+        if (!isArray(comparisonValues)) {
+            return false;
         }
-        return false;
+
+        const currentValue = (field?.value ?? '').toString();
+        return !comparisonValues.includes(currentValue);
     }
 }

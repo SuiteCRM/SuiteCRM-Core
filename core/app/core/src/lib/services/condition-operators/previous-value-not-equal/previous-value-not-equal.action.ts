@@ -30,6 +30,7 @@ import {Field} from '../../../common/record/field.model';
 import {Record} from '../../../common/record/record.model';
 import {LogicRuleValues} from '../../../common/metadata/metadata.model';
 import {ConditionOperatorModel} from '../condition-operator.model';
+import {isArray} from "lodash-es";
 
 @Injectable({
     providedIn: 'root'
@@ -43,17 +44,20 @@ export class PreviousValueNotEqualAction extends ConditionOperatorActionHandler 
     }
 
     run(record: Record, field: Field, opsConfig: LogicRuleValues): boolean {
-        const comparisonValue = opsConfig.field ? [record.fields[opsConfig.field].value] : (Array.isArray(opsConfig.values) ? opsConfig.values : [opsConfig.value]).map(value => value.toString());
 
-        if (field.previousValue === field.value) {
+        const previousValue = (field?.previousValue ?? '').toString();
+        const currentValue = (field?.value ?? '').toString();
+
+        if (previousValue === currentValue) {
             return false;
         }
 
-        const previousValue = field.previousValue ? field.previousValue.toString() : '';
+        let comparisonValues = this.getComparisonValues(opsConfig, record);
 
-        if(comparisonValue) {
-            return !previousValue.includes(field.value.toString());
+        if (!isArray(comparisonValues)) {
+            return false;
         }
-        return false;
+
+        return !comparisonValues.includes(previousValue);
     }
 }

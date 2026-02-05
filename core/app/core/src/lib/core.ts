@@ -272,6 +272,10 @@ export * from './containers/record-modal/actions/record-actions/cancel/record-mo
 export * from './containers/record-modal/actions/record-actions/save/record-modal-save.action';
 export * from './containers/record-modal/actions/header-actions/record-modal-header.action';
 export * from './containers/record-modal/actions/header-actions/record-modal-header-action-manager.service';
+export * from './containers/record-modal/actions/header-actions/async-process/async-process.service';
+export * from './containers/record-modal/actions/footer-actions/record-modal-footer.action';
+export * from './containers/record-modal/actions/footer-actions/record-modal-footer-action-manager.service';
+export * from './containers/record-modal/actions/footer-actions/async-process/async-process.service';
 export * from './containers/record-modal/adapters/record-actions/record-modal-record-actions-adapter.factory';
 export * from './containers/record-modal/adapters/record-actions/record-modal-record-actions.adapter';
 export * from './containers/record-modal/adapters/record-modal-content.adapter.factory';
@@ -280,6 +284,8 @@ export * from './containers/record-modal/adapters/field-actions/record-modal-fie
 export * from './containers/record-modal/adapters/field-actions/record-modal-field-actions.adapter';
 export * from './containers/record-modal/adapters/header-actions/record-modal-header-actions.adapter';
 export * from './containers/record-modal/adapters/header-actions/record-modal-header-actions.adapter.factory';
+export * from './containers/record-modal/adapters/footer-actions/record-modal-footer-actions.adapter';
+export * from './containers/record-modal/adapters/footer-actions/record-modal-footer-actions.adapter.factory';
 export * from './containers/record-modal/components/record-modal/record-modal.component';
 export * from './containers/record-modal/store/record-modal/record-modal.store.factory';
 export * from './containers/record-modal/store/record-modal/record-modal.store';
@@ -552,6 +558,8 @@ export * from './services/actions/base-action-manager.service';
 export * from './services/actions/base-action.adapter';
 export * from './services/actions/base-record-thread-modal-action.adapter';
 export * from './services/actions/base-field-action.adapter';
+export * from './services/actions/base-modal-header-action.adapter';
+export * from './services/actions/base-modal-footer-action.adapter';
 export * from './services/actions/base-record-action.adapter';
 export * from './services/api/graphql-api/api.collection.get';
 export * from './services/api/graphql-api/api.entity.get';

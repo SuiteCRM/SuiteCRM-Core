@@ -33,6 +33,7 @@ export interface RecordModalActionData extends RecordBasedActionData {
     store: RecordModalStore;
     action?: Action;
     record?: Record;
+    module?: string;
 }
 
 export abstract class RecordModalRecordActionHandler extends ActionHandler<RecordModalActionData> {

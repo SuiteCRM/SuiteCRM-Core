@@ -107,7 +107,8 @@ export class RecordModalHeaderActionsAdapter extends BaseModalHeaderActionsAdapt
         return {
             store: this.store,
             action,
-            record: context?.record || this.store.recordStore.getBaseRecord(),
+            record: context?.record || this.store?.recordStore?.getBaseRecord(),
+            module: context?.record?.module || this.getModuleName(),
         } as RecordModalActionData;
     }
 
@@ -116,7 +117,7 @@ export class RecordModalHeaderActionsAdapter extends BaseModalHeaderActionsAdapt
     }
 
     protected getModuleName(context?: ActionContext): string {
-        return this.store.getModuleName();
+        return context?.record?.module || this.store.getModuleName();
     }
 
     protected reload(action: Action, process: Process, context?: ActionContext): void {

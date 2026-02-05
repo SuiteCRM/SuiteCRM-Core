@@ -168,7 +168,7 @@ export class RecordThreadModalComponent implements OnInit {
         return {
             klass: 'btn',
             onClick: () => {
-                this.activeModal.close();
+                this.activeModal?.close();
             },
         } as ButtonInterface;
     }

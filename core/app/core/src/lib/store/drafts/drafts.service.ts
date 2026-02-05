@@ -79,7 +79,7 @@ export class DraftsService {
             }
 
             if (this.draftsCount() === 1 && currentCount === 0) {
-                this.modal.close();
+                this.modal?.close();
             }
 
             this.draftsCount.set(currentCount);

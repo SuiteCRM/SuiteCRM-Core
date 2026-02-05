@@ -41,7 +41,7 @@ import {FieldLogicManager} from "../../../../fields/field-logic/field-logic.mana
 import {RecordManager} from "../../../../services/record/record.manager";
 import {RecordMapperRegistry} from "../../../../common/record/record-mappers/record-mapper.registry";
 import {RecordModalFooterActionsAdapter} from "./record-modal-footer-actions.adapter";
-import {RecordModalFooterActionManager} from "../../actions/footer-actions/record-modal-footer-action-manager";
+import {RecordModalFooterActionManager} from "../../actions/footer-actions/record-modal-footer-action-manager.service";
 
 @Injectable({
     providedIn: 'root',

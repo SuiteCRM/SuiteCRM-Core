@@ -32,7 +32,7 @@ import {AsyncProcessRecordModalFooterAction} from "./async-process/async-process
 @Injectable({
     providedIn: 'root',
 })
-export class RecordModalFooterActionManagerService extends BaseActionManager<RecordModalActionData> {
+export class RecordModalFooterActionManager extends BaseActionManager<RecordModalActionData> {
 
     constructor(
         protected async: AsyncProcessRecordModalFooterAction

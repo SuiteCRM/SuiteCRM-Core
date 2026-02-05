@@ -53,7 +53,7 @@ import {RecordManager} from "../../../../services/record/record.manager";
 import {isTrue} from "../../../../common/utils/value-utils";
 import {RecordMapperRegistry} from "../../../../common/record/record-mappers/record-mapper.registry";
 import {BaseModalFooterActionsAdapter} from "../../../../services/actions/base-modal-footer-action.adapter";
-import {RecordModalFooterActionManager} from "../../actions/footer-actions/record-modal-footer-action-manager";
+import {RecordModalFooterActionManager} from "../../actions/footer-actions/record-modal-footer-action-manager.service";
 
 @Injectable()
 export class RecordModalFooterActionsAdapter extends BaseModalFooterActionsAdapter<RecordModalActionData> {
@@ -108,6 +108,7 @@ export class RecordModalFooterActionsAdapter extends BaseModalFooterActionsAdapt
             store: this.store,
             action,
             record: context?.record || this.store.recordStore.getBaseRecord(),
+            module: context?.record?.module || this.store.getModuleName(),
         } as RecordModalActionData;
     }
 
@@ -116,7 +117,7 @@ export class RecordModalFooterActionsAdapter extends BaseModalFooterActionsAdapt
     }
 
     protected getModuleName(context?: ActionContext): string {
-        return this.store.getModuleName();
+        return context?.record?.module || this.store.getModuleName();
     }
 
     protected reload(action: Action, process: Process, context?: ActionContext): void {

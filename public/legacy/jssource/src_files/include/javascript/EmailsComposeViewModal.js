@@ -53,6 +53,8 @@
           module: 'emails',
           metadataView: 'composeView',
           detached: true,
+          closable: false,
+          headerActionsKlass: 'draft-modal-action',
           headerClass: 'left-aligned-title',
           dynamicTitleKey: 'LBL_EMAIL_MODAL_DYNAMIC_TITLE',
           modalOptions: {
@@ -148,6 +150,8 @@
             ],
           }
         },
+        closable: false,
+        headerActionsKlass: 'draft-modal-action',
         parentId: $(source).attr('data-record-id'),
         parentName: $(source).attr('data-module-name'),
         parentModule: $(source).attr('data-module'),

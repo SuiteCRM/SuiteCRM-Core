@@ -36,7 +36,7 @@ import {UserPreferenceStore} from '../../store/user-preference/user-preference.s
 import {AttributeMap} from "../../common/record/record.model";
 
 
-export declare type TemplateValueFilter = (value: string, filterArguments?: string[]) => string;
+export declare type TemplateValueFilter = (value: any, filterArguments?: string[]) => string;
 export declare type TemplateFieldFilter = (value: Field) => string;
 
 export interface TemplateValueFilterMap {
@@ -80,6 +80,7 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
         this.valuePipes.uppercase = (value: string): string => this.toUpperCase(value);
         this.valuePipes.lowercase = (value: string): string => this.toLowerCase(value);
         this.valuePipes.default = (value: string, filterArguments: string[]): string => this.showDefault(value, filterArguments);
+        this.valuePipes.filter = (value: any[], filterArguments: string[] = []): string => this.filterArray(value, filterArguments);
 
         this.fieldPipes.int = (value: Field): string => this.fieldTypeFormat('int', value);
         this.fieldPipes.float = (value: Field): string => this.fieldTypeFormat('float', value);
@@ -367,5 +368,45 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
         }
 
         return filterArguments ? filterArguments[0] : '';
+    }
+
+    protected filterArray(value: any[], filterArguments: string[]): any {
+        if (!Array.isArray(value) || !value.length || !filterArguments?.length) {
+            return "";
+        }
+
+        let attributeKey = '';
+
+        // (primary=true becomes {primary: "true"})
+        const filters: { [key: string]: string } = {};
+        filterArguments.forEach(arg => {
+            const [key, val] = arg.split('=').map(s => s.trim());
+            if (key === 'attributeKey') {
+                attributeKey = val;
+                return;
+            }
+            if (key && val) {
+                filters[key] = val;
+            }
+        });
+
+        const filtered = value.filter(item => {
+            if (typeof item !== 'object' || item === null) {
+                return false;
+            }
+
+            return Object.entries(filters).every(([key, val]) => {
+                const itemValue = String(item[key]);
+                return itemValue === val;
+            });
+        });
+
+        if (filtered.length === 0) {
+            return value[0][attributeKey] ?? '';
+        }
+
+        const filteredRecord = filtered[0];
+
+        return filteredRecord[attributeKey] ?? '';
     }
 }

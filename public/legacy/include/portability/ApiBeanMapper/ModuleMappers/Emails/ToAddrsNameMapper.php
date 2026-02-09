@@ -34,6 +34,36 @@ class ToAddrsNameMapper extends AbstractAddrsNameClass
     /**
      * @inheritDoc
      */
+    public function toApi(SugarBean $bean, array &$container, string $alternativeName = ''): void
+    {
+        $metadataName = $bean->addrs_metadata ?? '';
+        $addrs_metadata = json_decode(html_entity_decode($metadataName), true) ?? [];
+        $addrs = $addrs_metadata[static::getField()] ?? [];
+
+        foreach ($addrs as $key => $metadata) {
+
+            $primary = false;
+
+            if ($metadata['id'] === '') {
+                continue;
+            }
+
+            if ($metadata['id'] === $bean->parent_id) {
+                $primary = true;
+            }
+
+            $container[static::getField()][] = [
+                'id' => $metadata['id'] ?? '',
+                'name' => $metadata['name'] ?? '',
+                'module_name' => $metadata['module_name'] ?? '',
+                'primary' => $primary,
+            ];
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
     public static function getField(): string
     {
         return self::FIELD_NAME;

@@ -66,6 +66,8 @@ export class EmailDetailFieldsComponent extends BaseFieldComponent implements On
             parentModule: this.parent.module,
             module: 'emails',
             metadataView: 'modalComposeView',
+            closable: false,
+            headerActionsKlass: 'draft-modal-action',
             detached: true,
             headerClass: 'left-aligned-title',
             dynamicTitleKey: 'LBL_EMAIL_MODAL_DYNAMIC_TITLE',

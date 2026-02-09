@@ -1249,9 +1249,9 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
 
     initEditor() {
 
-        this.editor.setHTML(this?.value ?? '');
+        this.editor?.setHTML(this?.value ?? '');
         this.initEditorListeners();
-        this.editor.focus();
+        this.editor?.focus();
     }
 
     protected initEditorListeners(): void {
@@ -1372,7 +1372,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
     }
 
     initHtml() {
-        this.editor.setHTML(this?.value ?? '');
+        this.editor?.setHTML(this?.value ?? '');
     }
 
     protected initRebuildMetadataSignal() {

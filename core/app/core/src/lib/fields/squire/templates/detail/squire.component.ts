@@ -276,6 +276,6 @@ export class SquireDetailFieldComponent extends BaseFieldComponent implements On
     }
 
     initHtml() {
-        this.editor.setHTML(this?.value ?? '');
+        this.editor?.setHTML(this?.value ?? '');
     }
 }

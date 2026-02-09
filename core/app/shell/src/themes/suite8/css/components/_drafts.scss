@@ -44,7 +44,16 @@
   .drafts-button {
     min-width: 3.5em;
     width: auto;
-    padding: .375rem 0!important;
+    padding: 0.375rem .25rem 0.375rem .5rem !important;
+
+    &:focus-visible, &:active, &:hover {
+      border-color: $bright-purple !important;
+      background-color: $bright-purple !important;
+    }
+
+    &:focus {
+      box-shadow: none !important;
+    }
 
     .drafts-caret {
       fill: $white;
@@ -55,8 +64,8 @@
     }
 
 
-    &:hover{
-        background-color: $bright-purple!important;
+    &:hover {
+      background-color: $bright-purple !important;
     }
   }
 
@@ -68,9 +77,10 @@
     width: 17em;
     top: -410px;
     left: -218px;
-    box-shadow: 0 .125rem .25rem #00000040!important;
+    box-shadow: 0 .125rem .25rem #00000040 !important;
     margin-left: 0.5rem;
     border-radius: 3px;
+    pointer-events: none;
 
     .drafts-modal-wrapper {
       min-height: 25em;
@@ -100,7 +110,7 @@
 
       .close-button {
         color: $midnight-blue;
-        font-size: x-large!important;
+        font-size: x-large !important;
       }
 
       .modal-title {
@@ -116,7 +126,7 @@
       border-bottom-right-radius: 0;
       border-bottom-left-radius: 0;
       animation: none;
-      box-shadow: none!important;
+      box-shadow: none !important;
     }
 
     .record-modal {
@@ -186,16 +196,18 @@
     .button-group-button {
       color: #8d74cc !important;
       font-weight: 600;
+      border: none!important;
 
       &:focus-visible {
-        outline: none!important;
-        box-shadow: none!important;
-        border: none!important;
+        outline: none !important;
+        box-shadow: none !important;
+        border: none !important;
       }
+
       &:focus {
-        outline: none!important;
-        box-shadow: none!important;
-        border: none!important;
+        outline: none !important;
+        box-shadow: none !important;
+        border: none !important;
       }
     }
   }
@@ -209,6 +221,7 @@
     padding: 0 .5rem !important;
     width: 100% !important;
     display: table !important;
+
     .record-thread-item-body {
       box-shadow: none !important;
       background-color: transparent !important;
@@ -217,11 +230,11 @@
       padding: 0 .5rem !important;
 
       .containerClass {
-        display: table!important;
+        display: table !important;
         width: 100% !important;
 
         .draft-column-header {
-          align-items: center!important;
+          align-items: center !important;
 
           .draft-to-icon {
             .sicon {
@@ -231,13 +244,14 @@
 
           .draft-to {
             font-size: 95%;
-            color: $midnight-blue!important;
+            color: $midnight-blue !important;
             padding-top: 0.375rem;
             top: 2px;
             position: relative;
           }
+
           .draft-column {
-            display: inline-table!important;
+            display: inline-table !important;
 
             .dynamic-label {
               display: inline-block;
@@ -286,6 +300,7 @@
 
         .draft-item-buttons {
           flex-grow: 1;
+
           .sicon {
             color: $bright-purple !important;
           }

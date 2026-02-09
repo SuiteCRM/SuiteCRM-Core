@@ -124,6 +124,8 @@ class EmailProcessProcessor extends LegacyHandler
 
         [$addresses['to'], $addresses['cc'], $addresses['bcc']] = $this->mapAttributes($emailAttributes);
 
+        $emailRecord = $this->updateEmailStatus($emailRecord);
+
         $emailRecord = $this->recordProvider->saveRecord($emailRecord);
 
         $this->saveEmailAddresses($outboundRecord->getAttributes(), $emailRecord->getAttributes(), $addresses);
@@ -171,12 +173,24 @@ class EmailProcessProcessor extends LegacyHandler
         $bccAddresses = !empty($emailAttributes['bcc_addrs_names']) ? $emailAttributes['bcc_addrs_names'] : [];
 
         foreach ($toAddresses as $key => $value) {
+            if (isset($value['attributes'])){
+                $value = $value['attributes'];
+            }
+
             $to[] = $value['email1'] ?? $value['email'];
         }
         foreach ($ccAddresses as $key => $value) {
+            if (isset($value['attributes'])){
+                $value = $value['attributes'];
+            }
+
             $cc[] = $value['email1'] ?? $value['email'];
         }
         foreach ($bccAddresses as $key => $value) {
+            if (isset($value['attributes'])){
+                $value = $value['attributes'];
+            }
+
             $bcc[] = $value['email1'] ?? $value['email'];
         }
 
@@ -317,6 +331,16 @@ class EmailProcessProcessor extends LegacyHandler
         );
 
         return $attributes;
+    }
+
+    protected function updateEmailStatus(Record $emailRecord): Record
+    {
+        $attributes = $emailRecord->getAttributes() ?? [];
+        $attributes['type'] = 'out';
+        $attributes['status'] = 'sent';
+        $emailRecord->setAttributes($attributes);
+
+        return $emailRecord;
     }
 
 }

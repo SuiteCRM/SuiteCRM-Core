@@ -58,6 +58,11 @@ export interface AsyncActionInput {
     [key: string]: any
 }
 
+export interface AsyncActionConfig {
+    handler: string;
+    params?: { [key: string]: any };
+}
+
 @Injectable({
     providedIn: 'root',
 })
@@ -133,20 +138,23 @@ export class AsyncActionService {
                         return;
                     }
 
+                    const handlers = process.data?.handlers ?? null;
+
+                    if (handlers) {
+                        if (presetHandlerKey) {
+                            this.runHandlerByKey(presetHandlerKey, handlers[presetHandlerKey]?.params ?? null, process, actionData);
+                        }
+                        this.callMultipleHandlers(process, presetHandlerKey, actionData);
+                        return;
+                    }
+
                     const actionHandlerKey = presetHandlerKey || (process.data && process.data.handler) || null;
 
                     if (!actionHandlerKey) {
                         return;
                     }
 
-                    const actionHandler: AsyncActionHandler = this.actions[actionHandlerKey];
-
-                    if (!actionHandler) {
-                        this.message.addDangerMessageByKey('LBL_MISSING_HANDLER');
-                        return;
-                    }
-
-                    actionHandler.run(process.data.params, process, actionData);
+                    this.runHandlerByKey(actionHandlerKey, process.data.params, process, actionData);
 
                 }),
                 catchError((err) => {
@@ -174,5 +182,31 @@ export class AsyncActionService {
                     return of(null);
                 }),
             );
+    }
+
+    protected callMultipleHandlers(process: Process, presetHandlerKey: string, actionData: ActionData) {
+        const handlers = process.data?.handlers ?? [];
+
+        Object.values(handlers).forEach((handlerData) => {
+            const data = handlerData as AsyncActionConfig;
+            const actionHandlerKey = data?.handler || null;
+
+            if (!actionHandlerKey) {
+                return;
+            }
+
+            this.runHandlerByKey(actionHandlerKey, data?.params ?? null, process, actionData);
+        });
+    }
+
+    protected runHandlerByKey(actionHandlerKey: string, params: any, process: Process, actionData: ActionData) {
+        const actionHandler: AsyncActionHandler = this.actions[actionHandlerKey];
+
+        if (!actionHandler) {
+            this.message.addDangerMessageByKey('LBL_MISSING_HANDLER');
+            return;
+        }
+
+        actionHandler.run(params, process, actionData);
     }
 }

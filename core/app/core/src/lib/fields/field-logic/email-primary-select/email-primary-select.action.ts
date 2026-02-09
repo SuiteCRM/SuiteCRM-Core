@@ -28,8 +28,11 @@ import {Injectable} from '@angular/core';
 import {FieldLogicActionData, FieldLogicActionHandler} from '../field-logic.action';
 import {Action} from '../../../common/actions/action.model';
 import {Field} from '../../../common/record/field.model';
+import {StringArrayMap} from '../../../common/types/string-map';
 import {ViewMode} from '../../../common/views/view.model';
 import {isTrue} from '../../../common/utils/value-utils';
+import {ActiveFieldsChecker} from "../../../services/condition-operators/active-fields-checker.service";
+import {ObjectArrayMatrix} from "../../../common/types/object-map";
 
 @Injectable({
     providedIn: 'root'
@@ -39,7 +42,9 @@ export class EmailPrimarySelectAction extends FieldLogicActionHandler {
     key = 'emailPrimarySelect';
     modes = ['edit', 'create', 'massupdate'] as ViewMode[];
 
-    constructor() {
+    constructor(
+        protected activeFieldsChecker: ActiveFieldsChecker
+    ) {
         super();
     }
 
@@ -49,6 +54,19 @@ export class EmailPrimarySelectAction extends FieldLogicActionHandler {
 
         if (!record || !field) {
             return;
+        }
+
+        const activeOnFields: StringArrayMap = (action.params && action.params.activeOnFields) || {} as StringArrayMap;
+        const relatedFields: string[] = Object.keys(activeOnFields);
+
+        const activeOnAttributes: ObjectArrayMatrix = (action.params && action.params.activeOnAttributes) || {} as ObjectArrayMatrix;
+        const relatedAttributesFields: string[] = Object.keys(activeOnAttributes);
+
+        if (relatedFields.length || relatedAttributesFields.length) {
+            const isActive = this.activeFieldsChecker.isActive(relatedFields, record, activeOnFields, relatedAttributesFields, activeOnAttributes);
+            if (!isActive) {
+                return;
+            }
         }
 
         const items = field.items;

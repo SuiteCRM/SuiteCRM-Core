@@ -262,8 +262,8 @@ $viewdefs['Emails']['ModalComposeView'] = [
             [
                 [
                     'name' => 'cc_addrs_names',
-                    'display' => 'none',
                     'type' => 'multiflexrelate',
+                    'hideIfEmpty' => true,
                     'metadata' => [
                         'headerColumnClass' => 'col-xs-12 col-sm-2 col-md-2 col-lg-2 maximize-col-xl-1',
                         'valueColumnClass' => 'col-xs-12 col-sm-10 col-md-10 col-lg-10 maximize-col-xl-11',
@@ -301,7 +301,7 @@ $viewdefs['Emails']['ModalComposeView'] = [
             [
                 [
                     'name' => 'bcc_addrs_names',
-                    'display' => 'none',
+                    'hideIfEmpty' => true,
                     'type' => 'multiflexrelate',
                     'metadata' => [
                         'headerColumnClass' => 'col-xs-12 col-sm-2 col-md-2 col-lg-2 maximize-col-xl-1',

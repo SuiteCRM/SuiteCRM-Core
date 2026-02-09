@@ -58,6 +58,7 @@ return static function (ContainerConfigurator $containerConfig) {
                                     'disableOnRun' => true,
                                 ],
                                 'modes' => ['detail', 'edit', 'create', 'list'],
+                                'acl' => ['delete']
                             ],
                         ]
                     ],
@@ -133,6 +134,7 @@ return static function (ContainerConfigurator $containerConfig) {
                                                 'field' => [
                                                     'name' => 'to_addrs_names',
                                                     'dynamicLabelKey' => 'LBL_DRAFT_ITEM_TO',
+                                                    'emptyDynamicLabelKey' => 'LBL_DRAFT_ITEM_TO_EMPTY',
                                                     'type' => 'relate',
                                                 ],
                                                 'labelClass' => 'm-0',
@@ -186,7 +188,9 @@ return static function (ContainerConfigurator $containerConfig) {
                                     'asyncProcess' => true,
                                     'klass' => ['btn fill-complementary pr-1 fill-hover-complementary-light border-0 btn-sm p-0 m-0'],
                                     'modes' => ['detail', 'edit', 'list'],
-                                    'acl' => [],
+                                    'acl' => [
+                                        'edit'
+                                    ],
                                 ],
                                 [
                                     'key' => 'dismiss-record',

@@ -4166,6 +4166,7 @@ $app_strings['LBL_WRONG_MODULE_PROVIDED'] = 'Wrong module provided';
 $app_strings['LBL_NO_TEMPLATE_ID_PROVIDED'] = 'No template id provided';
 $app_strings['LBL_TEMPLATE_NOT_FOUND'] = 'Template not found';
 $app_strings['LBL_EMAIL_MODAL_DYNAMIC_TITLE'] = 'New Email{{fields.name.value|prefix:\' - \'}}';
+$app_strings['LBL_EMAIL_MODAL_DRAFT_DYNAMIC_TITLE'] = 'Draft{{fields.name.value|prefix:\' - \'}}';
 $app_strings['LBL_CLOSE_EMAIL_MODAL'] = 'Are you sure you wish to discard this Email? (Changes will be lost)';
 $app_strings['LBL_RELATED_TO_DYNAMIC'] = '{{fields.parent_type.value|uppercase}}';
 $app_strings['LBL_RELATED_TO'] = 'Related To';
@@ -4344,7 +4345,8 @@ $app_strings['LBL_UNKNOWN_USER'] = 'Unknown User';
 
 $app_strings['LBL_DRAFTS'] = 'Drafts';
 $app_strings['LBL_DRAFT_ITEM_LAST_MODIFIED'] = '{{fields.date_modified.value}}';
-$app_strings['LBL_DRAFT_ITEM_TO'] = '{{fields.to_addrs_names.valueList[0].name|default:\'No Recipient(s)\'}}';
+$app_strings['LBL_DRAFT_ITEM_TO_EMPTY'] = 'No Recipient(s)';
+$app_strings['LBL_DRAFT_ITEM_TO'] = '{{fields.to_addrs_names.valueList|filter:primary=true:attributeKey=name}}';
 $app_strings['LBL_DRAFT_ITEM_TO_ICON'] = '{{fields.to_icon_type.value}}';
 $app_strings['LBL_DRAFTS_TOTAL'] = '{{fields.count.value}}';
 $app_strings['LBL_DRAFTS_DELETED_SUCCESSFULLY'] = 'Drafts Deleted Successfully.';

@@ -28,7 +28,7 @@ import {Injectable} from '@angular/core';
 import {Record} from '../../common/record/record.model';
 import {Field} from '../../common/record/field.model';
 import {StringArrayMap} from '../../common/types/string-map';
-import {isEmpty} from "lodash-es";
+import {isEmpty, isObject} from "lodash-es";
 import {ConditionOperatorManager} from "./condition-operator.manager";
 import {isFalse, isTrue} from "../../common/utils/value-utils";
 import {LogicRuleValues} from "../../common/metadata/metadata.model";
@@ -127,6 +127,12 @@ export class ActiveFieldsChecker {
      */
     public isValueActive(record: Record, field: Field, activeValues: string[] | any): boolean {
 
+        const fields = Object.keys(record.fields);
+
+        if (isObject(activeValues) && (activeValues as any)?.operator) {
+            return this.checkOperatorActiveValue(record, field, fields, activeValues);
+        }
+
         let isActive = false;
         if (field.valueList && field.valueList.length) {
             field.valueList.some(value => {
@@ -141,37 +147,49 @@ export class ActiveFieldsChecker {
             return isActive;
         }
 
-        const fields = Object.keys(record.fields);
         let opsArr: boolean[] = [];
 
         activeValues.some(activeValue => {
 
-            if (activeValue.field && !fields.includes(activeValue.field)) {
-                return;
-            }
-
             if (isTrue(activeValue) || isFalse(activeValue)) {
                 isActive = activeValue.toString() === field.value.toString();
-                return;
+                return isActive;
             }
-
-            const operatorKey = activeValue?.operator ?? 'is-equal';
 
             if (typeof activeValue === 'string') {
                 activeValue = {
-                    operator: operatorKey,
+                    operator: 'is-equal',
                     values: [activeValue]
                 } as LogicRuleValues;
             }
 
-            const operator = this.operatorManager.get(operatorKey);
-            if (!operator) {
-                return;
-            }
-            opsArr.push(operator.run(record, field, activeValue))
+            opsArr.push(this.checkOperatorActiveValue(record, field, fields, activeValue));
             isActive = opsArr.every(data => data);
         })
 
         return isActive;
+    }
+
+    protected checkOperatorActiveValue(record: Record, field: Field, fields: string[], activeValue: any): boolean {
+
+        let isActive = false;
+        if (!isObject(activeValue)) {
+            return isActive;
+        }
+
+        activeValue = activeValue as any;
+
+        if (activeValue.field && !fields.includes(activeValue.field)) {
+            return isActive;
+        }
+
+        const operatorKey = activeValue?.operator ?? 'is-equal';
+
+        const operator = this.operatorManager.get(operatorKey);
+        if (!operator) {
+            return isActive;
+        }
+
+        return operator.run(record, field, activeValue)
     }
 }

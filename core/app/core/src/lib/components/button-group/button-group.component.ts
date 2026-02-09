@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
 import {Button} from '../../common/components/button/button.model';
 import {ButtonGroupInterface} from '../../common/components/button/button-group.model';
 import {AnyButtonInterface, DropdownButtonInterface} from '../../common/components/button/dropdown-button.model';
@@ -46,10 +46,10 @@ export class ButtonGroupComponent implements OnInit, OnDestroy {
     @Input() config$: Observable<ButtonGroupInterface>;
     @Input() klass: string = '';
 
-    buttons: SplitButtons = {
+    buttons: WritableSignal<SplitButtons> = signal({
         expanded: [],
         collapsed: [],
-    };
+    });
 
     dropdownConfig: DropdownButtonInterface;
 
@@ -96,7 +96,7 @@ export class ButtonGroupComponent implements OnInit, OnDestroy {
             label: this.internalConfig.dropdownLabel,
             klass: [...buttonClasses],
             wrapperKlass: wrapperClasses,
-            items: this.buttons.collapsed,
+            items: this.buttons().collapsed,
         } as DropdownButtonInterface;
 
         if (this.internalConfig.dropdownOptions && this.internalConfig.dropdownOptions.placement) {
@@ -119,10 +119,11 @@ export class ButtonGroupComponent implements OnInit, OnDestroy {
 
     protected splitButtons(): void {
 
-        this.buttons.expanded = [];
-        this.buttons.collapsed = [];
+        const expanded: AnyButtonInterface[] = [];
+        const collapsed: AnyButtonInterface[] = [];
 
         if (!this.internalConfig.buttons || this.internalConfig.buttons.length < 1) {
+            this.buttons.set({ expanded, collapsed });
             return;
         }
 
@@ -146,51 +147,54 @@ export class ButtonGroupComponent implements OnInit, OnDestroy {
                 const newButton = {...button};
                 Button.appendClasses(newButton, [...classes]);
 
-                this.buttons.expanded.push(newButton);
+                expanded.push(newButton);
             } else if (showAfterBreakpoint === true) {
                 if (this.internalConfig.pushActiveToExpanded && button?.active) {
                     pushToExpanded.push({...button});
                     count++;
                     return;
                 }
-                this.buttons.collapsed.push({...button});
+                collapsed.push({...button});
             }
 
             count++;
         });
 
-        this.applyPushActiveToExpanded(pushToExpanded);
+        this.applyPushActiveToExpanded(pushToExpanded, expanded, collapsed);
 
         this.buildDropdownConfig();
     }
 
-    protected applyPushActiveToExpanded(pushToExpanded: any[]): void {
+    protected applyPushActiveToExpanded(pushToExpanded: any[], expanded: AnyButtonInterface[], collapsed: AnyButtonInterface[]): void {
         const pushToExpandedLength = pushToExpanded?.length;
 
         if (!pushToExpandedLength) {
+            this.buttons.set({ expanded, collapsed });
             return;
         }
 
-        const expandedLength = this?.buttons?.expanded?.length ?? 0;
+        const expandedLength = expanded?.length ?? 0;
         const pushToCollapsedCount = expandedLength - pushToExpandedLength;
 
         if (pushToCollapsedCount < 0) {
             const overflow = pushToExpanded.slice(pushToCollapsedCount);
-            const pushToCollapsed = overflow.concat([...this.buttons.expanded]);
-            this.buttons.expanded = pushToExpanded.slice(this.buttons.expanded.length);
-            this.buttons.collapsed = pushToCollapsed.concat(this.buttons.collapsed);
+            const pushToCollapsed = overflow.concat([...expanded]);
+            const newExpanded = pushToExpanded.slice(expanded.length);
+            const newCollapsed = pushToCollapsed.concat(collapsed);
+            this.buttons.set({ expanded: newExpanded, collapsed: newCollapsed });
             return;
         }
 
         if (pushToCollapsedCount === 0) {
-            this.buttons.expanded = [...pushToExpanded];
-            this.buttons.collapsed = [...this.buttons.expanded].concat(this.buttons.collapsed);
+            const newCollapsed = [...pushToExpanded].concat(collapsed);
+            this.buttons.set({ expanded: [...pushToExpanded], collapsed: newCollapsed });
             return;
         }
 
-        const pushToCollapsed = this.buttons.expanded.slice(-1 * pushToExpandedLength);
-        const keepOnExpanded = this.buttons.expanded.slice(0, pushToCollapsedCount);
-        this.buttons.expanded = keepOnExpanded.concat([...pushToExpanded])
-        this.buttons.collapsed = pushToCollapsed.concat(this.buttons.collapsed);
+        const pushToCollapsed = expanded.slice(-1 * pushToExpandedLength);
+        const keepOnExpanded = expanded.slice(0, pushToCollapsedCount);
+        const newExpanded = keepOnExpanded.concat([...pushToExpanded]);
+        const newCollapsed = pushToCollapsed.concat(collapsed);
+        this.buttons.set({ expanded: newExpanded, collapsed: newCollapsed });
     }
 }

@@ -31,6 +31,7 @@ import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
 import {Injectable, signal, WritableSignal} from "@angular/core";
 import {isTrue} from "../../common/utils/value-utils";
 import {toObservable} from "@angular/core/rxjs-interop";
+import {Subscription} from "rxjs";
 
 @Injectable({
     providedIn: 'root',
@@ -43,6 +44,10 @@ export class DraftsService {
     draftsCount$ = toObservable(this.draftsCount);
     modalConfig: any = {};
     showDrafts: WritableSignal<boolean> = signal(false);
+    caretSignal: WritableSignal<string> = signal('arrow_up_filled');
+    caretSignal$ = toObservable(this.caretSignal);
+
+    protected subs: Subscription[] = [];
 
     constructor(
         protected appState: AppStateStore,
@@ -64,9 +69,10 @@ export class DraftsService {
 
         this.appState.recordModalOpenEventEmitter.subscribe((options) => {
             if (this?.modal?.componentInstance) {
-                this.modal.close();
+                this.closeModal();
             }
         });
+
 
         this.draftsStore.getRecordThreadStore()?.getRecordList()?.pagination$.subscribe((pagination) => {
             const currentCount = pagination.total ?? 0;
@@ -75,17 +81,19 @@ export class DraftsService {
                 this.showDrafts.set(false);
             } else {
                 this.showDrafts.set(true);
-
             }
 
             if (this.draftsCount() === 1 && currentCount === 0) {
-                this.modal?.close();
+                this.closeModal();
             }
 
-            this.draftsCount.set(currentCount);
+            setTimeout(() => {
+                this.draftsCount.set(currentCount);
+            }, 250);
         });
 
         this.draftsStore.getRecordThreadStore()?.load();
+
     }
 
     showModal(): void {
@@ -98,15 +106,23 @@ export class DraftsService {
         const options = {
             ...modalOptions,
             modalStore: this.draftsStore,
-        }
+        };
         this.modal = this.recordThreadModalService.showModal(options, {
             addToAppState: false,
-        })
+        });
+
+        this.subs.push(this.modal?.shown?.subscribe(() => {
+            this.caretSignal.set('arrow_down_filled');
+        }));
+        this.subs.push(this.modal?.closed?.subscribe(() => {
+            this.caretSignal.set('arrow_up_filled');
+        }));
     }
 
     closeModal(): void {
         if (this?.modal?.componentInstance) {
             this.modal.close();
+            this.subs.forEach(sub => sub?.unsubscribe());
         }
     }
 
@@ -121,5 +137,7 @@ export class DraftsService {
         this.modal = this.recordThreadModalService.showModal(options, {
             addToAppState: false,
         });
+
+        this.modal.close();
     }
 }

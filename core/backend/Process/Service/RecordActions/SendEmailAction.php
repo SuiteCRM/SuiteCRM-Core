@@ -142,13 +142,17 @@ class SendEmailAction implements ProcessHandlerInterface
             return;
         }
 
-        $process->setStatus('success');
-        $process->setMessages(['LBL_EMAIL_SENT_SUCCESSFULLY']);
-
         $responseData = [
-            'closeModal' => true
+            'closeModal' => true,
+            'handler' => 'emit-event',
+            'params' => [
+                'event' => 'refresh-drafts',
+                'payload' => true,
+            ],
         ];
 
+        $process->setStatus('success');
+        $process->setMessages(['LBL_EMAIL_SENT_SUCCESSFULLY']);
         $process->setData($responseData);
     }
 }

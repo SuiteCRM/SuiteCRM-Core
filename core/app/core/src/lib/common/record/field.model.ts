@@ -191,6 +191,7 @@ export interface Field {
     labelKey?: string;
     loading?: WritableSignal<boolean>;
     dynamicLabelKey?: string;
+    emptyDynamicLabelKey?: string;
     parentKey?: string;
     attributes?: FieldAttributeMap;
     items?: Record[];
@@ -245,6 +246,7 @@ export class BaseField implements Field {
     displayType?: string;
     default?: string;
     initDefaultProcess?: string;
+    emptyDynamicLabelKey?: string;
     defaultValueModes?: ViewMode[];
     source?: FieldSource;
     valueSignal?: WritableSignal<string>;

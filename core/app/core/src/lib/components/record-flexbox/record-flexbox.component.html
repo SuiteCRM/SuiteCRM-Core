@@ -67,6 +67,7 @@
 
                                                 <scrm-dynamic-label *ngIf="field.dynamicLabelKey"
                                                                     [labelKey]="field.dynamicLabelKey"
+                                                                    [emptyLabelKey]="field?.emptyDynamicLabelKey ?? ''"
                                                                     [fields]="record.fields">
                                                 </scrm-dynamic-label>
                                             </div>

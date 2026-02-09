@@ -27,7 +27,7 @@
 import {Injectable, signal} from '@angular/core';
 import {ValidationManager} from '../validation/validation.manager';
 import {DataTypeFormatter} from '../../formatters/data-type.formatter.service';
-import {isFalse, isTrue} from '../../../common/utils/value-utils';
+import {isFalse, isTrue, isVoid} from '../../../common/utils/value-utils';
 import {ObjectMap} from '../../../common/types/object-map';
 import {AttributeDependency, BaseField, DisplayType, Field, FieldDefinition} from '../../../common/record/field.model';
 import {FieldLogic, FieldLogicMap} from '../../../common/actions/field-logic-action.model';
@@ -266,6 +266,12 @@ export class FieldBuilder {
             field.valueObject = valueObject;
         }
 
+
+        if (((viewField?.displayIfHasValue ?? false) || (definition?.displayIfHasValue ?? false)) && this.hasValue(field)) {
+            field.display.set('default');
+            field.defaultDisplay = 'show';
+        }
+
         if (language) {
             field.label = this.getFieldLabel(viewField.label, module, language);
         }
@@ -361,6 +367,18 @@ export class FieldBuilder {
         }
 
         return get(field.valueObject, name, '');
+    }
+
+
+    protected hasValue(field: Field): boolean {
+
+        let hasValue = false;
+        hasValue = hasValue || (field?.value !== '' && !isVoid(field.value));
+        hasValue = hasValue || !!(field?.valueList && field?.valueList?.length);
+        hasValue = hasValue || !!(field?.valueObject && Object.keys(field.valueObject).length);
+        hasValue = hasValue || !!(field?.valueObjectArray && field?.valueObjectArray?.length);
+
+        return hasValue;
     }
 
 }

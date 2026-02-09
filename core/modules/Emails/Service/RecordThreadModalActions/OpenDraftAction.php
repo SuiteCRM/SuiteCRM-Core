@@ -126,13 +126,37 @@ class OpenDraftAction implements ProcessHandlerInterface
 
         $emailRecord = $this->recordProvider->getRecord($module, $id);
 
+        $attributes = $this->getMapFields($emailRecord);
+
+        $attributes['parent_name'] = [
+            'id' => $attributes['parent_id'] ?? '',
+            'name' => $attributes['parent_name'] ?? '',
+        ];
+
+        $emailRecord->setAttributes($attributes);
+
+        $emailRecord = $this->recordProvider->saveRecord($emailRecord);
+
         $params = $this->getModalData($emailRecord);
 
         $responseData = [
-            'handler' => 'record-modal',
-            'params' => [
-                ...$params,
+            'hasMultipleHandlers' => true,
+            'handlers' => [
+                [
+                    'handler' => 'record-modal',
+                    'params' => [
+                        ...$params,
+                    ]
+                ],
+                [
+                    'handler' => 'emit-event',
+                    'params' => [
+                        'event' => 'refresh-drafts',
+                        'payload' => true,
+                    ],
+                ]
             ]
+
         ];
 
         $process->setStatus('success');
@@ -157,7 +181,7 @@ class OpenDraftAction implements ProcessHandlerInterface
             'parentType' => $record->getAttributes()['parent_type'] ?? null,
             'headerActionsKlass' => 'draft-modal-action',
             'headerClass' => 'left-aligned-title',
-            'dynamicTitleKey' => 'LBL_EMAIL_MODAL_DYNAMIC_TITLE',
+            'dynamicTitleKey' => 'LBL_EMAIL_MODAL_DRAFT_DYNAMIC_TITLE',
             'modalOptions' => [
                 'size' => 'lg',
                 'scrollable' => false,

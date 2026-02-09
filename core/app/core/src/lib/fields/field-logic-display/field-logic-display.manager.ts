@@ -26,7 +26,7 @@
 
 import {Injectable} from '@angular/core';
 import {BaseActionManager} from '../../services/actions/base-action-manager.service';
-import {FieldLogicDisplayActionData} from './field-logic-display.action';
+import {FieldLogicDisplayActionData, FieldLogicDisplayActionHandler} from './field-logic-display.action';
 import {Action, ActionContext} from '../../common/actions/action.model';
 import {DisplayType, Field} from '../../common/record/field.model';
 import {Record} from '../../common/record/record.model';
@@ -43,6 +43,10 @@ export class FieldLogicDisplayManager extends BaseActionManager<FieldLogicDispla
     ) {
         super();
         displayType.modes.forEach(mode => this.actions[mode][displayType.key] = displayType);
+    }
+
+    registerAction(handler: FieldLogicDisplayActionHandler): void {
+        handler.modes.forEach(mode => this.actions[mode][handler.key] = handler);
     }
 
     runAll(field: Field, record: Record, mode: ViewMode, triggeringStatus: string = ''): void {

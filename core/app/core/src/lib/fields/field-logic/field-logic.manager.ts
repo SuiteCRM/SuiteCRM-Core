@@ -26,7 +26,7 @@
 
 import {Injectable} from '@angular/core';
 import {BaseActionManager} from '../../services/actions/base-action-manager.service';
-import {FieldLogicActionData, FieldLogicActionHandlerMap} from './field-logic.action';
+import {FieldLogicActionData, FieldLogicActionHandler, FieldLogicActionHandlerMap} from './field-logic.action';
 import {Action, ActionContext, ModeActions} from '../../common/actions/action.model';
 import {Field} from '../../common/record/field.model';
 import {Record} from '../../common/record/record.model';
@@ -85,6 +85,10 @@ export class FieldLogicManager extends BaseActionManager<FieldLogicActionData> {
         updateEmailSignature.modes.forEach(mode => this.actions[mode][updateEmailSignature.key] = updateEmailSignature);
         updateTemplateVariables.modes.forEach(mode => this.actions[mode][updateTemplateVariables.key] = updateTemplateVariables);
         setEmpty.modes.forEach(mode => this.actions[mode][setEmpty.key] = setEmpty);
+    }
+
+    registerAction(handler: FieldLogicActionHandler): void {
+        handler.modes.forEach(mode => this.actions[mode][handler.key] = handler);
     }
 
     /**

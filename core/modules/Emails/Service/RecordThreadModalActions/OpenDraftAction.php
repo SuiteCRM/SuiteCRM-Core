@@ -282,6 +282,16 @@ class OpenDraftAction implements ProcessHandlerInterface
      */
     protected function mapRecipients(array $toAddr, array &$recipients, string $key): void
     {
+        if ($toAddr['name'] === $toAddr['id']) {
+            $recipients[$key][] = [
+                'id' => $toAddr['id'],
+                'name' => $toAddr['name'],
+                'module_name' => 'Emails',
+                'email' => $toAddr['name'],
+            ];
+            return;
+        }
+
         $record = $this->getRecord($toAddr['module_name'], $toAddr['id'])->toArray();
         if (empty($record)) {
             return;

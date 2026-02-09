@@ -216,6 +216,7 @@ export class RecordModalStore implements StateStore, BaseRecordContainerStoreInt
                 type: '',
                 module: module,
                 attributes: {
+                    id: recordID,
                     assigned_user_id: this?.appStateStore?.getCurrentUser().id,
                     assigned_user_name: {
                         id: this.appStateStore?.getCurrentUser()?.id,

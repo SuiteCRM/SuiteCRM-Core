@@ -66,6 +66,7 @@ return static function (ContainerConfigurator $containerConfig) {
                 ],
             ],
             'recordThreadConfig' => [
+                'closeOnLoad' => true,
                 'recordThreadOptions' => [
                     'autoRefresh' => false,
                     'module' => 'emails',

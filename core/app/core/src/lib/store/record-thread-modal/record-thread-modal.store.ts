@@ -102,9 +102,13 @@ export class RecordThreadModalStore implements StateStore, BaseRecordContainerSt
                     ...this.config.modalConfig,
                     modalStore: this,
                 }
-                this.recordThreadModalService.showModal(options, {
+                const modal = this.recordThreadModalService.showModal(options, {
                     addToAppState: false,
                 })
+
+                if (this.config.recordThreadConfig?.closeOnLoad) {
+                    modal?.close();
+                }
             }
         }));
 

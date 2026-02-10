@@ -40,6 +40,7 @@ export class DraftsService {
 
     initialized = false;
     modal: NgbModalRef;
+    openedDrafts: string[] = [];
     draftsCount: WritableSignal<number> = signal(0);
     draftsCount$ = toObservable(this.draftsCount);
     modalConfig: any = {};
@@ -59,15 +60,21 @@ export class DraftsService {
     init(): void {
         this.initialized = true;
         this.modalConfig = this.recordThreadModalService.getOptions('drafts')?.modalConfig || {};
+
+        this.appState.openedDraftsEventEmitter.subscribe(() => {
+            this.getOpenedDrafts();
+            this.updateCriteria();
+        })
         this.appState.refreshDraftsEventEmitter.subscribe(() => {
             if (isTrue(this.showDrafts())) {
-                this.draftsStore.getRecordThreadStore()?.reload();
+                this.getOpenedDrafts();
+                this.updateCriteria();
                 return;
             }
             this.initModal();
         });
 
-        this.appState.recordModalOpenEventEmitter.subscribe((options) => {
+        this.appState.recordModalOpenEventEmitter.subscribe(() => {
             if (this?.modal?.componentInstance) {
                 this.closeModal();
             }
@@ -76,12 +83,6 @@ export class DraftsService {
 
         this.draftsStore.getRecordThreadStore()?.getRecordList()?.pagination$.subscribe((pagination) => {
             const currentCount = pagination.total ?? 0;
-
-            if (currentCount < 1) {
-                this.showDrafts.set(false);
-            } else {
-                this.showDrafts.set(true);
-            }
 
             if (this.draftsCount() === 1 && currentCount === 0) {
                 this.closeModal();
@@ -92,8 +93,8 @@ export class DraftsService {
             }, 250);
         });
 
-        this.draftsStore.getRecordThreadStore()?.load();
-
+        this.getOpenedDrafts();
+        this.updateCriteria();
     }
 
     showModal(): void {
@@ -110,6 +111,9 @@ export class DraftsService {
         this.modal = this.recordThreadModalService.showModal(options, {
             addToAppState: false,
         });
+
+        this.getOpenedDrafts();
+        this.updateCriteria();
 
         this.subs.push(this.modal?.shown?.subscribe(() => {
             this.caretSignal.set('arrow_down_filled');
@@ -139,5 +143,41 @@ export class DraftsService {
         });
 
         this.modal.close();
+    }
+
+    protected updateCriteria(): void {
+        const recordThreadStore = this.draftsStore.getRecordThreadStore();
+        const recordList = recordThreadStore?.getRecordList();
+        const currentCriteria = recordList.criteria || {};
+
+        const newCriteria = {
+            ...currentCriteria,
+            filters: {
+                id: {
+                    field: 'id',
+                    fieldType: 'id',
+                    operator: 'not_in',
+                    values: [...this.openedDrafts],
+                }
+            }
+        }
+
+        recordList.updateSearchCriteria(newCriteria);
+    }
+
+    protected getOpenedDrafts(): void {
+        this.openedDrafts = [];
+        this.appState.getActiveModals().forEach((modal) => {
+            const recordId = modal?.componentInstance?.recordId ?? '';
+
+            if (recordId === '') {
+                return;
+            }
+
+            if (this.openedDrafts.includes(recordId)) {
+                return;
+            }
+            this.openedDrafts.push(recordId);
+        });
     }
 }

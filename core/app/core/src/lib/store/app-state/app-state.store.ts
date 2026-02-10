@@ -92,10 +92,12 @@ export class AppStateStore implements StateStore {
     recordModalOpenEventEmitter: EventEmitter<RecordModalOptions> = new EventEmitter<RecordModalOptions>();
     recordThreadModalOpenEventEmitter: EventEmitter<RecordThreadModalModel> = new EventEmitter<RecordThreadModalModel>();
     refreshDraftsEventEmitter: EventEmitter<boolean> = new EventEmitter<boolean>();
+    draftOpenedEventEmitter: EventEmitter<string> = new EventEmitter<string>();
     eventEmitterMapper: EventEmitterMap = {
         'open-record-modal': this.recordModalOpenEventEmitter,
         'open-record-thread-modal': this.recordThreadModalOpenEventEmitter,
         'refresh-drafts': this.refreshDraftsEventEmitter,
+        'draft-opened': this.draftOpenedEventEmitter,
     };
 
     /**

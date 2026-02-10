@@ -162,8 +162,7 @@ class CloseDraftAction extends LegacyHandler implements ProcessHandlerInterface
         if (!empty($record['id'])) {
             $newRecord = $this->mapToRecord($record['module'] ?? '', $attributes, $record['id']);
             $this->recordProvider->saveRecord($newRecord);
-            $process->setStatus('success');
-            $process->setMessages(['LBL_EMAIL_DRAFT_SAVED']);
+            $this->setResponse($process);
             return;
         }
 
@@ -183,17 +182,7 @@ class CloseDraftAction extends LegacyHandler implements ProcessHandlerInterface
 
         $this->recordProvider->saveRecord($record);
 
-        $data = [
-            'handler' => 'emit-event',
-            'params' => [
-                'event' => 'refresh-drafts',
-                'payload' => true,
-            ],
-        ];
-
-        $process->setStatus('success');
-        $process->setMessages(['LBL_EMAIL_DRAFT_SAVED']);
-        $process->setData($data);
+        $this->setResponse($process);
     }
 
     /**
@@ -254,5 +243,24 @@ class CloseDraftAction extends LegacyHandler implements ProcessHandlerInterface
     protected function stripString(string $value): string
     {
         return trim(strip_tags(html_entity_decode($value, ENT_QUOTES)));
+    }
+
+    /**
+     * @param Process $process
+     * @return void
+     */
+    public function setResponse(Process $process): void
+    {
+        $data = [
+            'handler' => 'emit-event',
+            'params' => [
+                'event' => 'refresh-drafts',
+                'payload' => true,
+            ],
+        ];
+
+        $process->setStatus('success');
+        $process->setMessages(['LBL_EMAIL_DRAFT_SAVED']);
+        $process->setData($data);
     }
 }

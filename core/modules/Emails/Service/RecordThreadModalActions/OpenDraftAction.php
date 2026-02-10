@@ -151,6 +151,13 @@ class OpenDraftAction implements ProcessHandlerInterface
                 [
                     'handler' => 'emit-event',
                     'params' => [
+                        'event' => 'opened-drafts',
+                        'payload' => $id ?? '',
+                    ],
+                ],
+                [
+                    'handler' => 'emit-event',
+                    'params' => [
                         'event' => 'refresh-drafts',
                         'payload' => true,
                     ],

@@ -1035,7 +1035,13 @@ class SearchForm
                             }
                         }
                     } else {
-                        $operator = $operator != 'subquery' ? 'in' : $operator;
+
+                        $acceptedOperators = ['in', 'not in', 'not_in', 'subquery'];
+
+                        if (!in_array($operator, $acceptedOperators)){
+                            $operator = $operator != 'subquery' ? 'in' : $operator;
+                        }
+
                         foreach ($parms['value'] as $val) {
                             if ($val != ' ' && $val != '') {
                                 if (!empty($field_value)) {
@@ -1366,6 +1372,7 @@ class SearchForm
                                 }
                                 break;
                             case 'not in':
+                            case 'not_in':
                                 $where .= $db_field . ' not in (' . $field_value . ')';
                                 break;
                             case 'in':

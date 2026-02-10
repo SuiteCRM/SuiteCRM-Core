@@ -126,21 +126,9 @@ class OpenDraftAction implements ProcessHandlerInterface
 
         $emailRecord = $this->recordProvider->getRecord($module, $id);
 
-        $attributes = $this->getMapFields($emailRecord);
-
-        $attributes['parent_name'] = [
-            'id' => $attributes['parent_id'] ?? '',
-            'name' => $attributes['parent_name'] ?? '',
-        ];
-
-        $emailRecord->setAttributes($attributes);
-
-        $emailRecord = $this->recordProvider->saveRecord($emailRecord);
-
         $params = $this->getModalData($emailRecord);
 
         $responseData = [
-            'hasMultipleHandlers' => true,
             'handlers' => [
                 [
                     'handler' => 'record-modal',
@@ -151,8 +139,7 @@ class OpenDraftAction implements ProcessHandlerInterface
                 [
                     'handler' => 'emit-event',
                     'params' => [
-                        'event' => 'opened-drafts',
-                        'payload' => $id ?? '',
+                        'event' => 'draft-opened',
                     ],
                 ],
                 [

@@ -114,7 +114,7 @@ export class RecordThreadModalComponent implements OnInit {
 
         this.recordThreadModalOptions = this.recordThreadModalService.getOptions(this?.modalStore?.optionsKey)?.recordThreadConfig?.recordThreadOptions || {};
 
-        const filter= {};
+        const filter= this.modalStore?.getRecordThreadStore()?.getRecordList()?.criteria?.filters || {};
         const fields = this?.recordThreadModalOptions?.filters?.static ?? [];
 
         Object.keys(fields).forEach((field) => {

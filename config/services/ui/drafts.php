@@ -56,6 +56,8 @@ return static function (ContainerConfigurator $containerConfig) {
                                 'params' => [
                                     'expanded' => true,
                                     'disableOnRun' => true,
+                                    'inlineConfirmation' => true,
+                                    'confirmationLabel' => 'LBL_DISMISS_INLINE_CONFIRM'
                                 ],
                                 'modes' => ['detail', 'edit', 'create', 'list'],
                                 'acl' => ['delete']

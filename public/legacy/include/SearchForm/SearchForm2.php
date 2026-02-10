@@ -1223,7 +1223,7 @@ class SearchForm
                             }
                         }
 
-                        if ($type == 'decimal' || $type == 'float' || $type == 'currency' || (!empty($parms['enable_range_search']) && empty($parms['is_date_field']))) {
+                        if ($type == 'decimal' || $type == 'float' || $type == 'currency' || (!empty($parms['enable_range_search']) && empty($parms['is_date_field']) && empty($parms['is_id_field']))) {
                             require_once('modules/Currencies/Currency.php');
 
                             //we need to handle formatting either a single value or 2 values in case the 'between' search option is set

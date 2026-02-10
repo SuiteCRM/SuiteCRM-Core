@@ -40,6 +40,10 @@ $filter_operator_map = [
             '{field}_{type}_range_choice' => '{operator}',
             'range_{field}_{type}' => '{target}'
         ],
+        'not_in' => [
+            '{field}_{type}_range_choice' => '{operator}',
+            'range_{field}_{type}' => 'values'
+        ],
         'between' => [
             '{field}_{type}_range_choice' => '{operator}',
             'range_{field}_{type}' => '',

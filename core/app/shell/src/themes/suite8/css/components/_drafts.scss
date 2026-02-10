@@ -210,6 +210,38 @@
         border: none !important;
       }
     }
+    .action-group-menu {
+
+      .inline-spinner-md {
+        top: 5px;
+        position: relative;
+        right: 13px;
+      }
+
+      .inline-confirmation {
+        color: #534d64 !important;
+        font-weight: 700;
+        font-size: smaller;
+        height: 100%;
+        display: flex;
+        top: 8px;
+        position: relative;
+        padding-right: 0.5rem;
+
+        .inline-confirmation-label {
+          > scrm-label {
+            top: 2px;
+            position: relative;
+          }
+        }
+
+        .inline-confirmation-button {
+          .btn-link {
+            color: $bright-purple !important;
+          }
+        }
+      }
+    }
   }
 }
 

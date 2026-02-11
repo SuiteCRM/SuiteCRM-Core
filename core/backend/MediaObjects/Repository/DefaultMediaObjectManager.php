@@ -541,8 +541,16 @@ class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectMana
 
     protected function createThumbnail(MediaObjectInterface $mediaObject, string $contents, array $options): array
     {
-        $height = $this->getThumbnailHeight($options['height'] ?? 0);
-        $width = $this->getThumbnailWidth($options['width'] ?? 0);
+        if (empty($options['height'])) {
+            $options['height'] = 0;
+        }
+
+        if (empty($options['height'])) {
+            $options['height'] = 0;
+        }
+
+        $height = $this->getThumbnailHeight((int)$options['height']);
+        $width = $this->getThumbnailWidth((int)$options['width']);
 
         $id = create_guid();
         $imagine = $this->getImagine();

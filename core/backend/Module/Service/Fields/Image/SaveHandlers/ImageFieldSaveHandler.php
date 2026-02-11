@@ -157,7 +157,7 @@ class ImageFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
 
         $compressedMediaObject = $this->mediaObjectManager->getCompressedMediaObject($storageType, $mediaObject);
 
-        if ($compressedMediaObject !== null || ($fieldVardef['metadata']['createThumbnail'] ?? true) === false) {
+        if ($compressedMediaObject !== null || isFalse($fieldVardef['metadata']['createThumbnail'] ?? true)) {
             return;
         }
 

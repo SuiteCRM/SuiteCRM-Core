@@ -49,6 +49,17 @@ button, .button {
     vertical-align: top
 }
 
+.mb-muted-header {
+    vertical-align: top;
+    text-align: left;
+    width: 1%;
+    font-weight: bold;
+    white-space: nowrap;
+    color: #777;
+    text-decoration: underline;
+    padding-top: 0.75em;
+}
+
 .mbLBL {
     vertical-align: top;
     text-align: left;

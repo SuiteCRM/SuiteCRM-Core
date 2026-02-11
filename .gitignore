@@ -45,6 +45,10 @@ node_modules
 /public/
 /dist/
 
+# Tmp
+/tmp/
+!/tmp/.gitkeep
+
 # Custom
 /extensions/
 !extensions/.gitkeep

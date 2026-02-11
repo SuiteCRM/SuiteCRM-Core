@@ -44,6 +44,7 @@ export class BaseImageComponent extends BaseFileComponent {
     preview = true;
     storageType: string;
     showThumbnail: boolean = true;
+    thumbnailCreated: boolean = true;
     loading: WritableSignal<boolean> = signal(false);
 
     constructor(
@@ -59,7 +60,7 @@ export class BaseImageComponent extends BaseFileComponent {
 
     getMaxHeight(): string {
 
-        if (this.showThumbnail && this?.uploadedFile()?.thumbnailUrl !== '') {
+        if (isTrue(this.thumbnailCreated) && isTrue(this.showThumbnail)) {
             return this.getThumbnailMaxHeight();
         }
 
@@ -85,7 +86,7 @@ export class BaseImageComponent extends BaseFileComponent {
 
     getMaxWidth(): string {
 
-        if (this.showThumbnail && this?.uploadedFile()?.thumbnailUrl !== '') {
+        if (isTrue(this.thumbnailCreated) && isTrue(this.showThumbnail)) {
             return this.getThumbnailMaxWidth();
         }
 

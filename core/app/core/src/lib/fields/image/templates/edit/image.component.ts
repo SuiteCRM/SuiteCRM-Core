@@ -81,7 +81,8 @@ export class ImageEditFieldComponent extends BaseImageComponent implements OnIni
     ];
 
     ngOnInit() {
-        this.showThumbnail = this.field?.metadata?.showThumbnail ?? false;
+        this.showThumbnail = this.field?.metadata?.showThumbnail ?? true;
+        this.thumbnailCreated = this.field?.metadata?.createThumbnail ?? true;
         this.storageType = this?.field?.metadata?.storage_type ?? '';
         if (this.validStorageTypes.includes(this.storageType)) {
             this.isValidStorageType = true;

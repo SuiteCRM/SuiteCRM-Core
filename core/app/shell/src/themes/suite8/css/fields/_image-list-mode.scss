@@ -24,10 +24,14 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-.field-mode-list, .field-mode-detail {
+.field-mode-list {
   .image-field-container {
     padding-bottom: 0;
+  }
+}
 
+.field-mode-list, .field-mode-detail {
+  .image-field-container {
     .thumbnail-image {
       .p-image-preview-container {
         .p-image-preview-indicator {

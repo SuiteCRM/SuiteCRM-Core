@@ -89,4 +89,43 @@
 			   {if !empty($vardef.metadata.preview)}checked{/if}/>
 	</td>
 </tr>
+<tr>
+	<td class="mbLBL"></td>
+	<td class='mb-muted-header'>{sugar_translate module="DynamicFields" label="LBL_THUMBNAIL_CONFIG"}</td>
+</tr>
+<tr>
+	<td class="mbLBL"></td>
+	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_CREATE_THUMBNAIL"}:</td>
+	<td>
+		<input type="hidden" name="createThumbnail" value="0"/>
+		<input type="checkbox" id="createThumbnail" name="createThumbnail" value="1"
+			   {if !empty($vardef.metadata.createThumbnail)}checked{/if}/>
+	</td>
+</tr>
+<tr>
+	<td class="mbLBL"></td>
+	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_THUMBNAIL_WIDTH"}:</td>
+	<td>
+		<input id="thumbnailWidth" type="text" name="thumbnailWidth"
+				{if !$vardef.metadata.thumbnailWidth}
+					value=""
+				{else}
+					value="{$vardef.metadata.thumbnailWidth}"
+				{/if}
+		>
+	</td>
+</tr>
+<tr>
+	<td class="mbLBL"></td>
+	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_THUMBNAIL_HEIGHT"}:</td>
+	<td>
+		<input id="thumbnailHeight" type="text" name="thumbnailHeight"
+				{if !$vardef.metadata.thumbnailHeight}
+					value=""
+				{else}
+					value="{$vardef.metadata.thumbnailHeight}"
+				{/if}
+		>
+	</td>
+</tr>
 {include file="modules/DynamicFields/templates/Fields/Forms/coreBottom.tpl"}

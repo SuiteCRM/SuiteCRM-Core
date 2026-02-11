@@ -49,6 +49,9 @@ class TemplateImage extends TemplateText
     public $metadataMap = [
         'storage_type' => 'storage_type',
         'maxHeight' => 'maxHeight',
+        'createThumbnail' => 'createThumbnail',
+        'thumbnailHeight' => 'thumbnailHeight',
+        'thumbnailWidth' => 'thumbnailWidth',
         'preview' => 'preview',
         'upload_maxsize' => 'upload_maxsize',
     ];

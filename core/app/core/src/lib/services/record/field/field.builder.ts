@@ -248,6 +248,7 @@ export class FieldBuilder {
         field.source = 'field';
         field.logic = viewField.logic || definition.logic || null;
         field.displayLogic = viewField.displayLogic || definition.displayLogic || null;
+        field.hideIfEmpty = viewField?.hideIfEmpty || definition?.hideIfEmpty || null;
         const fieldDependencies: ObjectMap = {};
         const attributeDependencies: { [key: string]: AttributeDependency } = {};
 
@@ -266,10 +267,8 @@ export class FieldBuilder {
             field.valueObject = valueObject;
         }
 
-
-        if (((viewField?.displayIfHasValue ?? false) || (definition?.displayIfHasValue ?? false)) && this.hasValue(field)) {
-            field.display.set('default');
-            field.defaultDisplay = 'show';
+        if (field.hideIfEmpty && !field.hasValue()) {
+            field.display.set('none');
         }
 
         if (language) {
@@ -367,18 +366,6 @@ export class FieldBuilder {
         }
 
         return get(field.valueObject, name, '');
-    }
-
-
-    protected hasValue(field: Field): boolean {
-
-        let hasValue = false;
-        hasValue = hasValue || (field?.value !== '' && !isVoid(field.value));
-        hasValue = hasValue || !!(field?.valueList && field?.valueList?.length);
-        hasValue = hasValue || !!(field?.valueObject && Object.keys(field.valueObject).length);
-        hasValue = hasValue || !!(field?.valueObjectArray && field?.valueObjectArray?.length);
-
-        return hasValue;
     }
 
 }

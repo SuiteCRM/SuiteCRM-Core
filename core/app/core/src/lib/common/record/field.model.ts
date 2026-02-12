@@ -34,6 +34,7 @@ import {ViewMode} from '../views/view.model';
 import {signal, WritableSignal} from "@angular/core";
 import {FieldActions} from "../metadata/metadata.model";
 import {StandardValidationErrors} from "../services/validators/validators.model";
+import {isVoid} from "../utils/value-utils";
 
 export type DisplayType = 'none' | 'show' | 'readonly' | 'inline' | 'disabled' | 'default';
 
@@ -220,6 +221,7 @@ export interface Field {
     attributeDependencies?: AttributeDependency[];
     logic?: FieldLogicMap;
     displayLogic?: FieldLogicMap;
+    hideIfEmpty?: boolean;
     previousValue?: string;
     useFullColumn?: string[];
 
@@ -265,6 +267,7 @@ export class BaseField implements Field {
     attributeDependencies: AttributeDependency[] = [];
     logic?: FieldLogicMap;
     displayLogic?: FieldLogicMap;
+    hideIfEmpty?: boolean;
     useFullColumn?: string[];
 
     fieldActions?: FieldActions;
@@ -374,6 +377,17 @@ export class BaseField implements Field {
         } else if (this.valueObject === null) {
             this.valueObject = {};
         }
+    }
+
+    hasValue(): boolean {
+
+        let hasValue = false;
+        hasValue = hasValue || (this?.value !== '' && !isVoid(this.value));
+        hasValue = hasValue || !!(this?.valueList && this?.valueList?.length);
+        hasValue = hasValue || !!(this?.valueObject && Object.keys(this.valueObject).length);
+        hasValue = hasValue || !!(this?.valueObjectArray && this?.valueObjectArray?.length);
+
+        return hasValue;
     }
 
 }

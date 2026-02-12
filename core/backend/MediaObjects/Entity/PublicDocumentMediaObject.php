@@ -114,10 +114,6 @@ class PublicDocumentMediaObject implements MediaObjectInterface
 
     #[Assert\NotNull]
     #[UploadConstraint(storageType: 'public-documents')]
-    public ?File $file = null;
-
-    #[ApiProperty(writable: false)]
-    #[ORM\Column(name: "file_path", type: "string", length: 255, nullable: true, options: ["default" => null])]
     #[Vich\UploadableField(
         mapping: 'public_documents_media_object',
         fileNameProperty: 'filePath',
@@ -125,6 +121,10 @@ class PublicDocumentMediaObject implements MediaObjectInterface
         mimeType: 'mimeType',
         dimensions: 'dimensions'
     )]
+    public ?File $file = null;
+
+    #[ApiProperty(writable: false)]
+    #[ORM\Column(name: "file_path", type: "string", length: 255, nullable: true, options: ["default" => null])]
     public ?string $filePath = null;
 
     #[ApiProperty(writable: false)]

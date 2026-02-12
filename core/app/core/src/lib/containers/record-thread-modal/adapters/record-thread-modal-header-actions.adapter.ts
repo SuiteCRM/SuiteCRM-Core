@@ -92,9 +92,23 @@ export class RecordThreadModalHeaderActionsAdapter extends BaseRecordThreadModal
     }
 
     protected buildActionData(action: Action, context?: ActionContext): RecordThreadModalActionData {
+
+        const recordList = this.store?.getRecordThreadStore()?.getRecordList()
+        const currentCriteria = recordList?.criteria ?? {};
+
+        if (!context) {
+           context = {} as ActionContext
+        }
+
+        context.criteria = {
+            ...context.criteria,
+            ...currentCriteria,
+        }
+
         return {
             store: this.store,
             action,
+            actionContext: context,
         } as RecordThreadModalActionData;
     }
 

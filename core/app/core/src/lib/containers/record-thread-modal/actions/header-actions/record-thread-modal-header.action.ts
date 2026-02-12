@@ -27,9 +27,10 @@
 export interface RecordThreadModalActionData extends RecordBasedActionData {
     store: RecordThreadModalStore;
     action?: Action;
+    context?: ActionContext;
 }
 
-import {Action, ActionHandler, RecordBasedActionData} from "../../../../common/actions/action.model";
+import {Action, ActionContext, ActionHandler, RecordBasedActionData} from "../../../../common/actions/action.model";
 import {RecordThreadModalStore} from "../../../../store/record-thread-modal/record-thread-modal.store";
 
 export abstract class RecordThreadModalHeaderActionHandler extends ActionHandler<RecordThreadModalActionData> {

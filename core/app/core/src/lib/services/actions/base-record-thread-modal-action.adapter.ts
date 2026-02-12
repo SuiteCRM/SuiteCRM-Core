@@ -129,6 +129,7 @@ export abstract class BaseRecordThreadModalActionAdapter<D extends RecordBasedAc
             action: actionName,
             module: moduleName,
             id: baseRecord?.id ?? (context && context.record && context.record.id) ?? '',
+            criteria: context?.criteria ?? actionData?.actionContext?.criteria ?? null,
             params: (action && action.params) || [],
             record: baseRecord ?? null
         } as AsyncActionInput;

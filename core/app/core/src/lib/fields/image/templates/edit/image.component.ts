@@ -32,7 +32,7 @@ import {FieldLogicDisplayManager} from "../../../field-logic-display/field-logic
 import {
     LegacyEntrypointLinkBuilder
 } from "../../../../services/navigation/legacy-entrypoint-link-builder/legacy-entrypoint-link-builder.service";
-import {UploadedFile} from "../../../../components/uploaded-file/uploaded-file.model";
+import {Attachment} from "../../../../components/uploaded-file/uploaded-file.model";
 import {isEqual} from "lodash-es";
 import {Record} from "../../../../common/record/record.model";
 import {animate, style, transition, trigger} from "@angular/animations";
@@ -105,7 +105,7 @@ export class ImageEditFieldComponent extends BaseImageComponent implements OnIni
         const uploadedField = this.uploadFile(
             this.storageType,
             files[0],
-            (uploadFile: UploadedFile) => {
+            (uploadFile: Attachment) => {
                 this.setValue(uploadFile)
                 this.uploadedFile.set(uploadFile);
             },
@@ -114,7 +114,7 @@ export class ImageEditFieldComponent extends BaseImageComponent implements OnIni
         this.displayUploadArea.set(false);
     }
 
-    protected setValue(uploadFile: UploadedFile): void {
+    protected setValue(uploadFile: Attachment): void {
         const uploadFileRecord = this.mapToRecord(uploadFile);
 
         this.field.valueObject = uploadFileRecord;

@@ -26,7 +26,7 @@
 
 
 import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
-import {UploadedFile} from "../uploaded-file/uploaded-file.model";
+import {Attachment} from "../uploaded-file/uploaded-file.model";
 import {NgIf} from "@angular/common";
 import {ButtonModule} from "../button/button.module";
 import {ButtonInterface} from "../../common/components/button/button.model";
@@ -45,11 +45,11 @@ import {ImageModule} from "../image/image.module";
     templateUrl: './uploaded-image.component.html',
 })
 export class UploadedImageComponent implements OnInit {
-    @Input() file: UploadedFile;
+    @Input() file: Attachment;
     @Input() maxHeight: string = '100px';
     @Input() allowClear: boolean = true;
 
-    @Output('clear') clear: EventEmitter<UploadedFile> = new EventEmitter<UploadedFile>();
+    @Output('clear') clear: EventEmitter<Attachment> = new EventEmitter<Attachment>();
 
     clearButtonConfig: ButtonInterface;
     errorClearButtonConfig: ButtonInterface;

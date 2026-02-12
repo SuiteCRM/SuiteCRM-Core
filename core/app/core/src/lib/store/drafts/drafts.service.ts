@@ -45,8 +45,8 @@ export class DraftsService {
     draftsCount$ = toObservable(this.draftsCount);
     modalConfig: any = {};
     showDrafts: WritableSignal<boolean> = signal(false);
-    caretSignal: WritableSignal<string> = signal('arrow_up_filled');
-    caretSignal$ = toObservable(this.caretSignal);
+    modalOpenStatusIcon: WritableSignal<string> = signal('arrow_up_filled');
+    modalOpenStatusIcon$ = toObservable(this.modalOpenStatusIcon);
 
     protected subs: Subscription[] = [];
 
@@ -61,7 +61,7 @@ export class DraftsService {
         this.initialized = true;
         this.modalConfig = this.recordThreadModalService.getOptions('drafts')?.modalConfig || {};
 
-        this.appState.openedDraftsEventEmitter.subscribe(() => {
+        this.appState.draftOpenedEventEmitter.subscribe(() => {
             this.getOpenedDrafts();
             this.updateCriteria();
         })
@@ -116,10 +116,10 @@ export class DraftsService {
         this.updateCriteria();
 
         this.subs.push(this.modal?.shown?.subscribe(() => {
-            this.caretSignal.set('arrow_down_filled');
+            this.modalOpenStatusIcon.set('arrow_down_filled');
         }));
         this.subs.push(this.modal?.closed?.subscribe(() => {
-            this.caretSignal.set('arrow_up_filled');
+            this.modalOpenStatusIcon.set('arrow_up_filled');
         }));
     }
 
@@ -157,6 +157,7 @@ export class DraftsService {
                     field: 'id',
                     fieldType: 'id',
                     operator: 'not_in',
+                    valueType: 'array',
                     values: [...this.openedDrafts],
                 }
             }

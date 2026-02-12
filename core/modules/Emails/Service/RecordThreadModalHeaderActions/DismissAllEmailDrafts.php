@@ -35,6 +35,7 @@ use App\Data\Service\RecordDeletionServiceInterface;
 use App\Data\Service\RecordProviderInterface;
 use App\Process\Entity\Process;
 use App\Process\Service\ProcessHandlerInterface;
+use Doctrine\DBAL\ArrayParameterType;
 use Psr\Log\LoggerInterface;
 
 class DismissAllEmailDrafts implements ProcessHandlerInterface
@@ -106,6 +107,12 @@ class DismissAllEmailDrafts implements ProcessHandlerInterface
         if (empty($options)) {
             throw new InvalidArgumentException(self::MSG_OPTIONS_NOT_FOUND);
         }
+
+        $criteria = $options['criteria'] ?? null;
+
+        if (empty($criteria)) {
+            throw new InvalidArgumentException(self::MSG_OPTIONS_NOT_FOUND);
+        }
     }
 
     /**
@@ -114,6 +121,11 @@ class DismissAllEmailDrafts implements ProcessHandlerInterface
      */
     public function run(Process $process): void
     {
+
+        $options = $process->getOptions();
+        $criteria = $options['criteria'] ?? null;
+        $ids = $this->getIdsToExclude($criteria);
+
         $queryBuilder = $this->preparedStatementHandler->createQueryBuilder();
         $queryBuilder->select('*')
             ->from('emails')
@@ -126,6 +138,12 @@ class DismissAllEmailDrafts implements ProcessHandlerInterface
                 'status' => 'draft',
                 'created_by' => $this->userHandler->getCurrentUser()?->id,
             ]);
+
+        if (!empty($ids)) {
+            $queryBuilder
+                ->andWhere($queryBuilder->expr()->notIn('id', ':ids'))
+                ->setParameter('ids', $ids, ArrayParameterType::STRING);
+        }
 
         $result = $queryBuilder->fetchAllAssociative();
 
@@ -152,5 +170,19 @@ class DismissAllEmailDrafts implements ProcessHandlerInterface
         ];
 
         $process->setData($responseData);
+    }
+
+    protected function getIdsToExclude(array $criteria)
+    {
+        $ids = [];
+
+        foreach ($criteria['filters'] as $filter) {
+            if ($filter['field'] === 'id' && $filter['operator'] === 'not_in') {
+                $ids = $filter['values'];
+                break;
+            }
+        }
+
+        return $ids;
     }
 }

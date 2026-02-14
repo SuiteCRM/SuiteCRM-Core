@@ -120,14 +120,16 @@ $dictionary['EmailTemplate'] = array(
         ),
         'body' => array(
             'name' => 'body',
-            'vname' => 'LBL_BODY',
-            'type' => 'longtext',
+            'vname' => 'LBL_PLAIN_TEXT',
+            'type' => 'text',
+            'dbType' => 'longtext',
             'comment' => 'Plain text body to be used in resulting email'
         ),
         'body_html' => array(
             'name' => 'body_html',
-            'vname' => 'LBL_PLAIN_TEXT',
-            'type' => 'longtext',
+            'vname' => 'LBL_HTML_BODY',
+            'type' => 'html',
+            'dbType' => 'longtext',
             'comment' => 'HTML formatted email body to be used in resulting email'
         ),
         'deleted' => array(
@@ -195,7 +197,7 @@ $dictionary['EmailTemplate'] = array(
             'type' => 'enum',
             'required' => false,
             'reportable' => false,
-            'options' => 'emailTemplates_type_list',
+            'options' => 'emailTemplates_type_list_no_workflow',
             'comment' => 'Type of the email template'
         ),
     ),

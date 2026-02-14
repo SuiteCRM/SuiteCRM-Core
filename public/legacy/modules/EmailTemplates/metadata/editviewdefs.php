@@ -13,10 +13,6 @@ $viewdefs['EmailTemplates']['EditView'] = array(
     
     array(
       'name',
-      '',
-    ),
-    
-    array(
       'type',
     ),
     
@@ -30,6 +26,7 @@ $viewdefs['EmailTemplates']['EditView'] = array(
           'cols' => '90',
         ),
       ),
+      'assigned_user_name',
     ),
     
     array(
@@ -60,6 +57,18 @@ $viewdefs['EmailTemplates']['EditView'] = array(
       'text_only',
     ),
     
+    array(
+      
+      array(
+        'name' => 'body',
+        'displayParams' =>
+        array(
+          'rows' => '20',
+          'cols' => '100',
+        ),
+      ),
+    ),
+
     array(
       
       array(

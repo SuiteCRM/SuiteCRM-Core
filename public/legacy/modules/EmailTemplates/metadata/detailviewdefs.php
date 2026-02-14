@@ -55,10 +55,6 @@ $viewdefs['EmailTemplates']['DetailView'] = array(
     
     array(
       'name',
-      '',
-    ),
-    
-    array(
       'type',
     ),
     
@@ -72,6 +68,7 @@ $viewdefs['EmailTemplates']['DetailView'] = array(
           'cols' => '90',
         ),
       ),
+      'assigned_user_name',
     ),
     
     array(
@@ -102,6 +99,18 @@ $viewdefs['EmailTemplates']['DetailView'] = array(
       'text_only',
     ),
     
+    array(
+      
+      array(
+        'name' => 'body',
+        'displayParams' =>
+        array(
+          'rows' => '20',
+          'cols' => '100',
+        ),
+      ),
+    ),
+
     array(
       
       array(

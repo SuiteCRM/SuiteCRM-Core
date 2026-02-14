@@ -47,7 +47,7 @@ parameters:
     email-templates:
       index: true
       list: true
-      record: false
+      record: true
     email-marketing:
       index: true
       list: true

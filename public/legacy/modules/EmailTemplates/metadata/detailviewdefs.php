@@ -125,11 +125,7 @@ $viewdefs['EmailTemplates']['DetailView'] = array(
     
     array(
       
-      array(
-        'name' => 'ATTACHMENTS_JAVASCRIPT',
-        'customCode' => '{$fields.attachments_javascript.value} {$fields.attachments.value}',
-        'description' => 'This field was auto generated',
-      ),
+      'attachments',
     ),
   ),
 )

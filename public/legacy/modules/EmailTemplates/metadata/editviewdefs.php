@@ -42,6 +42,10 @@ $viewdefs['EmailTemplates']['EditView'] = array(
     ),
     
     array(
+      'variable_tools',
+    ),
+
+    array(
       
       array(
         'name' => 'subject',
@@ -83,11 +87,7 @@ $viewdefs['EmailTemplates']['EditView'] = array(
     
     array(
       
-      array(
-        'name' => 'ATTACHMENTS_JAVASCRIPT',
-        'customCode' => '{$fields.attachments_javascript.value} {$fields.attachments.value}',
-        'description' => 'This field was auto generated',
-      ),
+      'attachments',
     ),
   ),
 )

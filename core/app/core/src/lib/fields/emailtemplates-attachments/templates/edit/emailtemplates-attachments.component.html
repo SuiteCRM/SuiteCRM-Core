@@ -1,0 +1,32 @@
+<div class="d-flex flex-column gap-2">
+    <div class="d-flex align-items-center gap-2" *ngIf="mode === 'edit' || mode === 'create'">
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="attachDocument()">
+            <scrm-label labelKey="LBL_SUITE_DOCUMENT"></scrm-label>
+        </button>
+
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="triggerUpload()">
+            <scrm-label labelKey="LBL_UPLOAD_FILE"></scrm-label>
+        </button>
+
+        <input #fileInput type="file" class="d-none" multiple (change)="onFilesSelected($event)" />
+    </div>
+
+    <div *ngIf="loading" class="text-muted small">Loading...</div>
+
+    <div *ngIf="!loading && (!items || items.length === 0)" class="text-muted small">No attachments</div>
+
+    <div *ngIf="!loading && items && items.length > 0" class="d-flex flex-column gap-1">
+        <div *ngFor="let it of items" class="d-flex align-items-center gap-2">
+            <a [href]="it.downloadUrl" target="_blank" rel="noopener">{{it.filename}}</a>
+
+            <button
+                *ngIf="mode === 'edit' || mode === 'create'"
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                (click)="deleteItem(it)"
+            >
+                <scrm-label labelKey="LNK_REMOVE"></scrm-label>
+            </button>
+        </div>
+    </div>
+</div>

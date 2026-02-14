@@ -200,6 +200,23 @@ $dictionary['EmailTemplate'] = array(
             'options' => 'emailTemplates_type_list_no_workflow',
             'comment' => 'Type of the email template'
         ),
+
+        'variable_tools' => array(
+            'name' => 'variable_tools',
+            'vname' => 'LBL_INSERT_VARIABLE',
+            'type' => 'emailtemplates-variable-tools',
+            'source' => 'non-db',
+            'reportable' => false,
+            'studio' => false,
+        ),
+        'attachments' => array(
+            'name' => 'attachments',
+            'vname' => 'LBL_ATTACHMENTS',
+            'type' => 'emailtemplates-attachments',
+            'source' => 'non-db',
+            'reportable' => false,
+            'studio' => false,
+        ),
     ),
     'indices' => array(
         array(

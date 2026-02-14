@@ -130,6 +130,24 @@ import {AttachmentDetailFieldModule} from "./attachments/templates/detail/attach
 import {AttachmentDetailFieldComponent} from "./attachments/templates/detail/attachment.component";
 import {AttachmentListFieldModule} from "./attachments/templates/list/attachment.module";
 import {AttachmentListFieldComponent} from "./attachments/templates/list/attachment.component";
+import {
+    EmailTemplatesVariableToolsEditFieldModule
+} from "./emailtemplates-variable-tools/templates/edit/emailtemplates-variable-tools.module";
+import {
+    EmailTemplatesVariableToolsEditFieldComponent
+} from "./emailtemplates-variable-tools/templates/edit/emailtemplates-variable-tools.component";
+import {
+    EmailTemplatesAttachmentsEditFieldModule
+} from "./emailtemplates-attachments/templates/edit/emailtemplates-attachments.module";
+import {
+    EmailTemplatesAttachmentsEditFieldComponent
+} from "./emailtemplates-attachments/templates/edit/emailtemplates-attachments.component";
+import {
+    EmailTemplatesAttachmentsDetailFieldModule
+} from "./emailtemplates-attachments/templates/detail/emailtemplates-attachments.module";
+import {
+    EmailTemplatesAttachmentsDetailFieldComponent
+} from "./emailtemplates-attachments/templates/detail/emailtemplates-attachments.component";
 
 export const baseFieldModules = [
     VarcharDetailFieldModule,
@@ -183,7 +201,10 @@ export const baseFieldModules = [
     SquireDetailFieldModule,
     AttachmentEditFieldModule,
     AttachmentDetailFieldModule,
-    AttachmentListFieldModule
+    AttachmentListFieldModule,
+    EmailTemplatesVariableToolsEditFieldModule,
+    EmailTemplatesAttachmentsEditFieldModule,
+    EmailTemplatesAttachmentsDetailFieldModule,
 ];
 export const baseFieldComponents = [
     VarcharDetailFieldComponent,
@@ -238,7 +259,10 @@ export const baseFieldComponents = [
     SquireDetailFieldComponent,
     AttachmentEditFieldComponent,
     AttachmentDetailFieldComponent,
-    AttachmentListFieldComponent
+    AttachmentListFieldComponent,
+    EmailTemplatesVariableToolsEditFieldComponent,
+    EmailTemplatesAttachmentsEditFieldComponent,
+    EmailTemplatesAttachmentsDetailFieldComponent,
 ];
 
 export const baseViewFieldsMap: FieldComponentMap = {
@@ -331,6 +355,9 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'attachment.edit': AttachmentEditFieldComponent,
     'attachment.detail': AttachmentDetailFieldComponent,
     'attachment.list': AttachmentListFieldComponent,
+    'emailtemplates-variable-tools.edit': EmailTemplatesVariableToolsEditFieldComponent,
+    'emailtemplates-attachments.edit': EmailTemplatesAttachmentsEditFieldComponent,
+    'emailtemplates-attachments.detail': EmailTemplatesAttachmentsDetailFieldComponent,
     'html-native.detail': HtmlDetailFieldComponent,
     'html.detail': TinymceDetailFieldComponent,
     'html.edit': TinymceEditFieldComponent,

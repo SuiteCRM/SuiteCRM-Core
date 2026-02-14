@@ -29,12 +29,14 @@ class EmailTemplatesToolsController extends AbstractController
     #[Route('/api/email-templates/template-field-defs', name: 'email_templates_template_field_defs', methods: ['GET'])]
     public function templateFieldDefs(): JsonResponse
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
         return $this->json($this->tools->getVariableDefs());
     }
 
     #[Route('/api/email-templates/{id}/attachments', name: 'email_templates_attachments_list', methods: ['GET'])]
     public function listAttachments(string $id): JsonResponse
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
         return $this->json([
             'items' => $this->tools->listAttachments($id),
         ]);
@@ -43,6 +45,7 @@ class EmailTemplatesToolsController extends AbstractController
     #[Route('/api/email-templates/{id}/attachments/upload', name: 'email_templates_attachments_upload', methods: ['POST'])]
     public function uploadAttachment(Request $request, string $id): JsonResponse
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
         $file = $request->files->get('file');
         if (!$file) {
             return $this->json(['error' => 'file is required'], Response::HTTP_BAD_REQUEST);
@@ -54,6 +57,7 @@ class EmailTemplatesToolsController extends AbstractController
     #[Route('/api/email-templates/{id}/attachments/document', name: 'email_templates_attachments_document', methods: ['POST'])]
     public function attachDocument(Request $request, string $id): JsonResponse
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
         $payload = json_decode($request->getContent() ?: '{}', true);
         $documentId = (string)($payload['documentId'] ?? '');
 
@@ -63,6 +67,7 @@ class EmailTemplatesToolsController extends AbstractController
     #[Route('/api/email-templates/{id}/attachments/{noteId}', name: 'email_templates_attachments_delete', methods: ['DELETE'])]
     public function deleteAttachment(string $id, string $noteId): JsonResponse
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
         $this->tools->deleteAttachment($id, $noteId);
 
         return $this->json(['ok' => true]);

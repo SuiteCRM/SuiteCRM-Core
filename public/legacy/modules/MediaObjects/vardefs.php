@@ -150,10 +150,29 @@ $dictionary['PublicImageMediaObject'] = [
     'unified_search' => false,
 ];
 
+// Base MediaObject bean uses the `media_objects` table. Without vardefs for this base table,
+// Quick Repair and Rebuild can fail with:
+// "createRelationshipMeta: Metadata for table media_objects does not exist".
+$dictionary['MediaObject'] = [
+    'table' => 'media_objects',
+    'audited' => false,
+    'inline_edit' => false,
+    'duplicate_merge' => false,
+    'fields' => array_merge(
+        $mediaObjectFields,
+        []
+    ),
+    'relationships' => [
+    ],
+    'optimistic_locking' => true,
+    'unified_search' => false,
+];
+
 if (!class_exists('VardefManager')) {
     require_once 'include/SugarObjects/VardefManager.php';
 }
 
+VardefManager::createVardef('MediaObjects', 'MediaObject', ['basic', 'assignable', 'security_groups']);
 VardefManager::createVardef('MediaObjects', 'ArchivedDocumentMediaObject', ['basic', 'assignable', 'security_groups']);
 VardefManager::createVardef('MediaObjects', 'PrivateDocumentMediaObject', ['basic', 'assignable', 'security_groups']);
 VardefManager::createVardef('MediaObjects', 'PublicDocumentMediaObject', ['basic', 'assignable', 'security_groups']);

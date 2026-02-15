@@ -111,6 +111,20 @@ class UserHandler extends LegacyHandler
     }
 
     /**
+     * Best-effort admin check for the currently authenticated legacy user.
+     * Returns false when there is no authenticated user in the legacy context.
+     */
+    public function isCurrentUserAdmin(): bool
+    {
+        $user = $this->getCurrentUser();
+        if (!$user) {
+            return false;
+        }
+
+        return (bool)($user->is_admin ?? false);
+    }
+
+    /**
      * Get current language
      * @return string
      */

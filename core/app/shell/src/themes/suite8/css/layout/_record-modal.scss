@@ -156,7 +156,6 @@ body.modal-open.detached-modal-open {
   pointer-events: none;
 
   &.has-maximized-modal {
-    right: 0 !important;
     .detached-modal:not(.maximized) {
       z-index: 1070;
     }
@@ -440,7 +439,7 @@ div.record-modal-backdrop {
         max-height: 94vh;
         width: 82vw;
         max-width: 82vw;
-        transform: translate(-91vw, -97vh);
+        transform: translate(-84vw, -97vh);
         z-index: 1060;
         margin: 0;
 

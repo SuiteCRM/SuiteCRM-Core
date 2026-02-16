@@ -122,6 +122,11 @@ export class UploadedFileComponent implements OnInit {
     }
 
     protected getIcon() {
+        if (this.file.attachmentIcon !== '') {
+            this.attachmentIcon = this.file.attachmentIcon;
+            return;
+        }
+
         if (this.file?.attachmentType === 'file') {
             return;
         }

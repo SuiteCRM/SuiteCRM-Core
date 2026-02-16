@@ -88,6 +88,8 @@ export class BaseAttachmentComponent extends BaseFileComponent {
             contentUrl = '.' + contentUrl ?? '';
         }
 
+        const status = file?.attributes?.status ?? 'saved';
+
         return {
             id: file?.id ?? '',
             name: file?.attributes?.original_name ?? '',
@@ -96,7 +98,10 @@ export class BaseAttachmentComponent extends BaseFileComponent {
             attachmentType: file?.attributes?.attachmentType ?? 'file',
             sourceRecordId: file?.attributes?.source_record_id ?? '',
             contentUrl: contentUrl,
-            status: signal('saved'),
+            status: signal(status),
+            errorMessage: signal(file.attributes?.errorMessage ?? ''),
+            attachmentIcon: file?.attributes?.attachmentIcon ?? '',
+            errorLabelKey: file?.attributes?.errorLabelKey ?? '',
             progress: signal(100),
             dateCreated: file?.attributes?.date_entered || ''
         } as Attachment;
@@ -124,9 +129,11 @@ export class BaseAttachmentComponent extends BaseFileComponent {
                 id: uploadFile?.id ?? uploadFile?.name ?? '',
                 name: uploadFile?.name ?? '',
                 attachmentType: uploadFile?.attachmentType ?? 'file',
+                errorLabelKey: uploadFile?.errorLabelKey ?? '',
                 source_record_id: uploadFile?.sourceRecordId ?? '',
                 size: uploadFile?.size ?? '',
                 type: uploadFile?.type ?? '',
+                status: uploadFile?.status() ?? 'saved',
                 contentUrl: uploadFile?.contentUrl ?? '',
                 original_name: uploadFile?.name ?? '',
             }

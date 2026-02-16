@@ -34,11 +34,13 @@ export interface Attachment {
     size?: number;
     type?: string;
     attachmentType?: string; // File, Document, Note, etc
+    attachmentIcon?: string;
     contentUrl?: string;
     thumbnailUrl?: string;
     sourceRecordId?: string; // ID of Document, Note, etc. depending on type
     dateCreated?: string;
     status?: WritableSignal<AttachmentStatus>;
     errorMessage?: WritableSignal<string>;
+    errorLabelKey?: string;
     progress?: WritableSignal<number>;
 }

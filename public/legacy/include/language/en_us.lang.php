@@ -795,6 +795,18 @@ $app_list_strings = array(
         'done' => 'Done'
     ],
 
+    'dom_processes_types' => [
+        'background' => 'Background Process',
+        'immediate' => 'Immediate',
+    ],
+
+    'dom_processes_statuses' => [
+        'pending' => 'Pending',
+        'running' => 'Running',
+        'failed' => 'Failed',
+        'completed' => 'Completed'
+    ],
+
     'dom_outbound_email_account_types' => [
         'user' => 'Personal',
         'group' => 'Group',
@@ -3809,6 +3821,7 @@ $app_list_strings['moduleList']['OutboundEmailAccounts'] = 'Outbound Email Accou
 $app_list_strings['moduleList']['ExternalOAuthConnection'] = 'External OAuth Connection';
 $app_list_strings['moduleList']['ExternalOAuthProvider'] = 'External OAuth Provider';
 $app_list_strings['moduleList']['ManualMigrationTasks'] = 'Migrations';
+$app_list_strings['moduleList']['Processes'] = 'Processes';
 
 //social
 $app_strings['FACEBOOK_USER_C'] = 'Facebook';

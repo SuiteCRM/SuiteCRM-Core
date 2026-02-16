@@ -28,19 +28,36 @@
 namespace App\Module\Service\Fields\Attachments\AttachmentTypeHandlers;
 
 use App\Data\Service\RecordProviderInterface;
+use App\Engine\LegacyHandler\LegacyHandler;
+use App\Engine\LegacyHandler\LegacyScopeState;
 use App\FieldDefinitions\Service\FieldDefinitionsProviderInterface;
 use App\MediaObjects\Repository\MediaObjectManagerInterface;
+use App\Module\Service\ModuleNameMapperInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-class DocumentAttachmentTypeHandler implements AttachmentTypeHandlerInterface
+class DocumentAttachmentTypeHandler extends LegacyHandler implements AttachmentTypeHandlerInterface
 {
+    public function getHandlerKey(): string
+    {
+        return 'document-attachment-type-handlers';
+    }
+
     public function __construct(
+        string $projectDir,
+        string $legacyDir,
+        string $legacySessionName,
+        string $defaultSessionName,
+        LegacyScopeState $legacyScopeState,
+        RequestStack $requestStack,
         protected FieldDefinitionsProviderInterface $fieldDefinitionsProvider,
         protected MediaObjectManagerInterface $mediaObjectManager,
         protected LoggerInterface $logger,
         protected RecordProviderInterface $recordProvider,
+        protected ModuleNameMapperInterface $moduleNameMapper,
     )
     {
+        parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState, $requestStack);
     }
 
     public function getType(): string
@@ -52,13 +69,14 @@ class DocumentAttachmentTypeHandler implements AttachmentTypeHandlerInterface
     {
 
         $mediaObjects = [];
-        try {
-            $record = $this->recordProvider->getRecord($module, $id);
-        } catch (\Exception $e) {
-            $this->logger->warn('Unable to retrieve record for module ' . $module . ' with id ' . $id . '. Error: ' . $e->getMessage());
-            return null;
+
+        $bean = $this->getBean($this->moduleNameMapper->toLegacy($module), $id);
+
+        if (!$bean) {
+            return $this->buildDeletedAttachment();
         }
 
+        $record = $this->recordProvider->mapToRecord($bean);
         $attributes = $record->getAttributes() ?? [];
         $revisionId = $attributes['document_revision_id'] ?? null;
         if (!$revisionId) {
@@ -112,5 +130,28 @@ class DocumentAttachmentTypeHandler implements AttachmentTypeHandlerInterface
         }
 
         return $storageType;
+    }
+
+    protected function buildDeletedAttachment(): array
+    {
+        return [
+            [
+                'attributes' => [
+                    'attachmentType' => 'documents',
+                    'attachmentIcon' => 'exclamation-triangle',
+                    'status' => 'error',
+                    'errorLabelKey' => 'LBL_DOCUMENT_NOT_FOUND',
+                ],
+            ],
+        ];
+    }
+
+    protected function getBean(string $module, string $id): \SugarBean|bool
+    {
+        $this->init();
+        $bean = \BeanFactory::getBean($module, $id);
+        $this->close();
+
+        return $bean;
     }
 }

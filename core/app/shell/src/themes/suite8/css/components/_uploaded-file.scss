@@ -76,6 +76,15 @@ a.clickable.file-field-uploaded-link:hover {
         height: auto;
         display: block;
 
+        &.error-icon {
+          padding-left: .25em;
+          margin-right: .1em !important;
+
+          svg {
+            fill: $error !important;
+          }
+        }
+
         &.uploaded-file-icon-error {
           color: $error;
         }
@@ -218,6 +227,13 @@ a.clickable.file-field-uploaded-link:hover {
         height: auto;
         display: block;
 
+        &.error-icon {
+          padding-left: .25rem !important;
+          svg {
+            fill: $error !important;
+          }
+        }
+
         &.uploaded-file-icon-error {
           color: $error;
         }
@@ -323,7 +339,7 @@ a.clickable.file-field-uploaded-link:hover {
         border-radius: 0;
         padding-bottom: 1px;
 
-        .uploaded-file-info-container  {
+        .uploaded-file-info-container {
           .uploaded-file-info {
             a.clickable:hover {
               text-decoration: none;

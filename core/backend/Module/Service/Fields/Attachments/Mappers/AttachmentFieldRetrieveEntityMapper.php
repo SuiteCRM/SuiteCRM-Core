@@ -31,8 +31,11 @@ use App\Data\Entity\Record;
 use App\Data\Service\Record\EntityRecordMappers\EntityRecordFieldTypeMapperInterface;
 use App\FieldDefinitions\Entity\FieldDefinition;
 use App\MediaObjects\Repository\MediaObjectManagerInterface;
+use App\Module\Service\Fields\Attachments\AttachmentsManagerInterface;
 use App\Module\Service\ModuleNameMapperInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
+#[Autoconfigure(lazy: true)]
 class AttachmentFieldRetrieveEntityMapper implements EntityRecordFieldTypeMapperInterface
 {
     use AttachmentFieldApiMapperTrait;
@@ -41,7 +44,8 @@ class AttachmentFieldRetrieveEntityMapper implements EntityRecordFieldTypeMapper
 
     public function __construct(
         protected MediaObjectManagerInterface $mediaObjectManager,
-        protected ModuleNameMapperInterface $moduleNameMapper
+        protected ModuleNameMapperInterface $moduleNameMapper,
+        protected AttachmentsManagerInterface $attachmentsManager
     )
     {
     }
@@ -104,6 +108,6 @@ class AttachmentFieldRetrieveEntityMapper implements EntityRecordFieldTypeMapper
         if (empty($storageType)) {
             return;
         }
-        $this->injectMediaObjects($record, $field, $storageType, $this->mediaObjectManager, $this->moduleNameMapper);
+        $this->injectMediaObjects($record, $field, $storageType, $this->mediaObjectManager, $this->moduleNameMapper, $this->attachmentsManager);
     }
 }

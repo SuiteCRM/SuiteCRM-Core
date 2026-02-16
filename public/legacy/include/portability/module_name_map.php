@@ -222,6 +222,10 @@ $module_name_map = [
         'frontend' => 'manual-migration-tasks',
         'core' => 'ManualMigrationTasks'
     ],
+    'Processes' => [
+        'frontend' => 'processes',
+        'core' => 'Processes'
+    ],
     'TemplateSectionLine' => [
         'frontend' => 'template-section-line',
         'core' => 'TemplateSectionLine'

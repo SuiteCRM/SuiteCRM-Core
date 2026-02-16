@@ -348,11 +348,26 @@
   }
 }
 
+
 .draft-modal-action {
   .action-group-menu {
     .button-group-button {
-      padding: 0 0 0.2rem 0;
       margin: 0;
+      padding: .25rem .4rem;
+      position: relative;
+      outline: 0;
+      box-shadow: none;
+      height: 29px;
+      width: 28px;
+      line-height: 100%;
+      &:hover {
+        color: #495057;
+        background-color: #f8f9fa;
+
+        .sicon {
+          fill: #495057 !important;
+        }
+      }
 
       .sicon {
         font-size: x-small;

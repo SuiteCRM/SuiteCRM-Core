@@ -56,28 +56,34 @@
             <ng-container *ngIf="file?.attachmentType !== 'file'">
                 <div class="uploaded-file-icon-container">
                     <div @scaleInOut>
-                        <scrm-image [image]="attachmentIcon ?? ''" class="uploaded-file-icon"></scrm-image>
+                        <scrm-image [class.error-icon]="file?.status() === 'error'" [image]="attachmentIcon ?? ''"
+                                    class="uploaded-file-icon"></scrm-image>
                     </div>
                 </div>
             </ng-container>
             <div class="uploaded-file-info">
                 <ng-container *ngIf="titleLink">
-                    <a [href]="file?.contentUrl" download class="d-flex pr-1 clickable" [style.max-width]="textMaxWidth()" target="_blank">
+                    <a [href]="file?.contentUrl" download class="d-flex pr-1 clickable"
+                       [style.max-width]="textMaxWidth()" target="_blank">
                     <span class="uploaded-file-name" [title]="file?.name">
                         {{ file?.name }}
                     </span>
                     </a>
                 </ng-container>
                 <ng-container *ngIf="!titleLink">
-                    <span class="uploaded-file-name" [title]="file?.name">
+                    <span *ngIf="(file?.name ?? false)" class="uploaded-file-name" [title]="file?.name">
                         {{ file?.name }}
                     </span>
+                </ng-container>
+
+                <ng-container *ngIf="file?.status() === 'error' && file?.errorLabelKey">
+                    <scrm-label [class.pr-1]="compact" class="uploaded-file-name" [labelKey]="file.errorLabelKey"></scrm-label>
                 </ng-container>
 
                 <span *ngIf="displaySize" class="uploaded-file-size" [style.max-width]="textMaxWidth()">
                     ({{ file?.size | fileSize }})
                 </span>
-                <div *ngIf="file?.status() === 'error'">
+                <div *ngIf="file?.status() === 'error' && !file?.errorLabelKey">
                     <span *ngIf="file?.errorMessage()" class="text-error text-smaller-95">
                         <scrm-label [labelKey]="file?.errorMessage()"></scrm-label>
                     </span>
@@ -89,7 +95,7 @@
         </div>
         <div class="w-100" *ngIf="file?.status() === 'uploading'">
             <div class="upload-progress-bar">
-                <div class="upload-progress-bar-fill" [style.width.%]="file.progress()"></div>
+                <div class="upload-progress-bar-fill" [style.width.%]="file?.progress()"></div>
             </div>
         </div>
     </div>

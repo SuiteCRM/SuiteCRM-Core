@@ -194,7 +194,7 @@ class OpenDraftAction implements ProcessHandlerInterface
     protected function getMapFields(Record $record = null): array
     {
         $attributes = $record?->getAttributes() ?? [];
-        $name = $attributes['name'] ?? '';
+        $name = $this->getName($attributes);
         $bodyHtml = $attributes['description_html'] ?? '';
         $outboundEmailId = $attributes['outbound_email_id'] ?? '';
         $fromName = $attributes['outbound_email_name']['from_addr'] ?? '';
@@ -292,5 +292,15 @@ class OpenDraftAction implements ProcessHandlerInterface
         }
 
         $recipients[$key][] = $record;
+    }
+
+    protected function getName(array $attributes): string
+    {
+        $name = $attributes['name'] ?? '';
+        if ($name === '(no subject)') {
+            $name = '';
+        }
+
+        return $name;
     }
 }

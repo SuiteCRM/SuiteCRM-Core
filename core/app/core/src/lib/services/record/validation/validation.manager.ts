@@ -46,6 +46,7 @@ import {PrimaryEmailValidator} from './validators/primary-email.validator';
 import {DuplicateEmailValidator} from './validators/duplicate-email.validator';
 import {LineItemsRequiredValidator} from "./validators/line-items-required.validator";
 import {AsyncProcessValidator} from "./async-validators/async-process.validator";
+import {AttachmentValidator} from "./validators/attachment.validator";
 
 export interface ValidationManagerInterface {
     registerSaveValidator(module: string, key: string, validator: ValidatorInterface): void;
@@ -96,6 +97,7 @@ export class ValidationManager implements ValidationManagerInterface {
         protected primaryEmailValidator: PrimaryEmailValidator,
         protected duplicateEmailValidator: DuplicateEmailValidator,
         protected lineItemsRequiredValidator: LineItemsRequiredValidator,
+        protected attachmentValidator: AttachmentValidator
     ) {
 
         this.saveValidators = new OverridableMap<ValidatorInterface>();
@@ -112,6 +114,7 @@ export class ValidationManager implements ValidationManagerInterface {
         this.saveValidators.addEntry('default', this.getKey('float', 'all'), floatValidator);
         this.saveValidators.addEntry('default', this.getKey('int', 'all'), intValidator);
         this.saveValidators.addEntry('default', this.getKey('phone', 'all'), phoneValidator);
+        this.saveValidators.addEntry('default', this.getKey('attachment', 'all'), attachmentValidator);
         this.itemFormArraySaveValidators.addEntry('default', this.getKey('primary-email', 'all'), primaryEmailValidator);
         this.itemFormArraySaveValidators.addEntry('default', this.getKey('duplicate-email', 'all'), duplicateEmailValidator);
         this.itemFormArraySaveValidators.addEntry('default', this.getKey('line-items-required', 'all'), lineItemsRequiredValidator);

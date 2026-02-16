@@ -28,8 +28,6 @@
 namespace App\Module\Service\Fields\Attachments;
 
 use App\Data\LegacyHandler\PreparedStatementHandler;
-use App\FieldDefinitions\Service\FieldDefinitionsProviderInterface;
-use App\MediaObjects\Repository\MediaObjectManagerInterface;
 use App\Module\Service\Fields\Attachments\AttachmentTypeHandlers\AttachmentTypeHandlers;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -39,9 +37,7 @@ class AttachmentsManager implements AttachmentsManagerInterface
 {
     public function __construct(
         protected PreparedStatementHandler $preparedStatementHandler,
-        protected MediaObjectManagerInterface $mediaObjectManager,
         protected LoggerInterface $logger,
-        protected FieldDefinitionsProviderInterface $fieldDefinitionsProvider,
         protected AttachmentTypeHandlers $attachmentTypeHandlers,
     )
     {

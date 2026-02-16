@@ -44,14 +44,16 @@
     <ng-container *ngIf="showThumbnail && file?.thumbnailUrl">
         <img [src]="file?.thumbnailUrl"
              alt="{{ file?.name || 'uploaded-image-thumbnail' }}"
-             class="uploaded-image-thumbnail"
-             [style.max-height]="maxHeight"
+             class="uploaded-image"
+             [style.height]="maxHeight"
+             [style.width]="maxWidth"
         >
     </ng-container>
     <img *ngIf="file?.contentUrl && (!showThumbnail || !file?.thumbnailUrl)"
          [src]="file?.contentUrl"
          alt="{{ file?.name || 'uploaded-image' }}"
          class="uploaded-image"
-         [style.max-height]="maxHeight"
+         [style.height]="maxHeight"
+         [style.width]="maxWidth"
     >
 </ng-template>

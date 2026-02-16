@@ -54,8 +54,12 @@
         </scrm-uploaded-file>
 
         <div @scaleIn *ngIf="uploadedFile()?.status() === 'uploaded' || uploadedFile()?.status() === 'saved'">
-            <scrm-uploaded-image [file]="uploadedFile()" [maxHeight]="maxHeight"
-                                 (clear)="clearUpload()"></scrm-uploaded-image>
+            <scrm-uploaded-image [file]="uploadedFile()"
+                                 [maxHeight]="maxHeight"
+                                 [maxWidth]="maxWidth"
+                                 [showThumbnail]="showThumbnail"
+                                 (clear)="clearUpload()">
+            </scrm-uploaded-image>
         </div>
     </ng-container>
 

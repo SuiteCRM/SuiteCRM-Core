@@ -48,6 +48,7 @@ import {ImageModule} from "../image/image.module";
 export class UploadedImageComponent implements OnInit {
     @Input() file: Attachment;
     @Input() maxHeight: string = '100px';
+    @Input() maxWidth: string = '100px';
     @Input() allowClear: boolean = true;
     @Input() showThumbnail: boolean = true;
 

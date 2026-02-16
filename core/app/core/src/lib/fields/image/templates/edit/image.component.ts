@@ -87,6 +87,8 @@ export class ImageEditFieldComponent extends BaseImageComponent implements OnIni
         if (this.validStorageTypes.includes(this.storageType)) {
             this.isValidStorageType = true;
         }
+
+        this.maxWidth = this.getMaxWidth();
         this.maxHeight = this.getMaxHeight();
 
         const hasFile = this.field?.valueObject &&

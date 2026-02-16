@@ -89,6 +89,10 @@ class RecordToEmailService
     {
         $emailAddressesArray = [];
         foreach ($entities as $fromItem) {
+            if (isset($fromItem['attributes']) ){
+                $fromItem = $fromItem['attributes'];
+            }
+
             if (!empty($fromItem['email1']) && is_string($fromItem['email1'])) {
                 $emailAddressesArray[] = new Address($fromItem['email1']);
                 continue;

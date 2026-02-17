@@ -210,13 +210,17 @@ class UserPreference extends SugarBean
         ) {
         global $sugar_config, $current_user;
 
+        $currentUser = $current_user ?? null;
+        $currentUserId = (is_object($currentUser) && !empty($currentUser->id)) ? $currentUser->id : null;
+        $currentUserName = (is_object($currentUser) && !empty($currentUser->user_name)) ? $currentUser->user_name : null;
+
         $user = $this->_userFocus;
 
         if ($user->object_name != 'User') {
             return;
         }
 
-        if (!$current_user->id || $user->user_name !== $current_user->user_name) {
+        if (!$currentUserId || $user->user_name !== $currentUserName) {
             return $this->reloadPreferences($category);
         }
 
@@ -239,8 +243,13 @@ class UserPreference extends SugarBean
         if ($user->object_name != 'User' || empty($user->id) || empty($user->user_name)) {
             return false;
         }
+
+        $currentUser = $GLOBALS['current_user'] ?? null;
+        $currentUserId = (is_object($currentUser) && !empty($currentUser->id)) ? $currentUser->id : null;
+        $currentUserName = (is_object($currentUser) && !empty($currentUser->user_name)) ? $currentUser->user_name : null;
+
         $GLOBALS['log']->debug('Loading Preferences DB ' . $user->user_name);
-        if (!$GLOBALS['current_user']->id || $GLOBALS['current_user']->user_name === $user->user_name){
+        if (!$currentUserId || $currentUserName === $user->user_name){
             if (!isset($_SESSION[$user->user_name . '_PREFERENCES'])) {
                 $_SESSION[$user->user_name . '_PREFERENCES'] = array();
             }
@@ -252,13 +261,13 @@ class UserPreference extends SugarBean
         $result = $db->query("SELECT contents FROM user_preferences WHERE assigned_user_id='$user->id' AND category = '" . $category . "' AND deleted = 0", false, 'Failed to load user preferences');
         $row = $db->fetchByAssoc($result);
         if ($row) {
-            if (!$GLOBALS['current_user']->id || $GLOBALS['current_user']->user_name === $user->user_name){
+            if (!$currentUserId || $currentUserName === $user->user_name){
                 $_SESSION[$user->user_name . '_PREFERENCES'][$category] = unserialize(base64_decode($row['contents']), ['allowed_classes' => false]);
             }
             $user->user_preferences[$category] = unserialize(base64_decode($row['contents']), ['allowed_classes' => false]);
             return true;
         } else {
-            if (!$GLOBALS['current_user']->id || $GLOBALS['current_user']->user_name === $user->user_name){
+            if (!$currentUserId || $currentUserName === $user->user_name){
                 $_SESSION[$user->user_name . '_PREFERENCES'][$category] = array();
             }
             $user->user_preferences[$category] = array();

@@ -1,11 +1,11 @@
 <div class="d-flex flex-column gap-2">
     <div class="d-flex align-items-center gap-2" *ngIf="mode === 'edit' || mode === 'create'">
         <button type="button" class="btn btn-sm btn-outline-secondary" (click)="attachDocument()">
-            <scrm-label labelKey="LBL_SUITE_DOCUMENT"></scrm-label>
+            <scrm-label labelKey="LBL_SUITE_DOCUMENT" [module]="record?.module"></scrm-label>
         </button>
 
         <button type="button" class="btn btn-sm btn-outline-secondary" (click)="triggerUpload()">
-            <scrm-label labelKey="LBL_UPLOAD_FILE"></scrm-label>
+            <scrm-label labelKey="LBL_UPLOAD_FILE" [module]="record?.module"></scrm-label>
         </button>
 
         <input #fileInput type="file" class="d-none" multiple (change)="onFilesSelected($event)" />

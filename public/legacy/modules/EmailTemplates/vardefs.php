@@ -123,6 +123,7 @@ $dictionary['EmailTemplate'] = array(
             'vname' => 'LBL_PLAIN_TEXT',
             'type' => 'text',
             'dbType' => 'longtext',
+            'display' => 'none',
             'comment' => 'Plain text body to be used in resulting email'
         ),
         'body_html' => array(
@@ -130,6 +131,15 @@ $dictionary['EmailTemplate'] = array(
             'vname' => 'LBL_HTML_BODY',
             'type' => 'html',
             'dbType' => 'longtext',
+            'metadata' => array(
+                'tinymce' => array(
+                    'edit' => array(
+                        'menubar' => 'file edit view insert format tools table help',
+                        'toolbar' => 'undo redo | blocks | bold italic underline | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | removeformat | help',
+                        'promotion' => false,
+                    ),
+                ),
+            ),
             'comment' => 'HTML formatted email body to be used in resulting email'
         ),
         'deleted' => array(
@@ -185,7 +195,7 @@ $dictionary['EmailTemplate'] = array(
         ),
         'text_only' => array(
             'name' => 'text_only',
-            'vname' => 'LBL_TEXT_ONLY',
+            'vname' => 'LBL_SEND_AS_TEXT',
             'type' => 'bool',
             'required' => false,
             'reportable' => false,
@@ -208,6 +218,17 @@ $dictionary['EmailTemplate'] = array(
             'source' => 'non-db',
             'reportable' => false,
             'studio' => false,
+        ),
+        'plain_text_toggle' => array(
+            'name' => 'plain_text_toggle',
+            'vname' => 'LBL_EDIT_ALT_TEXT',
+            'type' => 'emailtemplates-plain-text-toggle',
+            'source' => 'non-db',
+            'reportable' => false,
+            'studio' => false,
+            'metadata' => array(
+                'labelDisplay' => 'none',
+            ),
         ),
         'attachments' => array(
             'name' => 'attachments',

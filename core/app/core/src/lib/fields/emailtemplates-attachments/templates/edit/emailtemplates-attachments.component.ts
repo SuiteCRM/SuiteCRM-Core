@@ -1,4 +1,5 @@
-import {ChangeDetectionStrategy, Component, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
+import {finalize} from 'rxjs/operators';
 import {BaseFieldComponent} from '../../../base/base-field.component';
 import {DataTypeFormatter} from '../../../../services/formatters/data-type.formatter.service';
 import {FieldLogicManager} from '../../../field-logic/field-logic.manager';
@@ -17,10 +18,12 @@ import {Record} from '../../../../common/record/record.model';
     styles: [],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EmailTemplatesAttachmentsEditFieldComponent extends BaseFieldComponent {
+export class EmailTemplatesAttachmentsEditFieldComponent extends BaseFieldComponent implements OnChanges {
 
     items: EmailTemplatesAttachmentItem[] = [];
     loading = false;
+
+    private lastLoadedId = '';
 
     @ViewChild('fileInput') fileInput: any;
 
@@ -30,6 +33,7 @@ export class EmailTemplatesAttachmentsEditFieldComponent extends BaseFieldCompon
         protected logicDisplay: FieldLogicDisplayManager,
         protected tools: EmailTemplatesToolsService,
         protected selectModal: SelectModalService,
+        protected cdr: ChangeDetectorRef,
     ) {
         super(typeFormatter, logic, logicDisplay);
     }
@@ -39,21 +43,37 @@ export class EmailTemplatesAttachmentsEditFieldComponent extends BaseFieldCompon
         this.refresh();
     }
 
+    ngOnChanges(changes: SimpleChanges): void {
+        // Record can arrive async when switching view modes; refresh once ID is available.
+        if (changes?.record) {
+            const templateId = this.record?.id ?? '';
+            if (templateId && templateId !== this.lastLoadedId) {
+                this.refresh();
+            }
+        }
+    }
+
     refresh(): void {
         const templateId = this.record?.id ?? '';
         if (!templateId) {
             return;
         }
 
+        this.lastLoadedId = templateId;
+
         this.loading = true;
+        this.cdr.markForCheck();
+
         this.tools.listAttachments(templateId).subscribe({
             next: (resp: EmailTemplatesAttachmentsListResponse) => {
                 this.items = resp?.items ?? [];
                 this.loading = false;
+                this.cdr.markForCheck();
             },
             error: () => {
                 this.items = [];
                 this.loading = false;
+                this.cdr.markForCheck();
             }
         });
     }
@@ -73,16 +93,26 @@ export class EmailTemplatesAttachmentsEditFieldComponent extends BaseFieldCompon
             return;
         }
 
-        Array.from(files).forEach((file) => {
-            this.tools.uploadAttachment(templateId, file).subscribe({
-                next: (item: EmailTemplatesAttachmentItem) => {
-                    this.items = [item, ...this.items];
-                }
-            });
-        });
+        const inputEl = event?.target as HTMLInputElement;
+        let remaining = files.length;
 
-        // reset input
-        event.target.value = '';
+        Array.from(files).forEach((file) => {
+            this.tools.uploadAttachment(templateId, file)
+                .pipe(finalize(() => {
+                    remaining -= 1;
+                    if (remaining <= 0 && inputEl) {
+                        // Allow re-selecting the same file name after uploads are done.
+                        inputEl.value = '';
+                    }
+                    this.cdr.markForCheck();
+                }))
+                .subscribe({
+                    next: (item: EmailTemplatesAttachmentItem) => {
+                        this.items = [item, ...this.items];
+                        this.cdr.markForCheck();
+                    }
+                });
+        });
     }
 
     attachDocument(): void {
@@ -100,6 +130,7 @@ export class EmailTemplatesAttachmentsEditFieldComponent extends BaseFieldCompon
             this.tools.attachDocument(templateId, documentId).subscribe({
                 next: (item: EmailTemplatesAttachmentItem) => {
                     this.items = [item, ...this.items];
+                    this.cdr.markForCheck();
                 }
             });
         });
@@ -114,6 +145,7 @@ export class EmailTemplatesAttachmentsEditFieldComponent extends BaseFieldCompon
         this.tools.deleteAttachment(templateId, item.id).subscribe({
             next: () => {
                 this.items = this.items.filter(i => i.id !== item.id);
+                this.cdr.markForCheck();
             }
         });
     }

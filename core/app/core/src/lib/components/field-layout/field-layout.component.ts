@@ -192,6 +192,33 @@ export class FieldLayoutComponent extends BaseFieldGridComponent {
         this.fieldGrid = grid;
     }
 
+    isColEmpty(col: FieldGridColumn): boolean {
+        if (!col) {
+            return true;
+        }
+
+        if ((col as any).actionSlot || (col as any).specialSlot) {
+            return false;
+        }
+
+        const field: any = (col as any).field;
+        if (!field || !field.display) {
+            return true;
+        }
+
+        try {
+            // Some fields need to stay "alive" (subscriptions) while their wrapper is collapsed.
+            return field.display() === 'none' || !!(field.metadata && (field.metadata as any).wrapperCollapsed);
+        } catch {
+            return false;
+        }
+    }
+
+    isRowEmpty(row: FieldGridRow): boolean {
+        const cols: any[] = (row as any)?.cols ?? [];
+        return cols.length === 0 || !cols.some((c) => !this.isColEmpty(c as FieldGridColumn));
+    }
+
     get colNumber(): number {
         const size = this.sizeMap[this.currentSize];
         if (size === 1) {

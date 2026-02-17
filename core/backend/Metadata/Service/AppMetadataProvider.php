@@ -217,7 +217,8 @@ class AppMetadataProvider implements AppMetadataProviderInterface
      */
     protected function getUserMetadata(string $moduleName, array $exposed = []): AppMetadata
     {
-        $userId = $this->userHandler->getCurrentUser()->id;
+        $currentUser = $this->userHandler->getCurrentUser() ?? null;
+        $userId = (!empty($currentUser) && !empty($currentUser->id)) ? (string)$currentUser->id : 'anonymous';
         $metadata = new AppMetadata();
         $metadata->setId('app');
         $language = $this->getLanguage();
@@ -295,12 +296,14 @@ class AppMetadataProvider implements AppMetadataProviderInterface
         /** @var \User $currentUser */
         $currentUser = $this->userHandler->getCurrentUser() ?? null;
 
+        $metadata->setAdminMetadata([]);
+
         if (in_array('adminMetadata', $exposed, true) && !empty($currentUser) && $currentUser->isAdmin()) {
             $adminMetadata = [
                 'adminPanel' => $this->adminPanelDefinitions->getAdminPanelDef()
             ];
             $metadata->setAdminMetadata($adminMetadata);
-        } elseif (!$currentUser->isAdmin()) {
+        } elseif (!empty($currentUser) && !$currentUser->isAdmin()) {
             $adminMetadata = ['adminPanel' => []];
             $metadata->setAdminMetadata($adminMetadata);
         }
@@ -521,7 +524,12 @@ class AppMetadataProvider implements AppMetadataProviderInterface
                 continue;
             }
 
-            $moduleMetadata[$module] = $this->moduleMetadata->getMetadata($module)->toArray();
+            try {
+                $moduleMetadata[$module] = $this->moduleMetadata->getMetadata($module)->toArray();
+            } catch (\Throwable $e) {
+                // Defensive: ignore invalid/unsupported module names (e.g. app during bootstrap)
+                continue;
+            }
             if ($i >= $max) {
                 break;
             }
@@ -680,12 +688,14 @@ class AppMetadataProvider implements AppMetadataProviderInterface
         /** @var \User $currentUser */
         $currentUser = $this->userHandler->getCurrentUser() ?? null;
 
+        $metadata->setAdminMetadata([]);
+
         if (in_array('adminMetadata', $exposed, true) && !empty($currentUser) && $currentUser->isAdmin()) {
             $adminMetadata = [
                 'adminPanel' => $this->adminPanelDefinitions->getAdminPanelDef()
             ];
             $metadata->setAdminMetadata($adminMetadata);
-        } elseif (!$currentUser->isAdmin()) {
+        } elseif (!empty($currentUser) && !$currentUser->isAdmin()) {
             $adminMetadata = ['adminPanel' => []];
             $metadata->setAdminMetadata($adminMetadata);
         }

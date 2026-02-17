@@ -26,13 +26,15 @@
 */
 -->
 <form class="field-layout {{config.mode}}">
-    <div [ngClass]="rowClass" class="field-layout-row" *ngFor="let row of fieldGrid; index as i">
+    <div [ngClass]="rowClass" class="field-layout-row" *ngFor="let row of fieldGrid; index as i"
+         [style.display]="isRowEmpty(row) ? 'none' : null">
 
         <div *ngFor="let col of row.cols; index as colNumber"
              [class.field-column-bordered]="row.cols.length > 1 && colNumber < row.cols.length - 1"
              [class.full-row]="row.cols.length === 1"
              [ngClass]="colClass"
              class="field-layout-col {{col.colClasses ?? ''}}"
+             [style.display]="isColEmpty(col) ? 'none' : null"
         >
 
             <ng-container *ngIf="col.field && col.field.display() !== 'none'">
@@ -54,7 +56,17 @@
                                 </scrm-dynamic-label>
                             </ng-container>
                             <ng-container *ngIf="!col.field?.metadata?.dynamicFieldLabel">
-                                <label [ngClass]="labelClass">{{col.field.label | uppercase}}</label>
+                                <label [ngClass]="labelClass" class="text-uppercase">
+                                    <ng-container *ngIf="col.field.label; else labelFromKey">
+                                        {{ col.field.label }}
+                                    </ng-container>
+                                    <ng-template #labelFromKey>
+                                        <scrm-label *ngIf="col.field.labelKey"
+                                                    [labelKey]="col.field.labelKey"
+                                                    [module]="record?.module">
+                                        </scrm-label>
+                                    </ng-template>
+                                </label>
                             </ng-container>
                         </strong>
                     </div>

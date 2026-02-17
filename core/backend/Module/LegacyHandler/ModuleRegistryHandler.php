@@ -86,7 +86,9 @@ class ModuleRegistryHandler extends LegacyHandler implements ModuleRegistryInter
 
         global $modInvisList, $current_user;
 
-        if ($current_user->isAdmin()) {
+        $isAdmin = is_object($current_user) && method_exists($current_user, 'isAdmin') && $current_user->isAdmin();
+
+        if ($isAdmin) {
             $modules = array_merge($this->getFilterAccessibleModules(), $this->getAllModules());
         } else {
             $modules = $this->getFilterAccessibleModules();
@@ -96,13 +98,20 @@ class ModuleRegistryHandler extends LegacyHandler implements ModuleRegistryInter
             return [];
         }
 
-        foreach ($modInvisList as $invis) {
-            $modules[$invis] = '';
+        if (!empty($modInvisList) && is_array($modInvisList)) {
+            foreach ($modInvisList as $invis) {
+                $modules[$invis] = '';
+            }
         }
 
         $modules['SecurityGroups'] = '';
 
-        $modules = $this->applyUserActionFilter($modules);
+        // When legacy global current_user isn't available (e.g. early bootstrap),
+        // we can't apply per-user ACL filters. Returning a superset is acceptable
+        // for language strings and avoids fatal errors.
+        if (is_object($current_user) && !empty($current_user->id)) {
+            $modules = $this->applyUserActionFilter($modules);
+        }
 
         foreach ($this->frontendExcludedModules as $excluded) {
             unset($modules[$excluded]);
@@ -178,6 +187,10 @@ class ModuleRegistryHandler extends LegacyHandler implements ModuleRegistryInter
     protected function applyUserActionFilter(array &$modules): array
     {
         global $current_user;
+
+        if (!is_object($current_user) || empty($current_user->id)) {
+            return $modules;
+        }
 
         $actions = ACLAction::getUserActions($current_user->id, true);
         foreach ($actions as $key => $value) {

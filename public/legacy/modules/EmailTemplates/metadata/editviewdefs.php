@@ -64,7 +64,7 @@ $viewdefs['EmailTemplates']['EditView'] = array(
     array(
       
       array(
-        'name' => 'body',
+        'name' => 'body_html',
         'displayParams' =>
         array(
           'rows' => '20',
@@ -76,7 +76,14 @@ $viewdefs['EmailTemplates']['EditView'] = array(
     array(
       
       array(
-        'name' => 'body_html',
+        'name' => 'plain_text_toggle',
+      ),
+    ),
+
+    array(
+      
+      array(
+        'name' => 'body',
         'displayParams' =>
         array(
           'rows' => '20',

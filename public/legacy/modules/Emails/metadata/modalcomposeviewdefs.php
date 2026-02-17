@@ -362,6 +362,7 @@ $viewdefs['Emails']['ModalComposeView'] = [
                     'displayType' => 'squire',
                     'metadata' => [
                         'labelDisplay' => 'none',
+                        'loadingEnabled' => false,
                     ],
                 ],
             ],

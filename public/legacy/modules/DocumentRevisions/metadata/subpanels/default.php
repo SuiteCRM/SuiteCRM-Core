@@ -76,9 +76,8 @@ $subpanel_layout = [
             'vname' => 'LBL_REV_LIST_LOG',
             'width' => '35%',
         ],
-        'remove_button'=> [
+        'delete_button'=> [
             'vname' => 'LBL_REMOVE',
-            'widget_class' => 'SubPanelRemoveButton',
             'module' => 'DocumentRevisions',
             'width' => '5%',
         ],

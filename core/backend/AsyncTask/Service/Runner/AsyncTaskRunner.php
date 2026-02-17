@@ -29,18 +29,27 @@ namespace App\AsyncTask\Service\Runner;
 
 use App\AsyncTask\Message\AsyncTaskRun;
 use App\AsyncTask\Service\Dispatcher\AsyncTaskDispatcherInterface;
+use App\AsyncTask\Service\Repository\AsyncTaskItemRepository;
 use App\AsyncTask\Service\TaskHandler\AsyncTaskHandlerInterface;
 use App\AsyncTask\Service\TaskHandler\AsyncTaskHandlerRegistryInterface;
 use App\Data\Entity\Record;
 use App\Data\LegacyHandler\PreparedStatementHandler;
 use App\Data\Service\RecordProviderInterface;
-use App\Engine\Model\Feedback;
 use App\MediaObjects\Repository\DefaultMediaObjectManager;
 use App\SystemConfig\Service\SystemConfigProviderInterface;
 use Psr\Log\LoggerInterface;
 
 abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
 {
+    public const PHASE_QUEUEING = 'queueing';
+    public const PHASE_PROCESSING = 'processing';
+    public const PHASE_FINALIZING = 'finalizing';
+
+    public const STATUS_QUEUED = 'queued';
+    public const STATUS_PROCESSING = 'processing';
+    public const STATUS_COMPLETED = 'completed';
+    public const STATUS_FAILED = 'failed';
+    public const STATUS_SKIPPED = 'skipped';
 
     public function __construct(
         protected DefaultMediaObjectManager $defaultMediaObjectManager,
@@ -49,6 +58,7 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         protected AsyncTaskDispatcherInterface $asyncTaskDispatcher,
         protected AsyncTaskHandlerRegistryInterface $handlerRegistry,
         protected RecordProviderInterface $recordProvider,
+        protected AsyncTaskItemRepository $itemRepository,
         protected LoggerInterface $logger
     ) {
     }
@@ -88,6 +98,7 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         }
 
         if ($result['status'] === 'completed') {
+            $this->cleanupItems($message->getTaskId());
             $this->dispatchTaskCompleted($message);
             return;
         }
@@ -116,84 +127,213 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
     protected function getMaxItemsPerRun(): int
     {
         $configKey = $this->getMaxItemsPerRunConfigKey();
-        return (int)($this->systemConfigProvider->getSystemConfig($configKey)?->getValue());
+        $value = (int)($this->systemConfigProvider->getSystemConfig($configKey)?->getValue());
+
+        if (empty($value) || $value <= 0) {
+            return 100;
+        }
+
+        return $value;
     }
 
+    /**
+     * Phase-aware task execution.
+     * Dispatches to the appropriate phase handler based on progress['phase'].
+     */
     protected function runTask(AsyncTaskRun $message, Record $task, AsyncTaskHandlerInterface $handler): array
     {
-        $maxItemsPerRun = $this->getMaxItemsPerRun();
-        if (empty($maxItemsPerRun) || !is_numeric($maxItemsPerRun) || $maxItemsPerRun <= 0) {
-            $maxItemsPerRun = 100;
+        $maxItems = $this->getMaxItemsPerRun();
+        $progress = $message->getProgress();
+        $phase = $progress['phase'] ?? self::PHASE_QUEUEING;
+
+        $this->log('info', 'Running task ' . $task->getId() . ' in phase: ' . $phase);
+
+        return match ($phase) {
+            self::PHASE_QUEUEING => $this->runQueueingPhase($task, $handler, $progress, $maxItems),
+            self::PHASE_PROCESSING => $this->runProcessingPhase($task, $handler, $progress, $maxItems),
+            self::PHASE_FINALIZING => $this->runFinalizingPhase($task, $handler, $progress),
+            default => ['status' => 'completed', 'progress' => $progress],
+        };
+    }
+
+    /**
+     * QUEUEING phase: ask handler for items to enqueue, insert them into the items table.
+     */
+    protected function runQueueingPhase(Record $task, AsyncTaskHandlerInterface $handler, array $progress, int $maxItems): array
+    {
+        $taskId = $task->getId();
+        $items = $handler->enqueueItems($task, $progress, $maxItems);
+
+        if (!empty($items)) {
+            $this->itemRepository->insertItems($taskId, $items);
+            $this->log('info', 'Enqueued ' . count($items) . ' items for task ' . $taskId);
         }
 
-        $currentProgress = $message->getProgress();
+        $enqueuedCount = count($items);
+        $progress['enqueue_offset'] = ($progress['enqueue_offset'] ?? 0) + $enqueuedCount;
 
-        $batch = $handler->getBatch($task, $currentProgress, $maxItemsPerRun) ?? [];
+        // If fewer items returned than batch size, queueing is done
+        if ($enqueuedCount < $maxItems) {
+            $total = $this->itemRepository->getTotal($taskId);
 
-        $result = [
-            'status' => 'in_progress',
-            'progress' => [],
-        ];
+            if ($total > 0) {
+                $progress['phase'] = self::PHASE_PROCESSING;
+                $progress['total'] = $total;
+                $progress['completed'] = 0;
+                $progress['failed'] = 0;
+                $progress['skipped'] = 0;
+                $progress['percent'] = 0;
+                $this->log('info', 'Queueing complete for task ' . $taskId . '. Total items: ' . $total . '. Transitioning to processing.');
+
+                return ['status' => 'in_progress', 'progress' => $progress];
+            }
+
+            // Nothing was enqueued at all
+            $this->log('info', 'No items enqueued for task ' . $taskId . '. Completing.');
+
+            return ['status' => 'completed', 'progress' => $progress];
+        }
+
+        $progress['phase'] = self::PHASE_QUEUEING;
+
+        return ['status' => 'in_progress', 'progress' => $progress];
+    }
+
+    /**
+     * PROCESSING phase: fetch queued items from the items table, process each via handler.
+     */
+    protected function runProcessingPhase(Record $task, AsyncTaskHandlerInterface $handler, array $progress, int $maxItems): array
+    {
+        $taskId = $task->getId();
+        $batch = $this->itemRepository->fetchBatch($taskId, self::STATUS_QUEUED, $maxItems);
 
         if (empty($batch)) {
-            $result['status'] = 'completed';
-            return $result;
+            return $this->transitionFromProcessing($task, $handler, $progress);
         }
 
-        foreach ($batch as $record) {
-            $this->processRecord($task, $record, $batch, $handler);
+        $this->log('info', 'Processing batch of ' . count($batch) . ' items for task ' . $taskId);
+
+        foreach ($batch as $item) {
+            $this->processItem($task, $handler, $item);
         }
 
-        $updatedProgress = $handler->getAsyncProgress($task, $batch);
-        $remaining = $handler->getBatch($task, $updatedProgress, $maxItemsPerRun) ?? [];
+        // Update progress from DB counts
+        $progress = $this->calculateProgress($taskId, $progress);
 
-        if (empty($remaining)) {
-            $result['status'] = 'completed';
-            return $result;
+        // Check if more queued items remain
+        $queued = $progress['queued'] ?? 0;
+        $processing = $progress['processing_count'] ?? 0;
+
+        if ($queued === 0 && $processing === 0) {
+            return $this->transitionFromProcessing($task, $handler, $progress);
         }
 
-        $result['progress'] = $updatedProgress;
-
-        return $result;
+        return ['status' => 'in_progress', 'progress' => $progress];
     }
 
     /**
-     * @param Record $task
-     * @param mixed $recordToProcess
-     * @param array $batch
-     * @param AsyncTaskHandlerInterface $handler
-     * @return void
+     * Process a single item: mark as processing, call handler, update status.
      */
-    protected function processRecord(Record $task, Record $recordToProcess, array $batch, AsyncTaskHandlerInterface $handler): void
+    protected function processItem(Record $task, AsyncTaskHandlerInterface $handler, array $item): void
     {
-        $this->log('info', 'Processing record ID: ' . $recordToProcess->getId());
-        $result = $this->runService($task, $recordToProcess, $batch, $handler);
+        $itemId = $item['id'] ?? '';
+        $itemKey = $item['item_key'] ?? '';
+        $this->log('info', 'Processing item: ' . $itemId . ' (key: ' . $itemKey . ')');
 
-        if ($result !== null && $result->isSuccess()) {
-            $this->markRecordAsProcessed($handler, $task, $recordToProcess);
-        } else {
-            $this->markRecordAsFailed($handler, $task, $recordToProcess);
-        }
-    }
+        $this->itemRepository->updateItemStatus($itemId, self::STATUS_PROCESSING);
 
-
-    /**
-     * @param Record $task
-     * @param mixed $recordToProcess
-     * @param array $batch
-     * @param AsyncTaskHandlerInterface $service
-     * @return Feedback|null
-     */
-    protected function runService(Record $task, Record $recordToProcess, array $batch, AsyncTaskHandlerInterface $service): ?Feedback
-    {
         try {
-            $result = $service->asyncRun($task, $recordToProcess, $batch);
+            $result = $handler->processItem($task, $item);
+
+            if ($result !== null && $result->isSuccess()) {
+
+                $resultData = $result->getData();
+                if (empty($resultData)) {
+                    $resultData = null;
+                }
+
+                $this->itemRepository->updateItem($itemId, self::STATUS_COMPLETED, $resultData);
+
+            } else {
+                $errorMsg = 'Processing failed';
+                $messages = $result?->getMessages() ?? [];
+                if (!empty($messages)) {
+                    $errorMsg = $messages[0];
+                }
+
+                $this->itemRepository->updateItemStatus($itemId, self::STATUS_FAILED, $errorMsg);
+            }
 
         } catch (\Throwable $e) {
-            $result = null;
-            $this->log('error', 'Error processing record ID: ' . $recordToProcess->getId() . ' Error: ' . $e->getMessage());
+            $this->log('error', 'Error processing item ' . $itemId . ': ' . $e->getMessage());
+            $this->itemRepository->updateItemStatus($itemId, self::STATUS_FAILED, $e->getMessage());
         }
-        return $result;
+    }
+
+    /**
+     * Transition from processing phase: either to finalizing or completed.
+     */
+    protected function transitionFromProcessing(Record $task, AsyncTaskHandlerInterface $handler, array $progress): array
+    {
+        if ($handler->hasFinalization()) {
+            $progress['phase'] = self::PHASE_FINALIZING;
+            $this->log('info', 'All items processed for task ' . $task->getId() . '. Transitioning to finalizing.');
+
+            return ['status' => 'in_progress', 'progress' => $progress];
+        }
+
+        $this->log('info', 'All items processed for task ' . $task->getId() . '. Completing.');
+        $progress['percent'] = 100;
+
+        return ['status' => 'completed', 'progress' => $progress];
+    }
+
+    /**
+     * FINALIZING phase: call handler's finalize() method.
+     */
+    protected function runFinalizingPhase(Record $task, AsyncTaskHandlerInterface $handler, array $progress): array
+    {
+        $this->log('info', 'Running finalization for task: ' . $task->getId());
+
+        try {
+            $result = $handler->finalize($task);
+
+            if ($result === null || !$result->isSuccess()) {
+                $this->log('error', 'Finalization failed for task: ' . $task->getId());
+            }
+        } catch (\Throwable $e) {
+            $this->log('error', 'Finalization error for task ' . $task->getId() . ': ' . $e->getMessage());
+        }
+
+        $progress['percent'] = 100;
+
+        return ['status' => 'completed', 'progress' => $progress];
+    }
+
+    /**
+     * Calculate progress from DB item counts.
+     */
+    protected function calculateProgress(string $taskId, array $progress): array
+    {
+        $counts = $this->itemRepository->countByStatus($taskId);
+        $total = array_sum($counts);
+        $completed = $counts[self::STATUS_COMPLETED] ?? 0;
+        $failed = $counts[self::STATUS_FAILED] ?? 0;
+        $skipped = $counts[self::STATUS_SKIPPED] ?? 0;
+        $queued = $counts[self::STATUS_QUEUED] ?? 0;
+        $processingCount = $counts[self::STATUS_PROCESSING] ?? 0;
+        $done = $completed + $failed + $skipped;
+
+        $progress['phase'] = self::PHASE_PROCESSING;
+        $progress['total'] = $total;
+        $progress['completed'] = $completed;
+        $progress['failed'] = $failed;
+        $progress['skipped'] = $skipped;
+        $progress['queued'] = $queued;
+        $progress['processing_count'] = $processingCount;
+        $progress['percent'] = $total > 0 ? (int)round($done / $total * 100) : 0;
+
+        return $progress;
     }
 
     protected function dispatchNextRun(AsyncTaskRun $message, array $updatedProgress): void
@@ -231,21 +371,13 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         );
     }
 
-    protected function markRecordAsProcessed(AsyncTaskHandlerInterface $service, Record $task, Record $record): void
+    protected function cleanupItems(string $taskId): void
     {
         try {
-            $service->setAsyncStatusProcessed($task, $record);
-        } catch (\Throwable $inner) {
-            $this->log('error', 'Failed to mark record as processed: ' . $inner->getMessage());
-        }
-    }
-
-    protected function markRecordAsFailed(AsyncTaskHandlerInterface $service, Record $task, Record $record): void
-    {
-        try {
-            $service->setAsyncStatusFailed($task, $record);
-        } catch (\Throwable $inner) {
-            $this->log('error', 'Failed to mark record as failed: ' . $inner->getMessage());
+            $this->itemRepository->purgeByTaskId($taskId);
+            $this->log('info', 'Cleaned up items for task ' . $taskId);
+        } catch (\Throwable $e) {
+            $this->log('error', 'Failed to clean up items for task ' . $taskId . ': ' . $e->getMessage());
         }
     }
 

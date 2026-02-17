@@ -808,6 +808,14 @@ $app_list_strings = array(
         'completed' => 'Completed'
     ],
 
+    'dom_async_task_phases' => [
+        '' => '',
+        'queueing' => 'Queueing',
+        'processing' => 'Processing',
+        'finalizing' => 'Finalizing',
+        'completed' => 'Completed',
+    ],
+
     'dom_outbound_email_account_types' => [
         'user' => 'Personal',
         'group' => 'Group',

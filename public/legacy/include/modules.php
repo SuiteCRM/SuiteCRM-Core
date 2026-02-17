@@ -521,6 +521,10 @@ $beanList['Processes'] = 'Process';
 $beanFiles['Process'] = 'modules/Processes/Process.php';
 $modInvisList[] = 'Processes';
 
+$beanList['AsyncTaskItems'] = 'AsyncTaskItem';
+$beanFiles['AsyncTaskItem'] = 'modules/AsyncTaskItems/AsyncTaskItem.php';
+$modInvisList[] = 'AsyncTaskItems';
+
 $beanList['TemplateSectionLine'] = 'TemplateSectionLine';
 $beanFiles['TemplateSectionLine'] = 'modules/TemplateSectionLine/TemplateSectionLine.php';
 $modules_exempt_from_availability_check['TemplateSectionLine'] = 'TemplateSectionLine';

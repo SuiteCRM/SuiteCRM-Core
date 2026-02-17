@@ -577,7 +577,12 @@ class SubPanelDefinitionHandler extends LegacyHandler implements SubPanelDefinit
     public function getSubpanelLineActions(aSubPanel $subpanelDef, string $subpanelModule): array
     {
         $lineActions = [];
-        $subpanelLineActions = ['edit_button' => 'edit', 'close_button' => 'close', 'remove_button' => 'unlink'];
+        $subpanelLineActions = [
+            'edit_button' => 'edit',
+            'close_button' => 'close',
+            'remove_button' => 'unlink',
+            'delete_button' => 'delete',
+        ];
 
         $thepanel = $subpanelDef->isCollection() ? $subpanelDef->get_header_panel_def() : $subpanelDef;
 

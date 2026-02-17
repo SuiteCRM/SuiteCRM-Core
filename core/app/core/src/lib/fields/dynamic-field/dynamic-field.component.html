@@ -25,7 +25,7 @@
 * the words "Supercharged by SuiteCRM".
 */
 -->
-<ng-container *ngIf="!field?.loading()">
+<ng-container *ngIf="!field?.loading() || !(field?.metadata?.loadingEnabled ?? true)">
     <ng-container *ngIf="getErrorPosition() === 'top' && isEdit() && field.formControl && touched()">
         <ng-container *ngIf="field.formControl.errors">
             <ng-container
@@ -100,7 +100,7 @@
 
 </ng-container>
 
-<ng-container *ngIf="field?.loading()">
+<ng-container *ngIf="field?.loading() && (field?.metadata?.loadingEnabled ?? true) !== false">
     <div class="dynamic-field">
         <div class="flex-grow-1 text-break rounded box-loading skeleton-field-content"></div>
     </div>

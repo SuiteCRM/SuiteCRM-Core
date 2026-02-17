@@ -45,6 +45,10 @@
     position: relative;
     background-color: $shaded-white;
 
+    &.box-loading {
+      background-color: $highlight-grey!important;
+    }
+
     .squire-editor-toolbar-divider {
       padding: 0 1px;
       color: $shell-grey;

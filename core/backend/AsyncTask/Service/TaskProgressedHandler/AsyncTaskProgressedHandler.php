@@ -85,6 +85,7 @@ abstract class AsyncTaskProgressedHandler implements AsyncTaskProgressedHandlerI
 
             $attributes['progress'] = $updatedProgress;
             $attributes['status'] = 'running';
+            $attributes['phase'] = $updatedProgress['phase'] ?? '';
             $attributes['last_run_datetime'] = (new \DateTime())->format('Y-m-d H:i:s');
 
             $task->setAttributes($attributes);

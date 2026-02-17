@@ -39,19 +39,38 @@ class DocumentRevisionDeleteRecordAction extends DeleteRecordAction
     protected const PROCESS_TYPE = 'document-revision-delete';
 
     public function __construct(
-        ModuleNameMapperInterface $moduleNameMapper,
-        RecordDeletionServiceInterface $recordDeletionProvider,
+        protected ModuleNameMapperInterface $moduleNameMapper,
+        protected RecordDeletionServiceInterface $recordDeletionProvider,
         protected DocumentsManagerInterface $documentsManager
     )
     {
         parent::__construct($moduleNameMapper, $recordDeletionProvider);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getRequiredACLs(Process $process): array
+    {
+        $module = 'Documents';
+
+        return [
+            $module => [
+                [
+                    'action' => 'delete',
+                    'record' => $options['id'] ?? ''
+                ]
+            ],
+        ];
+    }
+
     public function run(Process $process): void
     {
         $options = $process->getOptions();
+        $payload = $options['payload'] ?? [];
 
         $recordId = $options['id'] ?? '';
+        $baseRecordId = $payload['baseRecordId'] ?? '';
 
         if (!$recordId) {
             $process->setStatus('error');
@@ -68,6 +87,28 @@ class DocumentRevisionDeleteRecordAction extends DeleteRecordAction
             return;
         }
 
-        parent::run($process);
+        $result = $this->deleteRecord($process);
+
+        $process->setStatus('success');
+        $process->setMessages(['LBL_RECORD_DELETE_SUCCESS']);
+        if (!$result) {
+            $process->setStatus('error');
+            $process->setMessages(['LBL_ACTION_ERROR']);
+
+            return;
+        }
+
+        $responseData = [
+            'handler' => 'redirect',
+            'params' => [
+                'route' => 'documents/record/' . $baseRecordId,
+                'queryParams' => []
+            ],
+            'reloadRecentlyViewed' => true,
+            'reloadFavorites' => true
+        ];
+
+        $process->setData($responseData);
+
     }
 }

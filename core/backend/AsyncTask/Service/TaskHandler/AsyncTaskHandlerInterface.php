@@ -36,13 +36,50 @@ interface AsyncTaskHandlerInterface
 
     public function getType(): string;
 
-    public function getBatch(Record $task, array $progress, int $maxSize): array;
+    /**
+     * Return the next batch of items to enqueue.
+     * Each item: ['item_key' => string, 'data' => array, 'sort_order' => int (optional)]
+     * Use $progress['enqueue_offset'] for pagination.
+     * Return empty array when no more items to enqueue.
+     *
+     * @param Record $task The parent async task record
+     * @param array $progress Current progress state (contains 'enqueue_offset' for pagination)
+     * @param int $batchSize Max items to return in this call
+     * @return array Array of items to enqueue
+     */
+    public function enqueueItems(Record $task, array $progress, int $batchSize): array;
 
-    public function asyncRun(Record $task, Record $recordToProcess, array $batch): Feedback;
+    /**
+     * Process a single item.
+     * $item contains: 'id', 'item_key', 'data' (decoded), 'sort_order', 'result_data'.
+     * Return Feedback with success/failure. Set Feedback::data for result_data storage.
+     *
+     * @param Record $task The parent async task record
+     * @param array $item The item row from async_task_items (with decoded 'data')
+     * @return Feedback Result of processing
+     */
+    public function processItem(Record $task, array $item): Feedback;
 
-    public function setAsyncStatusProcessed(Record $task, Record $processedRecord): void;
+    /**
+     * Post-processing after all items are done (merge PDFs, generate summary, etc.).
+     * Only called if hasFinalization() returns true.
+     *
+     * @param Record $task The parent async task record
+     * @return Feedback Result of finalization
+     */
+    public function finalize(Record $task): Feedback;
 
-    public function setAsyncStatusFailed(Record $task, Record $processedRecord): void;
+    /**
+     * Whether this handler has a finalization phase.
+     *
+     * @return bool
+     */
+    public function hasFinalization(): bool;
 
-    public function getAsyncProgress(Record $task, array $batch): array;
+    /**
+     * Maximum number of retries for failed items. Return 0 for no retry.
+     *
+     * @return int
+     */
+    public function getMaxRetries(): int;
 }

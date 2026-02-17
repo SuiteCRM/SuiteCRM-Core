@@ -3831,6 +3831,7 @@ $app_list_strings['moduleList']['ExternalOAuthConnection'] = 'External OAuth Con
 $app_list_strings['moduleList']['ExternalOAuthProvider'] = 'External OAuth Provider';
 $app_list_strings['moduleList']['ManualMigrationTasks'] = 'Migrations';
 $app_list_strings['moduleList']['Processes'] = 'Processes';
+$app_list_strings['moduleList']['AsyncTaskItems'] = 'Async Task Item';
 
 //social
 $app_strings['FACEBOOK_USER_C'] = 'Facebook';

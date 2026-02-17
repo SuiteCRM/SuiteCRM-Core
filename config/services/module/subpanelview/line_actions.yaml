@@ -31,17 +31,18 @@ parameters:
     modules:
       document-revisions:
         actions:
-          unlink:
-            key: unlink
-            labelKey: LBL_UNLINK_RECORD
-            action: unlink
-            icon: unlink
+          delete:
+            key: delete
+            labelKey: LBL_DELETE_RECORD
+            titleKey: LBL_DELETE_RECORD
+            action: delete
+            icon: trash-filled
             aclModule: 'Documents'
             asyncProcess: true
             routing: false
             params:
               displayConfirmation: true
-              confirmationLabel: LBL_UNLINK_RELATIONSHIP_CONFIRM
+              confirmationLabel: LBL_DELETE_REVISION_CONFIRM
             modes:
               - list
             acl:

@@ -135,3 +135,13 @@ parameters:
           - save
           - saveNew
           - saveContinue
+      processes:
+        exclude:
+          - edit
+          - create
+          - duplicate
+          - delete
+          - duplicate-merge
+          - save
+          - saveNew
+          - saveContinue

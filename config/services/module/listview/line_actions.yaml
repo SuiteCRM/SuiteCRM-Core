@@ -136,3 +136,6 @@ parameters:
     manual-migration-tasks:
       exclude:
         - modal-create
+    processes:
+      exclude:
+        - modal-create

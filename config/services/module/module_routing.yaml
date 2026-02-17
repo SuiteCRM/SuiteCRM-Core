@@ -268,3 +268,7 @@ parameters:
       index: true
       list: true
       record: true
+    processes:
+      index: true
+      list: true
+      record: true

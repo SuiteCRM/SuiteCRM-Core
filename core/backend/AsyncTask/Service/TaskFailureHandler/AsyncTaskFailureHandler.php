@@ -82,6 +82,7 @@ abstract class AsyncTaskFailureHandler implements AsyncTaskFailureHandlerInterfa
             $attributes = $task->getAttributes();
 
             $attributes['status'] = 'failed';
+            $attributes['phase'] = $attributes['progress']['phase'] ?? $attributes['phase'] ?? '';
             $attributes['last_run_datetime'] = (new \DateTime())->format('Y-m-d H:i:s');
 
             $task->setAttributes($attributes);

@@ -114,6 +114,21 @@ $dictionary['ManualMigrationTask'] = [
             'unified_search' => false,
         ],
 
+        'phase' => [
+            'name' => 'phase',
+            'vname' => 'LBL_PHASE',
+            'type' => 'enum',
+            'options' => 'dom_async_task_phases',
+            'len' => 50,
+            'display' => 'readonly',
+            'inline_edit' => false,
+            'reportable' => false,
+            'massupdate' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false,
+        ],
+
         'service_key' => [
             'name' => 'service_key',
             'vname' => 'LBL_SERVICE_KEY',
@@ -142,6 +157,21 @@ $dictionary['ManualMigrationTask'] = [
             'reportable' => false,
             'massupdate' => false,
             'inline_edit' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false,
+        ],
+
+        'last_run_datetime' => [
+            'name' => 'last_run_datetime',
+            'vname' => 'LBL_LAST_RUN_DATETIME',
+            'type' => 'datetime',
+            'required' => false,
+            'display' => 'readonly',
+            'duplicate_merge' => 'disabled',
+            'inline_edit' => false,
+            'reportable' => false,
+            'massupdate' => false,
             'importable' => false,
             'exportable' => false,
             'unified_search' => false,

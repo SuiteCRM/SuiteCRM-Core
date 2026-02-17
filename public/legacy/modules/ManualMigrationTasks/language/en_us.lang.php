@@ -64,7 +64,9 @@ $mod_strings = [
     'LBL_ESTIMATED_RUN_TIME' => 'Run time estimate',
     'LBL_STATUS' => 'Status',
     'LBL_SERVICE_KEY' => 'Service Key',
+    'LBL_LAST_RUN_DATETIME' => 'Last Run DateTime',
 
+    'LBL_PHASE' => 'Phase',
     'LBL_OWNER' => 'Owner',
 
     'LBL_RUN_MIGRATION' => 'Run Migration',

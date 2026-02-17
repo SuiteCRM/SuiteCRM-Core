@@ -60,13 +60,19 @@ class SubpanelLineActionDefinitionProvider extends ActionDefinitionProvider impl
      * @param string $action
      * @return bool
      */
-    public function isActionDefined(string $action): bool
+    public function isActionDefined(string $module, string $action): bool
     {
         $config = $this->subpanelLineActions;
         $defaults = $config['default'] ?? [];
         $defaultActions = $defaults['actions'] ?? [];
 
-        return array_key_exists($action, $defaultActions);
+        $modules = $config['modules'] ?? [];
+        $actions = $modules[$module] ?? [];
+        $moduleActions = $actions['actions'] ?? [];
+
+        $merged = array_merge($defaultActions, $moduleActions);
+
+        return array_key_exists($action, $merged);
     }
 
     /**
@@ -90,7 +96,7 @@ class SubpanelLineActionDefinitionProvider extends ActionDefinitionProvider impl
      */
     public function isActionAccessible(string $module, string $actionKey): bool
     {
-        return $this->isActionDefined($actionKey)
+        return $this->isActionDefined($module, $actionKey)
             && $this->isActionAvailable($module, $actionKey);
     }
 

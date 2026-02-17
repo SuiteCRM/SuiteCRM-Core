@@ -69,6 +69,37 @@ $dictionary['Process'] = [
             'exportable' => false,
             'unified_search' => false,
         ],
+        'description' => array(
+            'name' => 'description',
+            'vname' => 'LBL_DESCRIPTION',
+            'type' => 'text',
+            'comment' => 'Full text of the note',
+            'rows' => 6,
+            'cols' => 80,
+            'display' => 'readonly',
+            'duplicate_merge' => 'disabled',
+            'reportable' => false,
+            'massupdate' => false,
+            'inline_edit' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false
+        ),
+        'progress' => array(
+            'name' => 'progress',
+            'vname' => 'LBL_PROGRESS',
+            'type' => 'text',
+            'rows' => 6,
+            'cols' => 80,
+            'display' => 'readonly',
+            'duplicate_merge' => 'disabled',
+            'reportable' => false,
+            'massupdate' => false,
+            'inline_edit' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false
+        ),
 
         'type' => [
             'name' => 'type',
@@ -106,6 +137,21 @@ $dictionary['Process'] = [
             'vname' => 'LBL_STATUS',
             'type' => 'enum',
             'options' => 'dom_processes_statuses',
+            'display' => 'readonly',
+            'inline_edit' => false,
+            'reportable' => false,
+            'massupdate' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false,
+        ],
+
+        'phase' => [
+            'name' => 'phase',
+            'vname' => 'LBL_PHASE',
+            'type' => 'enum',
+            'options' => 'dom_async_task_phases',
+            'len' => 50,
             'display' => 'readonly',
             'inline_edit' => false,
             'reportable' => false,
@@ -167,4 +213,4 @@ $dictionary['Process'] = [
     ],
 ];
 
-VardefManager::createVardef('Processes', 'Process', ['basic', 'security_groups']);
+VardefManager::createVardef('Processes', 'Process', ['basic', 'security_groups', 'assignable']);

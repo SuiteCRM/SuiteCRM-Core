@@ -111,7 +111,9 @@ export class BaseComposite extends BaseFieldComponent implements OnInit, OnDestr
     getDirection(): string {
         let direction = 'flex-column';
 
-        if (this.field.definition.display === 'inline') {
+        if (this.field.definition.direction === 'inline') {
+            direction = 'flex-row';
+        } else if (this.field.definition.display === 'inline') {
             direction = 'flex-row';
         }
 

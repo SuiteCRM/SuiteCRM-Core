@@ -95,12 +95,7 @@ $viewdefs[$module_name]['DetailView'] = [
                         'modes' => ['detail'],
                         'params' => [
                             'activeOnFields' => [
-                                'status' => [
-                                    [
-                                        'operator' => 'in',
-                                        'values' => ['completed', 'failed']
-                                    ],
-                                ],
+                                'status' => ['completed', 'failed'],
                             ]
                         ]
                     ],
@@ -129,16 +124,15 @@ $viewdefs[$module_name]['DetailView'] = [
                 'service_key',
             ],
             [
-                'estimated_run_time',
+                'progress',
                 'last_run_datetime',
             ],
             [
                 'attachments',
-                '',
             ],
             [
                 'description',
-                '',
+                'assigned_user_name',
             ],
             [
                 [

@@ -69,7 +69,20 @@ $dictionary['Process'] = [
             'exportable' => false,
             'unified_search' => false,
         ],
-        'description' => array(
+        'type' => [
+            'name' => 'type',
+            'vname' => 'LBL_TYPE',
+            'type' => 'enum',
+            'options' => 'dom_processes_types',
+            'display' => 'readonly',
+            'inline_edit' => false,
+            'reportable' => false,
+            'massupdate' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false,
+        ],
+        'description' => [
             'name' => 'description',
             'vname' => 'LBL_DESCRIPTION',
             'type' => 'text',
@@ -84,7 +97,7 @@ $dictionary['Process'] = [
             'importable' => false,
             'exportable' => false,
             'unified_search' => false
-        ),
+        ],
         'progress' => [
             'name' => 'progress',
             'vname' => 'LBL_PROGRESS',
@@ -114,20 +127,6 @@ $dictionary['Process'] = [
             'reportable' => false,
             'massupdate' => false,
             'inline_edit' => false,
-            'importable' => false,
-            'exportable' => false,
-            'unified_search' => false,
-        ],
-
-        'type' => [
-            'name' => 'type',
-            'vname' => 'LBL_TYPE',
-            'type' => 'enum',
-            'options' => 'dom_processes_types',
-            'display' => 'readonly',
-            'inline_edit' => false,
-            'reportable' => false,
-            'massupdate' => false,
             'importable' => false,
             'exportable' => false,
             'unified_search' => false,

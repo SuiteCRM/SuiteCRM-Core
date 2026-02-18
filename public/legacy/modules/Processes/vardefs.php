@@ -85,21 +85,39 @@ $dictionary['Process'] = [
             'exportable' => false,
             'unified_search' => false
         ),
-        'progress' => array(
+        'progress' => [
             'name' => 'progress',
             'vname' => 'LBL_PROGRESS',
-            'type' => 'text',
-            'rows' => 6,
-            'cols' => 80,
+            'type' => 'composite',
+            'dbType' => 'text',
+            'layout' => ['percent', 'completed', 'failed'],
+            'attributeFields' => [
+                'percent' => [
+                    'name' => 'percent',
+                    'type' => 'int',
+                    'vname' => 'LBL_PROGRESS_PERCENT',
+                ],
+                'completed' => [
+                    'name' => 'completed',
+                    'type' => 'int',
+                    'vname' => 'LBL_PROGRESS_COMPLETED',
+                ],
+                'failed' => [
+                    'name' => 'failed',
+                    'type' => 'int',
+                    'vname' => 'LBL_PROGRESS_FAILED',
+                ],
+            ],
             'display' => 'readonly',
+            'direction' => 'inline',
             'duplicate_merge' => 'disabled',
             'reportable' => false,
             'massupdate' => false,
             'inline_edit' => false,
             'importable' => false,
             'exportable' => false,
-            'unified_search' => false
-        ),
+            'unified_search' => false,
+        ],
 
         'type' => [
             'name' => 'type',

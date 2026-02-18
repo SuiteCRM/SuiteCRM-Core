@@ -69,4 +69,5 @@ $mod_strings = [
     'LBL_DISMISS' => 'Dismiss',
     'LBL_DISMISS_CONFIRMATION' => 'Are you sure you want to dismiss this process? This will remove it and all associated data.',
     'LBL_DISMISS_SUCCESS' => 'Process dismissed successfully.',
+    'LBL_FAILED_ITEMS' => 'Failed Items',
 ];

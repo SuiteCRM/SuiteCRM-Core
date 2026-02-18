@@ -233,6 +233,23 @@ class Process extends Basic
 
 
     /**
+     * Get failed async task items query for subpanel
+     * @return array
+     */
+    public function getFailedAsyncTaskItems(): array
+    {
+        $idQuoted = $this->db->quoted($this->id);
+
+        return [
+            'select' => '',
+            'from' => '',
+            'where' => "async_task_items.async_task_id = $idQuoted AND async_task_items.status = 'failed' ",
+            'join' => '',
+            'join_tables' => [],
+        ];
+    }
+
+    /**
      * Get not allowed action
      * @param string $view
      * @return bool

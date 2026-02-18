@@ -26,5 +26,14 @@
  */
 
 $layout_defs['Processes'] = [
-    'subpanel_setup' => [],
+    'subpanel_setup' => [
+        'failed_async_task_items' => [
+            'order' => 100,
+            'module' => 'AsyncTaskItems',
+            'subpanel_name' => 'ForAsyncTasks',
+            'get_subpanel_data' => 'function:getFailedAsyncTaskItems',
+            'generate_select' => true,
+            'title_key' => 'LBL_FAILED_ITEMS',
+        ],
+    ],
 ];

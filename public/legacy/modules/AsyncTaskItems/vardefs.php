@@ -126,6 +126,17 @@ $dictionary['AsyncTaskItem'] = [
             'display' => 'readonly',
             'reportable' => false,
         ],
+        'retry_count' => [
+            'name' => 'retry_count',
+            'vname' => 'LBL_RETRY_COUNT',
+            'type' => 'int',
+            'len' => 11,
+            'required' => false,
+            'default' => 0,
+            'comment' => 'Number of times this item has been retried after failure',
+            'display' => 'readonly',
+            'reportable' => false,
+        ],
     ],
     'indices' => [
         [

@@ -45,4 +45,5 @@ $mod_strings = [
     'LBL_DATA' => 'Data',
     'LBL_RESULT_DATA' => 'Result Data',
     'LBL_SORT_ORDER' => 'Sort Order',
+    'LBL_RETRY_COUNT' => 'Retry Count',
 ];

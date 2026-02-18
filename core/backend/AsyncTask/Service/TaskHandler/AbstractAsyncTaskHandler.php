@@ -53,6 +53,6 @@ abstract class AbstractAsyncTaskHandler implements AsyncTaskHandlerInterface
      */
     public function getMaxRetries(): int
     {
-        return 0;
+        return 1;
     }
 }

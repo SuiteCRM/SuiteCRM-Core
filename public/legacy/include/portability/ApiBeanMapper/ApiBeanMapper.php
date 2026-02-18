@@ -43,6 +43,7 @@ require_once __DIR__ . '/TypeMappers/TextMapper.php';
 require_once __DIR__ . '/TypeMappers/CurrencyMapper.php';
 require_once __DIR__ . '/TypeMappers/ImageMapper.php';
 require_once __DIR__ . '/TypeMappers/FileMapper.php';
+require_once __DIR__ . '/TypeMappers/CompositeMapper.php';
 require_once __DIR__ . '/ApiBeanModuleMappers.php';
 require_once __DIR__ . '/ModuleMappers/SavedSearch/SavedSearchMappers.php';
 require_once __DIR__ . '/ModuleMappers/AOP_Case_Updates/CaseUpdatesMappers.php';
@@ -97,6 +98,7 @@ class ApiBeanMapper
         $this->typeMappers[CurrencyMapper::getType()] = new CurrencyMapper();
         $this->typeMappers[ImageMapper::getType()] = new ImageMapper();
         $this->typeMappers[FileMapper::getType()] = new FileMapper();
+        $this->typeMappers[CompositeMapper::getType()] = new CompositeMapper();
         $this->moduleMappers[SavedSearchMappers::getModule()] = new SavedSearchMappers();
         $this->typeMappers[DateTimeComboMapper::getType()] = new DateTimeMapper();
         $this->linkMappers[EmailAddressLinkMapper::getRelateModule()] = [];

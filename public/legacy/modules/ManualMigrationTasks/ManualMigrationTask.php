@@ -96,7 +96,7 @@ class ManualMigrationTask extends Basic
     }
 
     /**
-     * Log personal account access denied
+     * Log access denied
      * @param string $action
      * @return void
      */

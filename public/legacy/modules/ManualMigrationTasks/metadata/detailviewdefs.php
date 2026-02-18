@@ -87,6 +87,7 @@ $viewdefs[$module_name]['DetailView'] = [
                 'modes' => ['detail'],
                 'params' => [
                     'expanded' => true,
+                    'disableOnRun' => true,
                     'displayConfirmation' => true,
                     'confirmationMessages' => ['LBL_DISMISS_CONFIRMATION'],
                 ],
@@ -95,12 +96,7 @@ $viewdefs[$module_name]['DetailView'] = [
                         'modes' => ['detail'],
                         'params' => [
                             'activeOnFields' => [
-                                'status' => [
-                                    [
-                                        'operator' => 'in',
-                                        'values' => ['completed', 'failed'],
-                                    ],
-                                ],
+                                'status' => ['completed', 'failed'],
                             ]
                         ]
                     ],
@@ -122,15 +118,33 @@ $viewdefs[$module_name]['DetailView'] = [
         'default' => [
             [
                 'name',
-                'type'
+                'type',
             ],
             [
                 'status',
-                'estimated_run_time'
+                'service_key',
             ],
             [
-                'description'
-            ]
+                'progress',
+                'last_run_datetime',
+            ],
+            [
+                'attachments',
+            ],
+            [
+                'description',
+                'assigned_user_name',
+            ],
+            [
+                [
+                    'name' => 'date_entered',
+                    'label' => 'LBL_DATE_ENTERED',
+                ],
+                [
+                    'name' => 'date_modified',
+                    'label' => 'LBL_DATE_MODIFIED',
+                ],
+            ],
         ],
     ],
 ];

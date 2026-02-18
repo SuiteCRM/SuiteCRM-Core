@@ -64,7 +64,8 @@ $mod_strings = [
     'LBL_ESTIMATED_RUN_TIME' => 'Run time estimate',
     'LBL_STATUS' => 'Status',
     'LBL_SERVICE_KEY' => 'Service Key',
-    'LBL_LAST_RUN_DATETIME' => 'Last Run DateTime',
+    'LBL_LAST_RUN_DATETIME' => 'Last Run',
+    'LBL_ATTACHMENTS' => 'Attachments',
 
     'LBL_PHASE' => 'Phase',
     'LBL_OWNER' => 'Owner',
@@ -75,6 +76,11 @@ $mod_strings = [
     'LBL_DISMISS' => 'Dismiss',
     'LBL_DISMISS_CONFIRMATION' => 'Are you sure you want to dismiss this migration task? This will remove it and all associated data.',
     'LBL_DISMISS_SUCCESS' => 'Migration task dismissed successfully.',
+
+    'LBL_PROGRESS' => 'Progress',
+    'LBL_PROGRESS_PERCENT' => 'Percent',
+    'LBL_PROGRESS_COMPLETED' => 'Completed',
+    'LBL_PROGRESS_FAILED' => 'Failed',
 
     'LBL_FAILED_ITEMS' => 'Failed Items',
 ];

@@ -83,6 +83,40 @@ $dictionary['ManualMigrationTask'] = [
             'unified_search' => false,
         ],
 
+        'progress' => [
+            'name' => 'progress',
+            'vname' => 'LBL_PROGRESS',
+            'type' => 'composite',
+            'dbType' => 'text',
+            'layout' => ['percent', 'completed', 'failed'],
+            'attributeFields' => [
+                'percent' => [
+                    'name' => 'percent',
+                    'type' => 'int',
+                    'vname' => 'LBL_PROGRESS_PERCENT',
+                ],
+                'completed' => [
+                    'name' => 'completed',
+                    'type' => 'int',
+                    'vname' => 'LBL_PROGRESS_COMPLETED',
+                ],
+                'failed' => [
+                    'name' => 'failed',
+                    'type' => 'int',
+                    'vname' => 'LBL_PROGRESS_FAILED',
+                ],
+            ],
+            'display' => 'readonly',
+            'direction' => 'inline',
+            'duplicate_merge' => 'disabled',
+            'reportable' => false,
+            'massupdate' => false,
+            'inline_edit' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false,
+        ],
+
         'estimated_run_time' => [
             'name' => 'estimated_run_time',
             'vname' => 'LBL_ESTIMATED_RUN_TIME',
@@ -175,6 +209,23 @@ $dictionary['ManualMigrationTask'] = [
             'importable' => false,
             'exportable' => false,
             'unified_search' => false,
+        ],
+
+        'attachments' => [
+            'name' => 'attachments',
+            'vname' => 'LBL_ATTACHMENTS',
+            'type' => 'attachment',
+            'source' => 'non-db',
+            'display' => 'readonly',
+            'inline_edit' => false,
+            'reportable' => false,
+            'massupdate' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false,
+            'metadata' => [
+                'storage_type' => 'private-documents',
+            ],
         ],
     ],
     'relationships' => [

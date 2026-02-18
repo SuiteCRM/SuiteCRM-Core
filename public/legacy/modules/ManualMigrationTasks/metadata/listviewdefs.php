@@ -52,16 +52,28 @@ $viewdefs[$module_name] = [
 
 $listViewDefs[$module_name] = [
     'NAME' => [
+        'label' => 'LBL_NAME',
         'default' => true,
         'link' => true,
-        'label' => 'LBL_NAME',
-    ],
-    'TYPE' => [
-        'default' => true,
-        'label' => 'LBL_TYPE',
     ],
     'STATUS' => [
-        'default' => true,
         'label' => 'LBL_STATUS',
+        'default' => true,
+    ],
+    'PHASE' => [
+        'label' => 'LBL_PHASE',
+        'default' => true,
+    ],
+    'PROGRESS' => [
+        'label' => 'LBL_PROGRESS',
+        'default' => true,
+    ],
+    'LAST_RUN_DATETIME' => [
+        'label' => 'LBL_LAST_RUN_DATETIME',
+        'default' => true,
+    ],
+    'ASSIGNED_USER_NAME' => [
+        'label' => 'LBL_ASSIGNED_TO_NAME',
+        'default' => true,
     ],
 ];

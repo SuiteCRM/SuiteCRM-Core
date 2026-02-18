@@ -78,7 +78,34 @@ $viewdefs[$module_name]['DetailView'] = [
                         ]
                     ],
                 ],
-            ]
+            ],
+            'dismiss' => [
+                'key' => 'dismiss',
+                'labelKey' => 'LBL_DISMISS',
+                'asyncProcess' => true,
+                'priority' => 200,
+                'modes' => ['detail'],
+                'params' => [
+                    'expanded' => true,
+                    'displayConfirmation' => true,
+                    'confirmationMessages' => ['LBL_DISMISS_CONFIRMATION'],
+                ],
+                'displayLogic' => [
+                    'show-on-finished' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'activeOnFields' => [
+                                'status' => [
+                                    [
+                                        'operator' => 'in',
+                                        'values' => ['completed', 'failed'],
+                                    ],
+                                ],
+                            ]
+                        ]
+                    ],
+                ],
+            ],
         ],
         'exclude' => [
             'duplicate',

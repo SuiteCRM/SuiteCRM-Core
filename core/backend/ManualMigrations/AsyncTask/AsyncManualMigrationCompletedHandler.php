@@ -31,7 +31,7 @@ use App\AsyncTask\Service\TaskCompletedHandler\AsyncTaskCompletedHandler;
 
 class AsyncManualMigrationCompletedHandler extends AsyncTaskCompletedHandler
 {
-    public const TYPE = 'manual-migrations';
+    public const TYPE = 'manual-migration-tasks';
 
     public function getType(): string
     {

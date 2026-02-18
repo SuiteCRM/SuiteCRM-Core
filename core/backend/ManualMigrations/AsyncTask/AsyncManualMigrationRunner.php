@@ -31,7 +31,7 @@ use App\AsyncTask\Service\Runner\AsyncTaskRunner;
 
 class AsyncManualMigrationRunner extends AsyncTaskRunner
 {
-    public const TYPE = 'manual-migrations';
+    public const TYPE = 'manual-migration-tasks';
 
     public function getType(): string
     {

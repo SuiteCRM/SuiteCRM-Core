@@ -31,7 +31,7 @@ use App\AsyncTask\Service\TaskFailureHandler\AsyncTaskFailureHandler;
 
 class AsyncManualMigrationFailureHandler extends AsyncTaskFailureHandler
 {
-    public const TYPE = 'manual-migrations';
+    public const TYPE = 'manual-migration-tasks';
 
     public function getType(): string
     {

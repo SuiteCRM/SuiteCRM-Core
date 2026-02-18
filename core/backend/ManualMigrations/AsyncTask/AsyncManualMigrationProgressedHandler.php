@@ -31,7 +31,7 @@ use App\AsyncTask\Service\TaskProgressedHandler\AsyncTaskProgressedHandler;
 
 class AsyncManualMigrationProgressedHandler extends AsyncTaskProgressedHandler
 {
-    public const TYPE = 'manual-migrations';
+    public const TYPE = 'manual-migration-tasks';
 
     public function getType(): string
     {

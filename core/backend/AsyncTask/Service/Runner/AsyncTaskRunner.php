@@ -103,6 +103,12 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
             return;
         }
 
+        if ($result['status'] === 'failed') {
+            $this->cleanupItems($message->getTaskId());
+            $this->dispatchTaskFailure($message);
+            return;
+        }
+
         $this->dispatchTaskProgressed($message, $result['progress']);
         $this->dispatchNextRun($message, $result['progress']);
     }
@@ -271,18 +277,46 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
     }
 
     /**
-     * Transition from processing phase: either to finalizing or completed.
+     * Transition from processing phase: retry failed items, then move to finalizing or completed/failed.
      */
     protected function transitionFromProcessing(Record $task, AsyncTaskHandlerInterface $handler, array $progress): array
     {
+        $taskId = $task->getId();
+        $maxRetries = $handler->getMaxRetries();
+
+        // Retry failed items if the handler supports it
+        if ($maxRetries > 0) {
+            $retriedCount = $this->itemRepository->retryFailedItems($taskId, $maxRetries);
+
+            if ($retriedCount > 0) {
+                $this->log('info', 'Retrying ' . $retriedCount . ' failed items for task ' . $taskId . ' (max retries: ' . $maxRetries . ').');
+                $progress = $this->calculateProgress($taskId, $progress);
+
+                return ['status' => 'in_progress', 'progress' => $progress];
+            }
+        }
+
+        // Recalculate progress to get final counts
+        $progress = $this->calculateProgress($taskId, $progress);
+        $failedCount = $progress['failed'] ?? 0;
+        $total = $progress['total'] ?? 0;
+
+        // If ALL items failed, mark task as failed
+        if ($failedCount > 0 && $failedCount >= $total) {
+            $this->log('error', 'All ' . $failedCount . ' items failed for task ' . $taskId . '. Marking as failed.');
+            $progress['percent'] = 100;
+
+            return ['status' => 'failed', 'progress' => $progress];
+        }
+
         if ($handler->hasFinalization()) {
             $progress['phase'] = self::PHASE_FINALIZING;
-            $this->log('info', 'All items processed for task ' . $task->getId() . '. Transitioning to finalizing.');
+            $this->log('info', 'All items processed for task ' . $taskId . '. Transitioning to finalizing.');
 
             return ['status' => 'in_progress', 'progress' => $progress];
         }
 
-        $this->log('info', 'All items processed for task ' . $task->getId() . '. Completing.');
+        $this->log('info', 'All items processed for task ' . $taskId . '. Completing.');
         $progress['percent'] = 100;
 
         return ['status' => 'completed', 'progress' => $progress];
@@ -371,11 +405,26 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         );
     }
 
+    protected function dispatchTaskFailure(AsyncTaskRun $message): void
+    {
+        $this->asyncTaskDispatcher->dispatchTaskFailure(
+            $message->getModule() ?? 'default',
+            $message->getTaskId(),
+            $message->getTaskType(),
+            $message->getHandlerKey(),
+            $message->getData()
+        );
+    }
+
+    /**
+     * Clean up items after task completion.
+     * Uses selective purge: failed items are preserved for user review.
+     */
     protected function cleanupItems(string $taskId): void
     {
         try {
-            $this->itemRepository->purgeByTaskId($taskId);
-            $this->log('info', 'Cleaned up items for task ' . $taskId);
+            $this->itemRepository->purgeCompletedItems($taskId);
+            $this->log('info', 'Cleaned up non-failed items for task ' . $taskId);
         } catch (\Throwable $e) {
             $this->log('error', 'Failed to clean up items for task ' . $taskId . ': ' . $e->getMessage());
         }

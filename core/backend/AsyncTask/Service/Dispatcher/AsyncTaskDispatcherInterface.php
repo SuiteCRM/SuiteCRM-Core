@@ -37,6 +37,7 @@ interface AsyncTaskDispatcherInterface
      * @param string $type type of the task
      * @param string $handlerKey key of the task
      * @param array $taskData data to be sent with the task
+     * @param array $progress
      * @return void
      */
     public function dispatchTaskRun(string $module, string $taskId, string $type, string $handlerKey, array $taskData, array $progress = []): void;
@@ -48,7 +49,37 @@ interface AsyncTaskDispatcherInterface
      */
     public function reDispatch(object $message): void;
 
+    /**
+     * Dispatches a task completed message.
+     * @param string $module module name, use default if not specified
+     * @param string $taskId unique id of the task
+     * @param string $type type of the task
+     * @param string $handlerKey key of the task
+     * @param array $taskData data to be sent with the task
+     * @return void
+     */
     public function dispatchTaskCompleted(string $module, string $taskId, string $type, string $handlerKey, array $taskData): void;
 
+    /**
+     * Dispatches a task progressed message.
+     * @param string $module module name, use default if not specified
+     * @param string $taskId unique id of the task
+     * @param string $type type of the task
+     * @param string $handlerKey key of the task
+     * @param array $taskData data to be sent with the task
+     * @param array $progress
+     * @return void
+     */
     public function dispatchTaskProgressed(string $module, string $taskId, string $type, string $handlerKey, array $taskData, array $progress = []): void;
+
+    /**
+     * Dispatches a task failure message.
+     * @param string $module module name, use default if not specified
+     * @param string $taskId unique id of the task
+     * @param string $type type of the task
+     * @param string $handlerKey key of the task
+     * @param array $taskData data to be sent with the task
+     * @return void
+     */
+    public function dispatchTaskFailure(string $module, string $taskId, string $type, string $handlerKey, array $taskData): void;
 }

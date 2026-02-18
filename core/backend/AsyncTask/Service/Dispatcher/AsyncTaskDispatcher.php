@@ -28,6 +28,7 @@
 namespace App\AsyncTask\Service\Dispatcher;
 
 use App\AsyncTask\Message\AsyncTaskCompleted;
+use App\AsyncTask\Message\AsyncTaskFailure;
 use App\AsyncTask\Message\AsyncTaskProgressed;
 use App\AsyncTask\Message\AsyncTaskRun;
 use App\AsyncTask\Service\Router\AsyncTaskRouterInterface;
@@ -135,4 +136,29 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
         );
     }
 
+    /**
+     * Dispatches a task failure message.
+     * @param string $module module name, use default if not specified
+     * @param string $taskId unique id of the task
+     * @param string $type type of the task
+     * @param string $handlerKey key of the task
+     * @param array $taskData data to be sent with the task
+     * @return void
+     */
+    public function dispatchTaskFailure(string $module, string $taskId, string $type, string $handlerKey, array $taskData): void
+    {
+        $transports = $this->asyncTaskRouter->getTransports($module, $handlerKey);
+
+        if ($transports === null) {
+            $this->bus->dispatch(new AsyncTaskFailure($taskId, $type, $module, $handlerKey, $taskData));
+            return;
+        }
+
+        $this->bus->dispatch(
+            new AsyncTaskFailure($taskId, $type, $module, $handlerKey, $taskData),
+            [
+                new TransportNamesStamp($transports)
+            ]
+        );
+    }
 }

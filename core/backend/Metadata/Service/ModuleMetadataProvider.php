@@ -94,7 +94,15 @@ class ModuleMetadataProvider implements ModuleMetadataProviderInterface
     {
         global $current_user;
 
-        $key = 'app-metadata-module-metadata-' . $moduleName . '-' . $current_user->id;
+        // Module metadata can be requested before the legacy global $current_user is initialized
+        // (e.g. unauthenticated/minimal bootstrap requests). Also, $exposed affects which sections
+        // are generated, so it must be part of the cache key to avoid serving partial metadata.
+        $userId = (!empty($current_user) && !empty($current_user->id)) ? (string)$current_user->id : 'anonymous';
+        $exposedSorted = $exposed;
+        sort($exposedSorted);
+        $exposedKey = empty($exposedSorted) ? 'all' : md5(json_encode(array_values($exposedSorted)));
+
+        $key = 'app-metadata-module-metadata-' . $moduleName . '-' . $userId . '-' . $exposedKey;
 
         $metadataArray = $this->cache->get($key, function () use ($moduleName, $exposed) {
             $metadataArray = [];

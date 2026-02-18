@@ -76,6 +76,13 @@ class LegacyNonViewActionRedirectHandler extends LegacyRedirectHandler
      */
     public function isMatch(Request $request): bool
     {
+        // SuiteCRM v8 API endpoints live under /api.
+        // Do not treat them as legacy non-view routes, even if they are missing.
+        $pathInfo = $request->getPathInfo();
+        if ($pathInfo === '/api' || strpos($pathInfo, '/api/') === 0) {
+            return false;
+        }
+
         if ($this->routeConverter->isLegacyViewRoute($request)) {
             return false;
         }
@@ -90,6 +97,10 @@ class LegacyNonViewActionRedirectHandler extends LegacyRedirectHandler
 
         $isRegistered = true;
         try {
+            // This handler runs during Kernel init (before RouterListener updates the context),
+            // so we must update the routing context manually to avoid treating POST/DELETE routes
+            // as unregistered.
+            $this->router->getContext()->fromRequest($request);
             $this->router->matchRequest($request);
         } catch (NoConfigurationException | ResourceNotFoundException | MethodNotAllowedException $e) {
             $isRegistered = false;

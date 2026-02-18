@@ -65,6 +65,39 @@ class AppMetadataStateProvider implements ProviderInterface
             $attributes = array_keys($context['attributes']);
         }
 
+        $uiBootstrapAttributes = [
+            'systemConfig',
+            'userPreferences',
+            'language',
+            'themeImages',
+            'navigation',
+            'minimalModuleMetadata',
+            'moduleMetadata',
+            'adminMetadata',
+            'globalRecentlyViewed',
+        ];
+
+        /**
+         * ApiPlatform GraphQL doesn't always populate $context['attributes'].
+         * If we pass an empty exposed list downstream, AppMetadataProvider returns
+         * empty language strings (appStrings/appListStrings/modStrings), which
+         * results in missing labels and raw enum values on cold-start deep-links.
+         *
+         * Default to the baseline app metadata required for the UI bootstrap.
+         */
+        $knownRequested = array_intersect($attributes, $uiBootstrapAttributes);
+        if (empty($knownRequested)) {
+            $attributes = [
+                'systemConfig',
+                'userPreferences',
+                'language',
+                'themeImages',
+                'navigation',
+                'adminMetadata',
+                'globalRecentlyViewed',
+            ];
+        }
+
         return $this->metadata->getMetadata($uriVariables['id'] ?? '', $attributes);
     }
 }

@@ -13,10 +13,6 @@ $viewdefs['EmailTemplates']['EditView'] = array(
     
     array(
       'name',
-      '',
-    ),
-    
-    array(
       'type',
     ),
     
@@ -30,6 +26,7 @@ $viewdefs['EmailTemplates']['EditView'] = array(
           'cols' => '90',
         ),
       ),
+      'assigned_user_name',
     ),
     
     array(
@@ -44,6 +41,10 @@ $viewdefs['EmailTemplates']['EditView'] = array(
       ),
     ),
     
+    array(
+      'variable_tools',
+    ),
+
     array(
       
       array(
@@ -71,14 +72,29 @@ $viewdefs['EmailTemplates']['EditView'] = array(
         ),
       ),
     ),
-    
+
     array(
       
       array(
-        'name' => 'ATTACHMENTS_JAVASCRIPT',
-        'customCode' => '{$fields.attachments_javascript.value} {$fields.attachments.value}',
-        'description' => 'This field was auto generated',
+        'name' => 'plain_text_toggle',
       ),
+    ),
+
+    array(
+      
+      array(
+        'name' => 'body',
+        'displayParams' =>
+        array(
+          'rows' => '20',
+          'cols' => '100',
+        ),
+      ),
+    ),
+    
+    array(
+      
+      'attachments',
     ),
   ),
 )

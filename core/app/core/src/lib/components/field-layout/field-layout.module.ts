@@ -32,6 +32,7 @@ import {FieldGridModule} from '../field-grid/field-grid.module';
 import {ImageModule} from '../image/image.module';
 import {ActionGroupMenuModule} from '../action-group-menu/action-group-menu.module';
 import {DynamicLabelModule} from "../dynamic-label/dynamic-label.module";
+import {LabelModule} from "../label/label.module";
 
 
 @NgModule({
@@ -45,7 +46,8 @@ import {DynamicLabelModule} from "../dynamic-label/dynamic-label.module";
         FieldGridModule,
         ImageModule,
         ActionGroupMenuModule,
-        DynamicLabelModule
+        DynamicLabelModule,
+        LabelModule
     ]
 })
 export class FieldLayoutModule {

@@ -250,6 +250,7 @@ services:
       - name: 'kernel.event_listener'
         event: 'Symfony\Component\Security\Http\Event\LogoutEvent'
         dispatcher: security.event_dispatcher.main
+        method: onSymfonyComponentSecurityHttpEventLogoutEvent
 
   session.storage.factory.legacy_bridge:
     class: App\Security\Session\LegacyBridgeSessionStorageFactory
@@ -568,4 +569,3 @@ services:
   App\Process\Service\SubpanelTopActionDefinitionProviderInterface: '@App\Process\Service\SubpanelTopActionDefinitionProvider'
   App\Engine\Service\Extensions\ExtensionAssetCopyInterface: '@App\Engine\Service\Extensions\ExtensionAssetCopy'
   Doctrine\Migrations\DependencyFactory: '@doctrine.migrations.dependency_factory'
-

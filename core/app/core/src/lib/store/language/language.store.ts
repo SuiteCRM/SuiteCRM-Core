@@ -36,6 +36,7 @@ import {LocalStorageService} from '../../services/local-storage/local-storage.se
 import {Process, ProcessService} from '../../services/process/process.service';
 import {SystemConfigStore} from '../system-config/system-config.store';
 import {isString} from 'lodash-es';
+import {ModuleNameMapper} from '../../services/navigation/module-name-mapper/module-name-mapper.service';
 
 export interface LanguageStringMap {
     [key: string]: string;
@@ -152,7 +153,8 @@ export class LanguageStore implements StateStore {
         protected recordGQL: EntityGQL,
         protected localStorage: LocalStorageService,
         protected processService: ProcessService,
-        protected configs: SystemConfigStore
+        protected configs: SystemConfigStore,
+        protected moduleNameMapper: ModuleNameMapper
     ) {
 
         this.appStrings$ = this.state$.pipe(map(state => state.appStrings), distinctUntilChanged());
@@ -309,6 +311,23 @@ export class LanguageStore implements StateStore {
 
         if (module) {
             label = languages.modStrings[module] && languages.modStrings[module][labelKey];
+
+            // In the frontend we often use the mapped (kebab-case) module name (e.g. "email-templates"),
+            // while modStrings are keyed by legacy module names (e.g. "EmailTemplates").
+            // Try both directions before falling back to appStrings.
+            if (!label && this.moduleNameMapper) {
+                const legacy = this.moduleNameMapper.toLegacy(module);
+                if (legacy && legacy !== module) {
+                    label = languages.modStrings[legacy] && languages.modStrings[legacy][labelKey];
+                }
+
+                if (!label) {
+                    const frontend = this.moduleNameMapper.toFrontend(module);
+                    if (frontend && frontend !== module) {
+                        label = languages.modStrings[frontend] && languages.modStrings[frontend][labelKey];
+                    }
+                }
+            }
         }
 
         if (!label) {

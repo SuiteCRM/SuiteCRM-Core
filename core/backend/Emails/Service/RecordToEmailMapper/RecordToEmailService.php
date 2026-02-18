@@ -31,6 +31,7 @@ use App\Data\Entity\Record;
 use App\FieldDefinitions\Service\FieldDefinitionsProviderInterface;
 use App\MediaObjects\Repository\DefaultMediaObjectManager;
 use App\MediaObjects\Services\MediaObjectFileHandler;
+use App\Module\Service\Fields\Attachments\AttachmentTypeHandlers\AttachmentTypeHandlers;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -42,7 +43,8 @@ class RecordToEmailService
         protected DefaultMediaObjectManager $defaultMediaObjectManager,
         protected FieldDefinitionsProviderInterface $fieldDefinitionsProvider,
         protected LoggerInterface $logger,
-        protected MediaObjectFileHandler $mediaObjectFileHandler
+        protected MediaObjectFileHandler $mediaObjectFileHandler,
+        protected AttachmentTypeHandlers $attachmentTypeHandlers,
     )
     {
     }
@@ -134,13 +136,33 @@ class RecordToEmailService
         }
     }
 
-    protected function getMediaObjects(array $emailRecordAttributes, string $storageType): array
+    protected function getMediaObjects(array $emailRecordAttributes, string $emailStorage): array
     {
         $attachments = $emailRecordAttributes['email_attachments'] ?? [];
 
         $mediaObjects = [];
 
         foreach ($attachments as $key => $attachment) {
+            if (!$attachment['id'] ?? null) {
+                $this->logger->warning('Attachment id is missing in email attachments');
+                continue;
+            }
+
+            $attachmentType = $attachment['attributes']['attachmentType'] ?? 'file';
+
+            if ($attachmentType === 'file') {
+                $storageType = $emailStorage;
+            } else {
+                $handler = $this->attachmentTypeHandlers->getHandler($attachmentType);
+
+                if ($handler === null) {
+                    $this->logger->warning('No handler found for attachment type '.$attachmentType);
+                    continue;
+                }
+
+                $storageType = $handler->getStorageType();
+            }
+
             $mediaObject = $this->defaultMediaObjectManager->getMediaObject($storageType, $attachment['id'] ?? '');
             if (!$mediaObject) {
                 $this->logger->warning('Attachment with id '.$attachment['id'].' not found');

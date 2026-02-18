@@ -78,7 +78,7 @@ class DefaultAttachmentTypeHandler implements AttachmentTypeHandlerInterface
     }
 
 
-    protected function getStorageType(string $module, string $fieldName): ?string
+    public function getStorageType(string $module = '', string $fieldName = ''): ?string
     {
         $fieldDef = $this->fieldDefinitionsProvider->getFieldDefinition($module, $fieldName);
         if (!$fieldDef) {

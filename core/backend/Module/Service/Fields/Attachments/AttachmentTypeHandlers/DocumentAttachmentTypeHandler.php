@@ -119,9 +119,9 @@ class DocumentAttachmentTypeHandler extends LegacyHandler implements AttachmentT
         return $mediaObjects;
     }
 
-    protected function getStorageType(): ?string
+    public function getStorageType($module = 'document-revisions', $fieldName = 'filename'): ?string
     {
-        $fieldDef = $this->fieldDefinitionsProvider->getFieldDefinition('document-revisions', 'filename');
+        $fieldDef = $this->fieldDefinitionsProvider->getFieldDefinition($module, $fieldName);
         if (!$fieldDef) {
             return null;
         }

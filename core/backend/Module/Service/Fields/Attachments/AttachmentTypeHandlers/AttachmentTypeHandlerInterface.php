@@ -32,4 +32,6 @@ interface AttachmentTypeHandlerInterface
     public function getType(): string;
 
     public function getAttachments(string $module, string $id): ?array;
+
+    public function getStorageType(string $module, string $fieldName): ?string;
 }

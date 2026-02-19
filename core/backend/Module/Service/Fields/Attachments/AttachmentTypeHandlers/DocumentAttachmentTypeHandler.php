@@ -75,7 +75,7 @@ class DocumentAttachmentTypeHandler extends LegacyHandler implements AttachmentT
         $bean = $this->getBean($this->moduleNameMapper->toLegacy($module), $id);
 
         if (!$bean) {
-            return $this->buildDeletedAttachment();
+            return $this->buildDeletedAttachment($id);
         }
 
         $record = $this->recordProvider->mapToRecord($bean);
@@ -134,11 +134,12 @@ class DocumentAttachmentTypeHandler extends LegacyHandler implements AttachmentT
         return $storageType;
     }
 
-    protected function buildDeletedAttachment(): array
+    protected function buildDeletedAttachment(string $id): array
     {
         return [
             [
                 'attributes' => [
+                    'source_record_id' => $id,
                     'attachmentType' => 'documents',
                     'attachmentIcon' => 'exclamation-triangle',
                     'status' => 'error',

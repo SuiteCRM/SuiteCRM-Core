@@ -55,7 +55,7 @@ class CompositeMapper implements TypeMapperInterface
             return;
         }
 
-        $decoded = json_decode($value, true);
+        $decoded = json_decode(html_entity_decode($value), true);
         $container[$fieldName] = is_array($decoded) ? $decoded : [];
     }
 

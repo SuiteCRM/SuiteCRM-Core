@@ -185,6 +185,7 @@ export class AttachmentEditFieldComponent extends BaseAttachmentComponent implem
         })
 
         this.field.valueObject = mapped;
+        this.field.valueList = mapped;
         this.setFormControlValue(mapped);
     }
 

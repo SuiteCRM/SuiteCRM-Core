@@ -77,6 +77,7 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
         this.valuePipes.enum = (value: string, filterArguments: string[] = []): string => this.enumFormat(value, filterArguments);
         this.valuePipes.prefix = (value: string, filterArguments: string[] = []): string => this.applyPrefix(value, filterArguments);
         this.valuePipes.applySuffix = (value: string, filterArguments: string[] = []): string => this.applySuffix(value, filterArguments);
+        this.valuePipes.default = (value: string, filterArguments: string[] = []): string => this.applyDefault(value, filterArguments);
         this.valuePipes.uppercase = (value: string): string => this.toUpperCase(value);
         this.valuePipes.lowercase = (value: string): string => this.toLowerCase(value);
         this.valuePipes.default = (value: string, filterArguments: string[]): string => this.showDefault(value, filterArguments);
@@ -352,6 +353,15 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
         const joinedArgs = (filterArguments ?? []).join('');
 
         return value + joinedArgs;
+    }
+
+    protected applyDefault(value: string, filterArguments: string[] = []): string {
+
+        if (isVoid(value) || value === '') {
+            return (filterArguments ?? []).join('');
+        }
+
+        return value;
     }
 
     protected toUpperCase(value: string) {

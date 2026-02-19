@@ -34,8 +34,10 @@ use App\FieldDefinitions\Service\FieldDefinitionsProviderInterface;
 use App\MediaObjects\Repository\MediaObjectManagerInterface;
 use App\Module\Service\ModuleNameMapperInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+#[Autoconfigure(lazy: true)]
 class DocumentAttachmentTypeHandler extends LegacyHandler implements AttachmentTypeHandlerInterface
 {
     public function getHandlerKey(): string

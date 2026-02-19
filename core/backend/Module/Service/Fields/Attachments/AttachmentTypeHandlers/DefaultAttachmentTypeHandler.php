@@ -30,7 +30,9 @@ namespace App\Module\Service\Fields\Attachments\AttachmentTypeHandlers;
 use App\FieldDefinitions\Service\FieldDefinitionsProviderInterface;
 use App\MediaObjects\Repository\MediaObjectManagerInterface;
 use App\Module\Service\ModuleNameMapperInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
+#[Autoconfigure(lazy: true)]
 class DefaultAttachmentTypeHandler implements AttachmentTypeHandlerInterface
 {
 

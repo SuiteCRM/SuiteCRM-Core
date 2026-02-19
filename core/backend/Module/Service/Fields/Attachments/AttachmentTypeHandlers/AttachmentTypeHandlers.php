@@ -27,8 +27,10 @@
 
 namespace App\Module\Service\Fields\Attachments\AttachmentTypeHandlers;
 
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Traversable;
 
+#[Autoconfigure(lazy: true)]
 class AttachmentTypeHandlers
 {
     /**

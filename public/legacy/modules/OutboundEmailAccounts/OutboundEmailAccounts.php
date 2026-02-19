@@ -162,13 +162,21 @@ class OutboundEmailAccounts extends OutboundEmailAccounts_sugar
             $admin->saveSetting('notify', 'fromaddress', $this->smtp_from_addr);
         }
 
-        $currentOECount = $this->getUserPersonalAccountCount($current_user);
+        $defaultOwner = $current_user;
+        if ($this->type === 'user' && !empty($this->user_id)) {
+            $owner = BeanFactory::getBean('Users', $this->user_id);
+            if (!empty($owner) && !empty($owner->id)) {
+                $defaultOwner = $owner;
+            }
+        }
+
+        $currentOECount = $this->getUserPersonalAccountCount($defaultOwner);
 
         $results = parent::save($check_notify);
 
         //If this is the first personal account the user has setup mark it as default for them.
-        if ($currentOECount === '0') {
-            $this->setUsersDefaultOutboundAccount($current_user, $this->id);
+        if ($this->type === 'user' && $currentOECount === '0') {
+            $this->setUsersDefaultOutboundAccount($defaultOwner, $this->id);
         }
 
         return $results;

@@ -31,6 +31,7 @@ use App\Data\Service\RecordProviderInterface;
 use App\Process\Entity\Process;
 use App\Process\Service\ProcessHandlerInterface;
 use App\UserPreferences\Service\UserPreferencesProviderInterface;
+use BeanFactory;
 use InvalidArgumentException;
 
 class InitOutboundEmailDefault implements ProcessHandlerInterface
@@ -101,21 +102,12 @@ class InitOutboundEmailDefault implements ProcessHandlerInterface
      */
     public function run(Process $process): void
     {
-
         $preferences = $this->userPreferenceService->getUserPreference('Emails')?->getItems() ?? [];
-
-        if ($preferences === []) {
-            $responseData = [
-                'value' => null,
-            ];
-
-            $process->setStatus('error');
-            $process->setMessages([]);
-            $process->setData($responseData);
-            return;
-        }
-
         $id = $preferences['defaultOEAccount'] ?? '';
+
+        if ($id === '') {
+            $id = $this->getSinglePersonalOutboundId();
+        }
 
         if ($id === '') {
             $responseData = [
@@ -155,5 +147,47 @@ class InitOutboundEmailDefault implements ProcessHandlerInterface
         $process->setStatus('success');
         $process->setMessages([]);
         $process->setData($responseData);
+    }
+
+    protected function getSinglePersonalOutboundId(): string
+    {
+        /** @var \OutboundEmailAccounts $outboundAccount */
+        $outboundAccount = BeanFactory::newBean('OutboundEmailAccounts');
+
+        if (!$outboundAccount || !method_exists($outboundAccount, 'getUserOutboundAccounts')) {
+            return '';
+        }
+
+        $personalOutboundIds = [];
+        $accounts = $outboundAccount->getUserOutboundAccounts();
+
+        foreach ($accounts as $account) {
+            $type = $account->type ?? '';
+            if ($type !== 'user') {
+                continue;
+            }
+
+            $id = $account->id ?? '';
+            if ($id === '') {
+                continue;
+            }
+
+            $fromAddress = trim((string)($account->smtp_from_addr ?? ''));
+            if ($fromAddress === '') {
+                continue;
+            }
+
+            $personalOutboundIds[] = $id;
+
+            if (count($personalOutboundIds) > 1) {
+                return '';
+            }
+        }
+
+        if (count($personalOutboundIds) !== 1) {
+            return '';
+        }
+
+        return $personalOutboundIds[0];
     }
 }

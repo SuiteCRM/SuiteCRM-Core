@@ -187,10 +187,16 @@ class AttachmentFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
         }
 
         $currentLinkedAttachmentsMap = [];
-        foreach ($currentLinkedAttachments as $currentLinkedAttachment) {
+        foreach ($currentLinkedAttachments as $key => $currentLinkedAttachment) {
+
+            if (!isset($currentLinkedAttachment['id'])) {
+                $this->attachmentsManager->unlinkAttachment($storageType, $currentLinkedAttachment, $parentField, $parentType, $parentId);
+                unset($currentLinkedAttachments[$key]); continue;
+            }
             $type = $currentLinkedAttachment['attributes']['attachmentType'];
+            $sourceRecordId = $currentLinkedAttachment['attributes']['source_record_id'] ?? '';
             $currentAttachmentTypeMap = $currentLinkedAttachmentsMap[$type] ?? [];
-            $currentAttachmentTypeMap[$currentLinkedAttachment['id']] = true;
+            $currentAttachmentTypeMap[$sourceRecordId] = $currentLinkedAttachment['id'];
             $currentLinkedAttachmentsMap[$type] = $currentAttachmentTypeMap;
         }
 
@@ -210,11 +216,10 @@ class AttachmentFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
             }
 
             $receivedItemsByType = $receivedItems[$type] ?? [];
-            $receivedItemsByType[$id] = true;
+            $receivedItemsByType[$sourceId] = $id;
             $receivedItems[$type] = $receivedItemsByType;
 
-
-            if (isset($currentLinkedAttachmentsMap[$type][$id])) {
+            if (isset($currentLinkedAttachmentsMap[$type][$sourceId])) {
                 continue;
             }
 
@@ -223,7 +228,7 @@ class AttachmentFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
 
         foreach ($currentLinkedAttachments as $currentLinkedAttachment) {
             $type = $currentLinkedAttachment['attributes']['attachmentType'];
-            if (!isset($receivedItems[$type][$currentLinkedAttachment['id']])) {
+            if (!isset($receivedItems[$type][$currentLinkedAttachment['attributes']['source_record_id']])) {
                 $this->attachmentsManager->unlinkAttachment($storageType, $currentLinkedAttachment, $parentField, $parentType, $parentId);
             }
         }

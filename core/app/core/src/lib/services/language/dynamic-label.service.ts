@@ -34,6 +34,7 @@ import get from 'lodash-es/get';
 import {SystemConfigStore} from '../../store/system-config/system-config.store';
 import {UserPreferenceStore} from '../../store/user-preference/user-preference.store';
 import {AttributeMap} from "../../common/record/record.model";
+import {isObject, isString} from "lodash-es";
 
 
 export declare type TemplateValueFilter = (value: any, filterArguments?: string[]) => string;
@@ -168,6 +169,14 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
                 sourceValues = fields;
             }
 
+            let attributeName = '';
+            if (source === 'fields' && ((parts[2] ?? '') === 'attributes')) {
+                source = 'field-attributes';
+                sourceValues = fields;
+                attributeName = parts[3] ?? '';
+                path = attributeName;
+            }
+
             if (source === 'fields') {
 
                 if (!sourceValues || !(variableName in sourceValues)) {
@@ -237,6 +246,36 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
             if (source === 'attributes') {
                 sourceValues = attributes;
                 value = sourceValues[variableName] ?? '';
+                parsedTemplate = parsedTemplate.replace(regexMatch, value);
+                return;
+            }
+
+            if (source === 'field-attributes') {
+
+                const field = fields[variableName] ?? null;
+
+                if (!field) {
+                    parsedTemplate = parsedTemplate.replace(regexMatch, '');
+                    return;
+                }
+
+                const attribute = field.attributes[attributeName] ?? null;
+
+                if (!attribute) {
+                    parsedTemplate = parsedTemplate.replace(regexMatch, '');
+                    return;
+                }
+
+                if (isObject(attribute.value)) {
+                    value = get({attribute}, path, '');
+                } else if (isString(attribute.value)) {
+                    value = attribute.value;
+                }
+
+                if (filter && this.valuePipes[filter]) {
+                    value = this.valuePipes[filter](value, filterArguments ?? []);
+                }
+
                 parsedTemplate = parsedTemplate.replace(regexMatch, value);
                 return;
             }

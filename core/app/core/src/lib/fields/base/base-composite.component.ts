@@ -24,7 +24,17 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    HostListener,
+    OnDestroy,
+    OnInit,
+    signal,
+    ViewChild,
+    WritableSignal
+} from '@angular/core';
 import {BaseFieldComponent} from './base-field.component';
 import {DataTypeFormatter} from '../../services/formatters/data-type.formatter.service';
 import {StandardFieldRegistry} from '../standard-field.registry';
@@ -35,9 +45,21 @@ import set from 'lodash-es/set';
 import {FieldLogicManager} from '../field-logic/field-logic.manager';
 import {FieldLogicDisplayManager} from '../field-logic-display/field-logic-display.manager';
 import {CompositeAttributeTypeOverrideRegistry} from "../composite/composite-attribute-type-override.registry";
+import {SystemConfigStore} from "../../store/system-config/system-config.store";
+import {Observable, Subject} from "rxjs";
 
 @Component({template: ''})
-export class BaseComposite extends BaseFieldComponent implements OnInit, OnDestroy {
+export class BaseComposite extends BaseFieldComponent implements OnInit, OnDestroy, AfterViewInit {
+
+    @ViewChild('wrapper') wrapper: ElementRef;
+    direction: WritableSignal<string> = signal<string>('');
+    protected recalculateDirectionBuffer = new Subject<boolean>();
+    protected recalculateDirectionBuffer$: Observable<any> = this.recalculateDirectionBuffer.asObservable();
+
+    @HostListener('window:resize', ['$event'])
+    onResize(): void {
+        this.triggerRecalculateDirection();
+    }
 
     constructor(
         protected typeFormatter: DataTypeFormatter,
@@ -45,7 +67,8 @@ export class BaseComposite extends BaseFieldComponent implements OnInit, OnDestr
         protected recordManager: RecordManager,
         protected logic: FieldLogicManager,
         protected logicDisplay: FieldLogicDisplayManager,
-        protected attributeTypeOverrideRegistry: CompositeAttributeTypeOverrideRegistry
+        protected attributeTypeOverrideRegistry: CompositeAttributeTypeOverrideRegistry,
+        protected config: SystemConfigStore
     ) {
         super(typeFormatter, logic, logicDisplay);
     }
@@ -53,6 +76,20 @@ export class BaseComposite extends BaseFieldComponent implements OnInit, OnDestr
     ngOnInit(): void {
         super.ngOnInit();
         this.initUpdateParentSubscription();
+
+        this.subs.push(this.recalculateDirectionBuffer$.pipe().subscribe(() => {
+            this.calculateDirection();
+        }));
+
+        this.subs.push(this.mode$.subscribe(() => {
+            this.triggerRecalculateDirection();
+        }));
+
+        this.triggerRecalculateDirection();
+    }
+
+    ngAfterViewInit(): void {
+        this.triggerRecalculateDirection();
     }
 
     ngOnDestroy(): void {
@@ -104,20 +141,32 @@ export class BaseComposite extends BaseFieldComponent implements OnInit, OnDestr
     }
 
     /**
-     * Get flex direction to be used
-     *
-     * @returns {string} direction
+     * Calculate flex direction to be used
      */
-    getDirection(): string {
-        let direction = 'flex-column';
+    calculateDirection(): void {
+        const wrapperWidth = this?.wrapper?.nativeElement?.offsetWidth ?? null;
+
+        let dir = 'flex-column';
 
         if (this.field.definition.direction === 'inline') {
-            direction = 'flex-row';
+            dir = 'flex-row';
         } else if (this.field.definition.display === 'inline') {
-            direction = 'flex-row';
+            dir = 'flex-row';
         }
 
-        return direction;
+        if (!wrapperWidth || this.mode === 'detail' || this.mode === 'list') {
+            this.direction.set(dir);
+            return;
+        }
+
+        const breakpoint = this?.config?.getUi('group_field_mobile_breakdown_limit') ?? 350;
+
+        if (wrapperWidth < breakpoint) {
+            this.direction.set('flex-column');
+            return;
+        }
+
+        this.direction.set(dir);
     }
 
     /**
@@ -135,7 +184,7 @@ export class BaseComposite extends BaseFieldComponent implements OnInit, OnDestr
      */
     showLabel(attribute: FieldAttribute): boolean {
         const definition = attribute.definition || null;
-        const showLabel = definition.showLabel || null;
+        let showLabel = definition?.showLabel ?? null;
         const labelDisplay = (attribute.metadata && attribute.metadata.labelDisplay) || '';
 
         if (!definition || !showLabel || labelDisplay === 'hide') {
@@ -143,6 +192,14 @@ export class BaseComposite extends BaseFieldComponent implements OnInit, OnDestr
         }
 
         return (showLabel.includes('*') || showLabel.includes(this.mode));
+    }
+
+    /**
+     * Add re-calculation trigger to buffer
+     * @protected
+     */
+    protected triggerRecalculateDirection(): void {
+        this.recalculateDirectionBuffer.next(true);
     }
 
     /**

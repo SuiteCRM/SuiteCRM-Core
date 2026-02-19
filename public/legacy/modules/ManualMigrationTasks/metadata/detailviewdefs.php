@@ -55,6 +55,7 @@ $viewdefs[$module_name]['DetailView'] = [
                 'asyncProcess' => true,
                 'priority' => 100,
                 'modes' => ['detail'],
+                'display' => 'show',
                 'params' => [
                     'asyncProcessKeyField' => 'service_key',
                     'asyncProcessKeyPrefix' => 'migration-task',
@@ -85,6 +86,7 @@ $viewdefs[$module_name]['DetailView'] = [
                 'asyncProcess' => true,
                 'priority' => 200,
                 'modes' => ['detail'],
+                'display' => 'hide',
                 'params' => [
                     'expanded' => true,
                     'disableOnRun' => true,
@@ -95,8 +97,14 @@ $viewdefs[$module_name]['DetailView'] = [
                     'show-on-finished' => [
                         'modes' => ['detail'],
                         'params' => [
+                            'fieldDependencies' => ['status'],
                             'activeOnFields' => [
-                                'status' => ['completed', 'failed'],
+                                'status' => [
+                                    [
+                                        'operator' => 'is-equal',
+                                        'values' => ['completed', 'failed']
+                                    ]
+                                ],
                             ]
                         ]
                     ],

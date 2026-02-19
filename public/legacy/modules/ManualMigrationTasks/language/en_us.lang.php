@@ -81,6 +81,7 @@ $mod_strings = [
     'LBL_PROGRESS_PERCENT' => 'Percent',
     'LBL_PROGRESS_COMPLETED' => 'Completed',
     'LBL_PROGRESS_FAILED' => 'Failed',
+    'LBL_PROGRESS_PERCENT_TPL' => '{{fields.progress.attributes.percent|default:-}}% ({{fields.progress.attributes.completed|default:-}} completed, {{fields.progress.attributes.failed|default:-}} failed)',
 
     'LBL_FAILED_ITEMS' => 'Failed Items',
 ];

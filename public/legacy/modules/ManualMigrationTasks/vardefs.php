@@ -88,22 +88,20 @@ $dictionary['ManualMigrationTask'] = [
             'vname' => 'LBL_PROGRESS',
             'type' => 'composite',
             'dbType' => 'text',
-            'layout' => ['percent', 'completed', 'failed'],
+            'layout' => ['percent'],
             'attributeFields' => [
                 'percent' => [
                     'name' => 'percent',
-                    'type' => 'int',
-                    'vname' => 'LBL_PROGRESS_PERCENT',
+                    'type' => 'texttemplate',
+                    'metadata' => ['templateLabelKey' => 'LBL_PROGRESS_PERCENT_TPL']
                 ],
                 'completed' => [
                     'name' => 'completed',
                     'type' => 'int',
-                    'vname' => 'LBL_PROGRESS_COMPLETED',
                 ],
                 'failed' => [
                     'name' => 'failed',
                     'type' => 'int',
-                    'vname' => 'LBL_PROGRESS_FAILED',
                 ],
             ],
             'display' => 'readonly',

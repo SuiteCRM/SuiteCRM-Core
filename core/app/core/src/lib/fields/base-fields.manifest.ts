@@ -134,6 +134,8 @@ import {ImageEditFieldComponent} from "./image/templates/edit/image.component";
 import {ImageEditFieldModule} from "./image/templates/edit/image.module";
 import {ImageDetailFieldComponent} from "./image/templates/detail/image.component";
 import {ImageDetailFieldModule} from "./image/templates/detail/image.module";
+import {TextTemplateDetailFieldModule} from "./texttemplate/templates/detail/texttemplate.module";
+import {TextTemplateDetailFieldComponent} from "./texttemplate/templates/detail/texttemplate.component";
 
 export const baseFieldModules = [
     VarcharDetailFieldModule,
@@ -189,7 +191,8 @@ export const baseFieldModules = [
     SquireDetailFieldModule,
     AttachmentEditFieldModule,
     AttachmentDetailFieldModule,
-    AttachmentListFieldModule
+    AttachmentListFieldModule,
+    TextTemplateDetailFieldModule
 ];
 export const baseFieldComponents = [
     VarcharDetailFieldComponent,
@@ -246,7 +249,8 @@ export const baseFieldComponents = [
     SquireDetailFieldComponent,
     AttachmentEditFieldComponent,
     AttachmentDetailFieldComponent,
-    AttachmentListFieldComponent
+    AttachmentListFieldComponent,
+    TextTemplateDetailFieldComponent
 ];
 
 export const baseViewFieldsMap: FieldComponentMap = {
@@ -346,5 +350,7 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'html.detail': TinymceDetailFieldComponent,
     'html.edit': TinymceEditFieldComponent,
     'html-squire.edit': SquireEditFieldComponent,
-    'html-squire.detail': SquireDetailFieldComponent
+    'html-squire.detail': SquireDetailFieldComponent,
+    'texttemplate.detail': TextTemplateDetailFieldComponent,
+    'texttemplate.list': TextTemplateDetailFieldComponent
 };

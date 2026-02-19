@@ -205,7 +205,7 @@ export class FieldBuilder {
         if (viewField?.lineItems) {
             field.definition.lineItems = viewField.lineItems;
         }
-        field.labelKey = viewField.label || definition.vname || '';
+        field.labelKey = viewField.labelKey || viewField.label || definition.vname || '';
         field.dynamicLabelKey = viewField.dynamicLabelKey || definition.dynamicLabelKey || '';
         field.emptyDynamicLabelKey = viewField?.emptyDynamicLabelKey || definition?.emptyDynamicLabelKey || '';
 

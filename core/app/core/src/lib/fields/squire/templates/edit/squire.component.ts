@@ -69,7 +69,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
 
     @ViewChild('editorEl') editorEl: ElementRef<HTMLIFrameElement>;
     @ViewChild('editorWrapper') editorWrapper: ElementRef;
-    @ViewChild('toolbar') toolbar: ElementRef;
+    @ViewChild('toolbarWrapper') toolbarWrapper: ElementRef;
     @ViewChild('monacoEditor') monacoEditor: MonacoEditorComponent;
 
     settings: any = {};
@@ -1170,7 +1170,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             dropdownWidth = limitConfig?.dynamicBreakpoint?.dropdownMax;
         }
 
-        let containerWidth = this?.toolbar?.nativeElement?.parentElement?.parentElement?.offsetWidth ?? 560;
+        let containerWidth = this?.toolbarWrapper?.nativeElement?.parentElement?.parentElement?.offsetWidth ?? 560;
 
         if (!containerWidth || containerWidth < buttonMax) {
             return 6;
@@ -1201,7 +1201,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
         const dynamicHeightAdjustment = parseInt(this?.settings?.dynamicHeightAdjustment ?? 0);
         let containerHeight = '';
 
-        const ancestor = this.findAncestor(this?.toolbar?.nativeElement, ancestorSelector);
+        const ancestor = this.findAncestor(this?.toolbarWrapper?.nativeElement, ancestorSelector);
         if (ancestor) {
             let offSetHeight = ancestor?.offsetHeight ?? 0;
 
@@ -1386,5 +1386,6 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
         this.initAvailableButtons();
         this.initButtons();
         this.calculateActiveButtons();
+        this.calculateDynamicMaxHeight();
     }
 }

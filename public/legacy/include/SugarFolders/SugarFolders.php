@@ -1514,12 +1514,35 @@ class SugarFolder
             $folders = $this->getFoldersForSettings($current_user);
         }
 
-        if ($this->shouldFolderDisplay($folders['userFolders'] ?? [], $folderId)) {
-            return true;
-        }
+        // The settings screen selects which *root* folders (inbound accounts / group inboxes)
+        // are displayed. Child folders (e.g. "Sent Emails", monitored IMAP subfolders) are
+        // displayed/selected implicitly when their parent root folder is selected.
+        //
+        // Some parts of the Emails UI navigate by passing a child `folders_id`. If we only
+        // allow direct matches, navigation will fall back to the default inbox folder.
+        $maxDepth = 10;
+        $currentId = $folderId;
 
-        if ($this->shouldFolderDisplay($folders['groupFolders'] ?? [], $folderId)) {
-            return true;
+        for ($i = 0; $i < $maxDepth && !empty($currentId); $i++) {
+            if ($this->shouldFolderDisplay($folders['userFolders'] ?? [], $currentId)) {
+                return true;
+            }
+
+            if ($this->shouldFolderDisplay($folders['groupFolders'] ?? [], $currentId)) {
+                return true;
+            }
+
+            // Walk up the tree (child -> parent). If we can't resolve the parent, stop.
+            $query = "SELECT parent_folder FROM folders WHERE id = " . $this->db->quoted($currentId) . " AND deleted = 0";
+            $r = $this->db->query($query);
+            $row = $this->db->fetchByAssoc($r);
+            $parent = $row['parent_folder'] ?? '';
+
+            if (empty($parent) || $parent === $currentId) {
+                break;
+            }
+
+            $currentId = $parent;
         }
 
         return false;

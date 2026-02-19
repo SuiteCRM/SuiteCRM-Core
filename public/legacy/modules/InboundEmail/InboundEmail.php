@@ -6771,8 +6771,19 @@ class InboundEmail extends SugarBean
     public function getUserInboundAccounts(): array {
         global $current_user, $db;
 
+        // Defensive: in some execution paths (e.g. embedded legacy views) $GLOBALS['db'] can be set
+        // while the global `$db` variable is not. Avoid fatals on `$db->quote(...)`.
+        if (!is_object($db) && isset($GLOBALS['db']) && is_object($GLOBALS['db'])) {
+            $db = $GLOBALS['db'];
+        }
+
         $where = '';
         if (is_admin($current_user)) {
+            if (!is_object($db)) {
+                $GLOBALS['log']?->fatal('InboundEmail::getUserInboundAccounts: DB connection not initialised');
+                return [];
+            }
+
             $currentUserId = $db->quote($current_user->id);
             $tableName = $db->quote($this->table_name);
             $where = "(($tableName.is_personal IS NULL) OR ($tableName.is_personal = 0 ) OR ($tableName.is_personal = 1 AND $tableName.created_by = '$currentUserId'))";

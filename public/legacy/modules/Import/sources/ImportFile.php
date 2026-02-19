@@ -105,6 +105,12 @@ class ImportFile extends ImportDataSource
      */
     private $_encoding;
 
+    /**
+     * Whether to apply securexss() sanitization when reading rows.
+     * Set to false when reading pre-sanitized display cache files.
+     */
+    private bool $_sanitize = true;
+
 
     /**
      * Constructor
@@ -232,7 +238,9 @@ class ImportFile extends ImportDataSource
                 $this->_currentRow[$key] = $locale->translateCharset($value, $this->_encoding);
             }
 
-            $this->_currentRow[$key] = securexss($value);
+            if ($this->_sanitize) {
+                $this->_currentRow[$key] = securexss($value);
+            }
 
             // Convert all line endings to the same style as PHP_EOL
             // Use preg_replace instead of str_replace as str_replace may cause extra lines on Windows
@@ -377,6 +385,11 @@ class ImportFile extends ImportDataSource
     public function setHeaderRow($hasHeader)
     {
         $this->_hasHeader = $hasHeader;
+    }
+
+    public function setSanitize(bool $sanitize): void
+    {
+        $this->_sanitize = $sanitize;
     }
 
     public function hasHeaderRow($autoDetect = true)

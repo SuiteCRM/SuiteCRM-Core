@@ -190,6 +190,7 @@ class ImportViewLast extends ImportView
     {
         $has_header = $_REQUEST['has_header'] == 'on' ? true : false;
         $if = new ImportFile($fileName, ",", '"', false, false);
+        $if->setSanitize(false);
         $if->setHeaderRow($has_header);
         $lv = new ImportListView($if, array('offset'=> 0), $tableName);
         return $lv->display(true);

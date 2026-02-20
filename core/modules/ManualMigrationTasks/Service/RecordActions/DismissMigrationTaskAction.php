@@ -38,7 +38,7 @@ class DismissMigrationTaskAction implements ProcessHandlerInterface
 {
     protected const MSG_OPTIONS_NOT_FOUND = 'Process options are not defined';
 
-    protected const PROCESS_TYPE = 'dismiss-migration-task';
+    protected const PROCESS_TYPE = 'record-dismiss-migration-task';
 
     public function __construct(
         protected ModuleNameMapperInterface $moduleNameMapper,
@@ -54,7 +54,7 @@ class DismissMigrationTaskAction implements ProcessHandlerInterface
 
     public function requiredAuthRole(): string
     {
-        return 'ROLE_ADMIN';
+        return 'ROLE_USER';
     }
 
     public function getRequiredACLs(Process $process): array
@@ -65,7 +65,7 @@ class DismissMigrationTaskAction implements ProcessHandlerInterface
         return [
             $module => [
                 [
-                    'action' => 'delete',
+                    'action' => 'view',
                     'record' => $options['id'] ?? ''
                 ]
             ],

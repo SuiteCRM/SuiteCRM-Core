@@ -41,7 +41,7 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
 {
     public function __construct(
         protected AsyncTaskRouterInterface $asyncTaskRouter,
-        protected LoggerInterface $logger,
+        protected LoggerInterface $messengerLogger,
         protected MessageBusInterface $bus
     ) {
     }
@@ -61,7 +61,7 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
         $transports = $this->asyncTaskRouter->getTransports($module, $handlerKey);
         $phase = $progress['phase'] ?? 'initial';
 
-        $this->logger->debug('Dispatching AsyncTaskRun', [
+        $this->messengerLogger->info('[DISPATCH] DispatchingAsyncTaskRun', [
             'component' => 'async-task-dispatcher',
             'taskId' => $taskId,
             'type' => $type,
@@ -91,7 +91,7 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
      */
     public function reDispatch(object $message): void
     {
-        $this->logger->debug('Re-dispatching message', [
+        $this->messengerLogger->info('[DISPATCH] Re-dispatching message', [
             'component' => 'async-task-dispatcher',
             'messageClass' => get_class($message),
         ]);
@@ -112,7 +112,7 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
     {
         $transports = $this->asyncTaskRouter->getTransports($module, $handlerKey);
 
-        $this->logger->debug('Dispatching AsyncTaskCompleted', [
+        $this->messengerLogger->info('[DISPATCH] DispatchingAsyncTaskCompleted', [
             'component' => 'async-task-dispatcher',
             'taskId' => $taskId,
             'type' => $type,
@@ -148,7 +148,7 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
     {
         $transports = $this->asyncTaskRouter->getTransports($module, $handlerKey);
 
-        $this->logger->debug('Dispatching AsyncTaskProgressed', [
+        $this->messengerLogger->info('[DISPATCH] DispatchingAsyncTaskProgressed', [
             'component' => 'async-task-dispatcher',
             'taskId' => $taskId,
             'type' => $type,
@@ -184,7 +184,7 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
     {
         $transports = $this->asyncTaskRouter->getTransports($module, $handlerKey);
 
-        $this->logger->debug('Dispatching AsyncTaskFailure', [
+        $this->messengerLogger->info('[DISPATCH] DispatchingAsyncTaskFailure', [
             'component' => 'async-task-dispatcher',
             'taskId' => $taskId,
             'type' => $type,

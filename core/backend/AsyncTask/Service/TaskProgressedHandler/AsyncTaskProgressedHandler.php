@@ -37,7 +37,7 @@ abstract class AsyncTaskProgressedHandler implements AsyncTaskProgressedHandlerI
 {
     public function __construct(
         protected RecordProviderInterface $recordProvider,
-        protected LoggerInterface $logger
+        protected LoggerInterface $messengerLogger
     ) {
     }
 
@@ -123,6 +123,6 @@ abstract class AsyncTaskProgressedHandler implements AsyncTaskProgressedHandlerI
      */
     protected function log(string $level, string $message, array $extra = []): void
     {
-        $this->logger->$level($message, array_merge(['component' => 'async-task-progressed-handler', 'type' => $this->getType(), 'handlerKey' => $this->getHandlerKey()], $extra));
+        $this->messengerLogger->$level($message, array_merge(['component' => 'async-task-progressed-handler', 'type' => $this->getType(), 'handlerKey' => $this->getHandlerKey()], $extra));
     }
 }

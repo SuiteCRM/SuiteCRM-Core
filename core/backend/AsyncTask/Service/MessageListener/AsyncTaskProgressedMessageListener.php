@@ -40,7 +40,7 @@ class AsyncTaskProgressedMessageListener
     public function __construct(
         protected AsyncTaskProgressedHandlerRegistryInterface $registry,
         protected Authentication $authentication,
-        protected LoggerInterface $logger
+        protected LoggerInterface $messengerLogger
     ) {
     }
 
@@ -49,7 +49,7 @@ class AsyncTaskProgressedMessageListener
         $type = $message->getTaskType();
         $handlerKey = $message->getHandlerKey();
 
-        $this->logger->debug('Received AsyncTaskProgressed message', [
+        $this->messengerLogger->info('[RECEIVED] AsyncTaskProgressed message', [
             'component' => 'async-task-progressed-listener',
             'taskId' => $message->getTaskId(),
             'type' => $type,
@@ -63,13 +63,13 @@ class AsyncTaskProgressedMessageListener
         $handler = $this->registry->getHandler($type, $handlerKey);
 
         if ($handler === null) {
-            $this->logger->error('No AsyncTaskProgressedHandler found for type: ' . $type . ' and handler key: ' . $handlerKey);
+            $this->messengerLogger->error('No AsyncTaskProgressedHandler found for type: ' . $type . ' and handler key: ' . $handlerKey);
             return;
         }
 
         $handler->onProgress($message);
 
-        $this->logger->debug('AsyncTaskProgressed handled successfully', [
+        $this->messengerLogger->debug('AsyncTaskProgressed handled successfully', [
             'component' => 'async-task-progressed-listener',
             'taskId' => $message->getTaskId(),
             'handlerClass' => get_class($handler),

@@ -60,7 +60,7 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         protected AsyncTaskHandlerRegistryInterface $handlerRegistry,
         protected RecordProviderInterface $recordProvider,
         protected AsyncTaskItemRepository $itemRepository,
-        protected LoggerInterface $logger
+        protected LoggerInterface $messengerLogger
     ) {
     }
 
@@ -506,6 +506,6 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
      */
     protected function log(string $level, string $message, array $extra = []): void
     {
-        $this->logger->$level($message, array_merge(['component' => 'async-task-runner', 'type' => $this->getType()], $extra));
+        $this->messengerLogger->$level($message, array_merge(['component' => 'async-task-runner', 'type' => $this->getType()], $extra));
     }
 }

@@ -48,6 +48,12 @@ monolog:
       max_level: error
       channels: [ "security" ]
 
+    messenger:
+      type: stream
+      path: "%env(default:log.dir:env.logs:LOG_DIR)%/%env(default:log.messenger.default:MESSENGER_LOG_FILE_NAME)%"
+      level: '%env(MESSENGER_LOG_LEVEL)%'
+      channels: [ "messenger" ]
+
 when@test:
   monolog:
     handlers:
@@ -72,18 +78,18 @@ when@prod:
         excluded_http_codes: [404, 405]
         # Prevents memory leaks
         buffer_size:  50
-        channels: ["!event","!upgrade", "!deprecation" , "!security"]
+        channels: ["!event","!upgrade", "!deprecation", "!security", "!messenger"]
       nested:
         type: stream
         path: "%env(default:log.dir:env.logs:LOG_DIR)%/%env(default:log.main.default:MAIN_LOG_FILE_NAME)%"
         level: '%env(MAIN_LOG_LEVEL)%'
-        channels: ["!event", "!upgrade", "!deprecation" , "!security"]
+        channels: ["!event", "!upgrade", "!deprecation", "!security", "!messenger"]
       console:
         type: console
         process_psr_3_messages: false
         level: warning
         action_level: info
-        channels: ["!event", "!doctrine", "!upgrade", "!deprecation"]
+        channels: ["!event", "!doctrine", "!upgrade", "!deprecation", "!messenger"]
 
       deprecation:
         type: stream
@@ -98,3 +104,9 @@ when@prod:
         level: '%env(SECURITY_LOG_LEVEL)%'
         max_level: error
         channels: [ "security" ]
+
+      messenger:
+        type: stream
+        path: "%env(default:log.dir:env.logs:LOG_DIR)%/%env(default:log.messenger.default:MESSENGER_LOG_FILE_NAME)%"
+        level: '%env(MESSENGER_LOG_LEVEL)%'
+        channels: [ "messenger" ]

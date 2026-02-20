@@ -40,7 +40,7 @@ class AsyncTaskCompletedMessageListener
     public function __construct(
         protected AsyncTaskCompletedHandlerRegistryInterface $registry,
         protected Authentication $authentication,
-        protected LoggerInterface $logger
+        protected LoggerInterface $messengerLogger
     ) {
     }
 
@@ -49,7 +49,7 @@ class AsyncTaskCompletedMessageListener
         $type = $message->getTaskType();
         $handlerKey = $message->getHandlerKey();
 
-        $this->logger->debug('Received AsyncTaskCompleted message', [
+        $this->messengerLogger->info('[RECEIVED] AsyncTaskCompleted message', [
             'component' => 'async-task-completed-listener',
             'taskId' => $message->getTaskId(),
             'type' => $type,
@@ -62,13 +62,13 @@ class AsyncTaskCompletedMessageListener
         $handler = $this->registry->getHandler($type, $handlerKey);
 
         if ($handler === null) {
-            $this->logger->error('No AsyncTaskCompletedHandler found for type: ' . $type . ' and handler key: ' . $handlerKey);
+            $this->messengerLogger->error('No AsyncTaskCompletedHandler found for type: ' . $type . ' and handler key: ' . $handlerKey);
             return;
         }
 
         $handler->onComplete($message);
 
-        $this->logger->debug('AsyncTaskCompleted handled successfully', [
+        $this->messengerLogger->debug('AsyncTaskCompleted handled successfully', [
             'component' => 'async-task-completed-listener',
             'taskId' => $message->getTaskId(),
             'handlerClass' => get_class($handler),

@@ -40,7 +40,7 @@ class AsyncTaskRunMessageListener
     public function __construct(
         protected AsyncTaskRunnerRegistryInterface $registry,
         protected Authentication $authentication,
-        protected LoggerInterface $logger
+        protected LoggerInterface $messengerLogger
     ) {
     }
 
@@ -50,7 +50,7 @@ class AsyncTaskRunMessageListener
         $handlerKey = $message->getHandlerKey();
         $phase = $message->getProgress()['phase'] ?? 'initial';
 
-        $this->logger->debug('Received AsyncTaskRun message', [
+        $this->messengerLogger->info('[RECEIVED] AsyncTaskRun message', [
             'component' => 'async-task-run-listener',
             'taskId' => $message->getTaskId(),
             'type' => $type,
@@ -64,11 +64,11 @@ class AsyncTaskRunMessageListener
         $runner = $this->registry->getRunner($type);
 
         if ($runner === null) {
-            $this->logger->error('No AsyncTaskRunner found for type: ' . $type);
+            $this->messengerLogger->error('No AsyncTaskRunner found for type: ' . $type);
             return;
         }
 
-        $this->logger->debug('Delegating to runner', [
+        $this->messengerLogger->debug('Delegating to runner', [
             'component' => 'async-task-run-listener',
             'taskId' => $message->getTaskId(),
             'runnerClass' => get_class($runner),

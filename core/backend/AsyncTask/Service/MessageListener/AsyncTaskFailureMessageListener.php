@@ -41,7 +41,7 @@ class AsyncTaskFailureMessageListener
     public function __construct(
         protected AsyncTaskFailureHandlerRegistryInterface $registry,
         protected Authentication $authentication,
-        protected LoggerInterface $logger
+        protected LoggerInterface $messengerLogger
     ) {
     }
 
@@ -51,7 +51,7 @@ class AsyncTaskFailureMessageListener
         $type = $message->getTaskType();
         $handlerKey = $message->getHandlerKey();
 
-        $this->logger->debug('Received internal failure (from failed transport)', [
+        $this->messengerLogger->info('[RECEIVED] Internal failure (from failed transport)', [
             'component' => 'async-task-failure-listener',
             'taskId' => $message->getTaskId(),
             'type' => $type,
@@ -64,7 +64,7 @@ class AsyncTaskFailureMessageListener
         $handler = $this->registry->getHandler($type, $handlerKey);
 
         if ($handler === null) {
-            $this->logger->error('No AsyncTaskFailureHandler found for type: ' . $type . ' and handler key: ' . $handlerKey);
+            $this->messengerLogger->error('No AsyncTaskFailureHandler found for type: ' . $type . ' and handler key: ' . $handlerKey);
             return;
         }
 
@@ -79,7 +79,7 @@ class AsyncTaskFailureMessageListener
 
         $handler->onFailure($failureMessage);
 
-        $this->logger->debug('Internal failure handled', [
+        $this->messengerLogger->debug('Internal failure handled', [
             'component' => 'async-task-failure-listener',
             'taskId' => $message->getTaskId(),
             'handlerClass' => get_class($handler),
@@ -92,7 +92,7 @@ class AsyncTaskFailureMessageListener
         $type = $message->getTaskType();
         $handlerKey = $message->getHandlerKey();
 
-        $this->logger->debug('Received AsyncTaskFailure message', [
+        $this->messengerLogger->info('[RECEIVED] AsyncTaskFailure message', [
             'component' => 'async-task-failure-listener',
             'taskId' => $message->getTaskId(),
             'type' => $type,
@@ -105,13 +105,13 @@ class AsyncTaskFailureMessageListener
         $handler = $this->registry->getHandler($type, $handlerKey);
 
         if ($handler === null) {
-            $this->logger->error('No AsyncTaskFailureHandler found for type: ' . $type . ' and handler key: ' . $handlerKey);
+            $this->messengerLogger->error('No AsyncTaskFailureHandler found for type: ' . $type . ' and handler key: ' . $handlerKey);
             return;
         }
 
         $handler->onFailure($message);
 
-        $this->logger->debug('AsyncTaskFailure handled', [
+        $this->messengerLogger->debug('AsyncTaskFailure handled', [
             'component' => 'async-task-failure-listener',
             'taskId' => $message->getTaskId(),
             'handlerClass' => get_class($handler),

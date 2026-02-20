@@ -38,7 +38,7 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
 
     public function __construct(
         protected RecordProviderInterface $recordProvider,
-        protected LoggerInterface $logger
+        protected LoggerInterface $messengerLogger
     ) {
     }
 
@@ -114,6 +114,6 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
      */
     protected function log(string $level, string $message, array $extra = []): void
     {
-        $this->logger->$level($message, array_merge(['component' => 'async-task-completed-handler', 'type' => $this->getType(), 'handlerKey' => $this->getHandlerKey()], $extra));
+        $this->messengerLogger->$level($message, array_merge(['component' => 'async-task-completed-handler', 'type' => $this->getType(), 'handlerKey' => $this->getHandlerKey()], $extra));
     }
 }

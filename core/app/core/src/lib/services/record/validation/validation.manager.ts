@@ -47,6 +47,7 @@ import {DuplicateEmailValidator} from './validators/duplicate-email.validator';
 import {LineItemsRequiredValidator} from "./validators/line-items-required.validator";
 import {AsyncProcessValidator} from "./async-validators/async-process.validator";
 import {AttachmentValidator} from "./validators/attachment.validator";
+import {SemanticVersionValidator} from "./validators/semantic-version.validator";
 
 export interface ValidationManagerInterface {
     registerSaveValidator(module: string, key: string, validator: ValidatorInterface): void;
@@ -97,7 +98,8 @@ export class ValidationManager implements ValidationManagerInterface {
         protected primaryEmailValidator: PrimaryEmailValidator,
         protected duplicateEmailValidator: DuplicateEmailValidator,
         protected lineItemsRequiredValidator: LineItemsRequiredValidator,
-        protected attachmentValidator: AttachmentValidator
+        protected attachmentValidator: AttachmentValidator,
+        protected semanticVersionValidator: SemanticVersionValidator
     ) {
 
         this.saveValidators = new OverridableMap<ValidatorInterface>();
@@ -106,6 +108,7 @@ export class ValidationManager implements ValidationManagerInterface {
         this.filterValidators = new OverridableMap<ValidatorInterface>();
 
         this.saveValidators.addEntry('default', this.getKey('required', 'all'), requiredValidator);
+        this.saveValidators.addEntry('default', this.getKey('semantic-version', 'all'), semanticVersionValidator);
         this.saveValidators.addEntry('default', this.getKey('range', 'all'), rangeValidator);
         this.saveValidators.addEntry('default', this.getKey('currency', 'all'), currencyValidator);
         this.saveValidators.addEntry('default', this.getKey('date', 'all'), dateValidator);

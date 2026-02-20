@@ -80,6 +80,36 @@ $viewdefs[$module_name]['DetailView'] = [
                     ],
                 ],
             ],
+            'retry-async-task' => [
+                'key' => 'retry-async-task',
+                'labelKey' => 'LBL_RETRY',
+                'asyncProcess' => true,
+                'priority' => 190,
+                'modes' => ['detail'],
+                'display' => 'hide',
+                'params' => [
+                    'expanded' => true,
+                    'disableOnRun' => true,
+                    'displayConfirmation' => true,
+                    'confirmationMessages' => ['LBL_RETRY_CONFIRMATION'],
+                ],
+                'displayLogic' => [
+                    'show-on-finished' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'fieldDependencies' => ['status'],
+                            'activeOnFields' => [
+                                'status' => [
+                                    [
+                                        'operator' => 'is-equal',
+                                        'values' => ['completed', 'failed'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
             'dismiss-migration-task' => [
                 'key' => 'dismiss-migration-task',
                 'labelKey' => 'LBL_DISMISS',

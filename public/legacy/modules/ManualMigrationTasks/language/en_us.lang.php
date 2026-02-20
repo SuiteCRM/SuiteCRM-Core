@@ -73,6 +73,9 @@ $mod_strings = [
     'LBL_RUN_MIGRATION' => 'Run Migration',
     'LBL_RUN_MIGRATION_CONFIRMATION' => 'Are you sure you want to run this migration?',
 
+    'LBL_RETRY' => 'Retry',
+    'LBL_RETRY_CONFIRMATION' => 'Are you sure you want to retry? This will re-queue all failed items for processing.',
+    'LBL_RETRY_SUCCESS' => 'Failed items have been re-queued for processing.',
     'LBL_DISMISS' => 'Dismiss',
     'LBL_DISMISS_CONFIRMATION' => 'Are you sure you want to dismiss this migration task? This will remove it and all associated data.',
     'LBL_DISMISS_SUCCESS' => 'Migration task dismissed successfully.',

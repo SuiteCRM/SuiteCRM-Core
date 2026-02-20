@@ -114,34 +114,39 @@ class CreateDocumentRevisionSaveHandler implements RecordFieldSaveHandlerInterfa
 
         if (empty($currentDocumentRevision?->getId())) {
             $mediaObject = $this->getMediaObject($mediaObjectId, $fieldVardef['metadata']['storage_type'] ?? 'private-documents');
-            $this->createDocumentRevision($savedRecord, $mediaObject, $fieldDefinition);
+            $this->createDocumentRevision($savedRecord, $inputRecord, $mediaObject);
             return;
         }
 
         $documentRevisionMediaObject = $this->getDocumentRevisionMediaObject($currentDocumentRevision);
 
-        if ($documentRevisionMediaObject?->getId() === $mediaObjectId){
+        if ($documentRevisionMediaObject?->getId() === $mediaObjectId) {
+            $attributes = $currentDocumentRevision->getAttributes();
+
+            if ($attributes['revision'] === $inputRecord->getAttributes()['revision']) {
+                $this->recordProvider->saveRecord($currentDocumentRevision);
+                return;
+            }
+
+            $attributes['revision'] = $inputRecord->getAttributes()['revision'];
+            $currentDocumentRevision->setAttributes($attributes);
+            $this->recordProvider->saveRecord($currentDocumentRevision);
             return;
         }
 
         $mediaObject = $this->getMediaObject($mediaObjectId, $fieldVardef['metadata']['storage_type'] ?? 'private-documents');
 
-        $this->createDocumentRevision($savedRecord, $mediaObject, $fieldDefinition, $currentDocumentRevision);
+        $this->createDocumentRevision($savedRecord, $inputRecord, $mediaObject, $currentDocumentRevision);
     }
 
     protected function createDocumentRevision(
         ?Record $savedRecord,
+        ?Record $inputRecord,
         MediaObjectInterface $mediaObject,
-        FieldDefinition $fieldDefinition,
         Record $currentRevision = null
     ): void
     {
-        $revisionId = $fieldDefinition->getVardef()['revision']['default'] ?? '1';
-
-        if ($currentRevision && $currentRevision->getAttributes()['revision']){
-            $revisionId = $this->documentsManager->increaseRevisionNumber($currentRevision->getAttributes()['revision']);
-        }
-
+        $revisionNumber = $this->getNextRevisionNumber($inputRecord, $currentRevision);
 
         $extension = $this->documentsManager->getExtensionFromMimeType($mediaObject->getMimeType() ?? '');
 
@@ -152,7 +157,7 @@ class CreateDocumentRevisionSaveHandler implements RecordFieldSaveHandlerInterfa
             'document_id' => $savedRecord?->getId() ?? '',
             'doc_type' => $savedRecord?->getAttributes()['doc_type'] ?? '',
             'created_by' => $savedRecord?->getAttributes()['created_by'] ?? '',
-            'revision' => $revisionId,
+            'revision' => $revisionNumber,
             'filename' => $mediaObject->getOriginalName() ?? '',
             'file_mime_type' => $mediaObject->getMimeType() ?? '',
             'file_size' => $mediaObject->getSize() ?? '',
@@ -213,5 +218,15 @@ class CreateDocumentRevisionSaveHandler implements RecordFieldSaveHandlerInterfa
         return $this->recordProvider->getRecord('document-revisions', $revisionId);
     }
 
+    protected function getNextRevisionNumber(Record $inputRecord, ?Record $currentRevision): string
+    {
+        $savedRevisionNumber = $currentRevision?->getAttributes()['revision'] ?? null;
+        $revisionNumber = $inputRecord->getAttributes()['revision'] ?? null;
 
+        if ($savedRevisionNumber === $revisionNumber && $currentRevision) {
+            $revisionNumber = $this->documentsManager->increaseRevisionNumber($currentRevision->getAttributes()['revision'] ?? $revisionNumber);
+        }
+
+        return $revisionNumber;
+    }
 }

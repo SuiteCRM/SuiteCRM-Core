@@ -41,6 +41,7 @@ use App\Process\Service\ProcessHandlerInterface;
 use App\Process\Service\ProcessHandlerRegistry;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Throwable;
 
 class ProcessProcessor implements ProcessorInterface
 {
@@ -259,10 +260,22 @@ class ProcessProcessor implements ProcessorInterface
     ): void {
         $module = $process->getModule() ?? 'default';
         $options = $process->getOptions() ?? [];
-        $processRecord = $this->mapToRecord($process);
-        $updatedProcessRecord = $this->recordProvider->saveRecord($processRecord);
+        $processRecord = null;
 
-        $this->asyncTaskDispatcher->dispatchTaskRun($module, $updatedProcessRecord->getId(), $asyncTaskType, $asyncHandlerKey, $options);
+        if (!empty($process->getId())) {
+            try {
+                $processRecord = $this->recordProvider->getRecord($process->getModule() ?? 'processes', $process->getId());
+            } catch (Throwable $e) {
+                // Record not found, we will create a new one
+            }
+        }
+
+        if ($processRecord === null || empty($processRecord->getId())) {
+            $mappedRecord = $this->mapToRecord($process);
+            $processRecord = $this->recordProvider->saveRecord($mappedRecord);
+        }
+
+        $this->asyncTaskDispatcher->dispatchTaskRun($module, $processRecord->getId(), $asyncTaskType, $asyncHandlerKey, $options);
     }
 
     /**
@@ -274,16 +287,23 @@ class ProcessProcessor implements ProcessorInterface
     {
         $record = new Record();
         $record->setModule($process->getAsyncRunnerType() ?? 'processes');
-        $record->setId($process->getId());
-        $record->setAttributes(
-            [
-                'id' => $process->getId(),
-                'type' => $process->getType(),
-                'status' => $process->getStatus(),
-                'async' => $process->getAsync(),
-                'options' => $process->getOptions(),
-            ]
-        );
+        $record->setId('');
+
+        $attributes = [
+            'id' => $process->getId(),
+            'name' => $process->getName() ?? $process->getType(),
+            'type' => 'background',
+            'status' => 'pending',
+            'phase' => '',
+            'service_key' => $process->getAsyncHandlerKey(),
+        ];
+
+        $data = $process->getData() ?? [];
+        if (!empty($data)) {
+            $attributes = array_merge($attributes, $data);
+        }
+
+        $record->setAttributes($attributes);
 
         return $record;
     }

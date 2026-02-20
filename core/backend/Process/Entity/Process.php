@@ -81,6 +81,17 @@ class Process
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
+            'description' => 'name',
+        ]
+    )]
+    protected ?string $name;
+
+    /**
+     * @var string|null
+     */
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'string',
             'description' => 'status',
         ]
     )]
@@ -201,6 +212,27 @@ class Process
     public function setType(?string $type): Process
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Get Name
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name ?? null;
+    }
+
+    /**
+     * Set Name
+     * @param string|null $name
+     * @return Process
+     */
+    public function setName(?string $name): Process
+    {
+        $this->name = $name;
 
         return $this;
     }

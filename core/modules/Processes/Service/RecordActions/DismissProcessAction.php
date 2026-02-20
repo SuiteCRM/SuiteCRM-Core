@@ -38,7 +38,7 @@ class DismissProcessAction implements ProcessHandlerInterface
 {
     protected const MSG_OPTIONS_NOT_FOUND = 'Process options are not defined';
 
-    protected const PROCESS_TYPE = 'dismiss-process';
+    protected const PROCESS_TYPE = 'record-dismiss-process';
 
     public function __construct(
         protected ModuleNameMapperInterface $moduleNameMapper,
@@ -74,7 +74,7 @@ class DismissProcessAction implements ProcessHandlerInterface
         return [
             $module => [
                 [
-                    'action' => 'delete',
+                    'action' => 'view',
                     'record' => $options['id'] ?? ''
                 ]
             ],

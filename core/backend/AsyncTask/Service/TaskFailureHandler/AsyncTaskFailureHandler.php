@@ -28,6 +28,7 @@
 namespace App\AsyncTask\Service\TaskFailureHandler;
 
 use App\AsyncTask\Message\AsyncTaskFailure;
+use App\AsyncTask\Service\Dispatcher\AsyncTaskNotificationDispatcherInterface;
 use App\Data\Entity\Record;
 use App\Data\Service\RecordProviderInterface;
 use Psr\Log\LoggerInterface;
@@ -38,7 +39,8 @@ abstract class AsyncTaskFailureHandler implements AsyncTaskFailureHandlerInterfa
 
     public function __construct(
         protected RecordProviderInterface $recordProvider,
-        protected LoggerInterface $messengerLogger
+        protected LoggerInterface $messengerLogger,
+        protected AsyncTaskNotificationDispatcherInterface $notificationDispatcher
     ) {
     }
 
@@ -49,10 +51,7 @@ abstract class AsyncTaskFailureHandler implements AsyncTaskFailureHandlerInterfa
     {
         $taskId = $message->getTaskId();
 
-        $this->log('debug', 'onFailure() called', [
-            'taskId' => $taskId,
-            'module' => $message->getModule(),
-        ]);
+        $this->log('debug', 'onFailure() called', ['taskId' => $taskId, 'module' => $message->getModule()]);
 
         $task = $this->getAsyncTask($taskId);
         if ($task === null) {
@@ -61,6 +60,7 @@ abstract class AsyncTaskFailureHandler implements AsyncTaskFailureHandlerInterfa
         }
 
         $this->markTaskAsFailed($task, $message->getProgress());
+        $this->notificationDispatcher->dispatchNotification($task, 'failed', $this->getType());
     }
 
     /**
@@ -95,10 +95,7 @@ abstract class AsyncTaskFailureHandler implements AsyncTaskFailureHandlerInterfa
             $attributes['phase'] = 'completed';
             $attributes['last_run_datetime'] = (new \DateTime())->format('Y-m-d H:i:s');
 
-            $this->log('debug', 'Saving failed task', [
-                'taskId' => $task->getId(),
-                'phase' => $attributes['phase'],
-            ]);
+            $this->log('debug', 'Saving failed task', ['taskId' => $task->getId(), 'phase' => $attributes['phase']]);
 
             $task->setAttributes($attributes);
 

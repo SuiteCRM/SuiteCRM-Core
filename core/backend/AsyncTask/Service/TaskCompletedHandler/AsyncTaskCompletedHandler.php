@@ -28,6 +28,7 @@
 namespace App\AsyncTask\Service\TaskCompletedHandler;
 
 use App\AsyncTask\Message\AsyncTaskCompleted;
+use App\AsyncTask\Service\Dispatcher\AsyncTaskNotificationDispatcherInterface;
 use App\Data\Entity\Record;
 use App\Data\Service\RecordProviderInterface;
 use Psr\Log\LoggerInterface;
@@ -38,7 +39,8 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
 
     public function __construct(
         protected RecordProviderInterface $recordProvider,
-        protected LoggerInterface $messengerLogger
+        protected LoggerInterface $messengerLogger,
+        protected AsyncTaskNotificationDispatcherInterface $notificationDispatcher
     ) {
     }
 
@@ -49,10 +51,12 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
     {
         $taskId = $message->getTaskId();
 
-        $this->log('debug', 'onComplete() called', [
+        $this->log(
+            'debug', 'onComplete() called', [
             'taskId' => $taskId,
             'module' => $message->getModule(),
-        ]);
+        ]
+        );
 
         $task = $this->getAsyncTask($taskId);
         if ($task === null) {
@@ -61,6 +65,7 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
         }
 
         $this->markTaskAsCompleted($task, $message->getProgress());
+        $this->notificationDispatcher->dispatchNotification($task, 'completed', $this->getType());
     }
 
     /**

@@ -493,6 +493,242 @@ eoq;
     }
 
     /**
+     * Resolve outbound transport configuration with backward-compatible fallbacks.
+     */
+    private function resolveOutboundTransportConfig(): array
+    {
+        $mailTransport = $this->normalizeTransportValue((string)($this->oe->mail_transport ?? ''));
+        $authType = strtolower(trim((string)($this->oe->auth_type ?? '')));
+        $oauthConnectionId = trim((string)($this->oe->external_oauth_connection_id ?? ''));
+        $host = trim((string)($this->Host ?? ($this->oe->mail_smtpserver ?? '')));
+
+        $graphEnabled = (bool)$this->getFirstConfigValue([
+            'graph_mailer_enabled',
+            'graph_mail_enabled',
+        ], false);
+
+        $matchHost = trim((string)$this->getFirstConfigValue([
+            'graph_mailer_match_host',
+            'graph_mail_match_host',
+        ], 'smtp.office365.com'));
+
+        $senderMailbox = trim((string)($this->oe->graph_sender_mailbox ?? ''));
+        if ($senderMailbox === '') {
+            $senderMailbox = trim((string)($this->oe->from_addr ?? ''));
+        }
+        if ($senderMailbox === '') {
+            $senderMailbox = trim((string)($this->oe->smtp_from_addr ?? ''));
+        }
+        if ($senderMailbox === '') {
+            $senderMailbox = trim((string)($this->From ?? ''));
+        }
+
+        $transport = 'smtp';
+        $selector = 'default_smtp';
+
+        if ($mailTransport === 'graph') {
+            $transport = 'graph';
+            $selector = 'mail_transport';
+        } elseif (
+            $graphEnabled
+            && $authType === 'oauth'
+            && $oauthConnectionId !== ''
+            && $this->hostMatches($host, $matchHost)
+        ) {
+            $transport = 'graph';
+            $selector = 'legacy_host_oauth';
+        }
+
+        return [
+            'transport' => $transport,
+            'selector' => $selector,
+            'host' => $host,
+            'match_host' => $matchHost,
+            'graph_enabled' => $graphEnabled,
+            'auth_type' => $authType,
+            'oauth_connection_id' => $oauthConnectionId,
+            'sender_mailbox' => $senderMailbox,
+            'from_addr' => trim((string)($this->oe->smtp_from_addr ?? ($this->From ?? ''))),
+            'from_name' => trim((string)($this->oe->smtp_from_name ?? ($this->FromName ?? ''))),
+            'reply_to_addr' => trim((string)($this->oe->reply_to_addr ?? '')),
+            'reply_to_name' => trim((string)($this->oe->reply_to_name ?? '')),
+        ];
+    }
+
+    private function shouldUseGraphTransport(array $transportConfig): bool
+    {
+        return ($transportConfig['transport'] ?? 'smtp') === 'graph';
+    }
+
+    private function logTransportDecision(array $transportConfig): void
+    {
+        $GLOBALS['log']->debug(
+            'SugarPHPMailer::send transport config: transport=' . ($transportConfig['transport'] ?? 'smtp') .
+            ', selector=' . ($transportConfig['selector'] ?? 'unknown') .
+            ', host=' . ($transportConfig['host'] ?? '') .
+            ', auth=' . ($transportConfig['auth_type'] ?? '') .
+            ', graph_enabled=' . (!empty($transportConfig['graph_enabled']) ? 'true' : 'false') .
+            ', has_oauth_connection=' . (!empty($transportConfig['oauth_connection_id']) ? 'true' : 'false') .
+            ', has_sender_mailbox=' . (!empty($transportConfig['sender_mailbox']) ? 'true' : 'false')
+        );
+    }
+
+    private function normalizeTransportValue(string $value): string
+    {
+        $value = strtolower(trim($value));
+        if ($value === 'graph' || $value === 'smtp') {
+            return $value;
+        }
+
+        return '';
+    }
+
+    private function hostMatches(string $host, string $matchHost): bool
+    {
+        if ($matchHost === '') {
+            return true;
+        }
+
+        if ($host === '') {
+            return false;
+        }
+
+        return stripos($host, $matchHost) !== false;
+    }
+
+    private function getFirstConfigValue(array $keys, $default = null)
+    {
+        $config = $GLOBALS['sugar_config'] ?? [];
+        foreach ($keys as $key) {
+            if (array_key_exists($key, $config)) {
+                return $config[$key];
+            }
+        }
+
+        return $default;
+    }
+
+    private function isGraphSkeletonEnabled(): bool
+    {
+        $value = $this->getFirstConfigValue([
+            'graph_mailer_skeleton_enabled',
+            'graph_mail_skeleton_enabled',
+        ], false);
+
+        if (is_string($value)) {
+            return in_array(strtolower(trim($value)), ['1', 'true', 'yes', 'on'], true);
+        }
+
+        return !empty($value);
+    }
+
+    /**
+     * @param array<int, mixed> $addresses
+     * @return array<int, string>
+     */
+    private function normalizeAddressList(array $addresses): array
+    {
+        $list = [];
+        foreach ($addresses as $address) {
+            $candidate = is_array($address) ? (string)($address[0] ?? '') : (string)$address;
+            if (preg_match('/<([^>]+)>/', $candidate, $match)) {
+                $candidate = (string)$match[1];
+            }
+            $candidate = trim($candidate);
+            if ($candidate !== '') {
+                $list[] = $candidate;
+            }
+        }
+
+        return $list;
+    }
+
+    private function buildMailTransportMessage(): MailTransportMessage
+    {
+        $message = new MailTransportMessage();
+        $message->from = trim((string)($this->From ?? ''));
+        $message->fromName = trim((string)($this->FromName ?? ''));
+        $message->to = $this->normalizeAddressList((array)$this->getToAddresses());
+        $message->cc = $this->normalizeAddressList((array)$this->getCcAddresses());
+        $message->bcc = $this->normalizeAddressList((array)$this->getBccAddresses());
+        $message->subject = (string)($this->Subject ?? '');
+        $message->htmlBody = (string)($this->Body ?? '');
+        $message->textBody = (string)($this->AltBody ?? '');
+
+        foreach ((array)$this->attachment as $attachment) {
+            $path = (string)($attachment[0] ?? '');
+            $name = (string)($attachment[2] ?? ($attachment[1] ?? ''));
+            $message->attachments[] = [
+                'path' => $path,
+                'name' => $name,
+                'is_file' => $path !== '' && file_exists($path),
+            ];
+        }
+
+        return $message;
+    }
+
+    private function buildGraphAccountConfig(array $transportConfig): MailTransportAccountConfig
+    {
+        $config = new MailTransportAccountConfig();
+        $config->transport = 'graph';
+        $config->oauthConnectionId = trim((string)($transportConfig['oauth_connection_id'] ?? ''));
+        if ($config->oauthConnectionId === '') {
+            $config->oauthConnectionId = trim((string)$this->getFirstConfigValue([
+                'graph_mailer_oauth_connection_id',
+                'graph_mail_oauth_connection_id',
+            ], ''));
+        }
+
+        $config->senderMailbox = trim((string)($transportConfig['sender_mailbox'] ?? ''));
+        $config->replyToAddress = trim((string)($transportConfig['reply_to_addr'] ?? ''));
+        $config->replyToName = trim((string)($transportConfig['reply_to_name'] ?? ''));
+        $config->accessToken = trim((string)$this->getFirstConfigValue([
+            'graph_mailer_access_token',
+            'graph_mail_access_token',
+        ], ''));
+
+        return $config;
+    }
+
+    private function trySendViaGraphSkeleton(array $transportConfig): bool
+    {
+        if (!$this->isGraphSkeletonEnabled()) {
+            $GLOBALS['log']->debug('SugarPHPMailer::send Graph skeleton feature flag disabled');
+            return false;
+        }
+
+        require_once 'include/OutboundEmail/Transport/MailerInterface.php';
+        require_once 'include/OutboundEmail/Transport/TokenProviderInterface.php';
+        require_once 'include/OutboundEmail/Transport/MailTransportMessage.php';
+        require_once 'include/OutboundEmail/Transport/MailTransportAccountConfig.php';
+        require_once 'include/OutboundEmail/Transport/MailTransportSendResult.php';
+        require_once 'include/OutboundEmail/Transport/GraphHttpClient.php';
+        require_once 'include/OutboundEmail/Transport/ConfigTokenProvider.php';
+        require_once 'include/OutboundEmail/Transport/GraphMailerAdapter.php';
+
+        $message = $this->buildMailTransportMessage();
+        $accountConfig = $this->buildGraphAccountConfig($transportConfig);
+        $adapter = new GraphMailerAdapter(new ConfigTokenProvider());
+        $result = $adapter->send($message, $accountConfig);
+
+        if ($result->success) {
+            $GLOBALS['log']->info(
+                'SugarPHPMailer::send Graph skeleton sendMail succeeded' .
+                ($result->providerRequestId !== '' ? ' request_id=' . $result->providerRequestId : '')
+            );
+            return true;
+        }
+
+        $GLOBALS['log']->warn(
+            'SugarPHPMailer::send Graph skeleton send failed, falling back to SMTP. code=' .
+            (string)$result->errorCode . ' message=' . (string)$result->errorMessage
+        );
+
+        return false;
+    }
+
+    /**
      * overloads PHPMailer::Send() to allow for better logging and debugging SMTP issues
      *
      * @return bool
@@ -512,6 +748,15 @@ eoq;
 
         $this->fullSmtpLog='';
         $phpMailerExceptionMsg='';
+
+        $transportConfig = $this->resolveOutboundTransportConfig();
+        $this->logTransportDecision($transportConfig);
+
+        if ($this->shouldUseGraphTransport($transportConfig)) {
+            if ($this->trySendViaGraphSkeleton($transportConfig)) {
+                return true;
+            }
+        }
 
         try {
             $saveExceptionsState = $this->exceptions;

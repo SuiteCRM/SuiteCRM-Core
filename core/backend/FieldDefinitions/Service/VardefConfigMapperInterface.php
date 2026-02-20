@@ -44,7 +44,7 @@ interface VardefConfigMapperInterface
 
     /**
      * Map array
-     * @param array $vardef
+     * @param array $vardefs
      * @return array
      */
     public function map(array $vardefs): array;

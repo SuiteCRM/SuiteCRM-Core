@@ -30,6 +30,7 @@ namespace App\AsyncTask\Service\MessageListener;
 use App\AsyncTask\Message\AsyncTaskFailure;
 use App\AsyncTask\Message\AsyncTaskRun;
 use App\AsyncTask\Service\TaskFailureHandler\AsyncTaskFailureHandlerRegistryInterface;
+use App\Authentication\LegacyHandler\Authentication;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -39,6 +40,7 @@ class AsyncTaskFailureMessageListener
 
     public function __construct(
         protected AsyncTaskFailureHandlerRegistryInterface $registry,
+        protected Authentication $authentication,
         protected LoggerInterface $logger
     ) {
     }
@@ -56,6 +58,8 @@ class AsyncTaskFailureMessageListener
             'module' => $message->getModule(),
             'handlerKey' => $handlerKey,
         ]);
+
+        $this->authentication->initLegacySystemSession();
 
         $handler = $this->registry->getHandler($type, $handlerKey);
 
@@ -95,6 +99,8 @@ class AsyncTaskFailureMessageListener
             'module' => $message->getModule(),
             'handlerKey' => $handlerKey,
         ]);
+
+        $this->authentication->initLegacySystemSession();
 
         $handler = $this->registry->getHandler($type, $handlerKey);
 

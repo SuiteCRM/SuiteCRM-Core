@@ -29,6 +29,7 @@ namespace App\AsyncTask\Service\MessageListener;
 
 use App\AsyncTask\Message\AsyncTaskCompleted;
 use App\AsyncTask\Service\TaskCompletedHandler\AsyncTaskCompletedHandlerRegistryInterface;
+use App\Authentication\LegacyHandler\Authentication;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -38,6 +39,7 @@ class AsyncTaskCompletedMessageListener
 
     public function __construct(
         protected AsyncTaskCompletedHandlerRegistryInterface $registry,
+        protected Authentication $authentication,
         protected LoggerInterface $logger
     ) {
     }
@@ -54,6 +56,8 @@ class AsyncTaskCompletedMessageListener
             'module' => $message->getModule(),
             'handlerKey' => $handlerKey,
         ]);
+
+        $this->authentication->initLegacySystemSession();
 
         $handler = $this->registry->getHandler($type, $handlerKey);
 

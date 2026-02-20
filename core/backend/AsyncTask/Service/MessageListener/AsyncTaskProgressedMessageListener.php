@@ -29,6 +29,7 @@ namespace App\AsyncTask\Service\MessageListener;
 
 use App\AsyncTask\Message\AsyncTaskProgressed;
 use App\AsyncTask\Service\TaskProgressedHandler\AsyncTaskProgressedHandlerRegistryInterface;
+use App\Authentication\LegacyHandler\Authentication;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -38,6 +39,7 @@ class AsyncTaskProgressedMessageListener
 
     public function __construct(
         protected AsyncTaskProgressedHandlerRegistryInterface $registry,
+        protected Authentication $authentication,
         protected LoggerInterface $logger
     ) {
     }
@@ -55,6 +57,8 @@ class AsyncTaskProgressedMessageListener
             'handlerKey' => $handlerKey,
             'progress' => $message->getProgress(),
         ]);
+
+        $this->authentication->initLegacySystemSession();
 
         $handler = $this->registry->getHandler($type, $handlerKey);
 

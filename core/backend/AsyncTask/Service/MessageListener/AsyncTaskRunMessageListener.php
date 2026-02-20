@@ -29,6 +29,7 @@ namespace App\AsyncTask\Service\MessageListener;
 
 use App\AsyncTask\Message\AsyncTaskRun;
 use App\AsyncTask\Service\Runner\AsyncTaskRunnerRegistryInterface;
+use App\Authentication\LegacyHandler\Authentication;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -38,6 +39,7 @@ class AsyncTaskRunMessageListener
 
     public function __construct(
         protected AsyncTaskRunnerRegistryInterface $registry,
+        protected Authentication $authentication,
         protected LoggerInterface $logger
     ) {
     }
@@ -56,6 +58,8 @@ class AsyncTaskRunMessageListener
             'handlerKey' => $handlerKey,
             'phase' => $phase,
         ]);
+
+        $this->authentication->initLegacySystemSession();
 
         $runner = $this->registry->getRunner($type);
 

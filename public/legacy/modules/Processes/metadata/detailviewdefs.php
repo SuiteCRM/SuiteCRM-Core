@@ -80,8 +80,8 @@ $viewdefs[$module_name]['DetailView'] = [
                     ],
                 ],
             ],
-            'dismiss' => [
-                'key' => 'dismiss',
+            'dismiss-process' => [
+                'key' => 'dismiss-process',
                 'labelKey' => 'LBL_DISMISS',
                 'asyncProcess' => true,
                 'priority' => 200,

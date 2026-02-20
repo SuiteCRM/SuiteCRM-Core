@@ -142,6 +142,11 @@ $dictionary['DocumentRevision'] = [
             'vname' => 'LBL_REVISION',
             'type' => 'varchar',
             'initDefaultProcess' => 'document-revision-new-revision',
+            'validations' => [
+                [
+                    'type' => 'semantic-version'
+                ]
+            ],
             'defaultValueModes' => [
                 'create'
             ],

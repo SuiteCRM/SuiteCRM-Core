@@ -212,6 +212,11 @@ $dictionary['Document'] = [
             'defaultValueModes' => [
                 'create'
             ],
+            'validations' => [
+                [
+                    'type' => 'semantic-version'
+                ]
+            ],
             'reportable' => false,
             'source' => 'non-db',
             'importable' => 'required',

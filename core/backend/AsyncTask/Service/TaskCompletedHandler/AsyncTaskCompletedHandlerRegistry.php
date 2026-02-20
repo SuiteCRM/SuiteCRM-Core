@@ -56,6 +56,10 @@ class AsyncTaskCompletedHandlerRegistry implements AsyncTaskCompletedHandlerRegi
             return $this->registry[$type][$handlerKey];
         }
 
+        if (!empty($this->registry[$type]['default'])) {
+            return $this->registry[$type]['default'];
+        }
+
         if (!empty($this->registry['default'][$handlerKey])) {
             return $this->registry['default'][$handlerKey];
         }

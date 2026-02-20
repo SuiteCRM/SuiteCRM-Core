@@ -1005,6 +1005,17 @@ class EmailMan extends SugarBean
                 $this->current_emailtemplate->body_html = from_html($this->current_emailtemplate->body_html);
                 $this->current_emailtemplate->body = from_html($this->current_emailtemplate->body);
 
+                // Prefer Email Marketing content over template content when provided.
+                $emailMarketingSubject = trim((string)($this->current_emailmarketing->subject ?? ''));
+                $emailMarketingBody = (string)($this->current_emailmarketing->body ?? '');
+                if ($emailMarketingSubject !== '') {
+                    $this->current_emailtemplate->subject = from_html($emailMarketingSubject);
+                }
+                if (trim($emailMarketingBody) !== '') {
+                    $this->current_emailtemplate->body_html = from_html($emailMarketingBody);
+                    $this->current_emailtemplate->body = from_html(strip_tags($emailMarketingBody));
+                }
+
                 $q = "SELECT * FROM notes WHERE parent_id = '" . $this->current_emailtemplate->id . "' AND deleted = 0";
                 $r = $this->db->query($q);
 

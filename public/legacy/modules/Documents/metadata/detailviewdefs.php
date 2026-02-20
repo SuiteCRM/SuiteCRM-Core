@@ -94,7 +94,6 @@ $viewdefs ['Documents'] = [
                     [
                         'name' => 'revision',
                         'label' => 'LBL_DOC_VERSION',
-                        'readonly' => true,
                     ],
                 ],
                 [

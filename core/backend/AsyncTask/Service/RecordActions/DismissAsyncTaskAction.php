@@ -25,7 +25,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-namespace App\Module\ManualMigrationTasks\Service\RecordActions;
+namespace App\AsyncTask\Service\RecordActions;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use App\AsyncTask\Service\Repository\AsyncTaskItemRepository;
@@ -34,11 +34,13 @@ use App\Module\Service\ModuleNameMapperInterface;
 use App\Process\Entity\Process;
 use App\Process\Service\ProcessHandlerInterface;
 
-class DismissMigrationTaskAction implements ProcessHandlerInterface
+class DismissAsyncTaskAction implements ProcessHandlerInterface
 {
+    protected const PROCESS_TYPE = 'record-dismiss-async-task';
+
     protected const MSG_OPTIONS_NOT_FOUND = 'Process options are not defined';
 
-    protected const PROCESS_TYPE = 'record-dismiss-migration-task';
+    protected const SUPPORTED_MODULES = ['processes', 'manual-migration-tasks'];
 
     public function __construct(
         protected ModuleNameMapperInterface $moduleNameMapper,
@@ -66,8 +68,8 @@ class DismissMigrationTaskAction implements ProcessHandlerInterface
             $module => [
                 [
                     'action' => 'view',
-                    'record' => $options['id'] ?? ''
-                ]
+                    'record' => $options['id'] ?? '',
+                ],
             ],
         ];
     }
@@ -80,10 +82,6 @@ class DismissMigrationTaskAction implements ProcessHandlerInterface
 
     public function validate(Process $process): void
     {
-        if (empty($process->getOptions())) {
-            throw new InvalidArgumentException(self::MSG_OPTIONS_NOT_FOUND);
-        }
-
         $options = $process->getOptions();
 
         if (empty($options['module']) || empty($options['action']) || empty($options['id'])) {
@@ -97,7 +95,7 @@ class DismissMigrationTaskAction implements ProcessHandlerInterface
         $module = $options['module'] ?? '';
         $id = $options['id'] ?? '';
 
-        if ($module !== 'manual-migration-tasks') {
+        if (!in_array($module, self::SUPPORTED_MODULES, true)) {
             $process->setStatus('error');
             $process->setMessages(['LBL_ACTION_ERROR']);
             return;
@@ -116,16 +114,15 @@ class DismissMigrationTaskAction implements ProcessHandlerInterface
 
         $process->setStatus('success');
         $process->setMessages(['LBL_DISMISS_SUCCESS']);
-
-        $responseData = [
-            'handler' => 'redirect',
-            'params' => [
-                'route' => $this->moduleNameMapper->toFrontEnd($module),
-                'queryParams' => []
-            ],
-            'reloadRecentlyViewed' => true,
-        ];
-
-        $process->setData($responseData);
+        $process->setData(
+            [
+                'handler' => 'redirect',
+                'params' => [
+                    'route' => $this->moduleNameMapper->toFrontEnd($module),
+                    'queryParams' => [],
+                ],
+                'reloadRecentlyViewed' => true,
+            ]
+        );
     }
 }

@@ -38,6 +38,7 @@ use App\Data\Service\RecordProviderInterface;
 use App\MediaObjects\Repository\DefaultMediaObjectManager;
 use App\SystemConfig\Service\SystemConfigProviderInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
 {
@@ -76,6 +77,14 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
     public function run(AsyncTaskRun $message): void
     {
         $taskId = $message->getTaskId() ?? '';
+
+        $this->log('debug', 'run() called', [
+            'taskId' => $taskId,
+            'handlerKey' => $message->getHandlerKey(),
+            'module' => $message->getModule(),
+            'phase' => $message->getProgress()['phase'] ?? 'initial',
+        ]);
+
         $task = $this->getAsyncTask($taskId);
 
         if ($task === null) {
@@ -90,12 +99,25 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
             return;
         }
 
+        $this->log('debug', 'Resolved handler', [
+            'taskId' => $taskId,
+            'handlerKey' => $handlerKey,
+            'handlerClass' => get_class($handler),
+        ]);
+
         try {
             $result = $this->runTask($message, $task, $handler);
         } catch (\Exception $e) {
             $this->log('error', 'Async task ID ' . $taskId . ' for handler ' . $handlerKey . ' failed with error: ' . $e->getMessage());
             throw $e;
         }
+
+        $this->log('debug', 'runTask result', [
+            'taskId' => $taskId,
+            'resultStatus' => $result['status'],
+            'resultPhase' => $result['progress']['phase'] ?? 'n/a',
+            'resultPercent' => $result['progress']['percent'] ?? 'n/a',
+        ]);
 
         if ($result['status'] === 'completed') {
             $this->cleanupItems($message->getTaskId());
@@ -115,17 +137,32 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
 
     protected function getTaskHandler(string $handlerKey): ?AsyncTaskHandlerInterface
     {
-        return $this->handlerRegistry->getHandler($this->getType(), $handlerKey);
+        $this->log('debug', 'Resolving task handler', ['handlerKey' => $handlerKey, 'taskType' => $this->getType()]);
+
+        $handler = $this->handlerRegistry->getHandler($this->getType(), $handlerKey);
+
+        $this->log('debug', 'Resolved task handler', [
+            'handlerKey' => $handlerKey,
+            'taskType' => $this->getType(),
+            'found' => $handler !== null,
+            'handlerClass' => $handler ? get_class($handler) : null,
+        ]);
+
+        return $handler;
     }
 
     protected function getAsyncTask(string $taskId): ?Record
     {
+        $this->log('debug', 'Fetching async task record', ['taskId' => $taskId, 'taskType' => $this->getType()]);
+
         $task = null;
         try {
             $task = $this->recordProvider->getRecord($this->getType(), $taskId);
-        } catch (\Throwable $inner) {
+        } catch (Throwable $inner) {
             $this->log('error', 'Unable to get async task with ID ' . $taskId . ': ' . $inner->getMessage());
         }
+
+        $this->log('debug', 'Fetched async task record', ['taskId' => $taskId, 'found' => $task !== null]);
 
         return $task;
     }
@@ -136,8 +173,11 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         $value = (int)($this->systemConfigProvider->getSystemConfig($configKey)?->getValue());
 
         if (empty($value) || $value <= 0) {
+            $this->log('debug', 'maxItemsPerRun using default', ['configKey' => $configKey, 'default' => 100]);
             return 100;
         }
+
+        $this->log('debug', 'maxItemsPerRun resolved', ['configKey' => $configKey, 'value' => $value]);
 
         return $value;
     }
@@ -258,6 +298,7 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
                     $resultData = null;
                 }
 
+                $this->log('debug', 'Item processed successfully', ['itemId' => $itemId, 'itemKey' => $itemKey, 'hasResultData' => $resultData !== null]);
                 $this->itemRepository->updateItem($itemId, self::STATUS_COMPLETED, $resultData);
 
             } else {
@@ -267,10 +308,11 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
                     $errorMsg = $messages[0];
                 }
 
+                $this->log('debug', 'Item processing failed', ['itemId' => $itemId, 'itemKey' => $itemKey, 'error' => $errorMsg]);
                 $this->itemRepository->updateItemStatus($itemId, self::STATUS_FAILED, $errorMsg);
             }
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->log('error', 'Error processing item ' . $itemId . ': ' . $e->getMessage());
             $this->itemRepository->updateItemStatus($itemId, self::STATUS_FAILED, $e->getMessage());
         }
@@ -335,7 +377,7 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
             if ($result === null || !$result->isSuccess()) {
                 $this->log('error', 'Finalization failed for task: ' . $task->getId());
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->log('error', 'Finalization error for task ' . $task->getId() . ': ' . $e->getMessage());
         }
 
@@ -367,11 +409,27 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         $progress['processing_count'] = $processingCount;
         $progress['percent'] = $total > 0 ? (int)round($done / $total * 100) : 0;
 
+        $this->log('debug', 'Calculated progress', [
+            'taskId' => $taskId,
+            'total' => $total,
+            'completed' => $completed,
+            'failed' => $failed,
+            'skipped' => $skipped,
+            'queued' => $queued,
+            'processing' => $processingCount,
+            'percent' => $progress['percent'],
+        ]);
+
         return $progress;
     }
 
     protected function dispatchNextRun(AsyncTaskRun $message, array $updatedProgress): void
     {
+        $this->log('debug', 'Dispatching next run', [
+            'taskId' => $message->getTaskId(),
+            'phase' => $updatedProgress['phase'] ?? 'n/a',
+        ]);
+
         $this->asyncTaskDispatcher->dispatchTaskRun(
             $message->getModule() ?? 'default',
             $message->getTaskId(),
@@ -384,6 +442,8 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
 
     protected function dispatchTaskCompleted(AsyncTaskRun $message, array $progress = []): void
     {
+        $this->log('debug', 'Dispatching task completed', ['taskId' => $message->getTaskId()]);
+
         $this->asyncTaskDispatcher->dispatchTaskCompleted(
             $message->getModule() ?? 'default',
             $message->getTaskId(),
@@ -396,6 +456,11 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
 
     protected function dispatchTaskProgressed(AsyncTaskRun $message, array $updatedProgress): void
     {
+        $this->log('debug', 'Dispatching task progressed', [
+            'taskId' => $message->getTaskId(),
+            'percent' => $updatedProgress['percent'] ?? 'n/a',
+        ]);
+
         $this->asyncTaskDispatcher->dispatchTaskProgressed(
             $message->getModule() ?? 'default',
             $message->getTaskId(),
@@ -408,6 +473,8 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
 
     protected function dispatchTaskFailure(AsyncTaskRun $message, array $progress = []): void
     {
+        $this->log('debug', 'Dispatching task failure', ['taskId' => $message->getTaskId()]);
+
         $this->asyncTaskDispatcher->dispatchTaskFailure(
             $message->getModule() ?? 'default',
             $message->getTaskId(),
@@ -427,7 +494,7 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         try {
             $this->itemRepository->purgeCompletedItems($taskId);
             $this->log('info', 'Cleaned up non-failed items for task ' . $taskId);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->log('error', 'Failed to clean up items for task ' . $taskId . ': ' . $e->getMessage());
         }
     }
@@ -437,8 +504,8 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
      * @param string $message
      * @return void
      */
-    protected function log(string $level, string $message): void
+    protected function log(string $level, string $message, array $extra = []): void
     {
-        $this->logger->$level($message, ['component' => 'async-task-runner', 'type' => $this->getType()]);
+        $this->logger->$level($message, array_merge(['component' => 'async-task-runner', 'type' => $this->getType()], $extra));
     }
 }

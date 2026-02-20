@@ -59,6 +59,17 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
     public function dispatchTaskRun(string $module, string $taskId, string $type, string $handlerKey, array $taskData, array $progress = []): void
     {
         $transports = $this->asyncTaskRouter->getTransports($module, $handlerKey);
+        $phase = $progress['phase'] ?? 'initial';
+
+        $this->logger->debug('Dispatching AsyncTaskRun', [
+            'component' => 'async-task-dispatcher',
+            'taskId' => $taskId,
+            'type' => $type,
+            'module' => $module,
+            'handlerKey' => $handlerKey,
+            'phase' => $phase,
+            'transports' => $transports,
+        ]);
 
         if ($transports === null) {
             $this->bus->dispatch(new AsyncTaskRun($taskId, $type, $module, $handlerKey, $taskData, $progress));
@@ -80,6 +91,11 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
      */
     public function reDispatch(object $message): void
     {
+        $this->logger->debug('Re-dispatching message', [
+            'component' => 'async-task-dispatcher',
+            'messageClass' => get_class($message),
+        ]);
+
         $this->bus->dispatch(new RedispatchMessage($message));
     }
 
@@ -95,6 +111,15 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
     public function dispatchTaskCompleted(string $module, string $taskId, string $type, string $handlerKey, array $taskData, array $progress = []): void
     {
         $transports = $this->asyncTaskRouter->getTransports($module, $handlerKey);
+
+        $this->logger->debug('Dispatching AsyncTaskCompleted', [
+            'component' => 'async-task-dispatcher',
+            'taskId' => $taskId,
+            'type' => $type,
+            'module' => $module,
+            'handlerKey' => $handlerKey,
+            'transports' => $transports,
+        ]);
 
         if ($transports === null) {
             $this->bus->dispatch(new AsyncTaskCompleted($taskId, $type, $module, $handlerKey, $taskData, $progress));
@@ -123,6 +148,16 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
     {
         $transports = $this->asyncTaskRouter->getTransports($module, $handlerKey);
 
+        $this->logger->debug('Dispatching AsyncTaskProgressed', [
+            'component' => 'async-task-dispatcher',
+            'taskId' => $taskId,
+            'type' => $type,
+            'module' => $module,
+            'handlerKey' => $handlerKey,
+            'progress' => $progress,
+            'transports' => $transports,
+        ]);
+
         if ($transports === null) {
             $this->bus->dispatch(new AsyncTaskProgressed($taskId, $type, $module, $handlerKey, $taskData, $progress));
             return;
@@ -148,6 +183,15 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
     public function dispatchTaskFailure(string $module, string $taskId, string $type, string $handlerKey, array $taskData, array $progress = []): void
     {
         $transports = $this->asyncTaskRouter->getTransports($module, $handlerKey);
+
+        $this->logger->debug('Dispatching AsyncTaskFailure', [
+            'component' => 'async-task-dispatcher',
+            'taskId' => $taskId,
+            'type' => $type,
+            'module' => $module,
+            'handlerKey' => $handlerKey,
+            'transports' => $transports,
+        ]);
 
         if ($transports === null) {
             $this->bus->dispatch(new AsyncTaskFailure($taskId, $type, $module, $handlerKey, $taskData, $progress));

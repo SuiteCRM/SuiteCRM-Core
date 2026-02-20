@@ -45,12 +45,30 @@ class AsyncTaskRunMessageListener
     public function __invoke(AsyncTaskRun $message): void
     {
         $type = $message->getTaskType();
+        $handlerKey = $message->getHandlerKey();
+        $phase = $message->getProgress()['phase'] ?? 'initial';
+
+        $this->logger->debug('Received AsyncTaskRun message', [
+            'component' => 'async-task-run-listener',
+            'taskId' => $message->getTaskId(),
+            'type' => $type,
+            'module' => $message->getModule(),
+            'handlerKey' => $handlerKey,
+            'phase' => $phase,
+        ]);
+
         $runner = $this->registry->getRunner($type);
 
         if ($runner === null) {
             $this->logger->error('No AsyncTaskRunner found for type: ' . $type);
             return;
         }
+
+        $this->logger->debug('Delegating to runner', [
+            'component' => 'async-task-run-listener',
+            'taskId' => $message->getTaskId(),
+            'runnerClass' => get_class($runner),
+        ]);
 
         $runner->run($message);
     }

@@ -29,29 +29,57 @@ namespace App\AsyncTask\Service\Router;
 
 use JsonException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 
 class AsyncTaskRouter implements AsyncTaskRouterInterface
 {
     public function __construct(
         protected array $transportMapConfig,
         protected string $transportMapEnv,
+        #[Target('messengerLogger')]
         protected LoggerInterface $logger
     ) {
     }
 
     public function getTransports(string $module, string $taskKey): ?array
     {
+        $this->logger->debug('AsyncTaskRouter: resolving transport.', [
+            'module' => $module,
+            'task_key' => $taskKey,
+        ]);
+
         $envTransports = $this->getEnvTransports() ?? [];
         $transports = $this->getTaskTransports($module, $taskKey, $envTransports);
 
         if ($transports !== null) {
+            $this->logger->debug('AsyncTaskRouter: transport resolved from env.', [
+                'module' => $module,
+                'task_key' => $taskKey,
+                'transports' => $transports,
+            ]);
+
             return $transports;
         }
 
         $configTransports = $this->getConfigTransports() ?? [];
         $transports = $this->getTaskTransports($module, $taskKey, $configTransports);
 
-        return $transports ?? null;
+        if ($transports !== null) {
+            $this->logger->debug('AsyncTaskRouter: transport resolved from config.', [
+                'module' => $module,
+                'task_key' => $taskKey,
+                'transports' => $transports,
+            ]);
+
+            return $transports;
+        }
+
+        $this->logger->debug('AsyncTaskRouter: no transport found, falling back to Messenger default routing.', [
+            'module' => $module,
+            'task_key' => $taskKey,
+        ]);
+
+        return null;
     }
 
     /**
@@ -99,6 +127,12 @@ class AsyncTaskRouter implements AsyncTaskRouterInterface
         $transports = $moduleTransports[$taskKey] ?? '';
 
         if (!empty($transports)) {
+            $this->logger->debug('AsyncTaskRouter: matched module-specific route.', [
+                'module' => $module,
+                'task_key' => $taskKey,
+                'transports' => $transports,
+            ]);
+
             return $this->normalizeTransports($transports);
         }
 
@@ -106,6 +140,12 @@ class AsyncTaskRouter implements AsyncTaskRouterInterface
         $transports = $defaultMap[$taskKey] ?? '';
 
         if (!empty($transports)) {
+            $this->logger->debug('AsyncTaskRouter: matched default route.', [
+                'module' => $module,
+                'task_key' => $taskKey,
+                'transports' => $transports,
+            ]);
+
             return $this->normalizeTransports($transports);
         }
 

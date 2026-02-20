@@ -48,13 +48,20 @@ abstract class AsyncTaskProgressedHandler implements AsyncTaskProgressedHandlerI
     {
         $taskId = $message->getTaskId();
 
+        $this->log('debug', 'onProgress() called', [
+            'taskId' => $taskId,
+            'module' => $message->getModule(),
+            'percent' => $message->getProgress()['percent'] ?? 'n/a',
+            'phase' => $message->getProgress()['phase'] ?? 'n/a',
+        ]);
+
         $task = $this->getAsyncTask($taskId);
         if ($task === null) {
             $this->log('error', 'Async task with ID ' . $taskId . ' not found.');
             return;
         }
 
-        $progress = $message->getProgress();
+        $progress = $message->getProgress() ?? [];
 
         $this->updateTaskProgress($task, $progress);
     }
@@ -64,6 +71,8 @@ abstract class AsyncTaskProgressedHandler implements AsyncTaskProgressedHandlerI
      */
     protected function getAsyncTask(string $taskId): ?Record
     {
+        $this->log('debug', 'Fetching async task record', ['taskId' => $taskId]);
+
         try {
             $task = $this->recordProvider->getRecord($this->getType(), $taskId);
         } catch (Throwable $inner) {
@@ -80,6 +89,14 @@ abstract class AsyncTaskProgressedHandler implements AsyncTaskProgressedHandlerI
      */
     protected function updateTaskProgress(Record $task, array $updatedProgress): void
     {
+        $this->log('debug', 'Updating task progress', [
+            'taskId' => $task->getId(),
+            'phase' => $updatedProgress['phase'] ?? '',
+            'percent' => $updatedProgress['percent'] ?? 'n/a',
+            'completed' => $updatedProgress['completed'] ?? 'n/a',
+            'failed' => $updatedProgress['failed'] ?? 'n/a',
+        ]);
+
         try {
             $attributes = $task->getAttributes();
 
@@ -91,8 +108,10 @@ abstract class AsyncTaskProgressedHandler implements AsyncTaskProgressedHandlerI
             $task->setAttributes($attributes);
 
             $this->recordProvider->saveRecord($task);
+
+            $this->log('debug', 'Task progress updated successfully', ['taskId' => $task->getId()]);
         } catch (Throwable $inner) {
-            $this->log('error', 'Failed to mark task as completed: ' . $inner->getMessage());
+            $this->log('error', 'Failed to update task progress: ' . $inner->getMessage());
             throw $inner;
         }
     }
@@ -102,8 +121,8 @@ abstract class AsyncTaskProgressedHandler implements AsyncTaskProgressedHandlerI
      * @param string $message
      * @return void
      */
-    protected function log(string $level, string $message): void
+    protected function log(string $level, string $message, array $extra = []): void
     {
-        $this->logger->$level($message, ['component' => 'async-task-progressed-handler', 'type' => $this->getType(), 'handlerKey' => $this->getHandlerKey()]);
+        $this->logger->$level($message, array_merge(['component' => 'async-task-progressed-handler', 'type' => $this->getType(), 'handlerKey' => $this->getHandlerKey()], $extra));
     }
 }

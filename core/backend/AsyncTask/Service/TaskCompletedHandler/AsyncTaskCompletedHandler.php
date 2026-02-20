@@ -49,6 +49,11 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
     {
         $taskId = $message->getTaskId();
 
+        $this->log('debug', 'onComplete() called', [
+            'taskId' => $taskId,
+            'module' => $message->getModule(),
+        ]);
+
         $task = $this->getAsyncTask($taskId);
         if ($task === null) {
             $this->log('error', 'Async task with ID ' . $taskId . ' not found.');
@@ -63,6 +68,8 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
      */
     protected function getAsyncTask(string $taskId): ?Record
     {
+        $this->log('debug', 'Fetching async task record', ['taskId' => $taskId]);
+
         try {
             $task = $this->recordProvider->getRecord($this->getType(), $taskId);
         } catch (Throwable $inner) {
@@ -78,6 +85,8 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
      */
     protected function markTaskAsCompleted(Record $task, array $progress = []): void
     {
+        $this->log('debug', 'Marking task as completed', ['taskId' => $task->getId()]);
+
         try {
             $attributes = $task->getAttributes();
 
@@ -90,6 +99,8 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
             $task->setAttributes($attributes);
 
             $this->recordProvider->saveRecord($task);
+
+            $this->log('debug', 'Task marked as completed successfully', ['taskId' => $task->getId()]);
         } catch (Throwable $inner) {
             $this->log('error', 'Failed to mark task as completed: ' . $inner->getMessage());
             throw $inner;
@@ -101,8 +112,8 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
      * @param string $message
      * @return void
      */
-    protected function log(string $level, string $message): void
+    protected function log(string $level, string $message, array $extra = []): void
     {
-        $this->logger->$level($message, ['component' => 'async-task-completed-handler', 'type' => $this->getType(), 'handlerKey' => $this->getHandlerKey()]);
+        $this->logger->$level($message, array_merge(['component' => 'async-task-completed-handler', 'type' => $this->getType(), 'handlerKey' => $this->getHandlerKey()], $extra));
     }
 }

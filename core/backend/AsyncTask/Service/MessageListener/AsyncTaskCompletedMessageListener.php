@@ -46,6 +46,15 @@ class AsyncTaskCompletedMessageListener
     {
         $type = $message->getTaskType();
         $handlerKey = $message->getHandlerKey();
+
+        $this->logger->debug('Received AsyncTaskCompleted message', [
+            'component' => 'async-task-completed-listener',
+            'taskId' => $message->getTaskId(),
+            'type' => $type,
+            'module' => $message->getModule(),
+            'handlerKey' => $handlerKey,
+        ]);
+
         $handler = $this->registry->getHandler($type, $handlerKey);
 
         if ($handler === null) {
@@ -54,5 +63,11 @@ class AsyncTaskCompletedMessageListener
         }
 
         $handler->onComplete($message);
+
+        $this->logger->debug('AsyncTaskCompleted handled successfully', [
+            'component' => 'async-task-completed-listener',
+            'taskId' => $message->getTaskId(),
+            'handlerClass' => get_class($handler),
+        ]);
     }
 }

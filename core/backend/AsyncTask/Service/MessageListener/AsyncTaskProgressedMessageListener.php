@@ -46,6 +46,16 @@ class AsyncTaskProgressedMessageListener
     {
         $type = $message->getTaskType();
         $handlerKey = $message->getHandlerKey();
+
+        $this->logger->debug('Received AsyncTaskProgressed message', [
+            'component' => 'async-task-progressed-listener',
+            'taskId' => $message->getTaskId(),
+            'type' => $type,
+            'module' => $message->getModule(),
+            'handlerKey' => $handlerKey,
+            'progress' => $message->getProgress(),
+        ]);
+
         $handler = $this->registry->getHandler($type, $handlerKey);
 
         if ($handler === null) {
@@ -54,5 +64,11 @@ class AsyncTaskProgressedMessageListener
         }
 
         $handler->onProgress($message);
+
+        $this->logger->debug('AsyncTaskProgressed handled successfully', [
+            'component' => 'async-task-progressed-listener',
+            'taskId' => $message->getTaskId(),
+            'handlerClass' => get_class($handler),
+        ]);
     }
 }

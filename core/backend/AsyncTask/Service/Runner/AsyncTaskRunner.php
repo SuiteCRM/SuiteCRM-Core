@@ -99,13 +99,13 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
 
         if ($result['status'] === 'completed') {
             $this->cleanupItems($message->getTaskId());
-            $this->dispatchTaskCompleted($message);
+            $this->dispatchTaskCompleted($message, $result['progress']);
             return;
         }
 
         if ($result['status'] === 'failed') {
             $this->cleanupItems($message->getTaskId());
-            $this->dispatchTaskFailure($message);
+            $this->dispatchTaskFailure($message, $result['progress']);
             return;
         }
 
@@ -382,14 +382,15 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         );
     }
 
-    protected function dispatchTaskCompleted(AsyncTaskRun $message): void
+    protected function dispatchTaskCompleted(AsyncTaskRun $message, array $progress = []): void
     {
         $this->asyncTaskDispatcher->dispatchTaskCompleted(
             $message->getModule() ?? 'default',
             $message->getTaskId(),
             $message->getTaskType(),
             $message->getHandlerKey(),
-            $message->getData()
+            $message->getData(),
+            $progress
         );
     }
 
@@ -405,14 +406,15 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         );
     }
 
-    protected function dispatchTaskFailure(AsyncTaskRun $message): void
+    protected function dispatchTaskFailure(AsyncTaskRun $message, array $progress = []): void
     {
         $this->asyncTaskDispatcher->dispatchTaskFailure(
             $message->getModule() ?? 'default',
             $message->getTaskId(),
             $message->getTaskType(),
             $message->getHandlerKey(),
-            $message->getData()
+            $message->getData(),
+            $progress
         );
     }
 

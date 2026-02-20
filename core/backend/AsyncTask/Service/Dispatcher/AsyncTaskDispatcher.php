@@ -92,17 +92,17 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
      * @param array $taskData data to be sent with the task
      * @return void
      */
-    public function dispatchTaskCompleted(string $module, string $taskId, string $type, string $handlerKey, array $taskData): void
+    public function dispatchTaskCompleted(string $module, string $taskId, string $type, string $handlerKey, array $taskData, array $progress = []): void
     {
         $transports = $this->asyncTaskRouter->getTransports($module, $handlerKey);
 
         if ($transports === null) {
-            $this->bus->dispatch(new AsyncTaskCompleted($taskId, $type, $module, $handlerKey, $taskData));
+            $this->bus->dispatch(new AsyncTaskCompleted($taskId, $type, $module, $handlerKey, $taskData, $progress));
             return;
         }
 
         $this->bus->dispatch(
-            new AsyncTaskCompleted($taskId, $type, $module, $handlerKey, $taskData),
+            new AsyncTaskCompleted($taskId, $type, $module, $handlerKey, $taskData, $progress),
             [
                 new TransportNamesStamp($transports)
             ]
@@ -145,17 +145,17 @@ class AsyncTaskDispatcher implements AsyncTaskDispatcherInterface
      * @param array $taskData data to be sent with the task
      * @return void
      */
-    public function dispatchTaskFailure(string $module, string $taskId, string $type, string $handlerKey, array $taskData): void
+    public function dispatchTaskFailure(string $module, string $taskId, string $type, string $handlerKey, array $taskData, array $progress = []): void
     {
         $transports = $this->asyncTaskRouter->getTransports($module, $handlerKey);
 
         if ($transports === null) {
-            $this->bus->dispatch(new AsyncTaskFailure($taskId, $type, $module, $handlerKey, $taskData));
+            $this->bus->dispatch(new AsyncTaskFailure($taskId, $type, $module, $handlerKey, $taskData, $progress));
             return;
         }
 
         $this->bus->dispatch(
-            new AsyncTaskFailure($taskId, $type, $module, $handlerKey, $taskData),
+            new AsyncTaskFailure($taskId, $type, $module, $handlerKey, $taskData, $progress),
             [
                 new TransportNamesStamp($transports)
             ]

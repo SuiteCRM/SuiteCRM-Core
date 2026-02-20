@@ -55,7 +55,7 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
             return;
         }
 
-        $this->markTaskAsCompleted($task);
+        $this->markTaskAsCompleted($task, $message->getProgress());
     }
 
     /**
@@ -76,12 +76,13 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
     /**
      * @throws Throwable
      */
-    protected function markTaskAsCompleted(Record $task): void
+    protected function markTaskAsCompleted(Record $task, array $progress = []): void
     {
         try {
             $attributes = $task->getAttributes();
 
-            $attributes['progress'] = ['percent' => 100];
+            $progress['percent'] = 100;
+            $attributes['progress'] = $progress;
             $attributes['status'] = 'completed';
             $attributes['phase'] = 'completed';
             $attributes['last_run_datetime'] = (new \DateTime())->format('Y-m-d H:i:s');

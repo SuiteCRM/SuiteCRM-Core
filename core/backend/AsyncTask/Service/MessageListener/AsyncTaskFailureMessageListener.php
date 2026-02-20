@@ -60,7 +60,8 @@ class AsyncTaskFailureMessageListener
             $type,
             $message->getModule(),
             $handlerKey,
-            $message->getData()
+            $message->getData(),
+            $message->getProgress()
         );
 
         $handler->onFailure($failureMessage);

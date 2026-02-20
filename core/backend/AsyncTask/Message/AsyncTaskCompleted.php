@@ -35,7 +35,8 @@ class AsyncTaskCompleted
         protected string $taskType,
         protected string $module,
         protected string $handlerKey,
-        protected array $data
+        protected array $data,
+        protected array $progress = []
     ) {
     }
     public function getTaskId(): string
@@ -61,6 +62,11 @@ class AsyncTaskCompleted
     public function getData(): array
     {
         return $this->data;
+    }
+
+    public function getProgress(): array
+    {
+        return $this->progress;
     }
 
 }

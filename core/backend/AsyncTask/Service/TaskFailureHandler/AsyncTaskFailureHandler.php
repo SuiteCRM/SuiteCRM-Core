@@ -55,7 +55,7 @@ abstract class AsyncTaskFailureHandler implements AsyncTaskFailureHandlerInterfa
             return;
         }
 
-        $this->markTaskAsFailed($task);
+        $this->markTaskAsFailed($task, $message->getProgress());
     }
 
     /**
@@ -76,13 +76,14 @@ abstract class AsyncTaskFailureHandler implements AsyncTaskFailureHandlerInterfa
     /**
      * @throws Throwable
      */
-    protected function markTaskAsFailed(Record $task): void
+    protected function markTaskAsFailed(Record $task, array $progress = []): void
     {
         try {
             $attributes = $task->getAttributes();
 
+            $attributes['progress'] = $progress;
             $attributes['status'] = 'failed';
-            $attributes['phase'] = $attributes['progress']['phase'] ?? $attributes['phase'] ?? '';
+            $attributes['phase'] = 'completed';
             $attributes['last_run_datetime'] = (new \DateTime())->format('Y-m-d H:i:s');
 
             $task->setAttributes($attributes);

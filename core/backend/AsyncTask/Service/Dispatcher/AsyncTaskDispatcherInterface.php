@@ -58,7 +58,7 @@ interface AsyncTaskDispatcherInterface
      * @param array $taskData data to be sent with the task
      * @return void
      */
-    public function dispatchTaskCompleted(string $module, string $taskId, string $type, string $handlerKey, array $taskData): void;
+    public function dispatchTaskCompleted(string $module, string $taskId, string $type, string $handlerKey, array $taskData, array $progress = []): void;
 
     /**
      * Dispatches a task progressed message.
@@ -81,5 +81,5 @@ interface AsyncTaskDispatcherInterface
      * @param array $taskData data to be sent with the task
      * @return void
      */
-    public function dispatchTaskFailure(string $module, string $taskId, string $type, string $handlerKey, array $taskData): void;
+    public function dispatchTaskFailure(string $module, string $taskId, string $type, string $handlerKey, array $taskData, array $progress = []): void;
 }

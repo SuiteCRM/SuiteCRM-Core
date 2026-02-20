@@ -41,6 +41,9 @@ return static function (ContainerConfigurator $containerConfig) {
         'failed' => [
             'dsn' => '%env(MESSENGER_INTERNAL_FAILURE_TRANSPORT_DSN)%',
             'options' => []
+        ],
+        'notifier-sync' => [
+            'dsn' => 'sync://'
         ]
     ];
 
@@ -83,7 +86,8 @@ return static function (ContainerConfigurator $containerConfig) {
         'App\AsyncTask\Message\AsyncTaskRun' => 'internal-async',
         'App\AsyncTask\Message\AsyncTaskCompleted' => 'internal-async',
         'App\AsyncTask\Message\AsyncTaskProgressed' => 'internal-async',
-        'App\AsyncTask\Message\AsyncTaskFailure' => 'internal-async'
+        'App\AsyncTask\Message\AsyncTaskFailure' => 'internal-async',
+        'App\Notifier\Message\Notification' => 'notifier-sync'
     ];
 
     $routingConfig = [];

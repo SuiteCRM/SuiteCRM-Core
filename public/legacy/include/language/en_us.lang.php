@@ -4034,6 +4034,7 @@ $app_strings['LBL_VALIDATION_ERROR_REMOVE_UNSUBSCRIBE_LINK'] = "Transactional Em
 $app_strings['LBL_VALIDATION_ERROR_EMAIL_FORMAT'] = "Invalid email format. Expected: '{{context.expected}}'";
 $app_strings['LBL_VALIDATION_ERROR_PHONE_FORMAT'] = "Invalid phone format.";
 $app_strings['LBL_VALIDATION_ERROR_MIN'] = "Invalid value. Value must greater or equal to '{{context.min}}'";
+$app_strings['LBL_VALIDATION_ERROR_VERSIONING'] = "Invalid format. Expected: '{{context.expected}}'";
 $app_strings['LBL_VALIDATION_ERROR_MAX'] = "Invalid value. Value must smaller or equal to '{{context.max}}'";
 $app_strings['LBL_MULTIPLE_PRIMARY_EMAIL_VALIDATION_ERROR'] = "Only one Valid Email Address should be marked as primary";
 $app_strings['LBL_DUPLICATE_EMAIL_VALIDATION_ERROR'] = "Duplicate email addresses are not allowed";

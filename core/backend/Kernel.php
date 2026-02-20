@@ -30,6 +30,7 @@ namespace App;
 
 use App\DependecyInjection\BackwardsCompatibility\LegacySAMLExtension;
 use App\DependecyInjection\Metadata\MetadataExtension;
+use App\DependecyInjection\Migrations\ExtensionMigrationsExtension;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -118,6 +119,7 @@ class Kernel extends BaseKernel
         parent::build($container);
         $container->registerExtension(new LegacySAMLExtension());
         $container->registerExtension(new MetadataExtension());
+        $container->registerExtension(new ExtensionMigrationsExtension());
     }
 
     /**

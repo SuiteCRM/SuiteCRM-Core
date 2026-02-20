@@ -34,7 +34,7 @@ import get from 'lodash-es/get';
 import {SystemConfigStore} from '../../store/system-config/system-config.store';
 import {UserPreferenceStore} from '../../store/user-preference/user-preference.store';
 import {AttributeMap} from "../../common/record/record.model";
-import {isObject, isString} from "lodash-es";
+import {isBoolean, isObject, isString} from "lodash-es";
 
 
 export declare type TemplateValueFilter = (value: any, filterArguments?: string[]) => string;
@@ -268,7 +268,7 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
 
                 if (isObject(attribute.value)) {
                     value = get({attribute}, path, '');
-                } else if (isString(attribute.value)) {
+                } else if (isString(attribute.value) || isFinite(attribute.value) || isBoolean(attribute.value)) {
                     value = attribute.value;
                 }
 

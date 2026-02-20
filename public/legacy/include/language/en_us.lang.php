@@ -1747,6 +1747,7 @@ $app_strings = array(
     'LBL_ALERT_DISMISS_ERROR' => 'Error while trying to dismiss alert',
     'LBL_ALERT_DISMISS_ALL_SUCCESS' => 'Alerts dismissed successfully',
     'LBL_DISMISS_ALL' => 'Dismiss All',
+    'LBL_DISMISS_SUCCESS' => 'Successfully Dismissed',
     'LBL_VERIFY' => 'Verify',
     'LBL_RESEND' => 'Resend',
     'LBL_RECORD_DOES_NOT_EXIST' => 'Error retrieving record. This record may be deleted or you may not be authorized to view it.',

@@ -59,8 +59,20 @@ export class BaseAttachmentComponent extends BaseFileComponent {
     }
 
     clearFile(event) {
+
+        const id = event?.id ?? '';
+
+        if (id === '') {
+            const updatedFiles = this.attachments().filter((file) => file.sourceRecordId !== event.sourceRecordId);
+            this.field.valueObject = Object.values(this.field.valueObject).filter((file: Record) => file.attributes.source_record_id !== event.sourceRecordId);
+            this.field.valueList = this.field.valueObject;
+            this.attachments.set(updatedFiles);
+            return;
+        }
+
         const updatedFiles = this.attachments().filter((file) => file.id !== event.id);
-        this.field.valueObject = Object.values(this.field.valueObject).filter((file: Attachment) => file.id !== event.id);
+        this.field.valueObject = Object.values(this.field.valueObject).filter((file: Record) => file.id !== event.id);
+        this.field.valueList = this.field.valueObject;
         this.attachments.set(updatedFiles);
     }
 

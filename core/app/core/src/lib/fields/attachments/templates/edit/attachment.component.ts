@@ -118,6 +118,11 @@ export class AttachmentEditFieldComponent extends BaseAttachmentComponent implem
         this.displayUploadArea.set(false);
     }
 
+    clearFile(event) {
+        super.clearFile(event);
+        this.setFormControlValue(this.field.valueObject);
+    }
+
     buildButtonItems(): void {
         this.dropdownButton = {
             labelKey: 'LBL_EMAIL_ATTACHMENT',

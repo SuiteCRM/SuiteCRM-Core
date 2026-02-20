@@ -263,9 +263,7 @@ class Process extends Basic
             'duplicate',
             'edit',
             'editview',
-            'delete',
             'create',
-            'save'
         ];
 
         return in_array(strtolower($view), $notAllowed);

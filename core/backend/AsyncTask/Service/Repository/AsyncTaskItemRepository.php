@@ -62,33 +62,35 @@ class AsyncTaskItemRepository
             try {
                 $qb = $this->preparedStatementHandler->createQueryBuilder();
                 $qb->insert(self::TABLE)
-                    ->setValue('id', ':id')
-                    ->setValue('name', ':name')
-                    ->setValue('async_task_id', ':async_task_id')
-                    ->setValue('item_key', ':item_key')
-                    ->setValue('status', ':status')
-                    ->setValue('data', ':data')
-                    ->setValue('sort_order', ':sort_order')
-                    ->setValue('date_entered', ':date_entered')
-                    ->setValue('date_modified', ':date_modified')
-                    ->setValue('deleted', '0')
-                    ->setParameter('id', $id)
-                    ->setParameter('name', $itemKey)
-                    ->setParameter('async_task_id', $taskId)
-                    ->setParameter('item_key', $itemKey)
-                    ->setParameter('status', 'queued')
-                    ->setParameter('data', $data)
-                    ->setParameter('sort_order', $sortOrder)
-                    ->setParameter('date_entered', $now)
-                    ->setParameter('date_modified', $now);
+                   ->setValue('id', ':id')
+                   ->setValue('name', ':name')
+                   ->setValue('async_task_id', ':async_task_id')
+                   ->setValue('item_key', ':item_key')
+                   ->setValue('status', ':status')
+                   ->setValue('data', ':data')
+                   ->setValue('sort_order', ':sort_order')
+                   ->setValue('date_entered', ':date_entered')
+                   ->setValue('date_modified', ':date_modified')
+                   ->setValue('deleted', '0')
+                   ->setParameter('id', $id)
+                   ->setParameter('name', $itemKey)
+                   ->setParameter('async_task_id', $taskId)
+                   ->setParameter('item_key', $itemKey)
+                   ->setParameter('status', 'queued')
+                   ->setParameter('data', $data)
+                   ->setParameter('sort_order', $sortOrder)
+                   ->setParameter('date_entered', $now)
+                   ->setParameter('date_modified', $now);
 
                 $qb->executeStatement();
             } catch (\Throwable $e) {
-                $this->logger->error('Failed to insert async task item: ' . $e->getMessage(), [
-                    'component' => 'async-task-item-repository',
-                    'task_id' => $taskId,
-                    'item_key' => $itemKey,
-                ]);
+                $this->logger->error(
+                    'Failed to insert async task item: ' . $e->getMessage(), [
+                        'component' => 'async-task-item-repository',
+                        'task_id' => $taskId,
+                        'item_key' => $itemKey,
+                    ]
+                );
                 continue;
             }
 
@@ -112,22 +114,24 @@ class AsyncTaskItemRepository
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
             $qb->select('id', 'async_task_id', 'item_key', 'status', 'error_message', 'data', 'result_data', 'sort_order')
-                ->from(self::TABLE)
-                ->where('async_task_id = :async_task_id')
-                ->andWhere('status = :status')
-                ->andWhere('deleted = 0')
-                ->orderBy('sort_order', 'ASC')
-                ->addOrderBy('date_entered', 'ASC')
-                ->setMaxResults($limit)
-                ->setParameter('async_task_id', $taskId)
-                ->setParameter('status', $status);
+               ->from(self::TABLE)
+               ->where('async_task_id = :async_task_id')
+               ->andWhere('status = :status')
+               ->andWhere('deleted = 0')
+               ->orderBy('sort_order', 'ASC')
+               ->addOrderBy('date_entered', 'ASC')
+               ->setMaxResults($limit)
+               ->setParameter('async_task_id', $taskId)
+               ->setParameter('status', $status);
 
             $rows = $qb->fetchAllAssociative();
         } catch (\Throwable $e) {
-            $this->logger->error('Failed to fetch async task items: ' . $e->getMessage(), [
-                'component' => 'async-task-item-repository',
-                'task_id' => $taskId,
-            ]);
+            $this->logger->error(
+                'Failed to fetch async task items: ' . $e->getMessage(), [
+                    'component' => 'async-task-item-repository',
+                    'task_id' => $taskId,
+                ]
+            );
             return [];
         }
 
@@ -148,21 +152,24 @@ class AsyncTaskItemRepository
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
             $qb->update(self::TABLE)
-                ->set('status', ':status')
-                ->set('error_message', ':error_message')
-                ->set('date_modified', ':date_modified')
-                ->where('id = :id')
-                ->setParameter('status', $status)
-                ->setParameter('error_message', $errorMessage)
-                ->setParameter('date_modified', $now)
-                ->setParameter('id', $itemId);
+               ->set('status', ':status')
+               ->set('error_message', ':error_message')
+               ->set('date_modified', ':date_modified')
+               ->where('id = :id')
+               ->setParameter('status', $status)
+               ->setParameter('error_message', $errorMessage)
+               ->setParameter('date_modified', $now)
+               ->setParameter('id', $itemId);
 
             $qb->executeStatement();
         } catch (\Throwable $e) {
-            $this->logger->error('Failed to update async task item status: ' . $e->getMessage(), [
-                'component' => 'async-task-item-repository',
-                'item_id' => $itemId,
-            ]);
+            $this->logger->error(
+                'Failed to update async task item status: ' . $e->getMessage(),
+                [
+                    'component' => 'async-task-item-repository',
+                    'item_id' => $itemId,
+                ]
+            );
         }
     }
 
@@ -181,23 +188,25 @@ class AsyncTaskItemRepository
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
             $qb->update(self::TABLE)
-                ->set('status', ':status')
-                ->set('result_data', ':result_data')
-                ->set('error_message', ':error_message')
-                ->set('date_modified', ':date_modified')
-                ->where('id = :id')
-                ->setParameter('status', $status)
-                ->setParameter('result_data', $resultData !== null ? json_encode($resultData) : null)
-                ->setParameter('error_message', $errorMessage)
-                ->setParameter('date_modified', $now)
-                ->setParameter('id', $itemId);
+               ->set('status', ':status')
+               ->set('result_data', ':result_data')
+               ->set('error_message', ':error_message')
+               ->set('date_modified', ':date_modified')
+               ->where('id = :id')
+               ->setParameter('status', $status)
+               ->setParameter('result_data', $resultData !== null ? json_encode($resultData) : null)
+               ->setParameter('error_message', $errorMessage)
+               ->setParameter('date_modified', $now)
+               ->setParameter('id', $itemId);
 
             $qb->executeStatement();
         } catch (\Throwable $e) {
-            $this->logger->error('Failed to update async task item: ' . $e->getMessage(), [
-                'component' => 'async-task-item-repository',
-                'item_id' => $itemId,
-            ]);
+            $this->logger->error(
+                'Failed to update async task item: ' . $e->getMessage(), [
+                    'component' => 'async-task-item-repository',
+                    'item_id' => $itemId,
+                ]
+            );
         }
     }
 
@@ -212,18 +221,20 @@ class AsyncTaskItemRepository
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
             $qb->select('status', 'COUNT(*) as cnt')
-                ->from(self::TABLE)
-                ->where('async_task_id = :async_task_id')
-                ->andWhere('deleted = 0')
-                ->groupBy('status')
-                ->setParameter('async_task_id', $taskId);
+               ->from(self::TABLE)
+               ->where('async_task_id = :async_task_id')
+               ->andWhere('deleted = 0')
+               ->groupBy('status')
+               ->setParameter('async_task_id', $taskId);
 
             $rows = $qb->fetchAllAssociative();
         } catch (\Throwable $e) {
-            $this->logger->error('Failed to count async task items: ' . $e->getMessage(), [
-                'component' => 'async-task-item-repository',
-                'task_id' => $taskId,
-            ]);
+            $this->logger->error(
+                'Failed to count async task items: ' . $e->getMessage(), [
+                    'component' => 'async-task-item-repository',
+                    'task_id' => $taskId,
+                ]
+            );
             return [];
         }
 
@@ -246,17 +257,19 @@ class AsyncTaskItemRepository
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
             $qb->select('COUNT(*) as cnt')
-                ->from(self::TABLE)
-                ->where('async_task_id = :async_task_id')
-                ->andWhere('deleted = 0')
-                ->setParameter('async_task_id', $taskId);
+               ->from(self::TABLE)
+               ->where('async_task_id = :async_task_id')
+               ->andWhere('deleted = 0')
+               ->setParameter('async_task_id', $taskId);
 
             $result = $qb->fetchOne();
         } catch (\Throwable $e) {
-            $this->logger->error('Failed to get async task item total: ' . $e->getMessage(), [
-                'component' => 'async-task-item-repository',
-                'task_id' => $taskId,
-            ]);
+            $this->logger->error(
+                'Failed to get async task item total: ' . $e->getMessage(), [
+                    'component' => 'async-task-item-repository',
+                    'task_id' => $taskId,
+                ]
+            );
             return 0;
         }
 
@@ -275,21 +288,23 @@ class AsyncTaskItemRepository
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
             $qb->select('id', 'async_task_id', 'item_key', 'status', 'error_message', 'data', 'result_data', 'sort_order')
-                ->from(self::TABLE)
-                ->where('async_task_id = :async_task_id')
-                ->andWhere('status = :status')
-                ->andWhere('deleted = 0')
-                ->orderBy('sort_order', 'ASC')
-                ->addOrderBy('date_entered', 'ASC')
-                ->setParameter('async_task_id', $taskId)
-                ->setParameter('status', $status);
+               ->from(self::TABLE)
+               ->where('async_task_id = :async_task_id')
+               ->andWhere('status = :status')
+               ->andWhere('deleted = 0')
+               ->orderBy('sort_order', 'ASC')
+               ->addOrderBy('date_entered', 'ASC')
+               ->setParameter('async_task_id', $taskId)
+               ->setParameter('status', $status);
 
             $rows = $qb->fetchAllAssociative();
         } catch (\Throwable $e) {
-            $this->logger->error('Failed to fetch all async task items by status: ' . $e->getMessage(), [
-                'component' => 'async-task-item-repository',
-                'task_id' => $taskId,
-            ]);
+            $this->logger->error(
+                'Failed to fetch all async task items by status: ' . $e->getMessage(), [
+                    'component' => 'async-task-item-repository',
+                    'task_id' => $taskId,
+                ]
+            );
             return [];
         }
 
@@ -308,18 +323,20 @@ class AsyncTaskItemRepository
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
             $qb->update(self::TABLE)
-                ->set('deleted', '1')
-                ->set('date_modified', ':date_modified')
-                ->where('async_task_id = :async_task_id')
-                ->setParameter('date_modified', $now)
-                ->setParameter('async_task_id', $taskId);
+               ->set('deleted', '1')
+               ->set('date_modified', ':date_modified')
+               ->where('async_task_id = :async_task_id')
+               ->setParameter('date_modified', $now)
+               ->setParameter('async_task_id', $taskId);
 
             $qb->executeStatement();
         } catch (\Throwable $e) {
-            $this->logger->error('Failed to delete async task items: ' . $e->getMessage(), [
-                'component' => 'async-task-item-repository',
-                'task_id' => $taskId,
-            ]);
+            $this->logger->error(
+                'Failed to delete async task items: ' . $e->getMessage(), [
+                    'component' => 'async-task-item-repository',
+                    'task_id' => $taskId,
+                ]
+            );
         }
     }
 
@@ -333,15 +350,17 @@ class AsyncTaskItemRepository
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
             $qb->delete(self::TABLE)
-                ->where('async_task_id = :async_task_id')
-                ->setParameter('async_task_id', $taskId);
+               ->where('async_task_id = :async_task_id')
+               ->setParameter('async_task_id', $taskId);
 
             $qb->executeStatement();
         } catch (\Throwable $e) {
-            $this->logger->error('Failed to purge async task items: ' . $e->getMessage(), [
-                'component' => 'async-task-item-repository',
-                'task_id' => $taskId,
-            ]);
+            $this->logger->error(
+                'Failed to purge async task items: ' . $e->getMessage(), [
+                    'component' => 'async-task-item-repository',
+                    'task_id' => $taskId,
+                ]
+            );
         }
     }
 
@@ -360,26 +379,66 @@ class AsyncTaskItemRepository
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
             $qb->update(self::TABLE)
-                ->set('status', ':new_status')
-                ->set('error_message', 'NULL')
-                ->set('retry_count', 'retry_count + 1')
-                ->set('date_modified', ':date_modified')
-                ->where('async_task_id = :async_task_id')
-                ->andWhere('status = :failed_status')
-                ->andWhere('retry_count < :max_retries')
-                ->andWhere('deleted = 0')
-                ->setParameter('new_status', 'queued')
-                ->setParameter('date_modified', $now)
-                ->setParameter('async_task_id', $taskId)
-                ->setParameter('failed_status', 'failed')
-                ->setParameter('max_retries', $maxRetries);
+               ->set('status', ':new_status')
+               ->set('error_message', 'NULL')
+               ->set('retry_count', 'retry_count + 1')
+               ->set('date_modified', ':date_modified')
+               ->where('async_task_id = :async_task_id')
+               ->andWhere('status = :failed_status')
+               ->andWhere('retry_count < :max_retries')
+               ->andWhere('deleted = 0')
+               ->setParameter('new_status', 'queued')
+               ->setParameter('date_modified', $now)
+               ->setParameter('async_task_id', $taskId)
+               ->setParameter('failed_status', 'failed')
+               ->setParameter('max_retries', $maxRetries);
 
             return (int)$qb->executeStatement();
         } catch (\Throwable $e) {
-            $this->logger->error('Failed to retry async task items: ' . $e->getMessage(), [
-                'component' => 'async-task-item-repository',
-                'task_id' => $taskId,
-            ]);
+            $this->logger->error(
+                'Failed to retry async task items: ' . $e->getMessage(), [
+                    'component' => 'async-task-item-repository',
+                    'task_id' => $taskId,
+                ]
+            );
+            return 0;
+        }
+    }
+
+    /**
+     * Reset ALL failed items to 'queued' and clear retry_count.
+     * Used for user-initiated retries which bypass the automatic max_retries limit.
+     *
+     * @param string $taskId
+     * @return int Number of items reset
+     */
+    public function resetFailedItems(string $taskId): int
+    {
+        $now = gmdate('Y-m-d H:i:s');
+
+        try {
+            $qb = $this->preparedStatementHandler->createQueryBuilder();
+            $qb->update(self::TABLE)
+               ->set('status', ':new_status')
+               ->set('error_message', 'NULL')
+               ->set('retry_count', '0')
+               ->set('date_modified', ':date_modified')
+               ->where('async_task_id = :async_task_id')
+               ->andWhere('status = :failed_status')
+               ->andWhere('deleted = 0')
+               ->setParameter('new_status', 'queued')
+               ->setParameter('date_modified', $now)
+               ->setParameter('async_task_id', $taskId)
+               ->setParameter('failed_status', 'failed');
+
+            return (int)$qb->executeStatement();
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                'Failed to reset async task items for retry: ' . $e->getMessage(), [
+                    'component' => 'async-task-item-repository',
+                    'task_id' => $taskId,
+                ]
+            );
             return 0;
         }
     }
@@ -395,17 +454,19 @@ class AsyncTaskItemRepository
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
             $qb->delete(self::TABLE)
-                ->where('async_task_id = :async_task_id')
-                ->andWhere('status != :failed_status')
-                ->setParameter('async_task_id', $taskId)
-                ->setParameter('failed_status', 'failed');
+               ->where('async_task_id = :async_task_id')
+               ->andWhere('status != :failed_status')
+               ->setParameter('async_task_id', $taskId)
+               ->setParameter('failed_status', 'failed');
 
             $qb->executeStatement();
         } catch (\Throwable $e) {
-            $this->logger->error('Failed to purge completed async task items: ' . $e->getMessage(), [
-                'component' => 'async-task-item-repository',
-                'task_id' => $taskId,
-            ]);
+            $this->logger->error(
+                'Failed to purge completed async task items: ' . $e->getMessage(), [
+                    'component' => 'async-task-item-repository',
+                    'task_id' => $taskId,
+                ]
+            );
         }
     }
 

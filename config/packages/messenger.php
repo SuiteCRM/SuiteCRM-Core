@@ -58,6 +58,7 @@ return static function (ContainerConfigurator $containerConfig) {
             } else if (is_array($config)) {
                 $dsn = $config['dsn'] ?? '';
                 $options = $config['options'] ?? [];
+                $serializer = $config['serializer'] ?? [];
             }
 
             if (empty($dsn)) {
@@ -66,7 +67,8 @@ return static function (ContainerConfigurator $containerConfig) {
 
             $transportsConfig[$name] = [
                 'dsn' => $dsn,
-                'options' => $options
+                'options' => $options,
+                'serializer' => $serializer
             ];
         }
     }
@@ -96,11 +98,25 @@ return static function (ContainerConfigurator $containerConfig) {
 
     $routingConfig = array_merge($defaultRouting, $routingConfig);
 
+    $serializerEnv = $env['MESSENGER_SERIALIZER'] ?? '{}';
+    $serializerOverrides = json_decode($serializerEnv, true, 512, JSON_THROW_ON_ERROR);
+
+    $defaultSerializer = [
+        'default_serializer' => 'messenger.transport.symfony_serializer',
+        'symfony_serializer' => [
+            'format' => 'json',
+            'context' => [],
+        ],
+    ];
+
+    $serializerConfig = array_merge($defaultSerializer, $serializerOverrides);
+
     $containerConfig->extension(
         'framework',
         [
             'messenger' => [
                 'failure_transport' => 'failed',
+                'serializer' => $serializerConfig,
                 'transports' => $transportsConfig,
                 'routing' => $routingConfig
             ]

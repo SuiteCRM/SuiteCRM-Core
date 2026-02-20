@@ -125,10 +125,14 @@ $viewdefs[$module_name]['DetailView'] = [
         'default' => [
             [
                 'name',
-                'type',
+                'assigned_user_name',
             ],
             [
                 'status',
+                'type',
+            ],
+            [
+                'phase',
                 'service_key',
             ],
             [
@@ -140,7 +144,6 @@ $viewdefs[$module_name]['DetailView'] = [
             ],
             [
                 'description',
-                'assigned_user_name',
             ],
             [
                 [

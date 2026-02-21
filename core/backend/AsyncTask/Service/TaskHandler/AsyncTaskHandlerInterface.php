@@ -81,7 +81,7 @@ interface AsyncTaskHandlerInterface
      *
      * @return int
      */
-    public function getMaxRetries(): int;
+    public function getMaxItemRetries(): int;
 
     /**
      * Whether this handler supports the retry-failed action (re-queues only failed items).

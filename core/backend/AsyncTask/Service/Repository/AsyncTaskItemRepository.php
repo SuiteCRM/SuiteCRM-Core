@@ -369,10 +369,10 @@ class AsyncTaskItemRepository
      * Only retries items that haven't exceeded the max retry limit.
      *
      * @param string $taskId
-     * @param int $maxRetries
+     * @param int $maxItemRetries
      * @return int Number of items reset for retry
      */
-    public function retryFailedItems(string $taskId, int $maxRetries): int
+    public function retryFailedItems(string $taskId, int $maxItemRetries): int
     {
         $now = gmdate('Y-m-d H:i:s');
 
@@ -385,13 +385,13 @@ class AsyncTaskItemRepository
                ->set('date_modified', ':date_modified')
                ->where('async_task_id = :async_task_id')
                ->andWhere('status = :failed_status')
-               ->andWhere('retry_count < :max_retries')
+               ->andWhere('retry_count < :max_item_retries')
                ->andWhere('deleted = 0')
                ->setParameter('new_status', 'queued')
                ->setParameter('date_modified', $now)
                ->setParameter('async_task_id', $taskId)
                ->setParameter('failed_status', 'failed')
-               ->setParameter('max_retries', $maxRetries);
+               ->setParameter('max_item_retries', $maxItemRetries);
 
             return (int)$qb->executeStatement();
         } catch (\Throwable $e) {

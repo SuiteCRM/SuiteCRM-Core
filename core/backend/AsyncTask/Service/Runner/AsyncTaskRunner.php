@@ -324,14 +324,14 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
     protected function transitionFromProcessing(Record $task, AsyncTaskHandlerInterface $handler, array $progress): array
     {
         $taskId = $task->getId();
-        $maxRetries = $handler->getMaxRetries();
+        $maxItemRetries = $handler->getMaxItemRetries();
 
         // Retry failed items if the handler supports it
-        if ($maxRetries > 0) {
-            $retriedCount = $this->itemRepository->retryFailedItems($taskId, $maxRetries);
+        if ($maxItemRetries > 0) {
+            $retriedCount = $this->itemRepository->retryFailedItems($taskId, $maxItemRetries);
 
             if ($retriedCount > 0) {
-                $this->log('info', 'Retrying ' . $retriedCount . ' failed items for task ' . $taskId . ' (max retries: ' . $maxRetries . ').');
+                $this->log('info', 'Retrying ' . $retriedCount . ' failed items for task ' . $taskId . ' (max item retries: ' . $maxItemRetries . ').');
                 $progress = $this->calculateProgress($taskId, $progress);
 
                 return ['status' => 'in_progress', 'progress' => $progress];

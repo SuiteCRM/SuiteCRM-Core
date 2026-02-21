@@ -51,7 +51,7 @@ abstract class AbstractAsyncTaskHandler implements AsyncTaskHandlerInterface
     /**
      * @inheritDoc
      */
-    public function getMaxRetries(): int
+    public function getMaxItemRetries(): int
     {
         return 1;
     }

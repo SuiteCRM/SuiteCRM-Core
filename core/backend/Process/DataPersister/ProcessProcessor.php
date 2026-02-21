@@ -267,7 +267,7 @@ class ProcessProcessor implements ProcessorInterface
         if (!empty($process->getId())) {
             try {
                 $processRecord = $this->recordProvider->getRecord($process->getModule() ?? 'processes', $process->getId());
-                $processRecord = $this->writeHandlerCapabilities($processRecord, $handler);
+                $processRecord = $this->prepareRecordForDispatch($processRecord, $handler);
             } catch (Throwable $e) {
                 // Record not found, we will create a new one
             }
@@ -315,15 +315,17 @@ class ProcessProcessor implements ProcessorInterface
     }
 
     /**
+     * Prepare an existing task record for dispatch: update capability flags and transition to pending status.
      * @param Record $processRecord
      * @param AsyncTaskHandlerInterface|null $handler
      * @return Record
      */
-    protected function writeHandlerCapabilities(Record $processRecord, ?AsyncTaskHandlerInterface $handler): Record
+    protected function prepareRecordForDispatch(Record $processRecord, ?AsyncTaskHandlerInterface $handler): Record
     {
         $attrs = $processRecord->getAttributes();
         $attrs['allow_failure_retry_action'] = $handler?->allowsFailureRetry() ?? false;
         $attrs['allow_failure_rerun_action'] = $handler?->allowsFailureRerun() ?? false;
+        $attrs['status'] = 'pending';
         $processRecord->setAttributes($attrs);
         return $this->recordProvider->saveRecord($processRecord);
     }

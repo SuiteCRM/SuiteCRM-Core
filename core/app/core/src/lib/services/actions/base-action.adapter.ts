@@ -49,11 +49,9 @@ import {FieldModalService} from "../modals/field-modal.service";
 import {Field, FieldMap} from "../../common/record/field.model";
 import {StringMap} from "../../common/types/string-map";
 import {FieldLogicManager} from "../../fields/field-logic/field-logic.manager";
-import {
-    LogicDefinition,
-    AfterActionLogicDefinitions
-} from "../../common/metadata/metadata.model";
+import {AfterActionLogicDefinitions, LogicDefinition} from "../../common/metadata/metadata.model";
 import {signal} from "@angular/core";
+import {isTrue} from "../../common/utils/value-utils";
 
 export abstract class BaseActionsAdapter<D extends ActionData> implements ActionDataSource {
 
@@ -130,7 +128,8 @@ export abstract class BaseActionsAdapter<D extends ActionData> implements Action
                     this.showFieldModal(action, context);
                     return;
                 }
-            }, () => {}, fields, modalContext);
+            }, () => {
+            }, fields, modalContext);
 
             return;
         }
@@ -330,7 +329,7 @@ export abstract class BaseActionsAdapter<D extends ActionData> implements Action
             this.runAfterActionLogic(afterActionLogic, actionData, context);
         }
 
-        if (this.shouldReload(process)) {
+        if (this.shouldReload(process, action)) {
             this.reload(action, process, context);
         }
 
@@ -383,9 +382,18 @@ export abstract class BaseActionsAdapter<D extends ActionData> implements Action
     /**
      * Should reload page
      * @param process
+     * @param action
      */
-    protected shouldReload(process: Process): boolean {
-        return !!(process.data && process.data.reload);
+    protected shouldReload(process: Process, action: Action = null): boolean {
+
+        const processTriggeredReload = process?.data?.reload ?? null;
+        const actionTriggeredReload = action?.params?.reload ?? null;
+
+        if (processTriggeredReload !== null) {
+            return isTrue(processTriggeredReload);
+        }
+
+        return isTrue(actionTriggeredReload);
     }
 
     /**

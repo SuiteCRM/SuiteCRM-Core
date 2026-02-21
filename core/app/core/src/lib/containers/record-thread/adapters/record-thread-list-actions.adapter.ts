@@ -159,7 +159,7 @@ export class RecordThreadListActionsAdapter extends BaseRecordActionsAdapter<Rec
     /**
      * @inheritDoc
      */
-    protected shouldReload(process: Process): boolean {
+    protected shouldReload(process: Process, action: Action = null): boolean {
         const reloadThread = process?.data?.reloadThread ?? false;
         return isTrue(reloadThread);
     }

@@ -44,6 +44,6 @@ export class IsTrueAction extends ConditionOperatorActionHandler implements Cond
     }
 
     run(record: Record, field: Field, opsConfig: LogicRuleValues): boolean {
-        return isTrue(field.value);
+        return isTrue(field?.value ?? null);
     }
 }

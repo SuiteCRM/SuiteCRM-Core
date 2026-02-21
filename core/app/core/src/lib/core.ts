@@ -617,6 +617,8 @@ export * from './services/condition-operators/is-equal/is-equal.action';
 export * from './services/condition-operators/less-than/less-than.action';
 export * from './services/condition-operators/not-empty/not-empty.action';
 export * from './services/condition-operators/not-equal/not-equal.action';
+export * from './services/condition-operators/is-true/is-true.action';
+export * from './services/condition-operators/is-false/is-false.action';
 export * from './services/currency/currency.service';
 export * from './services/extensions/extension-loader.service';
 export * from './services/formatters/data-type.formatter.service';

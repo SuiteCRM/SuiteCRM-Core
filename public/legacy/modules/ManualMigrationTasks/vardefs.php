@@ -225,6 +225,48 @@ $dictionary['ManualMigrationTask'] = [
                 'storage_type' => 'private-documents',
             ],
         ],
+
+        'allow_failure_retry_action' => [
+            'name' => 'allow_failure_retry_action',
+            'vname' => 'LBL_ALLOW_FAILURE_RETRY_ACTION',
+            'type' => 'bool',
+            'default' => false,
+            'display' => 'none',
+            'inline_edit' => false,
+            'reportable' => false,
+            'massupdate' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false,
+        ],
+
+        'allow_failure_rerun_action' => [
+            'name' => 'allow_failure_rerun_action',
+            'vname' => 'LBL_ALLOW_FAILURE_RERUN_ACTION',
+            'type' => 'bool',
+            'default' => false,
+            'display' => 'none',
+            'inline_edit' => false,
+            'reportable' => false,
+            'massupdate' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false,
+        ],
+
+        'completed_with_failures' => [
+            'name' => 'completed_with_failures',
+            'vname' => 'LBL_COMPLETED_WITH_FAILURES',
+            'type' => 'bool',
+            'default' => false,
+            'display' => 'none',
+            'inline_edit' => false,
+            'reportable' => false,
+            'massupdate' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false,
+        ],
     ],
     'relationships' => [
     ]

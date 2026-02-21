@@ -80,9 +80,39 @@ $viewdefs[$module_name]['DetailView'] = [
                     ],
                 ],
             ],
-            'retry-async-task' => [
-                'key' => 'retry-async-task',
-                'labelKey' => 'LBL_RETRY',
+            'rerun-async-task' => [
+                'key' => 'rerun-async-task',
+                'labelKey' => 'LBL_RERUN',
+                'asyncProcess' => true,
+                'priority' => 185,
+                'modes' => ['detail'],
+                'display' => 'hide',
+                'params' => [
+                    'expanded' => true,
+                    'disableOnRun' => true,
+                    'displayConfirmation' => true,
+                    'confirmationMessages' => ['LBL_RERUN_CONFIRMATION'],
+                ],
+                'displayLogic' => [
+                    'show-on-failures' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'fieldDependencies' => ['allow_failure_rerun_action', 'completed_with_failures'],
+                            'activeOnFields' => [
+                                'allow_failure_rerun_action' => [
+                                    ['operator' => 'is-true'],
+                                ],
+                                'completed_with_failures' => [
+                                    ['operator' => 'is-true'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'retry-failed-async-task' => [
+                'key' => 'retry-failed-async-task',
+                'labelKey' => 'LBL_RETRY_FAILED',
                 'asyncProcess' => true,
                 'priority' => 190,
                 'modes' => ['detail'],
@@ -91,19 +121,19 @@ $viewdefs[$module_name]['DetailView'] = [
                     'expanded' => true,
                     'disableOnRun' => true,
                     'displayConfirmation' => true,
-                    'confirmationMessages' => ['LBL_RETRY_CONFIRMATION'],
+                    'confirmationMessages' => ['LBL_RETRY_FAILED_CONFIRMATION'],
                 ],
                 'displayLogic' => [
-                    'show-on-finished' => [
+                    'show-on-failures' => [
                         'modes' => ['detail'],
                         'params' => [
-                            'fieldDependencies' => ['status'],
+                            'fieldDependencies' => ['allow_failure_retry_action', 'completed_with_failures'],
                             'activeOnFields' => [
-                                'status' => [
-                                    [
-                                        'operator' => 'is-equal',
-                                        'values' => ['completed', 'failed'],
-                                    ],
+                                'allow_failure_retry_action' => [
+                                    ['operator' => 'is-true'],
+                                ],
+                                'completed_with_failures' => [
+                                    ['operator' => 'is-true'],
                                 ],
                             ],
                         ],
@@ -183,6 +213,19 @@ $viewdefs[$module_name]['DetailView'] = [
                 [
                     'name' => 'date_modified',
                     'label' => 'LBL_DATE_MODIFIED',
+                ],
+            ],
+            [
+                [
+                    'name' => 'allow_failure_retry_action',
+                ],
+                [
+                    'name' => 'allow_failure_rerun_action',
+                ],
+            ],
+            [
+                [
+                    'name' => 'completed_with_failures',
                 ],
             ],
         ],

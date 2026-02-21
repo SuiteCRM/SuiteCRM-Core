@@ -790,6 +790,7 @@ $app_list_strings = array(
     ],
 
     'dom_manual_migration_tasks_statuses' => [
+        'initial' => 'Initial',
         'pending' => 'Pending',
         'running' => 'Running',
         'failed' => 'Failed',

@@ -29,7 +29,9 @@ namespace App\AsyncTask\Service\RecordActions;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use App\AsyncTask\Service\Repository\AsyncTaskItemRepository;
+use App\AsyncTask\Service\Runner\AsyncTaskRunnerRegistryInterface;
 use App\Data\Service\RecordDeletionServiceInterface;
+use App\Data\Service\RecordProviderInterface;
 use App\Module\Service\ModuleNameMapperInterface;
 use App\Process\Entity\Process;
 use App\Process\Service\ProcessHandlerInterface;
@@ -40,12 +42,14 @@ class DismissAsyncTaskAction implements ProcessHandlerInterface
 
     protected const MSG_OPTIONS_NOT_FOUND = 'Process options are not defined';
 
-    protected const SUPPORTED_MODULES = ['processes', 'manual-migration-tasks'];
+    protected const DISMISSABLE_STATUSES = ['completed', 'failed'];
 
     public function __construct(
         protected ModuleNameMapperInterface $moduleNameMapper,
         protected RecordDeletionServiceInterface $recordDeletionProvider,
-        protected AsyncTaskItemRepository $itemRepository
+        protected AsyncTaskItemRepository $itemRepository,
+        protected RecordProviderInterface $recordProvider,
+        protected AsyncTaskRunnerRegistryInterface $runnerRegistry
     ) {
     }
 
@@ -95,7 +99,17 @@ class DismissAsyncTaskAction implements ProcessHandlerInterface
         $module = $options['module'] ?? '';
         $id = $options['id'] ?? '';
 
-        if (!in_array($module, self::SUPPORTED_MODULES, true)) {
+        if ($this->runnerRegistry->getRunner($module) === null) {
+            $process->setStatus('error');
+            $process->setMessages(['LBL_ACTION_ERROR']);
+            return;
+        }
+
+        $task = $this->recordProvider->getRecord($module, $id);
+        $attrs = $task->getAttributes();
+        $status = $attrs['status'] ?? '';
+
+        if (!in_array($status, self::DISMISSABLE_STATUSES, true)) {
             $process->setStatus('error');
             $process->setMessages(['LBL_ACTION_ERROR']);
             return;

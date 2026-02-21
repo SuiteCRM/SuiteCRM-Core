@@ -82,4 +82,20 @@ interface AsyncTaskHandlerInterface
      * @return int
      */
     public function getMaxRetries(): int;
+
+    /**
+     * Whether this handler supports the retry-failed action (re-queues only failed items).
+     * When true, the retry-failed button is shown on the task record view after a failure.
+     *
+     * @return bool
+     */
+    public function allowsFailureRetry(): bool;
+
+    /**
+     * Whether this handler supports the rerun action (purges all items and restarts from scratch).
+     * When true, the rerun button is shown on the task record view after a failure.
+     *
+     * @return bool
+     */
+    public function allowsFailureRerun(): bool;
 }

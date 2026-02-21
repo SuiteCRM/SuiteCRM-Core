@@ -55,4 +55,20 @@ abstract class AbstractAsyncTaskHandler implements AsyncTaskHandlerInterface
     {
         return 1;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function allowsFailureRetry(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function allowsFailureRerun(): bool
+    {
+        return false;
+    }
 }

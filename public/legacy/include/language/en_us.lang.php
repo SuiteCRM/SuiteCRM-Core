@@ -803,6 +803,7 @@ $app_list_strings = array(
     ],
 
     'dom_processes_statuses' => [
+        'initial' => 'Initial',
         'pending' => 'Pending',
         'running' => 'Running',
         'failed' => 'Failed',

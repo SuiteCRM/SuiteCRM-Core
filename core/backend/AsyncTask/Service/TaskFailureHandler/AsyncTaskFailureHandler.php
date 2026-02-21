@@ -93,6 +93,7 @@ abstract class AsyncTaskFailureHandler implements AsyncTaskFailureHandlerInterfa
             $attributes['progress'] = $progress;
             $attributes['status'] = 'failed';
             $attributes['phase'] = 'completed';
+            $attributes['completed_with_failures'] = true;
             $attributes['last_run_datetime'] = (new \DateTime())->format('Y-m-d H:i:s');
 
             $this->log('debug', 'Saving failed task', ['taskId' => $task->getId(), 'phase' => $attributes['phase']]);

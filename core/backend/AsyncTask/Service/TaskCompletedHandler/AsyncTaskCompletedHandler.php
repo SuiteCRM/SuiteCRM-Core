@@ -99,6 +99,7 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
             $attributes['progress'] = $progress;
             $attributes['status'] = 'completed';
             $attributes['phase'] = 'completed';
+            $attributes['completed_with_failures'] = ($progress['failed'] ?? 0) > 0;
             $attributes['last_run_datetime'] = (new \DateTime())->format('Y-m-d H:i:s');
 
             $task->setAttributes($attributes);

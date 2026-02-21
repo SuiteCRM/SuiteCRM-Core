@@ -243,7 +243,7 @@ class ProcessProcessor implements ProcessorInterface
             return;
         }
 
-        $this->dispatchAsyncTaskMessage($process, $asyncTaskType, $asyncHandlerKey);
+        $this->dispatchAsyncTaskMessage($process, $asyncTaskType, $asyncHandlerKey, $handler);
     }
 
     /**
@@ -251,12 +251,14 @@ class ProcessProcessor implements ProcessorInterface
      * @param Process $process
      * @param string $asyncTaskType
      * @param string $asyncHandlerKey
+     * @param AsyncTaskHandlerInterface|null $handler
      * @return void
      */
     protected function dispatchAsyncTaskMessage(
         Process $process,
         string $asyncTaskType,
-        string $asyncHandlerKey
+        string $asyncHandlerKey,
+        ?AsyncTaskHandlerInterface $handler = null
     ): void {
         $module = $process->getModule() ?? 'default';
         $options = $process->getOptions() ?? [];
@@ -265,13 +267,14 @@ class ProcessProcessor implements ProcessorInterface
         if (!empty($process->getId())) {
             try {
                 $processRecord = $this->recordProvider->getRecord($process->getModule() ?? 'processes', $process->getId());
+                $processRecord = $this->writeHandlerCapabilities($processRecord, $handler);
             } catch (Throwable $e) {
                 // Record not found, we will create a new one
             }
         }
 
         if ($processRecord === null || empty($processRecord->getId())) {
-            $mappedRecord = $this->mapToRecord($process);
+            $mappedRecord = $this->mapToRecord($process, $handler);
             $processRecord = $this->recordProvider->saveRecord($mappedRecord);
         }
 
@@ -281,9 +284,10 @@ class ProcessProcessor implements ProcessorInterface
     /**
      * Map Process entity to Record entity
      * @param Process $process
+     * @param AsyncTaskHandlerInterface|null $handler
      * @return Record
      */
-    protected function mapToRecord(Process $process): Record
+    protected function mapToRecord(Process $process, ?AsyncTaskHandlerInterface $handler = null): Record
     {
         $record = new Record();
         $record->setModule($process->getAsyncRunnerType() ?? 'processes');
@@ -296,6 +300,8 @@ class ProcessProcessor implements ProcessorInterface
             'status' => 'pending',
             'phase' => '',
             'service_key' => $process->getAsyncHandlerKey(),
+            'allow_failure_retry_action' => $handler?->allowsFailureRetry() ?? false,
+            'allow_failure_rerun_action' => $handler?->allowsFailureRerun() ?? false,
         ];
 
         $data = $process->getData() ?? [];
@@ -306,5 +312,19 @@ class ProcessProcessor implements ProcessorInterface
         $record->setAttributes($attributes);
 
         return $record;
+    }
+
+    /**
+     * @param Record $processRecord
+     * @param AsyncTaskHandlerInterface|null $handler
+     * @return Record
+     */
+    protected function writeHandlerCapabilities(Record $processRecord, ?AsyncTaskHandlerInterface $handler): Record
+    {
+        $attrs = $processRecord->getAttributes();
+        $attrs['allow_failure_retry_action'] = $handler?->allowsFailureRetry() ?? false;
+        $attrs['allow_failure_rerun_action'] = $handler?->allowsFailureRerun() ?? false;
+        $processRecord->setAttributes($attrs);
+        return $this->recordProvider->saveRecord($processRecord);
     }
 }

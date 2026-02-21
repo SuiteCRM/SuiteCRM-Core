@@ -63,6 +63,7 @@ $viewdefs[$module_name]['DetailView'] = [
                     'disableOnRun' => true,
                     'displayConfirmation' => true,
                     'confirmationMessages' => ['LBL_RUN_MIGRATION_CONFIRMATION'],
+                    'reload' => true,
                 ],
                 'displayLogic' => [
                     'show-on-initial' => [

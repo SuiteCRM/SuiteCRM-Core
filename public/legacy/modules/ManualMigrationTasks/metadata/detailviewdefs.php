@@ -55,7 +55,7 @@ $viewdefs[$module_name]['DetailView'] = [
                 'asyncProcess' => true,
                 'priority' => 100,
                 'modes' => ['detail'],
-                'display' => 'show',
+                'display' => 'hide',
                 'params' => [
                     'asyncProcessKeyField' => 'service_key',
                     'asyncProcessKeyPrefix' => 'migration-task',
@@ -65,18 +65,19 @@ $viewdefs[$module_name]['DetailView'] = [
                     'confirmationMessages' => ['LBL_RUN_MIGRATION_CONFIRMATION'],
                 ],
                 'displayLogic' => [
-                    'hide-on-running' => [
+                    'show-on-initial' => [
                         'modes' => ['detail'],
                         'params' => [
+                            'fieldDependencies' => ['status'],
                             'activeOnFields' => [
                                 'status' => [
                                     [
-                                        'operator' => 'not-equal',
-                                        'values' => ['pending']
+                                        'operator' => 'is-equal',
+                                        'values' => ['initial']
                                     ],
                                 ],
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                 ],
             ],

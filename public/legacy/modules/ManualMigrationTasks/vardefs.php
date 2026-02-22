@@ -272,4 +272,4 @@ $dictionary['ManualMigrationTask'] = [
     ]
 ];
 
-VardefManager::createVardef('ManualMigrationTasks', 'ManualMigrationTask', ['basic', 'security_groups']);
+VardefManager::createVardef('ManualMigrationTasks', 'ManualMigrationTask', ['basic', 'security_groups', 'assignable']);

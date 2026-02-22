@@ -133,6 +133,7 @@ include("metadata/cache_rebuildMetaData.php");
 include("metadata/attachments_referencesMetaData.php");
 
 include 'metadata/surveyquestionoptions_surveyquestionresponsesMetaData.php';
+include 'metadata/messenger_messagesMetaData.php';
 
 if (file_exists('custom/application/Ext/TableDictionary/tabledictionary.ext.php')) {
     include('custom/application/Ext/TableDictionary/tabledictionary.ext.php');

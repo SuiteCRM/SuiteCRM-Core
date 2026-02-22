@@ -4436,3 +4436,9 @@ $app_strings['LBL_NO_RECORD_ID_PROVIDED'] = 'Cannot find docuemnt revision to de
 $app_strings['LBL_DELETE_REVISION_CONFIRM'] = 'Are you sure you want to delete this revision?';
 $app_strings['LBL_DOCUMENT_NOT_FOUND'] = 'Document not found.';
 $app_strings['LBL_EMAIL_ATTACHMENT_DOCUMENT_DELETED'] = 'One or more attached documents have been deleted and cannot be sent.';
+
+$app_strings['LBL_DISMISS_INVALID_STATUS'] = 'This record cannot be dismissed while it is still in progress.';
+$app_strings['LBL_DISMISS_FAILED'] = 'Failed to dismiss. Please try again.';
+$app_strings['LBL_RERUN_NOT_ELIGIBLE'] = 'This record is not eligible for re-run. It may not have completed with failures or re-run may not be supported.';
+$app_strings['LBL_RETRY_FAILED_NOT_ELIGIBLE'] = 'This record is not eligible for retry. It may not have completed with failures or retry may not be supported.';
+$app_strings['LBL_ASYNC_TASK_UNSUPPORTED_MODULE'] = 'This module does not support async task actions.';

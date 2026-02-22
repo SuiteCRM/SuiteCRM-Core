@@ -67,7 +67,7 @@ class RerunAsyncTaskAction implements ProcessHandlerInterface
         return [
             $module => [
                 [
-                    'action' => 'edit',
+                    'action' => 'view',
                     'record' => $options['id'] ?? '',
                 ],
             ],
@@ -97,7 +97,7 @@ class RerunAsyncTaskAction implements ProcessHandlerInterface
 
         if ($this->runnerRegistry->getRunner($module) === null) {
             $process->setStatus('error');
-            $process->setMessages(['LBL_ACTION_ERROR']);
+            $process->setMessages(['LBL_ASYNC_TASK_UNSUPPORTED_MODULE']);
             return;
         }
 
@@ -107,7 +107,7 @@ class RerunAsyncTaskAction implements ProcessHandlerInterface
 
         if (empty($attrs['allow_failure_rerun_action']) || empty($attrs['completed_with_failures'])) {
             $process->setStatus('error');
-            $process->setMessages(['LBL_ACTION_ERROR']);
+            $process->setMessages(['LBL_RERUN_NOT_ELIGIBLE']);
             return;
         }
 

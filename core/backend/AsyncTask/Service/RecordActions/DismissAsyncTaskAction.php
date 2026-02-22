@@ -101,7 +101,7 @@ class DismissAsyncTaskAction implements ProcessHandlerInterface
 
         if ($this->runnerRegistry->getRunner($module) === null) {
             $process->setStatus('error');
-            $process->setMessages(['LBL_ACTION_ERROR']);
+            $process->setMessages(['LBL_ASYNC_TASK_UNSUPPORTED_MODULE']);
             return;
         }
 
@@ -111,7 +111,7 @@ class DismissAsyncTaskAction implements ProcessHandlerInterface
 
         if (!in_array($status, self::DISMISSABLE_STATUSES, true)) {
             $process->setStatus('error');
-            $process->setMessages(['LBL_ACTION_ERROR']);
+            $process->setMessages(['LBL_DISMISS_INVALID_STATUS']);
             return;
         }
 
@@ -122,7 +122,7 @@ class DismissAsyncTaskAction implements ProcessHandlerInterface
 
         if (!$result) {
             $process->setStatus('error');
-            $process->setMessages(['LBL_ACTION_ERROR']);
+            $process->setMessages(['LBL_DISMISS_FAILED']);
             return;
         }
 

@@ -28,6 +28,7 @@
 namespace App\Notifier\LegacyHandler;
 
 use App\AsyncTask\Service\LegacyBridge\AsyncTaskLegacyHandler;
+use App\DateTime\LegacyHandler\DateTimeHandlerInterface;
 use App\Module\Service\ModuleNameMapperInterface;
 use App\Notifier\Message\Notification;
 use BeanFactory;
@@ -39,7 +40,8 @@ class LegacyAlertCreatorHandler
     public function __construct(
         protected AsyncTaskLegacyHandler $legacyHandler,
         protected ModuleNameMapperInterface $moduleNameMapper,
-        protected LoggerInterface $logger
+        protected LoggerInterface $logger,
+        protected DateTimeHandlerInterface $dateTimeHandler
     ) {
     }
 
@@ -65,8 +67,8 @@ class LegacyAlertCreatorHandler
             $alert->assigned_user_id = $notification->getAssignedUserId();
             $alert->type = $notification->getType();
             $alert->reminder_id = '';
-            $alert->snooze = '';
-            $alert->date_start = '';
+            $alert->snooze = $this->dateTimeHandler->nowDb();
+            $alert->status = $notification->getData()['status'] ?? '';
             $alert->save();
         } catch (Throwable $e) {
             $this->logger->error(

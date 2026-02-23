@@ -52,9 +52,7 @@ class AsyncTaskNotificationDispatcher implements AsyncTaskNotificationDispatcher
         }
 
         $taskName = $attrs['name'] ?? '';
-        $labelKey = $status === 'completed' ? 'LBL_TASK_NOTIFICATION_COMPLETED' : 'LBL_TASK_NOTIFICATION_FAILED';
-        $prefix   = $this->languageManager->getAppLabel($labelKey);
-        $subject  = trim($prefix . ' ' . $taskName);
+        $subject  = $taskName;
         $type = $status === 'completed' ? 'info' : 'warning';
 
         $this->notificationDispatcher->dispatch(
@@ -62,7 +60,8 @@ class AsyncTaskNotificationDispatcher implements AsyncTaskNotificationDispatcher
             assignedUserId: $assignedUserId,
             targetModule: $module,
             targetRecordId: $task->getId(),
-            type: $type
+            type: $type,
+            data: ['status' => $status]
         );
     }
 }

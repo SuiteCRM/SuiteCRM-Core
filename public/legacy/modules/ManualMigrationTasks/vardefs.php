@@ -93,7 +93,27 @@ $dictionary['ManualMigrationTask'] = [
                 'percent' => [
                     'name' => 'percent',
                     'type' => 'texttemplate',
-                    'metadata' => ['templateLabelKey' => 'LBL_PROGRESS_PERCENT_TPL']
+                    'metadata' => [
+                        'templateLabelKey' => 'LBL_PROGRESS_PERCENT_TPL',
+                        'conditionalTemplates' => [
+                            [
+                                'templateLabelKey' => 'LBL_PROGRESS_NOT_STARTED',
+                                'displayModes' => ['detail', 'list'],
+                                'fieldName' => 'status',
+                                'activeOn' => [
+                                    ['operator' => 'is-equal', 'values' => ['initial', 'pending']],
+                                ],
+                            ],
+                            [
+                                'templateLabelKey' => 'LBL_PROGRESS_QUEUING_TPL',
+                                'displayModes' => ['detail', 'list'],
+                                'fieldName' => 'phase',
+                                'activeOn' => [
+                                    ['operator' => 'is-equal', 'values' => ['queueing']],
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'completed' => [
                     'name' => 'completed',
@@ -101,6 +121,14 @@ $dictionary['ManualMigrationTask'] = [
                 ],
                 'failed' => [
                     'name' => 'failed',
+                    'type' => 'int',
+                ],
+                'total' => [
+                    'name' => 'total',
+                    'type' => 'int',
+                ],
+                'queued' => [
+                    'name' => 'queued',
                     'type' => 'int',
                 ],
             ],

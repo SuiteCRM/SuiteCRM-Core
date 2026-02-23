@@ -32,7 +32,7 @@ use App\Engine\LegacyHandler\LegacyScopeState;
 use DateFormatService;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class DateTimeHandler extends LegacyHandler
+class DateTimeHandler extends LegacyHandler implements DateTimeHandlerInterface
 {
     public const HANDLER_KEY = 'date-time';
     /**
@@ -151,5 +151,22 @@ class DateTimeHandler extends LegacyHandler
         $this->close();
 
         return $timedate;
+    }
+
+    /**
+     * Get the current datetime as a DB-format string (UTC, Y-m-d H:i:s).
+     * @return string
+     */
+    public function nowDb(): string
+    {
+        $this->init();
+
+        global $timedate;
+
+        $result = $timedate->nowDb();
+
+        $this->close();
+
+        return $result;
     }
 }

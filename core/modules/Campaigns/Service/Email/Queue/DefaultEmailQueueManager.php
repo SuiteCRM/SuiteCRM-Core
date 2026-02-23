@@ -29,7 +29,7 @@ namespace App\Module\Campaigns\Service\Email\Queue;
 
 use App\Authentication\LegacyHandler\UserHandler;
 use App\Data\LegacyHandler\PreparedStatementHandler;
-use App\DateTime\LegacyHandler\DateTimeHandler;
+use App\DateTime\LegacyHandler\DateTimeHandlerInterface;
 use Doctrine\DBAL\Exception;
 use Psr\Log\LoggerInterface;
 
@@ -39,7 +39,7 @@ class DefaultEmailQueueManager implements EmailQueueManagerInterface
         protected PreparedStatementHandler $preparedStatementHandler,
         protected LoggerInterface $logger,
         protected UserHandler $userHandler,
-        protected DateTimeHandler $dateTimeHandler
+        protected DateTimeHandlerInterface $dateTimeHandler
     ) {
     }
 

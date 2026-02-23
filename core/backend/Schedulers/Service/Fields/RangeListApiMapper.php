@@ -30,8 +30,7 @@ namespace App\Schedulers\Service\Fields;
 use App\Authentication\LegacyHandler\UserHandler;
 use App\Data\Entity\Record;
 use App\Data\Service\Record\ApiRecordMappers\ApiRecordFieldMapperInterface;
-use App\Data\Service\Record\ApiRecordMappers\ApiRecordFieldTypeMapperInterface;
-use App\DateTime\LegacyHandler\DateTimeHandler;
+use App\DateTime\LegacyHandler\DateTimeHandlerInterface;
 use App\FieldDefinitions\Entity\FieldDefinition;
 use App\Languages\LegacyHandler\ModStringsHandler;
 
@@ -41,11 +40,10 @@ class RangeListApiMapper implements ApiRecordFieldMapperInterface
     public const FIELD = 'date_time_start';
 
     public function __construct(
-        protected UserHandler       $userHandler,
+        protected UserHandler $userHandler,
         protected ModStringsHandler $modStringsHandler,
-        protected DateTimeHandler  $dateTimeHandler
-    )
-    {
+        protected DateTimeHandlerInterface $dateTimeHandler
+    ) {
     }
 
     public function getModule(): string

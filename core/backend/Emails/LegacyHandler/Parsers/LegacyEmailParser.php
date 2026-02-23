@@ -27,7 +27,7 @@
 
 namespace App\Emails\LegacyHandler\Parsers;
 
-use App\DateTime\LegacyHandler\DateTimeHandler;
+use App\DateTime\LegacyHandler\DateTimeHandlerInterface;
 use App\Emails\Service\EmailParserHandler\EmailParserInterface;
 use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;
@@ -39,16 +39,15 @@ class LegacyEmailParser extends LegacyHandler implements EmailParserInterface
     public const KEY = 'legacy-email-parser';
 
     public function __construct(
-        string                        $projectDir,
-        string                        $legacyDir,
-        string                        $legacySessionName,
-        string                        $defaultSessionName,
-        LegacyScopeState              $legacyScopeState,
-        RequestStack                  $requestStack,
+        string $projectDir,
+        string $legacyDir,
+        string $legacySessionName,
+        string $defaultSessionName,
+        LegacyScopeState $legacyScopeState,
+        RequestStack $requestStack,
         protected SystemConfigHandler $systemConfigHandler,
-        protected DateTimeHandler     $dateTimeHandler
-    )
-    {
+        protected DateTimeHandlerInterface $dateTimeHandler
+    ) {
         parent::__construct(
             $projectDir,
             $legacyDir,
@@ -87,17 +86,19 @@ class LegacyEmailParser extends LegacyHandler implements EmailParserInterface
     {
         $siteUrl = $this->getSiteUrl();
 
-        $string =  str_replace([
-            '$config_site_url',
-            '$sugarurl',
-            '$contact_user_user_name',
-            '$contact_user_pwd_last_changed',
-        ], [
+        $string = str_replace(
+            [
+                '$config_site_url',
+                '$sugarurl',
+                '$contact_user_user_name',
+                '$contact_user_pwd_last_changed',
+            ], [
             $siteUrl,
             $siteUrl,
             $bean->name ?? '',
             $this->dateTimeHandler->getDateTime()->nowDb(),
-        ], $string);
+        ], $string
+        );
 
         require_once $this->legacyDir . '/modules/EmailTemplates/EmailTemplateParser.php';
 

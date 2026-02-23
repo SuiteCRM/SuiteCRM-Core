@@ -28,7 +28,7 @@
 namespace App\Install\Service;
 
 use App\Data\LegacyHandler\PreparedStatementHandler;
-use App\DateTime\LegacyHandler\DateTimeHandler;
+use App\DateTime\LegacyHandler\DateTimeHandlerInterface;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Psr\Log\LoggerInterface;
@@ -38,7 +38,7 @@ class CommandLastRunTracker {
     public function __construct(
         protected PreparedStatementHandler $preparedStatementHandler,
         protected LoggerInterface $logger,
-        protected DateTimeHandler $dateTimeHandler
+        protected DateTimeHandlerInterface $dateTimeHandler
     )
     {
     }

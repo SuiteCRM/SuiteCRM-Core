@@ -27,25 +27,17 @@
 
 namespace App\UserPreferences\LegacyHandler\Mappers;
 
-use App\DateTime\LegacyHandler\DateTimeHandler;
+use App\DateTime\LegacyHandler\DateTimeHandlerInterface;
 use App\UserPreferences\LegacyHandler\UserPreferencesMapperInterface;
 
 class DateFormatPreferenceMapper implements UserPreferencesMapperInterface
 {
-
-    /**
-     * @var DateTimeHandler
-     */
-    private $dateTimeHandler;
-
     /**
      * DateFormatPreferenceMapper constructor.
-     * @param DateTimeHandler $dateTimeHandler
+     * @param DateTimeHandlerInterface $dateTimeHandler
      */
-    public function __construct(DateTimeHandler $dateTimeHandler)
+    public function __construct(protected DateTimeHandlerInterface $dateTimeHandler)
     {
-
-        $this->dateTimeHandler = $dateTimeHandler;
     }
 
     /**

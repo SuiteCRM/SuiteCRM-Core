@@ -27,24 +27,18 @@
 
 namespace App\SystemConfig\LegacyHandler;
 
+use App\DateTime\LegacyHandler\DateTimeHandlerInterface;
 use App\SystemConfig\Entity\SystemConfig;
-use App\DateTime\LegacyHandler\DateTimeHandler;
 
 class DateFormatConfigMapper implements SystemConfigMapperInterface
 {
-    /**
-     * @var DateTimeHandler
-     */
-    private $dateTimeHandler;
 
     /**
      * DateFormatConfigMapper constructor.
-     * @param DateTimeHandler $dateTimeHandler
+     * @param DateTimeHandlerInterface $dateTimeHandler
      */
-    public function __construct(DateTimeHandler $dateTimeHandler)
+    public function __construct(protected DateTimeHandlerInterface $dateTimeHandler)
     {
-
-        $this->dateTimeHandler = $dateTimeHandler;
     }
 
     /**

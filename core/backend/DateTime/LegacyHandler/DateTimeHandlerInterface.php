@@ -1,7 +1,7 @@
 <?php
 /**
  * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
- * Copyright (C) 2022 SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -25,39 +25,54 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-namespace App\UserPreferences\LegacyHandler\Mappers;
+namespace App\DateTime\LegacyHandler;
 
-use App\DateTime\LegacyHandler\DateTimeHandlerInterface;
-use App\UserPreferences\LegacyHandler\UserPreferencesMapperInterface;
-
-class TimeFormatPreferenceMapper implements UserPreferencesMapperInterface
+interface DateTimeHandlerInterface
 {
+    /**
+     * Map Datetime format
+     * @param string $format
+     * @return string
+     */
+    public function mapFormat(string $format): string;
 
     /**
-     * TimeFormatPreferenceMapper constructor.
-     * @param DateTimeHandlerInterface $dateTimeHandler
+     * To user date format
+     * @param string $dateString
+     * @return string
      */
-    public function __construct(protected DateTimeHandlerInterface $dateTimeHandler)
-    {
-    }
+    public function toUserDate(string $dateString): string;
 
     /**
-     * @inheritDoc
+     * To user datetime format
+     * @param string $dateString
+     * @return string
      */
-    public function getKey(): string
-    {
-        return 'timef';
-    }
+    public function toUserDateTime(string $dateString): string;
 
     /**
-     * @inheritDoc
+     * To DB datetime format
+     * @param string $dateString
+     * @return string
      */
-    public function map($value)
-    {
-        if (empty($value)) {
-            return $value;
-        }
+    public function toDBDateTime(string $dateString): string;
 
-        return $this->dateTimeHandler->mapFormat($value);
-    }
+    /**
+     * From string format to datetime object
+     * @param string $dateString
+     * @return \SugarDateTime
+     */
+    public function toDateTime(string $dateString): \SugarDateTime;
+
+    /**
+     * Get the legacy TimeDate instance
+     * @return \TimeDate
+     */
+    public function getDateTime(): \TimeDate;
+
+    /**
+     * Get the current datetime as a DB-format string (UTC, Y-m-d H:i:s).
+     * @return string
+     */
+    public function nowDb(): string;
 }

@@ -30,7 +30,7 @@ namespace App\Module\Campaigns\Service\Email\Log;
 use App\Data\Entity\Record;
 use App\Data\LegacyHandler\PreparedStatementHandler;
 use App\Data\Service\RecordProviderInterface;
-use App\DateTime\LegacyHandler\DateTimeHandler;
+use App\DateTime\LegacyHandler\DateTimeHandlerInterface;
 use Doctrine\DBAL\Exception;
 use Psr\Log\LoggerInterface;
 
@@ -39,7 +39,7 @@ class DefaultEmailCampaignLogManager implements EmailCampaignLogManagerInterface
     public function __construct(
         protected RecordProviderInterface $recordProvider,
         protected LoggerInterface $logger,
-        protected DateTimeHandler $dateTimeHandler,
+        protected DateTimeHandlerInterface $dateTimeHandler,
         protected PreparedStatementHandler $preparedStatementHandler,
     ) {
     }

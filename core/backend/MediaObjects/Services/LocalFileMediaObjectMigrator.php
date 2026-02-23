@@ -67,6 +67,12 @@ class LocalFileMediaObjectMigrator implements LocalFileMediaObjectMigratorInterf
 
         $this->mediaObjectManager->saveMediaObject($storageType, $mediaObject);
 
+        // Vich's upload listener overwrites originalName with the file's basename during flush.
+        // Restore the intended original name with a second lightweight save (file is null at this point,
+        // so Vich skips the upload and only the field update is persisted).
+        $mediaObject->setOriginalName($originalName);
+        $this->mediaObjectManager->saveMediaObject($storageType, $mediaObject);
+
         if ($deleteSourceFile && file_exists($filePath)) {
             unlink($filePath);
         }

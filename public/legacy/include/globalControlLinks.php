@@ -63,6 +63,15 @@ $global_control_links['employees'] = array(
 'linkinfo' => array($app_strings['LBL_EMPLOYEES']=> 'index.php?module=Employees&action=index'),
 'submenu' => ''
 );
+
+$global_control_links['processes'] = array(
+    'linkinfo' => array(
+        $app_strings['LNK_USER_MENU_PROCESSES'] => './#/processes'
+    ),
+    'submenu' => ''
+);
+
+
 if (
         is_admin($current_user)
 

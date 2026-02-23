@@ -3836,6 +3836,8 @@ $app_list_strings['moduleList']['ManualMigrationTasks'] = 'Migrations';
 $app_list_strings['moduleList']['Processes'] = 'Processes';
 $app_list_strings['moduleList']['AsyncTaskItems'] = 'Async Task Item';
 
+$app_strings['LNK_USER_MENU_PROCESSES'] = 'Processes';
+
 //social
 $app_strings['FACEBOOK_USER_C'] = 'Facebook';
 $app_strings['TWITTER_USER_C'] = 'Twitter';

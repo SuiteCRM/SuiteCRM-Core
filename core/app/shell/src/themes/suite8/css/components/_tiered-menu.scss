@@ -24,12 +24,28 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-.tiered-menu-container {
+
+.tiered-menu-popup-button {
+  .popover {
+    width: 220px !important;
+    .popover-body {
+      padding: .15em !important;
+      .tiered-menu-popup-body {
+
+      }
+    }
+  }
+}
+
+
+
+.tiered-menu-container,
+.tiered-menu-popup-button .popover .tiered-menu-container {
   max-height: 25em;
 
   .tiered-menu-search-bar {
     border: solid 1px lightgray;
-
+    border-radius: 0.35em;
     .input-group {
       background-color: #fff !important;
     }
@@ -49,8 +65,8 @@
 
       width: inherit;
       background-color: $white;
-      padding-bottom: 0.1em;
       border: none !important;
+      padding: .15em .15em 0;
 
       .p-tieredmenu-root-list {
         list-style-type: none !important;
@@ -59,11 +75,17 @@
 
         > .p-menuitem {
           > .p-menuitem-content {
-            border-bottom: 1px solid lightgrey;
+            border-top: 1px solid lightgrey;
+
+            .p-menuitem-text {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
           }
 
-          &:last-child > .p-menuitem-content {
-            border-bottom: none;
+          &:first-child > .p-menuitem-content {
+            border-top: none;
           }
         }
 
@@ -74,14 +96,17 @@
           max-height: 18em;
           overflow: auto;
           scrollbar-width: thin;
+          max-width: 16em !important;
           overflow-x: clip;
           position: fixed;
           padding-top: 0.2em;
-          top: 51px;
+          top: 41px;
+          margin-left: 4px;
+
 
           > .p-menuitem {
             > .p-menuitem-content {
-              border-bottom: 1px solid lightgrey;
+              border-top: 1px solid lightgrey;
 
               > a {
                 display: flex;
@@ -90,14 +115,25 @@
                 padding-bottom: 0.25em;
               }
 
+              .p-menuitem-text {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 95%;
+              }
+
               .p-menuitem-badge {
                 font-size: small;
                 color: gray;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 95%;
               }
             }
 
-            &:last-child > .p-menuitem-content {
-              border-bottom: none;
+            &:first-child > .p-menuitem-content {
+              border-top: none;
             }
           }
         }
@@ -109,3 +145,49 @@
     }
   }
 }
+
+
+@media (max-width: $breakpoint-large) {
+  .tiered-menu-container,
+  .tiered-menu-popup-button .popover {
+    width: 250px !important;
+    .tiered-menu-container {
+      max-height: none !important;
+      .tiered-menu-search-bar {
+        max-width: 93% !important;
+      }
+
+      .tiered-menu {
+        max-height: 36em;
+
+        .p-tieredmenu {
+          max-width: 96%!important;
+
+          .p-tieredmenu-root-list {
+            .p-menuitem-link {
+              padding: .75em .45em;
+            }
+            .p-submenu-list {
+              position: inherit !important;
+              max-width: 16em !important;
+              margin-left: 0 !important;
+              margin-top: 5px;
+              margin-bottom: 5px;
+              max-height: 15em!important;
+              box-shadow: .1rem .15rem .2rem #00000040 !important;
+            }
+          }
+
+
+        }
+      }
+
+    }
+  }
+
+  .input-group {
+    margin: .25em !important;
+    width: 96%;
+  }
+}
+

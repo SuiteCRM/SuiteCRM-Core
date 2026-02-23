@@ -25,8 +25,9 @@
 * the words "Supercharged by SuiteCRM".
 */
 -->
-<scrm-dynamic-label *ngIf="field?.definition?.metadata?.templateLabelKey"
-                    [labelKey]="field.definition.metadata.templateLabelKey"
-                    [fields]="record?.fields"
-                    [module]="record?.module">
-</scrm-dynamic-label>
+<ng-container *ngIf="activeTemplateKey() as templateKey">
+    <scrm-dynamic-label [labelKey]="templateKey"
+                        [fields]="record?.fields"
+                        [module]="record?.module">
+    </scrm-dynamic-label>
+</ng-container>

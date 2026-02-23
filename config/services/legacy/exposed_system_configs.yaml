@@ -32,6 +32,8 @@ parameters:
     list_max_entries_per_modal: true
     list_max_entries_per_record_thread: true
     image_field_height_default: true
+    image_field_subpanel_height_default: true
+    image_field_listview_height_default: true
     record_modal_pagination_type: true
     cache_reset_actions: true
     navigation_tab_limits: true

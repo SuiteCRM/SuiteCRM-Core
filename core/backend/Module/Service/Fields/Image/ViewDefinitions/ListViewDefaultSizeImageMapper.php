@@ -28,11 +28,18 @@
 namespace App\Module\Service\Fields\Image\ViewDefinitions;
 
 use App\FieldDefinitions\Entity\FieldDefinition;
+use App\SystemConfig\Service\SystemConfigProviderInterface;
 use App\ViewDefinitions\Entity\ViewDefinition;
 use App\ViewDefinitions\LegacyHandler\ViewDefinitionMapperInterface;
 
 class ListViewDefaultSizeImageMapper implements ViewDefinitionMapperInterface
 {
+    public function __construct(
+        protected SystemConfigProviderInterface $systemConfigProvider,
+    )
+    {
+    }
+
     /**
      * @inheritDoc
      */
@@ -69,12 +76,8 @@ class ListViewDefaultSizeImageMapper implements ViewDefinitionMapperInterface
 
             $metadata = $col['metadata'] ?? [];
 
-            if (empty($metadata['maxWidth'])) {
-                $metadata['maxWidth'] = '60px';
-            }
-
             if (empty($metadata['maxHeight'])) {
-                $metadata['maxHeight'] = '60px';
+                $metadata['maxHeight'] = $this->getMaxHeight();
             }
 
             $col['metadata'] = $metadata;
@@ -83,5 +86,17 @@ class ListViewDefaultSizeImageMapper implements ViewDefinitionMapperInterface
 
         $listview['columns'] = $columns;
         $definition->setListView($listview);
+    }
+
+
+    protected function getMaxHeight(): string
+    {
+        $defaultMaxHeight = $this->systemConfigProvider->getSystemConfig('image_field_listview_height_default')->getValue();
+
+        if (!$defaultMaxHeight) {
+            return '60px';
+        }
+
+        return $defaultMaxHeight;
     }
 }

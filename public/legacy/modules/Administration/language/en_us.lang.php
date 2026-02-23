@@ -338,6 +338,9 @@ $mod_strings = array(
     'LBL_MANAGE_MANUAL_MIGRATION_TASKS' => 'Migrations',
     'LBL_MANAGE_MANUAL_MIGRATION_TASKS_DESC' => 'Run Post Upgrade Migration Processes',
 
+    'LBL_MANAGE_PROCESSES' => 'Processes',
+    'LBL_MANAGE_PROCESSES_DESC' => 'View Running Processes',
+
     'LBL_MANAGE_CURRENCIES' => 'Currencies',
     'LBL_MANAGE_LANGUAGES' => 'Languages',
     'LBL_MANAGE_LICENSE_TITLE' => 'License Management',

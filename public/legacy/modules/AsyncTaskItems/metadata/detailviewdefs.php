@@ -72,6 +72,9 @@ $viewdefs[$module_name]['DetailView'] = [
                 'error_message',
             ],
             [
+                'attachments',
+            ],
+            [
                 [
                     'name' => 'date_entered',
                     'label' => 'LBL_DATE_ENTERED',

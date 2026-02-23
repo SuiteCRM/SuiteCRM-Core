@@ -137,6 +137,17 @@ $dictionary['AsyncTaskItem'] = [
             'display' => 'readonly',
             'reportable' => false,
         ],
+        'attachments' => [
+            'name' => 'attachments',
+            'vname' => 'LBL_ATTACHMENTS',
+            'type' => 'attachment',
+            'source' => 'non-db',
+            'inline_edit' => false,
+            'comment' => 'File attachments for this task item',
+            'metadata' => [
+                'storage_type' => 'private-documents',
+            ],
+        ],
     ],
     'indices' => [
         [

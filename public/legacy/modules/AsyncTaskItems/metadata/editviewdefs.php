@@ -36,6 +36,9 @@ $viewdefs[$module_name]['EditView'] = [
     ],
     'panels' => [
         'default' => [
+            [
+                'attachments',
+            ],
         ],
     ],
 ];

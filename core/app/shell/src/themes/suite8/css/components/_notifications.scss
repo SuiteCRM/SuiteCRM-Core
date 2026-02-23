@@ -158,6 +158,8 @@
 
         a, a.clickable {
           color: $black;
+          text-overflow: ellipsis;
+          overflow: hidden;
         }
       }
 

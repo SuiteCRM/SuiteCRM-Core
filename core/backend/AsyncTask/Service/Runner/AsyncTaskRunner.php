@@ -218,31 +218,59 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         $enqueuedCount = count($items);
         $progress['enqueue_offset'] = ($progress['enqueue_offset'] ?? 0) + $enqueuedCount;
 
-        // If fewer items returned than batch size, queueing is done
-        if ($enqueuedCount < $maxItems) {
-            $total = $this->itemRepository->getTotal($taskId);
+        // Full batch returned — more items to queue, update running progress
+        if ($enqueuedCount >= $maxItems) {
+            $runningTotal = $this->itemRepository->getTotal($taskId);
+            $this->log('info', 'Queueing in progress for task ' . $taskId . '. Running total: ' . $runningTotal);
 
-            if ($total > 0) {
-                $progress['phase'] = self::PHASE_PROCESSING;
-                $progress['total'] = $total;
-                $progress['completed'] = 0;
-                $progress['failed'] = 0;
-                $progress['skipped'] = 0;
-                $progress['percent'] = 0;
-                $this->log('info', 'Queueing complete for task ' . $taskId . '. Total items: ' . $total . '. Transitioning to processing.');
+            return ['status' => 'in_progress', 'progress' => $this->buildQueueingProgress($progress, $runningTotal)];
+        }
 
-                return ['status' => 'in_progress', 'progress' => $progress];
-            }
+        // Fewer items than batch size — queueing is done
+        $total = $this->itemRepository->getTotal($taskId);
 
-            // Nothing was enqueued at all
+        if ($total === 0) {
             $this->log('info', 'No items enqueued for task ' . $taskId . '. Completing.');
 
             return ['status' => 'completed', 'progress' => $progress];
         }
 
-        $progress['phase'] = self::PHASE_QUEUEING;
+        $this->log('info', 'Queueing complete for task ' . $taskId . '. Total items: ' . $total . '. Transitioning to processing.');
 
-        return ['status' => 'in_progress', 'progress' => $progress];
+        return ['status' => 'in_progress', 'progress' => $this->buildProcessingProgress($progress, $total)];
+    }
+
+    /**
+     * Builds progress for an ongoing queueing batch.
+     * percent is 0 — the final total is unknown until queueing completes.
+     */
+    protected function buildQueueingProgress(array $progress, int $runningTotal): array
+    {
+        $progress['phase'] = self::PHASE_QUEUEING;
+        $progress['queued'] = $runningTotal;
+        $progress['total'] = $runningTotal;
+        $progress['completed'] = 0;
+        $progress['failed'] = 0;
+        $progress['percent'] = 0;
+
+        return $progress;
+    }
+
+    /**
+     * Builds the initial progress when transitioning from queueing into processing.
+     * Resets all counters so the processing phase starts from 0%.
+     */
+    protected function buildProcessingProgress(array $progress, int $total): array
+    {
+        $progress['phase'] = self::PHASE_PROCESSING;
+        $progress['total'] = $total;
+        $progress['queued'] = $total;
+        $progress['completed'] = 0;
+        $progress['failed'] = 0;
+        $progress['skipped'] = 0;
+        $progress['percent'] = 0;
+
+        return $progress;
     }
 
     /**

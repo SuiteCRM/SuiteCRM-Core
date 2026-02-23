@@ -99,7 +99,7 @@ class AttachmentFieldSaveHandler implements RecordFieldTypeSaveHandlerInterface
         $attributes = $inputRecord->getAttributes();
 
 
-        if (!isset($attributes[$field])) {
+        if (!isset($attributes[$field]) || !is_array($attributes[$field])) {
             return;
         }
 

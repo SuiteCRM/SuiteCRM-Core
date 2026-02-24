@@ -87,7 +87,7 @@ $mod_strings = array(
     'LBL_NEW_FORM_TITLE' => 'New Document',
     //document edit and detail view
     'LBL_DOC_NAME' => 'Document Name:',
-    'LBL_FILENAME' => 'File Name:',
+    'LBL_FILENAME' => 'File:',
     'LBL_LIST_FILENAME' => 'File:',
     'LBL_DOC_VERSION' => 'Revision:',
     'LBL_FILE_UPLOAD' => 'File:',

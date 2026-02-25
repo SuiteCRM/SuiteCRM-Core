@@ -48,8 +48,7 @@
                       [class.pr-1]="attribute?.definition?.metadata?.labelDisplay !== 'inline'"
                       [class.mr-1]="attribute?.definition?.metadata?.labelDisplay === 'inline'"
                       [class.d-none]="attribute?.definition?.metadata?.labelDisplay === 'none'">
-                    <label *ngIf="attribute.labelKey && showLabel(attribute)"
-                           [class.m-0]="attribute?.definition?.metadata?.labelDisplay === 'inline'">
+                    <label [class.m-0]="attribute?.definition?.metadata?.labelDisplay === 'inline'">
                         <scrm-label [labelKey]="attribute.labelKey" [module]="getModule()"></scrm-label>
                         <ng-container *ngIf="attribute?.required() && (['edit', 'create'].includes(mode))">
                             <span class="required">*</span>

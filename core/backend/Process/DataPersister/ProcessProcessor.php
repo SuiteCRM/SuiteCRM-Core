@@ -269,7 +269,6 @@ class ProcessProcessor implements ProcessorInterface
                 $processRecord = $this->recordProvider->getRecord($process->getModule() ?? 'processes', $process->getId());
                 $processRecord = $this->prepareRecordForDispatch($processRecord, $handler);
             } catch (Throwable $e) {
-                // Record not found, we will create a new one
             }
         }
 

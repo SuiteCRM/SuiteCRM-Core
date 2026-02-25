@@ -64,7 +64,9 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
     ) {
     }
 
-    abstract protected function getMaxItemsPerRunConfigKey(): string;
+    abstract protected function getMaxItemsToQueuePerRunConfigKey(): string;
+
+    abstract protected function getMaxItemsToProcessPerRunConfigKey(): string;
 
     public function getHandlerKey(): string
     {
@@ -167,17 +169,32 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         return $task;
     }
 
-    protected function getMaxItemsPerRun(): int
+    protected function getMaxItemsToQueuePerRun(): int
     {
-        $configKey = $this->getMaxItemsPerRunConfigKey();
+        $configKey = $this->getMaxItemsToQueuePerRunConfigKey();
         $value = (int)($this->systemConfigProvider->getSystemConfig($configKey)?->getValue());
 
         if (empty($value) || $value <= 0) {
-            $this->log('debug', 'maxItemsPerRun using default', ['configKey' => $configKey, 'default' => 100]);
+            $this->log('debug', 'maxItemsToQueuePerRun using default', ['configKey' => $configKey, 'default' => 100]);
             return 100;
         }
 
-        $this->log('debug', 'maxItemsPerRun resolved', ['configKey' => $configKey, 'value' => $value]);
+        $this->log('debug', 'maxItemsToQueuePerRun resolved', ['configKey' => $configKey, 'value' => $value]);
+
+        return $value;
+    }
+
+    protected function getMaxItemsToProcessPerRun(): int
+    {
+        $configKey = $this->getMaxItemsToProcessPerRunConfigKey();
+        $value = (int)($this->systemConfigProvider->getSystemConfig($configKey)?->getValue());
+
+        if (empty($value) || $value <= 0) {
+            $this->log('debug', 'maxItemsToProcessPerRun using default', ['configKey' => $configKey, 'default' => 100]);
+            return 100;
+        }
+
+        $this->log('debug', 'maxItemsToProcessPerRun resolved', ['configKey' => $configKey, 'value' => $value]);
 
         return $value;
     }
@@ -188,15 +205,14 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
      */
     protected function runTask(AsyncTaskRun $message, Record $task, AsyncTaskHandlerInterface $handler): array
     {
-        $maxItems = $this->getMaxItemsPerRun();
         $progress = $message->getProgress();
         $phase = $progress['phase'] ?? self::PHASE_QUEUEING;
 
         $this->log('info', 'Running task ' . $task->getId() . ' in phase: ' . $phase);
 
         return match ($phase) {
-            self::PHASE_QUEUEING => $this->runQueueingPhase($task, $handler, $progress, $maxItems),
-            self::PHASE_PROCESSING => $this->runProcessingPhase($task, $handler, $progress, $maxItems),
+            self::PHASE_QUEUEING => $this->runQueueingPhase($task, $handler, $progress, $this->getMaxItemsToQueuePerRun()),
+            self::PHASE_PROCESSING => $this->runProcessingPhase($task, $handler, $progress, $this->getMaxItemsToProcessPerRun()),
             self::PHASE_FINALIZING => $this->runFinalizingPhase($task, $handler, $progress),
             default => ['status' => 'completed', 'progress' => $progress],
         };

@@ -38,8 +38,13 @@ class AsyncManualMigrationRunner extends AsyncTaskRunner
         return self::TYPE;
     }
 
-    protected function getMaxItemsPerRunConfigKey(): string
+    protected function getMaxItemsToQueuePerRunConfigKey(): string
     {
-        return 'max_migration_items_per_run';
+        return 'max_migration_items_to_queue_per_run';
+    }
+
+    protected function getMaxItemsToProcessPerRunConfigKey(): string
+    {
+        return 'max_migration_items_to_process_per_run';
     }
 }

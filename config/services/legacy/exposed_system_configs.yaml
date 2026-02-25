@@ -75,3 +75,7 @@ parameters:
     campaign_emails_max_retries_default: true
     campaign_emails_threshold_default: true
     drafts_popup: true
+    max_migration_items_to_queue_per_run: true
+    max_migration_items_to_process_per_run: true
+    max_processes_items_to_queue_per_run: true
+    max_processes_items_to_process_per_run: true

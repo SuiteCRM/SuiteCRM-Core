@@ -308,7 +308,11 @@ function make_sugar_config(&$sugar_config)
         'web_to_lead_allowed_redirect_hosts' => [],
         'trusted_hosts' => [],
         'external_trusted_hosts' => [],
-        'installed' => true
+        'installed' => true,
+        'max_migration_items_to_queue_per_run' => 50,
+        'max_migration_items_to_process_per_run' => 20,
+        'max_processes_items_to_queue_per_run' => 50,
+        'max_processes_items_to_process_per_run' => 20
     );
 }
 
@@ -633,7 +637,11 @@ function get_sugar_config_defaults(): array
         'web_to_lead_allowed_redirect_hosts' => [],
         'trusted_hosts' => [],
         'external_trusted_hosts' => [],
-        'installed' => true
+        'installed' => true,
+        'max_migration_items_to_queue_per_run' => 50,
+        'max_migration_items_to_process_per_run' => 20,
+        'max_processes_items_to_queue_per_run' => 50,
+        'max_processes_items_to_process_per_run' => 20
     ];
 
     if (!is_object($locale)) {

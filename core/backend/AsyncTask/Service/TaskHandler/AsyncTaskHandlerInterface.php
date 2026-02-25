@@ -38,16 +38,19 @@ interface AsyncTaskHandlerInterface
 
     /**
      * Return the next batch of items to enqueue.
-     * Each item: ['item_key' => string, 'data' => array, 'sort_order' => int (optional)]
+     *
+     * Each item is an AsyncTaskBatchItemInterface — construct one per record:
+     *   new AsyncTaskBatchItem($recordId, ['record_id' => $recordId, ...])
+     *
      * Use $progress['enqueue_offset'] for pagination.
-     * Return empty array when no more items to enqueue.
+     * Return an empty array when there are no more items to enqueue.
      *
      * @param Record $task The parent async task record
      * @param array $progress Current progress state (contains 'enqueue_offset' for pagination)
      * @param int $batchSize Max items to return in this call
-     * @return array Array of items to enqueue
+     * @return AsyncTaskBatchItemInterface[]
      */
-    public function enqueueItems(Record $task, array $progress, int $batchSize): array;
+    public function getNextBatchToQueue(Record $task, array $progress, int $batchSize): array;
 
     /**
      * Process a single item.

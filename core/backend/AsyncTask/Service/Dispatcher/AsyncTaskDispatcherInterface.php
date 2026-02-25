@@ -79,6 +79,7 @@ interface AsyncTaskDispatcherInterface
      * @param string $type type of the task
      * @param string $handlerKey key of the task
      * @param array $taskData data to be sent with the task
+     * @param array $progress
      * @return void
      */
     public function dispatchTaskFailure(string $module, string $taskId, string $type, string $handlerKey, array $taskData, array $progress = []): void;

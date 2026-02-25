@@ -48,7 +48,7 @@ class AsyncTaskItemRepository
      * @param array $items Array of items, each: ['item_key' => string, 'data' => array, 'sort_order' => int]
      * @return array The inserted items with their generated IDs
      */
-    public function insertItems(string $taskId, array $items): array
+    public function addItemsToQueue(string $taskId, array $items): void
     {
         $now = gmdate('Y-m-d H:i:s');
         $insertedItems = [];

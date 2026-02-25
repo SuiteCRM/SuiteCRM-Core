@@ -57,7 +57,7 @@ class MigrateNotesFilesTaskHandler extends AbstractAsyncTaskHandler
         return 'manual-migration-tasks';
     }
 
-    public function enqueueItems(Record $task, array $progress, int $batchSize): array
+    public function getNextBatchToQueue(Record $task, array $progress, int $batchSize): array
     {
         $offset = $progress['enqueue_offset'] ?? 0;
 

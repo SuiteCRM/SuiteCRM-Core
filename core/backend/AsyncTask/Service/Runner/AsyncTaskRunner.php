@@ -208,10 +208,10 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
     protected function runQueueingPhase(Record $task, AsyncTaskHandlerInterface $handler, array $progress, int $maxItems): array
     {
         $taskId = $task->getId();
-        $items = $handler->enqueueItems($task, $progress, $maxItems);
+        $items = $handler->getNextBatchToQueue($task, $progress, $maxItems);
 
         if (!empty($items)) {
-            $this->itemRepository->insertItems($taskId, $items);
+            $this->itemRepository->addItemsToQueue($taskId, $items);
             $this->log('info', 'Enqueued ' . count($items) . ' items for task ' . $taskId);
         }
 

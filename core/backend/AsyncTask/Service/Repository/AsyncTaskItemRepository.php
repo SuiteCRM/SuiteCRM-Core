@@ -27,6 +27,7 @@
 
 namespace App\AsyncTask\Service\Repository;
 
+use App\AsyncTask\Service\TaskHandler\AsyncTaskBatchItemInterface;
 use App\Data\LegacyHandler\PreparedStatementHandler;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
@@ -45,19 +46,17 @@ class AsyncTaskItemRepository
      * Bulk insert items into the async_task_items table.
      *
      * @param string $taskId The parent task ID
-     * @param array $items Array of items, each: ['item_key' => string, 'data' => array, 'sort_order' => int]
-     * @return array The inserted items with their generated IDs
+     * @param AsyncTaskBatchItemInterface[] $items Items returned by AsyncTaskHandlerInterface::getNextBatchToQueue()
      */
     public function addItemsToQueue(string $taskId, array $items): void
     {
         $now = gmdate('Y-m-d H:i:s');
-        $insertedItems = [];
 
         foreach ($items as $index => $item) {
             $id = Uuid::uuid4()->toString();
-            $itemKey = $item['item_key'] ?? '';
-            $data = !empty($item['data']) ? json_encode($item['data']) : null;
-            $sortOrder = $item['sort_order'] ?? $index;
+            $itemKey = $item->getItemKey();
+            $data = !empty($item->getData()) ? json_encode($item->getData()) : null;
+            $sortOrder = $item->getSortOrder() ?? $index;
 
             try {
                 $qb = $this->preparedStatementHandler->createQueryBuilder();
@@ -91,14 +90,8 @@ class AsyncTaskItemRepository
                         'item_key' => $itemKey,
                     ]
                 );
-                continue;
             }
-
-            $item['id'] = $id;
-            $insertedItems[] = $item;
         }
-
-        return $insertedItems;
     }
 
     /**

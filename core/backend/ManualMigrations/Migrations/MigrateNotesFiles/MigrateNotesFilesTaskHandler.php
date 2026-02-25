@@ -29,6 +29,7 @@ namespace App\ManualMigrations\Migrations\MigrateNotesFiles;
 
 use App\AsyncTask\Service\LegacyBridge\AsyncTaskLegacyHandler;
 use App\AsyncTask\Service\TaskHandler\AbstractAsyncTaskHandler;
+use App\AsyncTask\Service\TaskHandler\AsyncTaskBatchItem;
 use App\Data\Entity\Record;
 use App\Data\LegacyHandler\PreparedStatementHandler;
 use App\Engine\Model\Feedback;
@@ -82,14 +83,14 @@ class MigrateNotesFilesTaskHandler extends AbstractAsyncTaskHandler
 
         $items = [];
         foreach ($results as $row) {
-            $items[] = [
-                'item_key' => $row['id'],
-                'data' => [
+            $items[] = new AsyncTaskBatchItem(
+                $row['id'],
+                [
                     'record_id' => $row['id'],
                     'filename' => $row['filename'],
                     'file_mime_type' => $row['file_mime_type'] ?? 'application/octet-stream',
-                ],
-            ];
+                ]
+            );
         }
 
         return $items;

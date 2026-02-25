@@ -51,12 +51,7 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
     {
         $taskId = $message->getTaskId();
 
-        $this->log(
-            'debug', 'onComplete() called', [
-            'taskId' => $taskId,
-            'module' => $message->getModule(),
-        ]
-        );
+        $this->log('debug', 'onComplete() called', ['taskId' => $taskId, 'module' => $message->getModule()]);
 
         $task = $this->getAsyncTask($taskId);
         if ($task === null) {

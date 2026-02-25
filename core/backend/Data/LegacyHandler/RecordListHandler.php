@@ -173,6 +173,39 @@ class RecordListHandler extends LegacyHandler implements RecordListProviderInter
     }
 
     /**
+     * @inheritDoc
+     */
+    public function fetchRecordIds(array $options, int $offset, int $batchSize): array
+    {
+        $ids = $options['ids'] ?? [];
+
+        if (!empty($ids) && is_array($ids)) {
+            return array_values(array_slice($ids, $offset, $batchSize));
+        }
+
+        $criteria = $options['criteria'] ?? [];
+        if (empty($criteria)) {
+            return [];
+        }
+
+        $module = $options['module'] ?? '';
+        $sort = $options['sort'] ?? [];
+
+        $recordList = $this->getList($module, $criteria, $offset, $batchSize, $sort);
+        $records = $recordList->getRecords() ?? [];
+
+        $recordIds = [];
+        foreach ($records as $record) {
+            $id = $record['id'] ?? '';
+            if (!empty($id)) {
+                $recordIds[] = $id;
+            }
+        }
+
+        return $recordIds;
+    }
+
+    /**
      * @param $moduleName
      * @return string
      */

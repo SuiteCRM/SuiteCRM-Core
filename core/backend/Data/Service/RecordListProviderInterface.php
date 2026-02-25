@@ -49,4 +49,14 @@ interface RecordListProviderInterface
         int $limit = -1,
         array $sort = []
     ): RecordList;
+
+    /**
+     * Fetch record IDs from task options, supporting both explicit ID lists and criteria-based queries.
+     *
+     * @param array $options Options containing 'module' and either 'ids' or 'criteria'+'sort'
+     * @param int $offset Current enqueue offset
+     * @param int $batchSize Maximum number of IDs to return
+     * @return array Flat array of record ID strings
+     */
+    public function fetchRecordIds(array $options, int $offset, int $batchSize): array;
 }

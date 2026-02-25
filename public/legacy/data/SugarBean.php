@@ -4514,6 +4514,12 @@ class SugarBean
      */
     public function create_list_count_query($query, $alias = 'c')
     {
+        // Guard: datasource functions may return an array instead of a string query.
+        // In that case we cannot build a meaningful count query, so return early.
+        if (!is_string($query)) {
+            return '';
+        }
+
         // remove the 'order by' clause which is expected to be at the end of the query
         $pattern = '/\sORDER BY.*/is';
         $replacement = '';

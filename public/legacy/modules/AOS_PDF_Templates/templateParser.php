@@ -81,7 +81,11 @@ class templateParser
                     $translatedVals = array();
 
                     foreach ($mVals as $mVal) {
-                        $translatedVals[] = translate($field_def['options'], $focus->module_dir, $mVal);
+                        if ($mVal === '' || $mVal === null) {
+                            continue;
+                        }
+                        $translated = translate($field_def['options'], $focus->module_dir, $mVal);
+                        $translatedVals[] = is_array($translated) ? (string)$mVal : $translated;
                     }
 
                     $repl_arr[$key . "_" . $fieldName] = implode(", ", $translatedVals);

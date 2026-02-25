@@ -31,13 +31,12 @@ if (!defined('sugarEntry') || !sugarEntry) {
 
 $module_name = 'AsyncTaskItems';
 $object_name = 'AsyncTaskItem';
-$_module_name = 'AsyncTaskItems';
 $popupMeta = [
     'moduleMain' => $module_name,
     'varName' => $object_name,
-    'orderBy' => $_module_name . '.name',
+    'orderBy' => $module_name . '.name',
     'whereClauses' => [
-        'name' => $_module_name . '.name',
+        'name' => $module_name . '.name',
     ],
-    'searchInputs' => [$_module_name . '_number', 'name'],
+    'searchInputs' => [$module_name . '_number', 'name'],
 ];

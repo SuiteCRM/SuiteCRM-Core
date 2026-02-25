@@ -29,8 +29,10 @@ if (!defined('sugarEntry') || !sugarEntry) {
     die('Not A Valid Entry Point');
 }
 
+require_once 'include/SugarObjects/templates/asynctask/AsyncTask.php';
+
 #[\AllowDynamicProperties]
-class Process extends Basic
+class Process extends AsyncTask
 {
     public $disable_row_level_security = true;
     public $new_schema = true;
@@ -54,38 +56,6 @@ class Process extends Basic
     /**
      * @inheritDoc
      */
-    public function retrieve($id = -1, $encode = true, $deleted = true)
-    {
-        $result = parent::retrieve($id, $encode, $deleted);
-
-        if (!empty($result) && !$this->hasAccess()) {
-            $this->logAccessDenied('retrieve');
-
-            return null;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function save($check_notify = false)
-    {
-        if (!$this->hasAccess()) {
-            $this->logAccessDenied('save');
-            throw new RuntimeException('Access Denied');
-        }
-
-        $this->keepWriteOnlyFieldValues();
-
-
-        return parent::save($check_notify);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function create_new_list_query(
         $order_by,
         $where,
@@ -104,7 +74,7 @@ class Process extends Basic
             $order_by,
             $where,
             $filter,
-            $params ,
+            $params,
             $show_deleted,
             $join_type,
             true,
@@ -113,7 +83,7 @@ class Process extends Basic
             $ifListForExport
         );
 
-        if(is_admin($current_user)) {
+        if (is_admin($current_user)) {
             if ($return_array) {
                 return $ret_array;
             }
@@ -121,7 +91,7 @@ class Process extends Basic
             return $ret_array['select'] . $ret_array['from'] . $ret_array['where'] . $ret_array['order_by'];
         }
 
-        if (is_array($ret_array) && !empty($ret_array['where'])){
+        if (is_array($ret_array) && !empty($ret_array['where'])) {
             $tableName = $db->quote($this->table_name);
             $currentUserId = $db->quote($current_user->id);
 
@@ -136,8 +106,8 @@ class Process extends Basic
     }
 
     /**
-     * Check if user has access to personal account
-     * @return bool
+     * Admins and the assigned user may access a process record.
+     * Unassigned records are accessible to all authenticated users.
      */
     public function hasAccess(): bool
     {
@@ -159,113 +129,12 @@ class Process extends Basic
     }
 
     /**
-     * Log personal account access denied
-     * @param string $action
-     * @return void
+     * @inheritDoc
      */
     public function logAccessDenied(string $action): void
     {
         global $log, $current_user;
 
         $log->fatal("Processes | Access denied. Action: '" . $action . "' | Current user id: '" . $current_user->id . "' | record: '" . $this->id . "'");
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function bean_implements($interface)
-    {
-        if ($interface === 'ACL') {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function ACLAccess($view, $is_owner = 'not_set', $in_group = 'not_set')
-    {
-        global $current_user;
-
-        $isNotAllowAction = $this->isNotAllowedAction($view);
-        if ($isNotAllowAction === true) {
-            return false;
-        }
-
-        if (!$this->hasAccess()) {
-            $this->logAccessDenied("ACLAccess-$view");
-
-            return false;
-        }
-
-        return parent::ACLAccess($view, $is_owner, $in_group);
-    }
-
-
-    /**
-     * Do not clear write only fields
-     * @return void
-     */
-    protected function keepWriteOnlyFieldValues(): void
-    {
-        if (empty($this->fetched_row)) {
-            return;
-        }
-
-        foreach ($this->field_defs as $field => $field_def) {
-            if (empty($field_def['display']) || $field_def['display'] !== 'writeonly') {
-                continue;
-            }
-
-            if (empty($this->fetched_row[$field])) {
-                continue;
-            }
-
-            if (!empty($this->$field)) {
-                continue;
-            }
-
-            $this->$field = $this->fetched_row[$field];
-        }
-    }
-
-
-    /**
-     * Get failed async task items query for subpanel
-     * @return array
-     */
-    public function getFailedAsyncTaskItems(): array
-    {
-        $idQuoted = $this->db->quoted($this->id);
-
-        return [
-            'select' => '',
-            'from' => '',
-            'where' => "async_task_items.async_task_id = $idQuoted AND async_task_items.status = 'failed' ",
-            'join' => '',
-            'join_tables' => [],
-        ];
-    }
-
-    /**
-     * Get not allowed action
-     * @param string $view
-     * @return bool
-     */
-    protected function isNotAllowedAction(string $view): bool
-    {
-        $notAllowed = [
-            'export',
-            'import',
-            'massupdate',
-            'duplicate',
-            'edit',
-            'editview',
-            'create',
-        ];
-
-        return in_array(strtolower($view), $notAllowed);
     }
 }

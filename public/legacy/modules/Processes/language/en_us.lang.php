@@ -29,23 +29,13 @@ if (!defined('sugarEntry') || !sugarEntry) {
     die('Not A Valid Entry Point');
 }
 
+/**
+ * Module-specific labels for Processes.
+ * Shared async task labels are inherited from the asynctask template language file.
+ */
 $mod_strings = [
-    'LBL_ASSIGNED_TO_ID' => 'Assigned User Id',
-    'LBL_ASSIGNED_TO_NAME' => 'Assigned to',
-    'LBL_ID' => 'ID',
-    'LBL_DATE_ENTERED' => 'Date Created',
-    'LBL_DATE_MODIFIED' => 'Date Modified',
-    'LBL_MODIFIED' => 'Modified By',
-    'LBL_MODIFIED_NAME' => 'Modified By Name',
-    'LBL_CREATED' => 'Created By',
-    'LBL_DESCRIPTION' => 'Description',
-    'LBL_DELETED' => 'Deleted',
-    'LBL_NAME' => 'Name',
-    'LBL_CREATED_USER' => 'Created by User',
-    'LBL_MODIFIED_USER' => 'Modified by User',
-    'LBL_LIST_NAME' => 'Name',
-    'LBL_EDIT_BUTTON' => 'Edit',
-    'LBL_REMOVE' => 'Remove',
+
+    // Module naming
     'LBL_LIST_FORM_TITLE' => 'Processes List',
     'LBL_MODULE_NAME' => 'Processes',
     'LBL_MODULE_TITLE' => 'Processes',
@@ -53,39 +43,11 @@ $mod_strings = [
     'LNK_NEW_RECORD' => 'Create Process',
     'LNK_LIST' => 'View Processes',
     'LBL_SEARCH_FORM_TITLE' => 'Search Processes',
-    'LBL_HISTORY_SUBPANEL_TITLE' => 'View History',
-    'LBL_ACTIVITIES_SUBPANEL_TITLE' => 'Activities',
     'LBL_NEW_FORM_TITLE' => 'New Process',
-    'LBL_LIST_DELETE' => 'Delete',
-    'LBL_TYPE' => 'Type',
-    'LBL_ESTIMATED_RUN_TIME' => 'Run time estimate',
-    'LBL_STATUS' => 'Status',
-    'LBL_SERVICE_KEY' => 'Service Key',
-    'LBL_LAST_RUN_DATETIME' => 'Last Run',
-    'LBL_ATTACHMENTS' => 'Attachments',
-    'LBL_PROGRESS' => 'Progress',
-    'LBL_PROGRESS_PERCENT' => 'Percent',
-    'LBL_PROGRESS_COMPLETED' => 'Completed',
-    'LBL_PROGRESS_FAILED' => 'Failed',
-    'LBL_PROGRESS_PERCENT_TPL' => '{{fields.progress.attributes.percent|default:-}}% ({{fields.progress.attributes.completed|default:-}} completed, {{fields.progress.attributes.failed|default:-}} failed)',
-    'LBL_PROGRESS_NOT_STARTED' => 'Not started',
-    'LBL_PROGRESS_QUEUING_TPL' => 'Queuing: {{fields.progress.attributes.total|default:0}} items enqueued',
-    'LBL_PHASE' => 'Phase',
-    'LBL_OWNER' => 'Owner',
-    'LBL_RETRY' => 'Retry',
-    'LBL_RETRY_CONFIRMATION' => 'Are you sure you want to retry? This will re-queue all failed items for processing.',
-    'LBL_RETRY_SUCCESS' => 'Failed items have been re-queued for processing.',
-    'LBL_RETRY_FAILED' => 'Retry Failed',
-    'LBL_RETRY_FAILED_CONFIRMATION' => 'Are you sure you want to retry? This will re-queue all failed items for processing.',
-    'LBL_RETRY_FAILED_SUCCESS' => 'Failed items have been re-queued for processing.',
-    'LBL_RERUN' => 'Re-run',
+
+    // Rerun/dismiss confirmation messages (reference this module by name)
     'LBL_RERUN_CONFIRMATION' => 'Are you sure you want to re-run this process from scratch? All existing items will be removed and the process will restart.',
     'LBL_RERUN_SUCCESS' => 'Process has been re-queued and will restart from the beginning.',
-    'LBL_ALLOW_FAILURE_RETRY_ACTION' => 'Allow Failure Retry Action',
-    'LBL_ALLOW_FAILURE_RERUN_ACTION' => 'Allow Failure Rerun Action',
-    'LBL_COMPLETED_WITH_FAILURES' => 'Completed With Failures',
-    'LBL_DISMISS' => 'Dismiss',
     'LBL_DISMISS_CONFIRMATION' => 'Are you sure you want to dismiss this process? This will remove it and all associated data.',
     'LBL_DISMISS_SUCCESS' => 'Process dismissed successfully.',
-    'LBL_FAILED_ITEMS' => 'Failed Items',
 ];

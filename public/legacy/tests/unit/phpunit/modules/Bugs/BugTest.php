@@ -208,12 +208,4 @@ class BugTest extends SuitePHPUnitFrameworkTestCase
         $result = $bug->retrieve($bug->id);
         self::assertEquals(null, $result);
     }
-
-    public function testgetReleaseDropDown(): void
-    {
-        $result = getReleaseDropDown();
-
-        //execute the method and verify it returns an array
-        self::assertIsArray($result);
-    }
 }

@@ -74,10 +74,10 @@ $viewdefs['Bugs']['DetailView'] = array(
 
       array(
         array(
-          'name' => 'found_in_release',
+          'name' => 'release_name',
           'label' => 'LBL_FOUND_IN_RELEASE',
         ),
-        'fixed_in_release',
+        'fixed_in_release_name',
       ),
 
       array(

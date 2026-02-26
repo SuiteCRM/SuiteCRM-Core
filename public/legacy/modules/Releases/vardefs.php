@@ -125,6 +125,24 @@ $dictionary['Release'] = array('table' => 'releases'
     'len' => 100,
     'importable' => 'required',
   ),
+  'bugs_found_in_release_link' => array(
+    'name' => 'bugs_found_in_release_link',
+    'type' => 'link',
+    'relationship' => 'bugs_release',
+    'vname' => 'LBL_BUGS',
+    'module' => 'Bugs',
+    'bean_name' => 'Bug',
+    'source' => 'non-db',
+  ),
+  'bugs_fixed_in_release_link' => array(
+    'name' => 'bugs_fixed_in_release_link',
+    'type' => 'link',
+    'relationship' => 'bugs_fixed_in_release',
+    'vname' => 'LBL_BUGS',
+    'module' => 'Bugs',
+    'bean_name' => 'Bug',
+    'source' => 'non-db',
+  ),
 )
                                                       , 'indices' => array(
        array('name' =>'releasespk', 'type' =>'primary', 'fields'=>array('id')),

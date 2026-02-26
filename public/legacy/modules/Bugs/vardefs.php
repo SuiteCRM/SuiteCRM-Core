@@ -51,59 +51,46 @@ $dictionary['Bug'] = array(
     'fields' => array(
         'found_in_release' => array(
             'name' => 'found_in_release',
-            'type' => 'enum',
-            'function' => 'getReleaseDropDown',
+            'type' => 'id',
             'vname' => 'LBL_FOUND_IN_RELEASE',
             'reportable' => false,
-            //'merge_filter' => 'enabled', //bug 22994, I think the former fixing is just avoiding the cross table query, it is not a good method.
             'comment' => 'The software or service release that manifested the bug',
             'duplicate_merge' => 'disabled',
             'audited' => true,
-            'studio' => array(
-                'fields' => 'false',  // tyoung bug 16442 - don't show in studio fields list
-                'listview' => false,
-            ),
-            'massupdate' => true,
+            'studio' => false,
+            'massupdate' => false,
         ),
         'release_name' => array(
             'name' => 'release_name',
             'rname' => 'name',
             'vname' => 'LBL_FOUND_IN_RELEASE',
             'type' => 'relate',
-            'dbType' => 'varchar',
             'group' => 'found_in_release',
             'reportable' => false,
             'source' => 'non-db',
             'table' => 'releases',
             'merge_filter' => 'enabled',
-            //bug 22994, we should use the release name to search, I have write codes to operate the cross table query.
             'id_name' => 'found_in_release',
             'module' => 'Releases',
             'link' => 'release_link',
-            'massupdate' => false,
-            'studio' => array(
-                'editview' => false,
-                'detailview' => false,
-                'quickcreate' => false,
-                'basic_search' => false,
-                'advanced_search' => false,
-            ),
+            'massupdate' => true,
+            'filter' => [
+                'static' => [
+                    'status' => 'Active',
+                ],
+            ],
         ),
 
         'fixed_in_release' => array(
             'name' => 'fixed_in_release',
-            'type' => 'enum',
-            'function' => 'getReleaseDropDown',
+            'type' => 'id',
             'vname' => 'LBL_FIXED_IN_RELEASE',
             'reportable' => false,
             'comment' => 'The software or service release that corrected the bug',
             'duplicate_merge' => 'disabled',
             'audited' => true,
-            'studio' => array(
-                'fields' => 'false', // tyoung bug 16442 - don't show in studio fields list
-                'listview' => false,
-            ),
-            'massupdate' => true,
+            'studio' => false,
+            'massupdate' => false,
         ),
         'fixed_in_release_name' => array(
             'name' => 'fixed_in_release_name',
@@ -114,19 +101,15 @@ $dictionary['Bug'] = array(
             'type' => 'relate',
             'table' => 'releases',
             'isnull' => 'false',
-            'massupdate' => false,
+            'massupdate' => true,
             'module' => 'Releases',
-            'dbType' => 'varchar',
-            'len' => 36,
             'source' => 'non-db',
             'link' => 'fixed_in_release_link',
-            'studio' => array(
-                'editview' => false,
-                'detailview' => false,
-                'quickcreate' => false,
-                'basic_search' => false,
-                'advanced_search' => false,
-            ),
+            'filter' => [
+                'static' => [
+                    'status' => 'Active',
+                ],
+            ],
         ),
         'source' => array(
             'name' => 'source',

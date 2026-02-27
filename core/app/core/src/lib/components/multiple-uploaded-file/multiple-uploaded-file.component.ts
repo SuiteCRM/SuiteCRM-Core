@@ -123,8 +123,9 @@ export class MultipleUploadedFileComponent implements OnChanges, OnInit, AfterVi
         const buttonWidth = 32;
         const padding = 20;
         const sizeWidth = this.displayType !== 'link' ? 60 : 0; // File size display width
+        const showMoreLinkSize = 80;
 
-        const dynamicTextWidth = Math.max(100, availableWidthPerItem - iconWidth - buttonWidth - padding - sizeWidth);
+        const dynamicTextWidth = Math.max(100, availableWidthPerItem - iconWidth - buttonWidth - padding - sizeWidth - showMoreLinkSize);
         this.maxTextWidth.set(`${Math.floor(dynamicTextWidth)}px`);
 
         const visibleFiles = this.files.slice(0, this.breakpoint ?? 2);

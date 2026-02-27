@@ -293,7 +293,7 @@ return static function (ContainerConfigurator $containerConfig) {
             ['path' => '^/auth/session-status', 'roles' => 'PUBLIC_ACCESS'],
             ['path' => '^/auth/logout', 'roles' => 'PUBLIC_ACCESS'],
             ['path' => '^/$', 'roles' => 'ROLE_USER'],
-            ['path' => '^/media', 'roles' => 'ROLE_USER'],
+            ['path' => '^/private/media', 'roles' => 'ROLE_USER'],
             ['path' => '^/api', 'roles' => 'PUBLIC_ACCESS'],
             ['path' => '^/api/graphql', 'roles' => 'PUBLIC_ACCESS'],
             ['path' => '^/api/graphql/graphiql*', 'roles' => 'PUBLIC_ACCESS'],

@@ -60,31 +60,31 @@ return static function (ContainerConfigurator $containerConfig) {
         'private.documents.storage' => [
             'adapter' => 'local',
             'options' => [
-                'directory' => '%kernel.project_dir%/uploads/documents',
+                'directory' => '%kernel.project_dir%/media/documents',
             ],
         ],
         'archived.documents.storage' => [
             'adapter' => 'local',
             'options' => [
-                'directory' => '%kernel.project_dir%/uploads/archived',
+                'directory' => '%kernel.project_dir%/media/archived',
             ],
         ],
         'private.images.storage' => [
             'adapter' => 'local',
             'options' => [
-                'directory' => '%kernel.project_dir%/uploads/images',
+                'directory' => '%kernel.project_dir%/media/images',
             ],
         ],
         'public.images.storage' => [
             'adapter' => 'local',
             'options' => [
-                'directory' => '%kernel.project_dir%/public/media-upload/images',
+                'directory' => '%kernel.project_dir%/public/media/images',
             ],
         ],
         'public.documents.storage' => [
             'adapter' => 'local',
             'options' => [
-                'directory' => '%kernel.project_dir%/public/media-upload/documents',
+                'directory' => '%kernel.project_dir%/public/media/documents',
             ],
         ],
     ];

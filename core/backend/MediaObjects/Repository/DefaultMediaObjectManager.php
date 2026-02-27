@@ -417,11 +417,11 @@ class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectMana
     protected function getPath(mixed $object): string
     {
         $prefixMap = [
-            ArchivedDocumentMediaObject::class => '/media/archived/',
-            PrivateDocumentMediaObject::class => '/media/documents/',
-            PrivateImageMediaObject::class => '/media/images/',
-            LegacyDocumentMediaObject::class => '/media/legacy/documents/',
-            LegacyImageMediaObject::class => '/media/legacy/images/',
+            ArchivedDocumentMediaObject::class => '/private/media/archived/',
+            PrivateDocumentMediaObject::class => '/private/media/documents/',
+            PrivateImageMediaObject::class => '/private/media/images/',
+            LegacyDocumentMediaObject::class => '/private/media/legacy/documents/',
+            LegacyImageMediaObject::class => '/private/media/legacy/images/',
         ];
 
         foreach ($prefixMap as $type => $prefix) {

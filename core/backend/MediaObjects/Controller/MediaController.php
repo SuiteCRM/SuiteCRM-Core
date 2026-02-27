@@ -58,7 +58,7 @@ class MediaController extends AbstractController
     ) {
     }
 
-    #[Route('/media/legacy/images/{id}', name: 'legacy_images', methods: ["GET"], stateless: false)]
+    #[Route('/private/media/legacy/images/{id}', name: 'legacy_images', methods: ["GET"], stateless: false)]
     #[isGranted('IS_AUTHENTICATED_FULLY')]
     public function downloadLegacyImage(string $id, Request $request, DownloadHandler $downloadHandler): Response
     {
@@ -75,7 +75,7 @@ class MediaController extends AbstractController
         return $downloadHandler->downloadObject($mediaObject, 'file', LegacyImageMediaObject::class, $mediaObject->originalName);
     }
 
-    #[Route('/media/legacy/documents/{id}', name: 'legacy_documents', methods: ["GET"], stateless: false)]
+    #[Route('/private/media/legacy/documents/{id}', name: 'legacy_documents', methods: ["GET"], stateless: false)]
     #[isGranted('IS_AUTHENTICATED_FULLY')]
     public function downloadLegacyDocument(string $id, Request $request, DownloadHandler $downloadHandler): Response
     {
@@ -92,7 +92,7 @@ class MediaController extends AbstractController
         return $downloadHandler->downloadObject($mediaObject, 'file', LegacyDocumentMediaObject::class, $mediaObject->originalName);
     }
 
-    #[Route('/media/documents/{id}', name: 'media_documents', methods: ["GET"], stateless: false)]
+    #[Route('/private/media/documents/{id}', name: 'media_documents', methods: ["GET"], stateless: false)]
     #[isGranted('IS_AUTHENTICATED_FULLY')]
     public function downloadDocument(string $id, Request $request, DownloadHandler $downloadHandler): Response
     {
@@ -110,7 +110,7 @@ class MediaController extends AbstractController
         return $downloadHandler->downloadObject($mediaObject, 'file', PrivateDocumentMediaObject::class, $mediaObject->originalName);
     }
 
-    #[Route('/media/archived/{id}', name: 'media_archived', methods: ["GET"], stateless: false)]
+    #[Route('/private/media/archived/{id}', name: 'media_archived', methods: ["GET"], stateless: false)]
     #[isGranted('IS_AUTHENTICATED_FULLY')]
     public function downloadArchived(string $id, Request $request, DownloadHandler $downloadHandler): Response
     {
@@ -127,7 +127,7 @@ class MediaController extends AbstractController
         return $downloadHandler->downloadObject($mediaObject, 'file', ArchivedDocumentMediaObject::class, $mediaObject->originalName);
     }
 
-    #[Route('/media/images/{id}', name: 'media_image', methods: ["GET"], stateless: false)]
+    #[Route('/private/media/images/{id}', name: 'media_image', methods: ["GET"], stateless: false)]
     #[isGranted('IS_AUTHENTICATED_FULLY')]
     public function downloadImage(string $id, Request $request, DownloadHandler $downloadHandler): Response
     {

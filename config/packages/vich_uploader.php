@@ -114,7 +114,7 @@ return static function (ContainerConfigurator $containerConfig) {
     $mappings = $env['MEDIA_UPLOADER_MAPPINGS'] ?? '';
     $defaultMappings = [
         'archived_documents_media_object' => [
-            'uri_prefix' => '/media/archived',
+            'uri_prefix' => '/private/media/archived',
             'upload_destination' => 'archived.documents.storage',
             'namer' => 'App\MediaObjects\Services\UuidMediaObjectFileNamer',
             'directory_namer' => [
@@ -126,7 +126,7 @@ return static function (ContainerConfigurator $containerConfig) {
             ]
         ],
         'private_documents_media_object' => [
-            'uri_prefix' => '/media/documents',
+            'uri_prefix' => '/private/media/documents',
             'upload_destination' => 'private.documents.storage',
             'namer' => 'App\MediaObjects\Services\UuidMediaObjectFileNamer',
             'directory_namer' => [
@@ -138,17 +138,17 @@ return static function (ContainerConfigurator $containerConfig) {
             ]
         ],
         'legacy_documents_media_object' => [
-            'uri_prefix' => '/media/legacy/documents',
+            'uri_prefix' => '/private/media/legacy/documents',
             'upload_destination' => 'legacy.documents.storage',
             'namer' => 'App\MediaObjects\Services\UuidMediaObjectFileNamer'
         ],
         'legacy_images_media_object' => [
-            'uri_prefix' => '/media/legacy/images',
+            'uri_prefix' => '/private/media/legacy/images',
             'upload_destination' => 'legacy.documents.storage',
             'namer' => 'App\MediaObjects\Services\UuidMediaObjectFileNamer'
         ],
         'private_images_media_object' => [
-            'uri_prefix' => '/media/images',
+            'uri_prefix' => '/private/media/images',
             'upload_destination' => 'private.images.storage',
             'namer' => 'App\MediaObjects\Services\UuidMediaObjectFileNamer',
             'directory_namer' => [
@@ -160,7 +160,7 @@ return static function (ContainerConfigurator $containerConfig) {
             ]
         ],
         'public_images_media_object' => [
-            'uri_prefix' => '/media-upload/images',
+            'uri_prefix' => '/media/images',
             'upload_destination' => 'public.images.storage',
             'namer' => 'Vich\UploaderBundle\Naming\SmartUniqueNamer',
             'directory_namer' => [
@@ -172,7 +172,7 @@ return static function (ContainerConfigurator $containerConfig) {
             ]
         ],
         'public_documents_media_object' => [
-            'uri_prefix' => '/media-upload/documents',
+            'uri_prefix' => '/media/documents',
             'upload_destination' => 'public.documents.storage',
             'namer' => 'Vich\UploaderBundle\Naming\SmartUniqueNamer',
             'directory_namer' => [

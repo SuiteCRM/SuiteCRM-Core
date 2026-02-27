@@ -77,7 +77,7 @@ $mod_strings = [
     'LBL_PROGRESS_FAILED' => 'Failed',
     'LBL_PROGRESS_PERCENT_TPL' => '{{fields.progress.attributes.percent|default:-}}% ({{fields.progress.attributes.completed|default:-}} completed, {{fields.progress.attributes.failed|default:-}} failed)',
     'LBL_PROGRESS_NOT_STARTED' => 'Not started',
-    'LBL_PROGRESS_QUEUING_TPL' => 'Queuing: {{fields.progress.attributes.total|default:0}} items enqueued',
+    'LBL_PROGRESS_QUEUING_TPL' => 'Queueing: {{fields.progress.attributes.total|default:0}} items enqueued',
 
     // Action labels — button text (shared across modules)
     'LBL_RETRY' => 'Retry',

@@ -275,6 +275,7 @@ class ProcessProcessor implements ProcessorInterface
         if ($processRecord === null || empty($processRecord->getId())) {
             $mappedRecord = $this->mapToRecord($process, $handler);
             $processRecord = $this->recordProvider->saveRecord($mappedRecord);
+            $process->setId($processRecord->getId());
         }
 
         $this->asyncTaskDispatcher->dispatchTaskRun($module, $processRecord->getId(), $asyncTaskType, $asyncHandlerKey, $options);

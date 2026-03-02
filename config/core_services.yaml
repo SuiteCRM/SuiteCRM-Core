@@ -566,10 +566,6 @@ services:
     alias: App\SystemConfig\Service\SystemConfigProviderInterface
     public: true
 
-  app.version.provider:
-    alias: 'shivas_versioning.provider.version'
-    public: true
-
   Symfony\Component\Security\Http\Logout\LogoutUrlGenerator: '@security.logout_url_generator'
 
   App\UserPreferences\Service\UserPreferencesProviderInterface: '@App\UserPreferences\LegacyHandler\UserPreferenceHandler'

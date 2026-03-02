@@ -78,7 +78,6 @@
     "scheb/2fa-bundle": "^6.12",
     "scheb/2fa-google-authenticator": "^6.12",
     "scheb/2fa-totp": "^6.12",
-    "shivas/versioning-bundle": "^4.0",
     "slim/slim": "^3.8",
     "smarty/smarty": "^4",
     "soundasleep/html2text": "~0.5",

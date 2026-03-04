@@ -31,6 +31,7 @@ use ApiPlatform\Exception\InvalidArgumentException;
 use App\Module\Service\ModuleNameMapperInterface;
 use App\Process\Entity\Process;
 use App\Process\Service\ProcessHandlerInterface;
+use Throwable;
 
 class EditAction implements ProcessHandlerInterface
 {
@@ -153,6 +154,14 @@ class EditAction implements ProcessHandlerInterface
         $options = $process->getOptions();
         $relationshipEdit = $options['payload']['relationshipEdit'] ?? [];
 
+        $modernResponse = $this->buildModernRelationshipEditResponseData($relationshipEdit);
+        if (($modernResponse['handled'] ?? false) === true) {
+            $process->setStatus($modernResponse['status'] ?? 'success');
+            $process->setMessages($modernResponse['messages'] ?? []);
+            $process->setData($modernResponse['data'] ?? null);
+            return;
+        }
+
         $responseData = $this->buildRelationshipEditResponseData($options, $relationshipEdit);
         if (empty($responseData)) {
             $responseData = $this->buildRecordEditResponseData($options);
@@ -161,6 +170,60 @@ class EditAction implements ProcessHandlerInterface
         $process->setStatus('success');
         $process->setMessages([]);
         $process->setData($responseData);
+    }
+
+    /**
+     * Build modern relationship-edit save response.
+     */
+    protected function buildModernRelationshipEditResponseData(array $relationshipEdit): array
+    {
+        if (($relationshipEdit['enabled'] ?? false) !== true) {
+            return ['handled' => false];
+        }
+
+        $modernConfig = $relationshipEdit['modern'] ?? [];
+        if (($modernConfig['enabled'] ?? false) !== true) {
+            return ['handled' => false];
+        }
+
+        if (!$this->isOpportunityContactRelationshipEdit($relationshipEdit)) {
+            return ['handled' => false];
+        }
+
+        $values = $relationshipEdit['values'] ?? [];
+        $roleField = $modernConfig['roleField'] ?? 'opportunity_role';
+        if ($roleField === '' || !array_key_exists($roleField, $values)) {
+            return ['handled' => false];
+        }
+
+        $relationshipRecordId = (string)($relationshipEdit['recordId'] ?? '');
+        if ($relationshipRecordId === '') {
+            return [
+                'handled' => true,
+                'status' => 'error',
+                'messages' => ['LBL_ACTION_ERROR'],
+                'data' => null
+            ];
+        }
+
+        $contactRole = (string)$values[$roleField];
+        if (!$this->saveOpportunityContactRole($relationshipRecordId, $contactRole)) {
+            return [
+                'handled' => true,
+                'status' => 'error',
+                'messages' => ['LBL_ACTION_ERROR'],
+                'data' => null
+            ];
+        }
+
+        return [
+            'handled' => true,
+            'status' => 'success',
+            'messages' => [],
+            'data' => [
+                'reload' => true
+            ]
+        ];
     }
 
     /**
@@ -255,5 +318,48 @@ class EditAction implements ProcessHandlerInterface
     protected function isSafeLegacyIdentifier(string $value): bool
     {
         return $value !== '' && preg_match('/^[A-Za-z0-9_]+$/', $value) === 1;
+    }
+
+    /**
+     * Check if payload targets Contacts->Opportunities relationship role edit.
+     */
+    protected function isOpportunityContactRelationshipEdit(array $relationshipEdit): bool
+    {
+        $relationshipModule = strtolower((string)($relationshipEdit['module'] ?? ''));
+        $relationshipAction = (string)($relationshipEdit['action'] ?? '');
+
+        return $relationshipModule === 'contacts'
+            && $relationshipAction === 'ContactOpportunityRelationshipEdit';
+    }
+
+    /**
+     * Save contact role on opportunities_contacts relationship row.
+     */
+    protected function saveOpportunityContactRole(string $relationshipRecordId, string $contactRole): bool
+    {
+        $relationshipClassFile = $this->legacyDir . '/modules/Contacts/ContactOpportunityRelationship.php';
+        if (!is_readable($relationshipClassFile)) {
+            return false;
+        }
+
+        require_once $relationshipClassFile;
+        if (!class_exists('ContactOpportunityRelationship')) {
+            return false;
+        }
+
+        try {
+            $relationship = new \ContactOpportunityRelationship();
+            $relationship->retrieve($relationshipRecordId);
+            if (empty($relationship->id)) {
+                return false;
+            }
+
+            $relationship->contact_role = $contactRole;
+            $relationship->save();
+        } catch (Throwable $exception) {
+            return false;
+        }
+
+        return true;
     }
 }

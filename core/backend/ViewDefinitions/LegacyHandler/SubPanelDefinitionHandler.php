@@ -634,6 +634,10 @@ class SubPanelDefinitionHandler extends LegacyHandler implements SubPanelDefinit
 
         $lineAction['params'] = $lineAction['params'] ?? [];
         $lineAction['params']['relationshipEdit'] = $relationshipEditConfig;
+        $fieldModalConfig = $this->buildRelationshipEditFieldModalConfig($relationshipEditConfig);
+        if (!empty($fieldModalConfig)) {
+            $lineAction['params']['fieldModal'] = $fieldModalConfig;
+        }
 
         return $lineAction;
     }
@@ -669,12 +673,87 @@ class SubPanelDefinitionHandler extends LegacyHandler implements SubPanelDefinit
             $moduleName = $relationshipModule;
         }
 
-        return [
+        $config = [
             'enabled' => true,
             'module' => $moduleName,
             'action' => $relationshipAction,
             'recordField' => $recordField,
             'fallbackToRecordEdit' => true,
+        ];
+
+        $modernConfig = $this->buildModernRelationshipEditConfig($moduleName, $relationshipAction);
+        if (!empty($modernConfig)) {
+            $config['modern'] = $modernConfig;
+        }
+
+        return $config;
+    }
+
+    /**
+     * Build modern-UI relation editor config for known relationship edit actions.
+     */
+    protected function buildModernRelationshipEditConfig(string $moduleName, string $relationshipAction): array
+    {
+        if (strtolower($moduleName) !== 'contacts' || $relationshipAction !== 'ContactOpportunityRelationshipEdit') {
+            return [];
+        }
+
+        return [
+            'enabled' => true,
+            'roleField' => 'opportunity_role',
+            'valueField' => 'opportunity_role',
+            'options' => 'opportunity_relationship_type_dom',
+            'labelKey' => 'LBL_CONTACT_ROLE',
+            'titleKey' => 'LBL_EDIT_RECORD',
+            'actionLabelKey' => 'LBL_SAVE',
+        ];
+    }
+
+    /**
+     * Build field-modal config for relationship edit actions with modern support.
+     */
+    protected function buildRelationshipEditFieldModalConfig(array $relationshipEditConfig): array
+    {
+        $modernConfig = $relationshipEditConfig['modern'] ?? [];
+        if (($modernConfig['enabled'] ?? false) !== true) {
+            return [];
+        }
+
+        $roleField = $modernConfig['roleField'] ?? '';
+        if ($roleField === '') {
+            return [];
+        }
+
+        $labelKey = $modernConfig['labelKey'] ?? 'LBL_CONTACT_ROLE';
+        $options = $modernConfig['options'] ?? 'opportunity_relationship_type_dom';
+
+        return [
+            'module' => $relationshipEditConfig['module'] ?? '',
+            'titleKey' => $modernConfig['titleKey'] ?? 'LBL_EDIT_RECORD',
+            'actionLabelKey' => $modernConfig['actionLabelKey'] ?? 'LBL_SAVE',
+            'fieldGridOptions' => [
+                'maxColumns' => 1,
+                'sizeMap' => [
+                    'handset' => 1,
+                    'tablet' => 1,
+                    'web' => 1,
+                    'wide' => 1,
+                ],
+            ],
+            'fields' => [
+                [
+                    'name' => $roleField,
+                    'type' => 'enum',
+                    'label' => $labelKey,
+                    'fieldDefinition' => [
+                        'name' => $roleField,
+                        'type' => 'enum',
+                        'vname' => $labelKey,
+                        'options' => $options,
+                        'required' => true,
+                    ],
+                ],
+            ],
         ];
     }
 

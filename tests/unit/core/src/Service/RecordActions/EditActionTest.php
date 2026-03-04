@@ -50,10 +50,15 @@ class EditActionTest extends Unit
      */
     protected $service;
 
+    /**
+     * @var ModuleNameMapperInterface
+     */
+    protected $moduleNameMapper;
+
     protected function _before(): void
     {
         /** @var ModuleNameMapperInterface $moduleNameMapper */
-        $moduleNameMapper = $this->makeEmpty(
+        $this->moduleNameMapper = $this->makeEmpty(
             ModuleNameMapperInterface::class,
             [
                 'toLegacy' => function (string $module): string {
@@ -68,7 +73,7 @@ class EditActionTest extends Unit
         );
 
         $this->service = new EditAction(
-            $moduleNameMapper,
+            $this->moduleNameMapper,
             $this->tester->getLegacyDir()
         );
     }
@@ -161,5 +166,100 @@ class EditActionTest extends Unit
 
         static::assertSame('success', $process->getStatus());
         static::assertSame([], $process->getMessages());
+    }
+
+    /**
+     * Regression: modern relation edit should save relationship role and reload subpanel.
+     */
+    public function testModernRelationshipEditSavesRoleAndReloads(): void
+    {
+        $service = new class($this->moduleNameMapper, $this->tester->getLegacyDir()) extends EditAction {
+            protected function saveOpportunityContactRole(string $relationshipRecordId, string $contactRole): bool
+            {
+                return $relationshipRecordId === '90d6129c-2a2b-4160-804e-f16ebe230443'
+                    && $contactRole === 'Primary Decision Maker';
+            }
+        };
+
+        $process = new Process();
+        $process->setType('record-edit');
+        $process->setOptions([
+            'action' => 'record-edit',
+            'id' => '19b870a2-8d0b-4f4b-9116-67b5e501590f',
+            'module' => 'contacts',
+            'payload' => [
+                'baseModule' => 'opportunities',
+                'baseRecordId' => 'b641b285-1f5e-47a3-8a8d-0508aa20c2b1',
+                'linkField' => 'contacts',
+                'recordModule' => 'contacts',
+                'relationshipEdit' => [
+                    'enabled' => true,
+                    'module' => 'contacts',
+                    'action' => 'ContactOpportunityRelationshipEdit',
+                    'recordId' => '90d6129c-2a2b-4160-804e-f16ebe230443',
+                    'modern' => [
+                        'enabled' => true,
+                        'roleField' => 'opportunity_role'
+                    ],
+                    'values' => [
+                        'opportunity_role' => 'Primary Decision Maker'
+                    ],
+                    'fallbackToRecordEdit' => true
+                ]
+            ]
+        ]);
+
+        $service->run($process);
+
+        static::assertSame(['reload' => true], $process->getData());
+        static::assertSame('success', $process->getStatus());
+        static::assertSame([], $process->getMessages());
+    }
+
+    /**
+     * Regression: modern relation save failure should return action error.
+     */
+    public function testModernRelationshipEditReturnsErrorWhenSaveFails(): void
+    {
+        $service = new class($this->moduleNameMapper, $this->tester->getLegacyDir()) extends EditAction {
+            protected function saveOpportunityContactRole(string $relationshipRecordId, string $contactRole): bool
+            {
+                return false;
+            }
+        };
+
+        $process = new Process();
+        $process->setType('record-edit');
+        $process->setOptions([
+            'action' => 'record-edit',
+            'id' => '19b870a2-8d0b-4f4b-9116-67b5e501590f',
+            'module' => 'contacts',
+            'payload' => [
+                'baseModule' => 'opportunities',
+                'baseRecordId' => 'b641b285-1f5e-47a3-8a8d-0508aa20c2b1',
+                'linkField' => 'contacts',
+                'recordModule' => 'contacts',
+                'relationshipEdit' => [
+                    'enabled' => true,
+                    'module' => 'contacts',
+                    'action' => 'ContactOpportunityRelationshipEdit',
+                    'recordId' => '90d6129c-2a2b-4160-804e-f16ebe230443',
+                    'modern' => [
+                        'enabled' => true,
+                        'roleField' => 'opportunity_role'
+                    ],
+                    'values' => [
+                        'opportunity_role' => 'Primary Decision Maker'
+                    ],
+                    'fallbackToRecordEdit' => true
+                ]
+            ]
+        ]);
+
+        $service->run($process);
+
+        static::assertNull($process->getData());
+        static::assertSame('error', $process->getStatus());
+        static::assertSame(['LBL_ACTION_ERROR'], $process->getMessages());
     }
 }

@@ -162,4 +162,37 @@ class EditActionTest extends Unit
         static::assertSame('success', $process->getStatus());
         static::assertSame([], $process->getMessages());
     }
+
+    /**
+     * Regression: disable fallback should return error when relation action is unavailable.
+     */
+    public function testRelationshipEditWithoutFallbackReturnsErrorWhenLegacyActionMissing(): void
+    {
+        $process = new Process();
+        $process->setType('record-edit');
+        $process->setOptions([
+            'action' => 'record-edit',
+            'id' => '19b870a2-8d0b-4f4b-9116-67b5e501590f',
+            'module' => 'contacts',
+            'payload' => [
+                'baseModule' => 'opportunities',
+                'baseRecordId' => 'b641b285-1f5e-47a3-8a8d-0508aa20c2b1',
+                'linkField' => 'contacts',
+                'recordModule' => 'contacts',
+                'relationshipEdit' => [
+                    'enabled' => true,
+                    'module' => 'contacts',
+                    'action' => 'ActionThatDoesNotExist',
+                    'recordId' => '90d6129c-2a2b-4160-804e-f16ebe230443',
+                    'fallbackToRecordEdit' => false
+                ]
+            ]
+        ]);
+
+        $this->service->run($process);
+
+        static::assertNull($process->getData());
+        static::assertSame('error', $process->getStatus());
+        static::assertSame(['LBL_ACTION_ERROR'], $process->getMessages());
+    }
 }

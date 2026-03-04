@@ -152,12 +152,24 @@ class EditAction implements ProcessHandlerInterface
     {
         $options = $process->getOptions();
         $relationshipEdit = $options['payload']['relationshipEdit'] ?? [];
+        $relationshipEditEnabled = ($relationshipEdit['enabled'] ?? false) === true;
 
         $responseData = $this->buildRelationshipEditResponseData($options, $relationshipEdit);
-        if (empty($responseData)) {
-            $responseData = $this->buildRecordEditResponseData($options);
+        if (!empty($responseData)) {
+            $process->setStatus('success');
+            $process->setMessages([]);
+            $process->setData($responseData);
+            return;
         }
 
+        if ($relationshipEditEnabled && !$this->shouldFallbackToRecordEdit($relationshipEdit)) {
+            $process->setStatus('error');
+            $process->setMessages(['LBL_ACTION_ERROR']);
+            $process->setData(null);
+            return;
+        }
+
+        $responseData = $this->buildRecordEditResponseData($options);
         $process->setStatus('success');
         $process->setMessages([]);
         $process->setData($responseData);
@@ -255,5 +267,13 @@ class EditAction implements ProcessHandlerInterface
     protected function isSafeLegacyIdentifier(string $value): bool
     {
         return $value !== '' && preg_match('/^[A-Za-z0-9_]+$/', $value) === 1;
+    }
+
+    /**
+     * Whether relation edit should fallback to standard record edit.
+     */
+    protected function shouldFallbackToRecordEdit(array $relationshipEdit): bool
+    {
+        return ($relationshipEdit['fallbackToRecordEdit'] ?? true) !== false;
     }
 }

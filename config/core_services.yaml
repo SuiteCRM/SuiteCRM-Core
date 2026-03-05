@@ -94,6 +94,7 @@ services:
       $entityFieldTypeMapperRegistry: '@entity.fieldType.mapper.registry'
       $transportMapConfig: '%async-task.routes%'
       $transportMapEnv: '%env(ASYNC_TASK_ROUTES)%'
+      $temporaryFileBaseDir: '%temporary_file.base_dir%'
 
 
 

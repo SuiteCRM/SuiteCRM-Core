@@ -17,6 +17,7 @@ parameters:
   log.messenger.default: '%kernel.environment%.messenger.log'
   site.url: '%env(SITE_URL)%'
   saml.autocreate.attributes_map: '%env(json:SAML_AUTOCREATE_ATTRIBUTES_MAP)%'
+  temporary_file.base_dir: '%env(TEMPORARY_FILE_BASE_DIR)%'
 
 services:
   Symfony\Component\Ldap\Ldap:

@@ -13,7 +13,6 @@ parameters:
     system_name: true
     image_thumbnail_height_default: true
     image_thumbnail_width_default: true
-    image_thumbnail_tmp_path: true
     subpanel_pagination_type: true
     listview_pagination_type: true
     classicview_routing_exclusions: true

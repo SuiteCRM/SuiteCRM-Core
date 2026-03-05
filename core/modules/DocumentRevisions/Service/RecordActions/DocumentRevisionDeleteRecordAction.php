@@ -27,16 +27,19 @@
 
 namespace App\Module\DocumentRevisions\Service\RecordActions;
 
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use App\Data\Service\RecordDeletionServiceInterface;
 use App\Module\Documents\LegacyHandler\DocumentsManagerInterface;
 use App\Module\Service\ModuleNameMapperInterface;
 use App\Process\Entity\Process;
-use App\Process\Service\RecordActions\DeleteRecordAction;
+use App\Process\Service\ProcessHandlerInterface;
 
-class DocumentRevisionDeleteRecordAction extends DeleteRecordAction
+class DocumentRevisionDeleteRecordAction implements ProcessHandlerInterface
 {
 
-    protected const PROCESS_TYPE = 'document-revision-delete';
+    protected const MSG_OPTIONS_NOT_FOUND = 'Process options are not defined';
+
+    protected const PROCESS_TYPE = 'record-document-revision-delete';
 
     public function __construct(
         protected ModuleNameMapperInterface $moduleNameMapper,
@@ -44,7 +47,41 @@ class DocumentRevisionDeleteRecordAction extends DeleteRecordAction
         protected DocumentsManagerInterface $documentsManager
     )
     {
-        parent::__construct($moduleNameMapper, $recordDeletionProvider);
+    }
+
+    public function getProcessType(): string
+    {
+        return self::PROCESS_TYPE;
+    }
+
+    public function requiredAuthRole(): string
+    {
+        return 'ROLE_USER';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function validate(Process $process): void
+    {
+        if (empty($process->getOptions())) {
+            throw new InvalidArgumentException(self::MSG_OPTIONS_NOT_FOUND);
+        }
+
+        $options = $process->getOptions();
+
+        if (empty($options['module']) || empty($options['action']) || empty($options['id'])) {
+            throw new InvalidArgumentException(self::MSG_OPTIONS_NOT_FOUND);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function configure(Process $process): void
+    {
+        $process->setId(static::PROCESS_TYPE);
+        $process->setAsync(false);
     }
 
     /**
@@ -110,5 +147,19 @@ class DocumentRevisionDeleteRecordAction extends DeleteRecordAction
 
         $process->setData($responseData);
 
+    }
+
+    /**
+     * @param Process $process
+     * @return bool
+     */
+    protected function deleteRecord(Process $process): bool
+    {
+        $options = $process->getOptions();
+
+        return $this->recordDeletionProvider->deleteRecord(
+            $this->moduleNameMapper->toLegacy($options['module']),
+            $options['id']
+        );
     }
 }

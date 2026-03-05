@@ -4394,3 +4394,4 @@ $app_strings['LBL_NO_DOCUMENT_ID_PROVIDED'] = 'Cannot find document to delete re
 $app_strings['LBL_NO_RECORD_ID_PROVIDED'] = 'Cannot find docuemnt revision to delete, no record id provided.';
 $app_strings['LBL_DELETE_REVISION_CONFIRM'] = 'Are you sure you want to delete this revision?';
 $app_strings['LBL_DOCUMENT_NOT_FOUND'] = 'Document not found.';
+$app_strings['LBL_EMAIL_ATTACHMENT_DOCUMENT_DELETED'] = 'One or more attached documents have been deleted and cannot be sent.';

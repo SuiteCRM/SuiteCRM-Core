@@ -68,13 +68,17 @@ a.clickable.file-field-uploaded-link:hover {
 
     .uploaded-file-icon-container {
       .uploaded-file-icon {
-        margin-right: .3em;
+        margin-right: .1em;
         color: $bright-purple;
         fill: $bright-purple;
         font-size: larger;
         line-height: 100%;
         height: auto;
         display: block;
+
+        svg {
+          overflow: visible;
+        }
 
         &.error-icon {
           padding-left: .25em;
@@ -145,8 +149,8 @@ a.clickable.file-field-uploaded-link:hover {
 
   .uploaded-file-actions {
     .upload-clear-button {
-
-      font-size: large;
+      font-size: medium;
+      padding: .2rem 0.15rem .19rem 0.2rem;
       color: $bright-purple;
       fill: $bright-purple;
 
@@ -226,6 +230,10 @@ a.clickable.file-field-uploaded-link:hover {
         line-height: 100%;
         height: auto;
         display: block;
+
+        svg {
+          overflow: visible;
+        }
 
         &.error-icon {
           padding-left: .25rem !important;

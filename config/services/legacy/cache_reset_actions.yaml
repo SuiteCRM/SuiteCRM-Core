@@ -27,3 +27,4 @@ parameters:
       - wizard
     emailman:
       - campaignconfig
+      - config

@@ -34,9 +34,18 @@ import {
     Router,
     RouterEvent
 } from '@angular/router';
-import {AppState, AppStateStore, StateManager, SystemConfigStore, NotificationStore, RecentlyViewedService, DraftsService} from 'core';
+import {
+    AppState,
+    AppStateStore,
+    StateManager,
+    SystemConfigStore,
+    NotificationStore,
+    RecentlyViewedService,
+    DraftsService, isTrue
+} from 'core';
 import {Observable} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-root',
@@ -80,7 +89,8 @@ export class AppComponent implements OnInit {
         if (routerEvent instanceof NavigationEnd) {
             // reset scroll on navigation
             window.scrollTo(0, 0);
-            this.appStateStore.setRouteUrl(routerEvent.url)
+            this.appStateStore.setRouteUrl(routerEvent.url);
+            this.updateDraftsVisibility();
         }
 
 
@@ -142,10 +152,15 @@ export class AppComponent implements OnInit {
         };
     }
 
+    protected isDraftsPopupEnabled(): boolean {
+        const draftsPopup = this.systemConfigs.getConfigValue('drafts_popup');
+        return draftsPopup === null || isTrue(draftsPopup);
+    }
+
     protected initDraftsConfig(): void {
         this.setDraftsButton();
         this.draftsService.draftsCount$.pipe().subscribe((count) => {
-            if (count < 1) {
+            if (count < 1 || !this.isDraftsPopupEnabled()) {
                 this.draftsService?.closeModal();
                 setTimeout(() => {
                     this.showDrafts.set(false);
@@ -160,7 +175,19 @@ export class AppComponent implements OnInit {
             this.draftsService.modalOpenStatusIcon$.pipe().subscribe(() => {
                 this.setDraftsButton();
             });
+        }
 
+    }
+
+    protected updateDraftsVisibility(): void {
+        if (!this.isDraftsPopupEnabled()) {
+            this.draftsService?.closeModal();
+            this.showDrafts.set(false);
+            return;
+        }
+        if (this.draftsService?.draftsCount() > 0) {
+            this.showDrafts.set(true);
+            this.setDraftsButton();
         }
     }
 

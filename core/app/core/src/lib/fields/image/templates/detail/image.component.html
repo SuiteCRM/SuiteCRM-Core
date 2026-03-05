@@ -68,9 +68,9 @@
 </div>
 
 <ng-template #previewTemplate>
-    <div class="d-flex flex-row align-items-center justify-content-around w-100">
+    <div class="d-flex flex-row align-items-center justify-content-center w-100">
         <scrm-image [image]="'eye'" [titleKey]="'LBL_PREVIEW_IMAGE'"></scrm-image>
-        <a [href]="uploadedFile()?.contentUrl" download class="d-flex pl-3 clickable" target="_blank"
+        <a [href]="uploadedFile()?.contentUrl" download class="d-flex image-download clickable" target="_blank"
            (click)="$event.stopPropagation()">
             <scrm-image [image]="'download-arrow'" [titleKey]="'LBL_DOWNLOAD_IMAGE'"></scrm-image>
         </a>

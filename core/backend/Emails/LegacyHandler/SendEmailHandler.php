@@ -74,6 +74,11 @@ class SendEmailHandler extends LegacyHandler
         return self::HANDLER_KEY;
     }
 
+    public function validateAttachments(Record $emailRecord): array
+    {
+        return $this->recordToEmailService->validateAttachments($emailRecord->getAttributes() ?? []);
+    }
+
     public function sendEmail(Record $emailRecord, Record $outboundRecord, $isTest = false): bool
     {
 

@@ -103,6 +103,12 @@ class EmailProcessProcessor extends LegacyHandler
 
         $emailRecord = $this->parseEmail($emailRecord);
 
+        $attachmentErrors = $this->sendEmailHandler->validateAttachments($emailRecord);
+        if (!empty($attachmentErrors)) {
+            $this->close();
+            return $attachmentErrors + ['success' => false];
+        }
+
         $success = false;
         $errorMessage = '';
         try {

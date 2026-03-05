@@ -137,7 +137,7 @@ class SendEmailAction implements ProcessHandlerInterface
 
         if ($result['success'] === false) {
             $process->setStatus('error');
-            $process->setMessages(['LBL_ACTION_ERROR']);
+            $process->setMessages([$result['labelKey'] ?? 'LBL_ACTION_ERROR']);
 
             return;
         }

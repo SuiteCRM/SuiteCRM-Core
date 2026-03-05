@@ -29,9 +29,11 @@ namespace App\Emails\Service\RecordToEmailMapper;
 
 use App\Data\Entity\Record;
 use App\FieldDefinitions\Service\FieldDefinitionsProviderInterface;
+use App\MediaObjects\Entity\MediaObjectInterface;
 use App\MediaObjects\Repository\DefaultMediaObjectManager;
 use App\MediaObjects\Services\MediaObjectFileHandler;
 use App\Module\Service\Fields\Attachments\AttachmentTypeHandlers\AttachmentTypeHandlers;
+use App\Module\Service\ModuleNameMapperInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -45,6 +47,7 @@ class RecordToEmailService
         protected LoggerInterface $logger,
         protected MediaObjectFileHandler $mediaObjectFileHandler,
         protected AttachmentTypeHandlers $attachmentTypeHandlers,
+        protected ModuleNameMapperInterface $moduleNameMapper,
     )
     {
     }
@@ -153,14 +156,12 @@ class RecordToEmailService
             if ($attachmentType === 'file') {
                 $storageType = $emailStorage;
             } else {
-                $handler = $this->attachmentTypeHandlers->getHandler($attachmentType);
-
-                if ($handler === null) {
-                    $this->logger->warning('No handler found for attachment type '.$attachmentType);
+                $mediaObject = $this->getLatestAttachment($attachment);
+                if (!$mediaObject) {
                     continue;
                 }
-
-                $storageType = $handler->getStorageType();
+                $mediaObjects[] = $mediaObject;
+                continue;
             }
 
             $mediaObject = $this->defaultMediaObjectManager->getMediaObject($storageType, $attachment['id'] ?? '');
@@ -208,6 +209,70 @@ class RecordToEmailService
             );
             $email->attach($fileInfo['stream'], $fileInfo['fileName'], $fileInfo['mimeType']);
         }
+    }
+
+    public function validateAttachments(array $emailRecordAttributes): array
+    {
+        $attachments = $emailRecordAttributes['email_attachments'] ?? [];
+
+        foreach ($attachments as $attachment) {
+            $attachmentType = $attachment['attributes']['attachmentType'] ?? 'file';
+
+            if ($attachmentType === 'file') {
+                continue;
+            }
+
+            $sourceRecordId = $attachment['attributes']['source_record_id'] ?? null;
+            if (!$sourceRecordId) {
+                continue;
+            }
+
+            $handler = $this->attachmentTypeHandlers->getHandler($attachmentType);
+            if (!$handler) {
+                continue;
+            }
+
+            $results = $handler->getAttachments($attachmentType, $sourceRecordId);
+            $first = $results[0] ?? null;
+
+            if (!empty($first['attributes']['status']) && $first['attributes']['status'] === 'error') {
+                return ['labelKey' => 'LBL_EMAIL_ATTACHMENT_DOCUMENT_DELETED'];
+            }
+        }
+
+        return [];
+    }
+
+    protected function getLatestAttachment(array $attachment): ?MediaObjectInterface
+    {
+        $sourceRecordId = $attachment['attributes']['source_record_id'] ?? null;
+        $attachmentType = $attachment['attributes']['attachmentType'] ?? null;
+
+        if (!$sourceRecordId || !$attachmentType) {
+            $this->logger->warning('Missing source record id or attachment type for email attachment');
+            return null;
+        }
+
+        $handler = $this->attachmentTypeHandlers->getHandler($attachmentType);
+        if (!$handler) {
+            $this->logger->warning('No attachment handler found for type '.$attachmentType);
+            return null;
+        }
+
+        $latestAttachment = $handler->getAttachments($attachmentType, $sourceRecordId)[0] ?? null;
+
+        if (!$latestAttachment) {
+            $this->logger->warning('Unable to retrieve attachments for source record id '.$sourceRecordId.' and attachment type '.$attachmentType);
+            return null;
+        }
+
+        $mediaObject = $this->defaultMediaObjectManager->getMediaObject($handler->getStorageType(), $latestAttachment['id'] ?? '');
+        if (!$mediaObject) {
+            $this->logger->warning('Attachment with id '.($latestAttachment['id'] ?? '').' not found');
+            return null;
+        }
+        $mediaObject->contentUrl = $this->defaultMediaObjectManager->buildContentUrl($handler->getStorageType(), $mediaObject);
+        return $mediaObject;
     }
 
 

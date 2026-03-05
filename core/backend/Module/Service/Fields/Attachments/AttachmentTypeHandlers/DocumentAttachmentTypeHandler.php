@@ -109,10 +109,12 @@ class DocumentAttachmentTypeHandler extends LegacyHandler implements AttachmentT
             $contentUrl = $this->mediaObjectManager->buildContentUrl($storageType, $linkedMediaObject);
             $linkedMediaObject->setContentUrl($contentUrl);
             $mediaObjectRecord = $this->mediaObjectManager->mapToRecord($storageType, $linkedMediaObject);
-            $attributes = $mediaObjectRecord->getAttributes();
-            $attributes['attachmentType'] = 'documents';
-            $attributes['source_record_id'] = $id;
-            $mediaObjectRecord->setAttributes($attributes);
+            $mediaObjectAttributes = $mediaObjectRecord->getAttributes();
+            $mediaObjectAttributes['attachmentType'] = 'documents';
+            $mediaObjectAttributes['source_record_id'] = $id;
+            $mediaObjectAttributes['name'] = $attributes['name'] ?? $mediaObjectAttributes['name'] ?? '';
+            $mediaObjectAttributes['original_name'] = $attributes['name'] ?? $mediaObjectAttributes['name'] ?? '';
+            $mediaObjectRecord->setAttributes($mediaObjectAttributes);
             $mediaObjects[] = $mediaObjectRecord->toArray();
         }
 

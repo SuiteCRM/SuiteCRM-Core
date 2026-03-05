@@ -65,6 +65,31 @@ class LegacySettingsProvider extends LegacyHandler implements SettingsProviderIn
         return $value;
     }
 
+    public function getAll(string $category): array
+    {
+        $this->init();
+        $this->startLegacyApp();
+
+        /** @var \Administration $administration */
+        $administration = \BeanFactory::newBean('Administration');
+        $administration->retrieveSettings();
+
+        $prefix = $category . '_';
+        $prefixLen = strlen($prefix);
+        $result = [];
+
+        foreach ($administration->settings as $settingKey => $value) {
+            if (strncmp($settingKey, $prefix, $prefixLen) === 0) {
+                $key = substr($settingKey, $prefixLen);
+                $result[$key] = $value;
+            }
+        }
+
+        $this->close();
+
+        return $result;
+    }
+
     public function save(string $category, string $key, string $value): void
     {
         $this->init();

@@ -75,6 +75,10 @@ class SystemConfigHandler extends LegacyHandler implements SystemConfigProviderI
      * @var InstallHandler
      */
     private $installHandler;
+    /**
+     * @var ConfigTableSystemMapperInterface
+     */
+    private $configTableSystemMapper;
 
     /**
      * SystemConfigHandler constructor.
@@ -90,6 +94,7 @@ class SystemConfigHandler extends LegacyHandler implements SystemConfigProviderI
      * @param SystemConfigMappers $mappers
      * @param CurrencyHandler $currencyHandler
      * @param InstallHandler $installHandler
+     * @param ConfigTableSystemMapperInterface $configTableSystemMapper
      * @param array $systemConfigKeyMap
      * @param array $cacheResetActions
      * @param array $navigationTabLimits
@@ -129,6 +134,7 @@ class SystemConfigHandler extends LegacyHandler implements SystemConfigProviderI
         SystemConfigMappers $mappers,
         CurrencyHandler $currencyHandler,
         InstallHandler $installHandler,
+        ConfigTableSystemMapperInterface $configTableSystemMapper,
         array $systemConfigKeyMap,
         array $cacheResetActions,
         array $navigationTabLimits,
@@ -201,6 +207,7 @@ class SystemConfigHandler extends LegacyHandler implements SystemConfigProviderI
         $this->systemConfigKeyMap = $systemConfigKeyMap;
         $this->currencyHandler = $currencyHandler;
         $this->installHandler = $installHandler;
+        $this->configTableSystemMapper = $configTableSystemMapper;
     }
 
     /**
@@ -540,6 +547,11 @@ class SystemConfigHandler extends LegacyHandler implements SystemConfigProviderI
     protected function initInjectedConfigs(): void
     {
         $this->injectedSystemConfigs['currencies'] = $this->currencyHandler->getCurrencies();
+
+        $systemTableConfigs = $this->configTableSystemMapper->getConfigs();
+        foreach ($systemTableConfigs as $key => $value) {
+            $this->injectedSystemConfigs[$key] = $value;
+        }
     }
 
     /**

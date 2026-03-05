@@ -1,7 +1,7 @@
 <?php
 /**
  * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
- * Copyright (C) 2025 SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -25,13 +25,15 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-namespace App\SystemConfig\Service;
+namespace App\SystemConfig\LegacyHandler;
 
-interface SettingsProviderInterface
+interface ConfigTableSystemMapperInterface
 {
-    public function get(string $category, string $key): ?string;
-
-    public function getAll(string $category): array;
-
-    public function save(string $category, string $key, string $value): void;
+    /**
+     * Returns all config entries from the config table with category 'system'
+     * as a flat key => value map.
+     *
+     * @return array<string, string|null>
+     */
+    public function getConfigs(): array;
 }

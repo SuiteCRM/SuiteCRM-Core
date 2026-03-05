@@ -124,53 +124,68 @@ export class AttachmentEditFieldComponent extends BaseAttachmentComponent implem
     }
 
     buildButtonItems(): void {
+
+
+        const items = [
+            {
+                labelKey: 'LBL_UPLOAD_FROM_FILES',
+                klass: 'btn-outline-main',
+                onClick: (): void => {
+                    this.uploadArea.triggerFileInput()
+                }
+            },
+        ];
+
+        if (this.field?.metadata?.allow_attach_documents === false) {
+            this.dropdownButton = {
+                labelKey: 'LBL_EMAIL_ATTACHMENT',
+                icon: 'paperclip',
+                klass: 'btn-sm btn btn-outline-main',
+                items,
+            } as DropdownButtonInterface;
+            return;
+        }
+
+        items.push({
+            labelKey: 'LBL_ATTACH_DOCUMENTS',
+            klass: 'btn-outline-main',
+            onClick: (): void => {
+                const selectModalOptions = {
+                    multiSelect: true,
+                    multiSelectButtonLabelKey: 'LBL_EMAIL_ATTACHMENT',
+                };
+
+                this.selectModalService.showSelectModal('Documents', (records) => {
+                    const mappedRecords = [];
+                    Object.values(records).forEach((record: Record) => {
+                        const baseRecord = this.recordManager.getBaseRecord(record)
+                        mappedRecords.push(baseRecord);
+                    });
+
+                    this.processService.submit('retrieve-attachment-media-objects', {
+                        records: mappedRecords,
+                    }).subscribe((process) => {
+
+                        if (isTrue(process.data?.failed_records ?? false)) {
+                            this.messageService.addDangerMessageByKey('LBL_SOME_ATTACHMENTS_FAILED');
+                        }
+
+                        Object.values(process?.data?.media_objects).forEach((file: Record) => {
+                            const mappedFile = this.mapFile(file);
+                            const uploadedFiles = [mappedFile, ...this.attachments() ?? []];
+                            this.setValue(uploadedFiles);
+                            this.attachments.set([mappedFile, ...this.attachments() ?? []]);
+                        });
+                    });
+                }, selectModalOptions);
+            }
+        });
+
         this.dropdownButton = {
             labelKey: 'LBL_EMAIL_ATTACHMENT',
             icon: 'paperclip',
             klass: 'btn-sm btn btn-outline-main',
-            items: [
-                {
-                    labelKey: 'LBL_UPLOAD_FROM_FILES',
-                    klass: 'btn-outline-main',
-                    onClick: (): void => {
-                        this.uploadArea.triggerFileInput()
-                    }
-                },
-                {
-                    labelKey: 'LBL_ATTACH_DOCUMENTS',
-                    klass: 'btn-outline-main',
-                    onClick: (): void => {
-                        const selectModalOptions = {
-                            multiSelect: true,
-                            multiSelectButtonLabelKey: 'LBL_EMAIL_ATTACHMENT',
-                        };
-
-                        this.selectModalService.showSelectModal('Documents', (records) => {
-                            const mappedRecords = [];
-                            Object.values(records).forEach((record: Record) => {
-                                const baseRecord = this.recordManager.getBaseRecord(record)
-                                mappedRecords.push(baseRecord);
-                            });
-
-                            this.processService.submit('retrieve-attachment-media-objects', {
-                                records: mappedRecords,
-                            }).subscribe((process) => {
-
-                                if (isTrue(process.data?.failed_records ?? false)) {
-                                    this.messageService.addDangerMessageByKey('LBL_SOME_ATTACHMENTS_FAILED');
-                                }
-
-                                Object.values(process?.data?.media_objects).forEach((file: Record) => {
-                                    const mappedFile = this.mapFile(file);
-                                    const uploadedFiles = [mappedFile, ...this.attachments() ?? []];
-                                    this.setValue(uploadedFiles);
-                                    this.attachments.set([mappedFile, ...this.attachments() ?? []]);
-                                });
-                            });
-                        }, selectModalOptions);
-                    }
-                },
-            ],
+            items,
         } as DropdownButtonInterface;
     }
 

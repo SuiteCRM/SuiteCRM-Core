@@ -68,3 +68,4 @@ parameters:
     campaign_marketing_items_per_run_default: true
     campaign_emails_max_retries_default: true
     campaign_emails_threshold_default: true
+    drafts_popup: true

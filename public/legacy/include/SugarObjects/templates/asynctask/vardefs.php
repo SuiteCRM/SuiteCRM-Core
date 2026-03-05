@@ -88,6 +88,21 @@ $vardefs = [
             'unified_search' => false,
         ],
 
+        'data' => [
+            'name' => 'data',
+            'vname' => 'LBL_DATA',
+            'type' => 'longtext',
+            'comment' => 'JSON-encoded task options and handler data',
+            'display' => 'none',
+            'duplicate_merge' => 'disabled',
+            'reportable' => false,
+            'massupdate' => false,
+            'inline_edit' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false,
+        ],
+
         // --- Async-task-specific fields ---
 
         'progress' => [

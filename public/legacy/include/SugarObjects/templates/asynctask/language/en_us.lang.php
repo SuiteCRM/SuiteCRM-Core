@@ -61,6 +61,7 @@ $mod_strings = [
     'LBL_ACTIVITIES_SUBPANEL_TITLE' => 'Activities',
 
     // Async task field labels
+    'LBL_DATA' => 'Data',
     'LBL_TYPE' => 'Type',
     'LBL_ESTIMATED_RUN_TIME' => 'Run time estimate',
     'LBL_STATUS' => 'Status',

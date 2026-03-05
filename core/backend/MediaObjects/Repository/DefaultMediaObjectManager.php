@@ -39,6 +39,7 @@ use App\MediaObjects\Entity\PrivateDocumentMediaObject;
 use App\MediaObjects\Entity\PrivateImageMediaObject;
 use App\MediaObjects\Entity\PublicDocumentMediaObject;
 use App\MediaObjects\Entity\PublicImageMediaObject;
+use App\MediaObjects\Service\TemporaryFile\TemporaryFileManagerInterface;
 use App\SystemConfig\Service\SystemConfigProviderInterface;
 use Imagine\Gd\Imagine;
 use Imagine\Gmagick\Imagine as GmagickImagine;
@@ -76,7 +77,8 @@ class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectMana
         protected LegacyImageMediaObjectRepository $legacyImageRepository,
         protected SystemConfigProviderInterface $systemConfigProvider,
         protected LoggerInterface $logger,
-        protected StorageInterface $storage
+        protected StorageInterface $storage,
+        protected TemporaryFileManagerInterface $temporaryFileManager
     )
     {
         parent::__construct(
@@ -545,8 +547,8 @@ class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectMana
             $options['height'] = 0;
         }
 
-        if (empty($options['height'])) {
-            $options['height'] = 0;
+        if (empty($options['width'])) {
+            $options['width'] = 0;
         }
 
         $height = $this->getThumbnailHeight((int)$options['height']);
@@ -556,7 +558,7 @@ class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectMana
         $imagine = $this->getImagine();
 
         $ext = $this->getExtension($mediaObject);
-        $path = $this->projectDir . '/' . $this->getThumbnailTmpPath() . $id . $ext;
+        $path = $this->temporaryFileManager->getWorkingFilePath('thumbnail', $id . $ext);
 
         $imagine->load($contents)->resize(new Box($width, $height))->save($path);
         return [new ReplacingFile($path), $path];
@@ -582,11 +584,6 @@ class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectMana
         }
 
         return $width;
-    }
-
-    protected function getThumbnailTmpPath(): string
-    {
-        return $this->systemConfigProvider->getSystemConfig('image_thumbnail_tmp_path')->getValue() ?? 'tmp/';
     }
 
     public function getStorageTypeFromClass(string $className): ?string

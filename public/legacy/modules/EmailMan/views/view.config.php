@@ -250,6 +250,9 @@ class ViewConfig extends SugarView
         }
         $this->ss->assign('DEFAULT_EMAIL_DELETE_ATTACHMENTS', $preserveAttachments);
 
+        $draftsPopup = !empty($focus->settings['system_drafts_popup']) ? "checked='checked'" : '';
+        $this->ss->assign('DRAFTS_POPUP', $draftsPopup);
+
         $emailNotifications = '';
         if (isset($sugar_config['email_warning_notifications']) && $sugar_config['email_warning_notifications'] === true) {
             $emailNotifications = 'CHECKED';

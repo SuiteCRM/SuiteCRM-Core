@@ -240,6 +240,15 @@ function change_state(radiobutton) {
 						</tr>
                         <tr>
 							<td width="20%" scope="row" valign='top'>
+								{$MOD.LBL_DRAFTS_POPUP}:&nbsp;
+							</td>
+							<td width="30%"  valign='top'>
+								<input type='hidden' name='system_drafts_popup' value='0'>
+								<input id="system_drafts_popup" name='system_drafts_popup' value="1" tabindex='1' class="checkbox" type="checkbox" {$DRAFTS_POPUP}>
+							</td>
+						</tr>
+                        <tr>
+							<td width="20%" scope="row" valign='top'>
 								{$MOD.LBL_LEGACY_EMAIL_COMPOSE_BEHAVIOR}:&nbsp;
 							</td>
 							<td width="30%"  valign='top'>

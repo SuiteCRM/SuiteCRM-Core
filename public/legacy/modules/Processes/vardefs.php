@@ -66,66 +66,6 @@ $dictionary['Process'] = [
             'unified_search' => false,
         ],
 
-        // Processes shows completed and failed counts alongside the percentage bar.
-        'progress' => [
-            'name' => 'progress',
-            'vname' => 'LBL_PROGRESS',
-            'type' => 'composite',
-            'dbType' => 'text',
-            'layout' => ['percent', 'completed', 'failed'],
-            'attributeFields' => [
-                'percent' => [
-                    'name' => 'percent',
-                    'type' => 'texttemplate',
-                    'metadata' => [
-                        'templateLabelKey' => 'LBL_PROGRESS_PERCENT_TPL',
-                        'conditionalTemplates' => [
-                            [
-                                'templateLabelKey' => 'LBL_PROGRESS_NOT_STARTED',
-                                'displayModes' => ['detail', 'list'],
-                                'fieldName' => 'status',
-                                'activeOn' => [
-                                    ['operator' => 'is-equal', 'values' => ['initial', 'pending']],
-                                ],
-                            ],
-                            [
-                                'templateLabelKey' => 'LBL_PROGRESS_QUEUING_TPL',
-                                'displayModes' => ['detail', 'list'],
-                                'fieldName' => 'phase',
-                                'activeOn' => [
-                                    ['operator' => 'is-equal', 'values' => ['queueing']],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-                'completed' => [
-                    'name' => 'completed',
-                    'type' => 'int',
-                ],
-                'failed' => [
-                    'name' => 'failed',
-                    'type' => 'int',
-                ],
-                'total' => [
-                    'name' => 'total',
-                    'type' => 'int',
-                ],
-                'queued' => [
-                    'name' => 'queued',
-                    'type' => 'int',
-                ],
-            ],
-            'display' => 'readonly',
-            'direction' => 'inline',
-            'duplicate_merge' => 'disabled',
-            'reportable' => false,
-            'massupdate' => false,
-            'inline_edit' => false,
-            'importable' => false,
-            'exportable' => false,
-            'unified_search' => false,
-        ],
     ],
     'relationships' => [
     ],

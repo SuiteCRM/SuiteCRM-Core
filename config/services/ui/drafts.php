@@ -73,7 +73,7 @@ return static function (ContainerConfigurator $containerConfig) {
                     'autoRefresh' => false,
                     'module' => 'emails',
                     'class' => 'drafts-modal',
-                    'maxListHeight' => 350,
+                    'maxListHeight' => 396,
                     'direction' => 'desc',
                     'loadMorePosition' => 'bottom',
                     'filters' => [

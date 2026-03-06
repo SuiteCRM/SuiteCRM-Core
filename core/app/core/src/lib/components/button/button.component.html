@@ -53,6 +53,10 @@
                     [image]="dynamicEndIcon()"
                     [klass]="config?.endIconKlass || ''"
                     [title]="language.getFieldLabel(config.endIconTitleKey || '')"></scrm-image>
+        <scrm-image *ngIf="config.endIcon"
+                    [image]="config.endIcon"
+                    [klass]="config?.endIconKlass || ''"
+                    [title]="language.getFieldLabel(config.endIconTitleKey || '')"></scrm-image>
         <ng-content></ng-content>
     </ng-container>
     <ng-content></ng-content>

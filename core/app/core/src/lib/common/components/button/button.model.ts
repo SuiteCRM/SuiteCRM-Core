@@ -51,6 +51,7 @@ export interface ButtonInterface {
     iconKlass?: string;
     endIconTitleKey?: string;
     endIconKlass?: string;
+    endIcon?: string;
     labelModule?: string;
     section?: string;
     disabled?: Signal<boolean>;

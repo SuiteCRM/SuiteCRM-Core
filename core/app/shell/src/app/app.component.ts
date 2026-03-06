@@ -134,7 +134,7 @@ export class AppComponent implements OnInit {
             klass: 'btn drafts-button btn-main',
             iconKlass: 'pr-1',
             dynamicLabelKey: 'LBL_DRAFTS_TOTAL',
-            dynamicEndIcon: this.draftsService.modalOpenStatusIcon,
+            endIcon: 'arrow_up_filled',
             endIconKlass: 'drafts-caret',
             dynamicLabelFields: {
                 count: {
@@ -170,13 +170,6 @@ export class AppComponent implements OnInit {
             this.showDrafts.set(true);
             this.setDraftsButton();
         });
-
-        if (this.draftsService?.modalOpenStatusIcon$) {
-            this.draftsService.modalOpenStatusIcon$.pipe().subscribe(() => {
-                this.setDraftsButton();
-            });
-        }
-
     }
 
     protected updateDraftsVisibility(): void {

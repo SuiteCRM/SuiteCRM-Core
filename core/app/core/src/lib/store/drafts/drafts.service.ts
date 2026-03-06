@@ -45,8 +45,6 @@ export class DraftsService {
     draftsCount$ = toObservable(this.draftsCount);
     modalConfig: any = {};
     showDrafts: WritableSignal<boolean> = signal(false);
-    modalOpenStatusIcon: WritableSignal<string> = signal('arrow_up_filled');
-    modalOpenStatusIcon$ = toObservable(this.modalOpenStatusIcon);
 
     protected subs: Subscription[] = [];
 
@@ -114,13 +112,6 @@ export class DraftsService {
 
         this.getOpenedDrafts();
         this.updateCriteria();
-
-        this.subs.push(this.modal?.shown?.subscribe(() => {
-            this.modalOpenStatusIcon.set('arrow_down_filled');
-        }));
-        this.subs.push(this.modal?.closed?.subscribe(() => {
-            this.modalOpenStatusIcon.set('arrow_up_filled');
-        }));
     }
 
     closeModal(): void {

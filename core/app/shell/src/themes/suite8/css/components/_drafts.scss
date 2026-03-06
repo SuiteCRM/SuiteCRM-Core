@@ -42,14 +42,9 @@
   z-index: 1040 !important;
 
   .drafts-button {
-    min-width: 3.5em;
-    width: auto;
+    width: 78px;
+    height: 38px;
     padding: 0.375rem .25rem 0.375rem .5rem !important;
-
-    &:focus-visible, &:active, &:hover {
-      border-color: $bright-purple !important;
-      background-color: $bright-purple !important;
-    }
 
     &:focus {
       box-shadow: none !important;
@@ -63,10 +58,6 @@
       position: relative;
     }
 
-
-    &:hover {
-      background-color: $bright-purple !important;
-    }
   }
 
   .detached-modal {
@@ -74,9 +65,10 @@
     overflow: visible;
     min-height: 25em;
     background-color: $white;
-    width: 17em;
-    top: -410px;
-    left: -218px;
+    width: 300px;
+    height: 444px;
+    top: -448px;
+    left: -229px;
     box-shadow: 0 .125rem .25rem #00000040 !important;
     margin-left: 0.5rem;
     border-radius: 3px;
@@ -248,6 +240,12 @@
 .drafts-modal {
   min-width: 25em;
   display: inline;
+
+  .record-thread-list {
+    .record-thread-load-more {
+      padding-top: .25rem !important;
+    }
+  }
 
   .draft-item {
     padding: 0 .5rem !important;

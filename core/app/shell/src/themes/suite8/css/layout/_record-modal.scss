@@ -145,7 +145,7 @@ body.modal-open.detached-modal-open {
 
 #detached-modals {
   position: fixed !important;
-  right: 110px;
+  right: 108px;
   bottom: 0;
   margin: 0;
   transform: translate(0) !important;
@@ -428,7 +428,6 @@ div.record-modal-backdrop {
 @media (min-width: 576px) {
 
   #detached-modals {
-    margin-right: 45px;
 
     .detached-modal {
 

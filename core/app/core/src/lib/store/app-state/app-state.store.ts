@@ -209,6 +209,9 @@ export class AppStateStore implements StateStore {
         }
         if (this.activeModals.length < 1) {
             window.document.body.classList.remove('detached-modal-open');
+            window.document.body.classList.remove('modal-open');
+            window.document.body.style.removeProperty('padding-right');
+            window.document.body.style.removeProperty('overflow');
         }
     }
 

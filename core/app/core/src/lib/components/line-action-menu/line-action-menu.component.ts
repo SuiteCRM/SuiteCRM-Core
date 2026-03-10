@@ -172,9 +172,14 @@ export class LineActionMenuComponent implements OnInit, OnDestroy {
     }
 
     protected buildButton(action: Action): ButtonInterface {
+        let buttonKlass = this.buttonClass;
+        if (action.klass?.length) {
+            buttonKlass = buttonKlass + ' ' + (Array.isArray(action.klass) ? action.klass.join(' ') : action.klass);
+        }
+
         const button = {
             titleKey: action.labelKey || '',
-            klass: this.buttonClass,
+            klass: buttonKlass,
             icon: action.icon || '',
             onClick: (): void => {
                 this.config.runAction(action, {

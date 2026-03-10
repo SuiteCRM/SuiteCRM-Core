@@ -40,6 +40,108 @@
 
 $viewdefs ['Documents'] = [
     'DetailView' => [
+        'bottomWidgets' => [
+            [
+                'type' => 'record-table',
+                'allowCollapse' => true,
+                'modes' => ['detail'],
+                'acl' => ['list'],
+                'aclModule' => 'Documents',
+                'options' => [
+                    'recordTable' => [
+                        'name' => 'therevisions',
+                        'sort_order' => 'desc',
+                        'sort_by' => 'date_entered',
+                        'labelKey' => 'LBL_DOC_REV_HEADER',
+                        'title_key' => 'LBL_DOC_REV_HEADER',
+                        'headerModule' => 'Documents',
+                        'module' => 'DocumentRevisions',
+                        'icon' => 'Documents',
+                        'top_buttons' => [
+                            [
+                                'modes' => ['list'],
+                                'acl' => ['edit'],
+                                'action' => 'create',
+                                'key' => 'create',
+                                'module' => 'document-revisions',
+                                'additionalFields' => [
+                                    'document_id' => 'id',
+                                    'document_name' => 'name',
+                                    'return_id' => 'id',
+                                ],
+                                'params' => [
+                                    'expanded' => true,
+                                    'redirect' => false
+                                ],
+                                'extraParams' => [
+                                    'parent_type' => 'Documents',
+                                    'return_relationship' => 'document_revisions',
+                                    'target_module' => 'document-revisions',
+                                    'return_module' => 'Documents',
+                                    'return_action' => 'DetailView'
+                                ],
+                                'labelKey' => 'LBL_NEW_REVISION',
+                                'widget_class' => 'SubPanelTopButtonQuickCreate',
+                            ],
+                        ],
+                        'lineActions' => [
+                            [
+                                'key' => 'delete',
+                                'labelKey' => 'LBL_DELETE_RECORD',
+                                'titleKey' => 'LBL_DELETE_RECORD',
+                                'action' => 'delete',
+                                'icon' => 'trash-filled',
+                                'klass' => 'delete-revision-line-action',
+                                'aclModule' => 'Documents',
+                                'asyncProcess' => true,
+                                'routing' => false,
+                                'params' => [
+                                    'displayConfirmation' => true,
+                                    'confirmationLabel' => 'LBL_DELETE_REVISION_CONFIRM',
+                                ],
+                                'modes' => ['list'],
+                                'acl' => ['edit'],
+                                'module' => 'document-revisions',
+                            ],
+                        ],
+
+
+                        'columns' => [
+                            [
+                                'name' => 'filename',
+                                'type' => 'file',
+                                'label' => 'LBL_REV_LIST_FILENAME',
+                                'vname' => 'LBL_REV_LIST_FILENAME',
+                            ],
+                            [
+                                'name' => 'revision',
+                                'label' => 'LBL_REV_LIST_REVISION',
+                            ],
+                            [
+                                'name' => 'date_entered',
+                                'label' => 'LBL_REV_LIST_ENTERED',
+                                'sortable' => true,
+                                'sortReadOnly' => true,
+                                'type' => 'datetime',
+                            ],
+                            [
+                                'name' => 'created_by_name',
+                                'label' => 'LBL_REV_LIST_CREATED',
+                                'type' => 'relate',
+                                'fieldDefinition' => [
+                                    'rname' => 'user_name',
+                                    'source' => 'non-db',
+                                ],
+                            ],
+                            [
+                                'name' => 'change_log',
+                                'label' => 'LBL_REV_LIST_LOG',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
         'templateMeta' => [
             'maxColumns' => '2',
             'form' => [

@@ -49,6 +49,7 @@ $layout_defs['Documents'] = array(
             'order' => 10,
             'sort_order' => 'desc',
             'sort_by' => 'date_entered',
+            'hidden' => true,
             'icon' => 'Documents',
             'module' => 'DocumentRevisions',
             'subpanel_name' => 'default',

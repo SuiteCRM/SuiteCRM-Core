@@ -49,6 +49,8 @@ $mod_strings = array(
     'LNK_NEW_DOCUMENT' => 'Create Document',
     'LNK_DOCUMENT_LIST' => 'View Documents',
     'LBL_DOC_REV_HEADER' => 'Document Revisions',
+    'LBL_NEW_REVISION' => 'Add Revision',
+    'LBL_FILENAME_REVISION_HINT' => 'Remove and replace this file to create a new revision.',
     'LBL_SEARCH_FORM_TITLE' => 'Document Search',
     //vardef labels
     'LBL_NAME' => 'Document Name',
@@ -166,4 +168,10 @@ $mod_strings = array(
     'LBL_BUGS_SUBPANEL_TITLE' => 'Bugs',
 
     'LBL_AOS_CONTRACTS' => 'Contracts',
+
+    'LBL_REV_LIST_REVISION' => 'Revision',
+    'LBL_REV_LIST_ENTERED' => 'Date Created',
+    'LBL_REV_LIST_CREATED' => 'Created by',
+    'LBL_REV_LIST_LOG' => 'Change Log',
+    'LBL_REV_LIST_FILENAME' => 'File',
 );

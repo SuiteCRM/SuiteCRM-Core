@@ -24,7 +24,18 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, EventEmitter, Input, OnInit, Output, signal, WritableSignal} from '@angular/core';
+import {
+    Component,
+    computed,
+    EventEmitter,
+    input,
+    Input,
+    OnInit,
+    Output,
+    signal,
+    Signal,
+    WritableSignal
+} from '@angular/core';
 import {ButtonModule} from "../button/button.module";
 import {ImageModule} from "../image/image.module";
 import {FileSizePipe} from "../../pipes/file-size/file-size.pipe";
@@ -62,7 +73,7 @@ import {ModuleNameMapper} from "../../services/navigation/module-name-mapper/mod
 export class UploadedFileComponent implements OnInit {
 
     @Input() file: Attachment;
-    @Input() maxTextWidth: string;
+    maxTextWidth = input<string>('200px');
     @Input() minWidth: string = '0px';
     @Input() allowClear: boolean = true;
     @Input() savedIcon: string = 'file-earmark-arrow-down';
@@ -76,7 +87,7 @@ export class UploadedFileComponent implements OnInit {
     clearButtonConfig: ButtonInterface;
     errorClearButtonConfig: ButtonInterface;
     uploadedFile: WritableSignal<Attachment> = signal(null);
-    textMaxWidth: WritableSignal<string> = signal('200px');
+    textMaxWidth: Signal<string> = computed(() => this.maxTextWidth() || '200px');
     attachmentIcon: string;
 
     constructor(
@@ -86,20 +97,10 @@ export class UploadedFileComponent implements OnInit {
 
     ngOnInit(): void {
         this.buildClearButtonConfig();
-        this.initMaxWidth();
 
         if (this.file) {
             this.getIcon()
             this.uploadedFile.set(this.file);
-        }
-    }
-
-
-    protected initMaxWidth(): void {
-        if (this.maxTextWidth) {
-            this.textMaxWidth.set(this.maxTextWidth);
-        } else {
-            this.textMaxWidth.set('200px');
         }
     }
 

@@ -310,6 +310,7 @@ export class LanguageStore implements StateStore {
         let label = '';
 
         if (module) {
+            module = this.moduleNameMapper.toFrontend(module) ?? module;
             label = (languages.modStrings[module] && languages.modStrings[module][labelKey]) || languages.modStrings[this.moduleNameMapper.toFrontend(module)] && languages.modStrings[this.moduleNameMapper.toFrontend(module)][labelKey];
         }
 

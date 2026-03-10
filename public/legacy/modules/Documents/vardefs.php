@@ -134,6 +134,12 @@ $dictionary['Document'] = [
             'docType' => 'doc_type',
             'docUrl' => 'doc_url',
             'docId' => 'doc_id',
+            'footnotes' => [
+                [
+                    'labelKey' => 'LBL_FILENAME_REVISION_HINT',
+                    'displayModes' => ['edit']
+                ],
+            ],
         ],
 
         'active_date' => [

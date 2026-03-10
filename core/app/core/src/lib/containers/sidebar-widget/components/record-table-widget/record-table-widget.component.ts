@@ -25,18 +25,20 @@
  */
 
 import {Component, OnInit, signal, WritableSignal} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
+import {Observable, of, Subscription} from 'rxjs';
 import {BaseWidgetComponent} from '../../../widgets/base-widget.model';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {SubpanelStore} from "../../../subpanel/store/subpanel/subpanel.store";
 import {SubpanelStoreFactory} from "../../../subpanel/store/subpanel/subpanel.store.factory";
 import {map, take} from "rxjs/operators";
 import {PanelCollapseMode} from "../../../../components/panel/panel.component";
+import {MaxColumnsCalculator} from "../../../../services/ui/max-columns-calculator/max-columns-calculator.service";
 
 @Component({
     selector: 'record-table-widget',
     templateUrl: './record-table-widget.component.html',
-    styleUrls: []
+    styleUrls: [],
+    providers: [MaxColumnsCalculator]
 })
 export class RecordTableWidgetComponent extends BaseWidgetComponent implements OnInit {
     panelHeaderButtonClass: string = 'btn btn-sm btn-outline-main';
@@ -47,11 +49,13 @@ export class RecordTableWidgetComponent extends BaseWidgetComponent implements O
     loading = true;
     protected subs: Subscription[] = [];
     store: SubpanelStore;
+    maxColumns$: Observable<number>;
 
 
     constructor(
         public language: LanguageStore,
-        protected subpanelFactory: SubpanelStoreFactory
+        protected subpanelFactory: SubpanelStoreFactory,
+        protected maxColumnCalculator: MaxColumnsCalculator,
     ) {
         super();
     }
@@ -72,6 +76,8 @@ export class RecordTableWidgetComponent extends BaseWidgetComponent implements O
         this.initPanelCollapseMode();
 
         this.store.load().pipe(take(1)).subscribe();
+
+        this.maxColumns$ = this.getMaxColumns();
     }
 
     protected initPanelTitleKey(recordTableConfig: any): void {
@@ -86,5 +92,9 @@ export class RecordTableWidgetComponent extends BaseWidgetComponent implements O
         }
         this.widgetCollapseMode.set(widgetCollapseMode as PanelCollapseMode);
         this.store.panelCollapseMode.set(widgetCollapseMode);
+    }
+
+    getMaxColumns(): Observable<number> {
+        return this.maxColumnCalculator.getMaxColumns(of(true));
     }
 }

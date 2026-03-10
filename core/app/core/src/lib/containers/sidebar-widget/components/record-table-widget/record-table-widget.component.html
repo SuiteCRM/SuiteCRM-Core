@@ -29,7 +29,7 @@
 <scrm-widget-panel [key]="key" [context]="context?.module ?? ''" [title]="titleKey()" [mode]="widgetCollapseMode()" [showHeader]="false">
     <div widget-body>
         <div class="widget-background record-table-widget widget-table minimal-table">
-            <scrm-subpanel *ngIf="store" [store]="store" [panelHeaderButtonClass]="panelHeaderButtonClass"></scrm-subpanel>
+            <scrm-subpanel *ngIf="store" [store]="store" [maxColumns$]="maxColumns$" [panelHeaderButtonClass]="panelHeaderButtonClass"></scrm-subpanel>
         </div>
     </div>
 </scrm-widget-panel>

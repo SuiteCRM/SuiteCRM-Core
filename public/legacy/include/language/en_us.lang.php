@@ -4364,6 +4364,7 @@ $app_strings['LBL_MAX_FILE_SIZE_EXCEEDED'] = 'The file exceeds the maximum allow
 $app_strings['LBL_UNSUPPORTED_IMAGE_TYPE'] = 'The image type is not supported.';
 $app_strings['LBL_UNSUPPORTED_FILE_TYPE'] = 'The file type is not supported.';
 $app_strings['LBL_UNSUPPORTED_IMAGE_FILE_TYPE'] = 'This image type is not supported.';
+$app_strings['LBL_MALWARE_DETECTED'] = 'Malware detected in uploaded file. The upload has been rejected.';
 
 $app_strings['LBL_DEFAULT_OUTBOUND_NOT_SET'] = 'Unable to retrieve Default Outbound Email';
 $app_strings['LBL_SMTP_UNABLE_TO_CONNECT']='Unable to connect to SMTP server with the current Outbound Email settings.';

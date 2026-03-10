@@ -47,14 +47,13 @@ export class FileEditFieldComponent extends BaseFileComponent {
 
     @HostListener('window:resize', ['$event'])
     onResize(): void {
-        this.calculateDynamicMaxWidth();
+        this.calculateDynamicMaxWidth(this.wrapper, 'scrm-file-edit');
     }
 
     @ViewChild('uploadArea') uploadArea: FileUploadAreaComponent;
     @ViewChild('wrapper') wrapper: HTMLDivElement;
 
     displayUploadArea: WritableSignal<boolean> = signal(true);
-    textMaxWidth: WritableSignal<string> = signal('200px');
     protected storageType: string = '';
 
     constructor(
@@ -138,52 +137,4 @@ export class FileEditFieldComponent extends BaseFileComponent {
         this.field.formControl.markAsDirty();
     }
 
-    protected calculateDynamicMaxWidth(): void {
-
-        const ancestorSelector = this?.field?.metadata?.dynamicWidthAncestor ?? 'scrm-file-edit'
-        const dynamicWidthAdjustment = 30;
-        let containerWidth = '';
-
-        const ancestor = this.findAncestor(this?.wrapper, ancestorSelector);
-        if (ancestor) {
-            let offSetWidth = ancestor?.offsetWidth ?? 0;
-
-            if (offSetWidth && dynamicWidthAdjustment) {
-                offSetWidth = offSetWidth - dynamicWidthAdjustment;
-            }
-            containerWidth = (offSetWidth).toString();
-        }
-
-        if (containerWidth) {
-            containerWidth = containerWidth + 'px';
-        } else {
-            containerWidth = this?.field?.metadata?.width ?? '200px';
-        }
-
-        this.textMaxWidth.set(containerWidth)
-    }
-
-    protected findAncestor(el: HTMLElement, selector: string) {
-        let found = false;
-        let iterations = 0;
-
-        while (!found || iterations > 50) {
-            el = el?.parentElement ?? null;
-            if (!el) {
-                found = true;
-                break;
-            }
-
-            if (el.matches(selector)) {
-                found = true;
-            }
-            iterations++;
-        }
-
-        if (!found) {
-            el = null;
-        }
-
-        return el;
-    }
 }

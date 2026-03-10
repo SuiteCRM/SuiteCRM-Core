@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, HostListener} from '@angular/core';
 import {DataTypeFormatter} from '../../../../services/formatters/data-type.formatter.service';
 import {FieldLogicManager} from '../../../field-logic/field-logic.manager';
 import {
@@ -39,14 +39,20 @@ import {MediaObjectsService} from "../../../../services/media-objects/media-obje
     templateUrl: './file.component.html',
     styleUrls: []
 })
-export class FileListFieldComponent extends BaseFileComponent {
+export class FileListFieldComponent extends BaseFileComponent implements AfterViewInit {
+
+    @HostListener('window:resize')
+    onResize(): void {
+        this.calculateDynamicMaxWidth(this.el.nativeElement, 'scrm-file-list');
+    }
 
     constructor(
         protected typeFormatter: DataTypeFormatter,
         protected logic: FieldLogicManager,
         protected logicDisplay: FieldLogicDisplayManager,
         protected mediaObjects: MediaObjectsService,
-        protected legacyEntrypointLinkBuilder: LegacyEntrypointLinkBuilder
+        protected legacyEntrypointLinkBuilder: LegacyEntrypointLinkBuilder,
+        protected el: ElementRef
     ) {
         super(typeFormatter, logic, logicDisplay, mediaObjects, legacyEntrypointLinkBuilder);
     }
@@ -56,5 +62,8 @@ export class FileListFieldComponent extends BaseFileComponent {
         this.initUploadedFile();
     }
 
+    ngAfterViewInit(): void {
+        this.calculateDynamicMaxWidth(this.el.nativeElement, 'scrm-file-list');
+    }
 
 }

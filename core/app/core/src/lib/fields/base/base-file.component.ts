@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, signal, WritableSignal} from "@angular/core";
+import {Component, signal, WritableSignal} from '@angular/core';
 import {BaseFieldComponent} from "./base-field.component";
 import {Attachment} from "../../components/uploaded-file/uploaded-file.model";
 import {DataTypeFormatter} from "../../services/formatters/data-type.formatter.service";
@@ -49,6 +49,7 @@ export class BaseFileComponent extends BaseFieldComponent {
     uploadedFile: WritableSignal<Attachment> = signal(null);
     attachments: WritableSignal<Attachment[]> = signal([]);
     isValidStorageType: boolean = false;
+    textMaxWidth: WritableSignal<string> = signal('200px');
 
     validStorageTypes: string[] = [
         'archived-documents',
@@ -159,5 +160,61 @@ export class BaseFileComponent extends BaseFieldComponent {
         }
 
         return url;
+    }
+
+    protected calculateDynamicMaxWidth(startElement: HTMLElement, defaultSelector?: string): void {
+
+        const ancestorSelector = this?.field?.metadata?.dynamicWidthAncestor ?? defaultSelector ?? '';
+        const dynamicWidthAdjustment = 30;
+        let containerWidth = '';
+
+        if (ancestorSelector) {
+            const ancestor = this.findAncestor(startElement, ancestorSelector);
+            if (ancestor) {
+                let offSetWidth = ancestor?.offsetWidth ?? 0;
+
+                if (offSetWidth && dynamicWidthAdjustment) {
+                    offSetWidth = offSetWidth - dynamicWidthAdjustment;
+                }
+                containerWidth = (offSetWidth).toString();
+            }
+        }
+
+        if (containerWidth) {
+            containerWidth = containerWidth + 'px';
+        } else {
+            containerWidth = this?.field?.metadata?.width ?? '200px';
+        }
+
+        this.textMaxWidth.set(containerWidth);
+    }
+
+    protected findAncestor(el: HTMLElement, selector: string): HTMLElement {
+        let found = false;
+        let iterations = 0;
+
+        if (el.matches(selector)) {
+            found = true;
+            return el;
+        }
+
+        while (!found || iterations > 50) {
+            el = el?.parentElement ?? null;
+            if (!el) {
+                found = true;
+                break;
+            }
+
+            if (el.matches(selector)) {
+                found = true;
+            }
+            iterations++;
+        }
+
+        if (!found) {
+            el = null;
+        }
+
+        return el;
     }
 }

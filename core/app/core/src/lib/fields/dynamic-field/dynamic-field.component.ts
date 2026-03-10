@@ -29,10 +29,12 @@ import {
     computed,
     HostBinding,
     Input,
+    OnChanges,
     OnDestroy,
     OnInit,
     signal,
     Signal,
+    SimpleChanges,
     Type,
     WritableSignal
 } from '@angular/core';
@@ -55,7 +57,7 @@ import {LinkActionResolverService, ResolvedLinkAction} from '../link-actions/lin
     templateUrl: './dynamic-field.component.html',
     styleUrls: []
 })
-export class DynamicFieldComponent implements OnInit, OnDestroy {
+export class DynamicFieldComponent implements OnInit, OnChanges, OnDestroy {
 
     @Input('mode') mode: string;
     @Input('originalMode') originalMode: string;
@@ -84,6 +86,12 @@ export class DynamicFieldComponent implements OnInit, OnDestroy {
         protected linkActionsAdapter: LinkActionsAdapter,
         protected linkActionResolver: LinkActionResolverService
     ) {
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if ((changes['mode'] || changes['originalMode']) && !changes['originalMode']?.firstChange) {
+            this.initActiveFootnotes();
+        }
     }
 
     get getRelateLink(): string {

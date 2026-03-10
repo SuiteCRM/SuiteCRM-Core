@@ -59,10 +59,6 @@ $viewdefs['DocumentRevisions']['DetailView'] = [
                 'newTab' => true,
                 'panelDefault' => 'expanded',
             ],
-            'LBL_OTHER' => [
-                'newTab' => true,
-                'panelDefault' => 'expanded',
-            ],
         ],
         'form' => [
             'buttons' => [],
@@ -87,23 +83,13 @@ $viewdefs['DocumentRevisions']['DetailView'] = [
             ],
 
             [
-                'revision',
-            ],
-
-            [
                 'filename',
+                'revision',
             ],
             [
                 'change_log',
+                ''
             ],
         ],
-        'LBL_OTHER' => [
-            [
-                [
-                    'name' => 'date_entered',
-                    'customCode' => '{$fields.date_entered.value} {$APP.LBL_BY} {$fields.created_by_name.value}',
-                ],
-            ],
-        ]
     ],
 ];

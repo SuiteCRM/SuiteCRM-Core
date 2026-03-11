@@ -145,7 +145,7 @@ body.modal-open.detached-modal-open {
 
 #detached-modals {
   position: fixed !important;
-  right: 108px;
+  right: 20px;
   bottom: 0;
   margin: 0;
   transform: translate(0) !important;
@@ -154,6 +154,11 @@ body.modal-open.detached-modal-open {
   align-items: flex-end;
   z-index: map-get($zindex, modal-low) !important;
   pointer-events: none;
+  transition: right 0.25s ease;
+
+  &.drafts-active {
+    right: 108px;
+  }
 
   &.has-maximized-modal {
     .detached-modal:not(.maximized) {

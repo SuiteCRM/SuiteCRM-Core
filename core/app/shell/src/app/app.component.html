@@ -36,7 +36,7 @@
     <router-outlet></router-outlet>
 </div>
 <scrm-footer-ui></scrm-footer-ui>
-<div id="detached-modals"></div>
+<div id="detached-modals" [class.drafts-active]="showDrafts()"></div>
 <div id="drafts-container">
     <ng-container *ngIf="showDrafts()">
         <scrm-button [config]="draftsButton()"></scrm-button>

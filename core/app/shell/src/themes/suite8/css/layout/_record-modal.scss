@@ -193,32 +193,54 @@ body.modal-open.detached-modal-open {
         border: 0;
         outline: 0;
         box-shadow: none;
-        color: $white;
+        color: $light-grey;
         margin: 0;
         padding: .4rem .5rem;
-        height: 29px;
-        width: 28px;
+        height: 28px;
+        width: 27px;
         line-height: 100%;
+
+        svg {
+          fill: $light-grey;
+
+          &:hover {
+            fill: $midnight-blue;
+          }
+        }
       }
 
       .minimise-button:hover {
-        color: $gray-700;
-        background-color: #f8f9fa;
+        color: $midnight-blue;
+        background-color: $light-grey;
+
+        svg {
+            fill: $midnight-blue;
+        }
       }
 
       .maximize-button {
-        padding: .25rem .4rem;
         margin: 0;
         outline: 0;
+        padding: .15rem .4rem 5px;
         box-shadow: none;
-        height: 29px;
-        width: 28px;
+        stroke: $light-grey;
+        stroke-opacity: 0.6;
+        color: $light-grey;
+        height: 28px;
+        width: 27px;
         line-height: 100%;
+
+        svg {
+          width: .9em !important;
+          height: .9em !important;
+        }
       }
 
       .maximize-button:hover {
-        color: $gray-700;
-        background-color: #f8f9fa;
+        color: $midnight-blue;
+        background-color: $light-grey;
+        stroke: $midnight-blue;
+        stroke-opacity: 0.6;
       }
 
       .close-button {
@@ -232,8 +254,8 @@ body.modal-open.detached-modal-open {
       }
 
       .close-button:hover {
-        color: $gray-700;
-        background-color: #f8f9fa;
+        color: $midnight-blue;
+        background-color: $light-grey;
       }
 
       .modal-title {
@@ -261,6 +283,7 @@ body.modal-open.detached-modal-open {
       .modal-header {
         margin-bottom: 0;
         border-bottom: 0 !important;
+        padding-right: 6px;
 
         .modal-title {
           max-width: 190px;
@@ -272,6 +295,7 @@ body.modal-open.detached-modal-open {
             overflow: hidden;
             text-overflow: ellipsis;
             display: inline-block;
+            color: $light-grey;
             line-height: 1;
           }
         }
@@ -356,6 +380,7 @@ div.record-modal-backdrop {
             overflow: hidden;
             text-overflow: ellipsis;
             display: inline-block;
+            color: $light-grey;
             line-height: 1;
           }
         }
@@ -401,6 +426,7 @@ div.record-modal-backdrop {
             max-width: 380px;
             white-space: nowrap;
             overflow: hidden;
+            color: $light-grey;
             text-overflow: ellipsis;
             display: inline-block;
             line-height: 1;
@@ -622,6 +648,7 @@ div.record-modal-backdrop {
               max-width: calc(100vw - 165px);
               white-space: nowrap;
               overflow: hidden;
+              color: $light-grey;
               text-overflow: ellipsis;
               display: inline-block;
               line-height: 1;

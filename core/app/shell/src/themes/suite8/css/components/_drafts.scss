@@ -46,12 +46,17 @@
     height: 38px;
     padding: 0.375rem .25rem 0.375rem .5rem !important;
 
+    span, svg {
+      color: $light-grey;
+      fill: $light-grey;
+    }
+
     &:focus {
       box-shadow: none !important;
     }
 
     .drafts-caret {
-      fill: $white;
+      fill: $light-grey !important;
       font-size: 65%;
       padding-left: .25rem;
       top: -1px;
@@ -353,23 +358,24 @@
       margin: 0;
       padding: .25rem .4rem;
       position: relative;
+      color: $light-grey;
       outline: 0;
       box-shadow: none;
-      height: 29px;
-      width: 28px;
+      height: 28px;
+      width: 27px;
       line-height: 100%;
       &:hover {
-        color: #495057;
-        background-color: #f8f9fa;
+        color: $midnight-blue;
+        background-color: $light-grey;
 
         .sicon {
-          fill: #495057 !important;
+          fill: $midnight-blue  !important;
         }
       }
 
       .sicon {
         font-size: x-small;
-        fill: #fff;
+        fill: $light-grey;
       }
     }
   }

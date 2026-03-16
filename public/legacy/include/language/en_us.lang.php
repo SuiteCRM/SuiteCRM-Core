@@ -4237,6 +4237,7 @@ $app_strings['LBL_UNORDERED_LIST'] = 'Unordered List';
 $app_strings['LBL_ORDERED_LIST'] = 'Ordered List';
 $app_strings['LBL_QUOTE'] = 'Quote';
 $app_strings['LBL_UNQUOTE'] = 'Unquote';
+$app_strings['LBL_ALIGN'] = 'Align';
 $app_strings['LBL_ALIGN_LEFT'] = 'Left';
 $app_strings['LBL_ALIGN_CENTER'] = 'Center';
 $app_strings['LBL_ALIGN_RIGHT'] = 'Right';

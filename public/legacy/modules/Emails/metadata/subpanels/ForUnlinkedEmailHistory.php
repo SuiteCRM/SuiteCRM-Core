@@ -57,6 +57,15 @@ $subpanel_layout = [
             'widget_class' => 'SubPanelDetailViewLink',
             'width' => '30%',
             'parent_info' => true,
+            'linkActions' => [
+                [
+                    'key' => 'open-draft-compose',
+                    'asyncProcess' => true,
+                    'activeOnFields' => [
+                        'status' => ['draft'],
+                    ],
+                ],
+            ],
         ],
         'status' => [
             'vname' => 'LBL_LIST_STATUS',

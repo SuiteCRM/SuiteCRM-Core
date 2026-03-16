@@ -275,10 +275,16 @@ class ListViewDefinitionHandler extends LegacyHandler
      */
     protected function buildListViewColumn($column, $key, ?array $vardefs): array
     {
+        $linkActions = $column['linkActions'] ?? [];
+
         $column = array_merge($this->listViewColumnInterface, $column);
         $column['name'] = strtolower($key);
 
         $column = $this->addFieldDefinition($vardefs, strtolower($key), $column);
+
+        if (!empty($linkActions)) {
+            $column['metadata']['linkActions'] = $linkActions;
+        }
 
         if ($column['name'] === 'email1') {
             $column['type'] = 'email';

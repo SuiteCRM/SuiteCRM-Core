@@ -478,13 +478,21 @@ class RecordModalDefinitionHandler extends LegacyHandler
      */
     protected function buildFieldCell($definition, ?array &$vardefs): array
     {
-        return $this->addFieldDefinition(
+        $linkActions = $definition['linkActions'] ?? [];
+
+        $result = $this->addFieldDefinition(
             $vardefs,
             $definition['name'],
             $definition,
             $this->defaultDefinition,
             $this->fieldAliasMapper
         );
+
+        if (!empty($linkActions)) {
+            $result['metadata']['linkActions'] = $linkActions;
+        }
+
+        return $result;
     }
 
     /**

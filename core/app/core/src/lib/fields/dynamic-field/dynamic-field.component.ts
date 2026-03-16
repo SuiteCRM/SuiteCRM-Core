@@ -43,13 +43,12 @@ import {Router} from '@angular/router';
 import {ModuleNameMapper} from '../../services/navigation/module-name-mapper/module-name-mapper.service';
 import {ModuleNavigation} from '../../services/navigation/module-navigation/module-navigation.service';
 import {DynamicLabelService} from '../../services/language/dynamic-label.service';
-import {
-    LinkRouteAsyncActionService
-} from '../../services/navigation/link-route-async-action/link-route-async-action.service';
 import {Subscription} from "rxjs";
 import {ControlEvent, TouchedChangeEvent} from "@angular/forms";
 import {ActiveFieldsChecker} from "../../services/condition-operators/active-fields-checker.service";
 import {deepClone} from "../../common/utils/object-utils";
+import {LinkActionsAdapter} from '../link-actions/link-actions.adapter';
+import {LinkActionResolverService, ResolvedLinkAction} from '../link-actions/link-action-resolver.service';
 
 @Component({
     selector: 'scrm-dynamic-field',
@@ -74,14 +73,16 @@ export class DynamicFieldComponent implements OnInit, OnDestroy {
     activeFootnotes: WritableSignal<any[]> = signal([]);
     validateOnlyOnSubmit: boolean = false;
     protected subs: Subscription[] = [];
+    activeLinkAction: WritableSignal<ResolvedLinkAction | null> = signal(null);
 
     constructor(
         protected navigation: ModuleNavigation,
         protected moduleNameMapper: ModuleNameMapper,
         protected router: Router,
         protected dynamicLabelService: DynamicLabelService,
-        protected linkRouteAsyncActionService: LinkRouteAsyncActionService,
-        protected activeFieldsChecker: ActiveFieldsChecker
+        protected activeFieldsChecker: ActiveFieldsChecker,
+        protected linkActionsAdapter: LinkActionsAdapter,
+        protected linkActionResolver: LinkActionResolverService
     ) {
     }
 
@@ -155,6 +156,7 @@ export class DynamicFieldComponent implements OnInit, OnDestroy {
         }
 
         this.initHelpFootnotes();
+        this.initLinkActions();
     }
 
     ngOnDestroy() {
@@ -163,7 +165,6 @@ export class DynamicFieldComponent implements OnInit, OnDestroy {
     }
 
     isLink(): boolean {
-
         if (EDITABLE_VIEW_MODES.includes(this.mode as ViewMode)) {
             return false;
         }
@@ -172,9 +173,22 @@ export class DynamicFieldComponent implements OnInit, OnDestroy {
             return false;
         }
 
+        const active = this.activeLinkAction();
+        if (active) {
+            if (!active.handler.isRouterLink(this.field, this.record, active.action.params)) {
+                return false;
+            }
+
+            if (this?.record?.module && !this.navigation?.hasAccessToModule(this?.record?.module)) {
+                return false;
+            }
+
+            return true;
+        }
+
         if (this.type === 'relate') {
             let linkModule = this.getLinkModule();
-            return this.navigation?.hasAccessToModule(linkModule) ?? false
+            return this.navigation?.hasAccessToModule(linkModule) ?? false;
         }
 
         if (this?.record?.module && !this.navigation?.hasAccessToModule(this?.record?.module)) {
@@ -185,12 +199,15 @@ export class DynamicFieldComponent implements OnInit, OnDestroy {
     }
 
     hasOnClick(): boolean {
+        const active = this.activeLinkAction();
+        if (active) {
+            return !active.handler.isRouterLink(this.field, this.record, active.action.params);
+        }
 
         const fieldMetadata = this?.field?.metadata ?? {};
-        const linkAsyncAction = fieldMetadata?.linkAsyncAction ?? null;
         const linkOnClick = fieldMetadata?.onClick ?? null;
 
-        return !!(linkAsyncAction || linkOnClick);
+        return !!linkOnClick;
     }
 
     isEdit(): boolean {
@@ -198,6 +215,11 @@ export class DynamicFieldComponent implements OnInit, OnDestroy {
     }
 
     getLink(): string {
+        const active = this.activeLinkAction();
+        if (active) {
+            return active.handler.getLink(this.field, this.record, active.action.params) ?? '';
+        }
+
         if (this.type === 'relate') {
             return this.getRelateLink;
         }
@@ -213,16 +235,15 @@ export class DynamicFieldComponent implements OnInit, OnDestroy {
 
 
     onClick(): boolean {
+        const active = this.activeLinkAction();
+        if (active) {
+            this.linkActionsAdapter.runAction(active.action, this.field, this.record, this.mode as ViewMode);
+            return false;
+        }
 
         const fieldMetadata = this?.field?.metadata ?? null;
         if (fieldMetadata && fieldMetadata.onClick) {
             this.field.metadata.onClick(this.field, this.record);
-            return;
-        }
-
-        const linkAsyncAction = fieldMetadata.linkAsyncAction ?? null;
-        if (fieldMetadata && linkAsyncAction) {
-            this.linkRouteAsyncActionService.run(linkAsyncAction, this.field, this.record);
             return;
         }
 
@@ -315,6 +336,24 @@ export class DynamicFieldComponent implements OnInit, OnDestroy {
         footnoteEntry.context.module = this.record?.module ?? '';
 
         return footnoteEntry;
+    }
+
+    protected initLinkActions(): void {
+        if (EDITABLE_VIEW_MODES.includes(this.mode as ViewMode)) {
+            return;
+        }
+
+        const resolved = this.linkActionResolver.resolve(this.field, this.record, this.mode as ViewMode);
+        if (!resolved) {
+            return;
+        }
+
+        this.activeLinkAction.set(resolved);
+        this.subs.push(this.field.valueChanges$.subscribe(() => {
+            this.activeLinkAction.set(
+                this.linkActionResolver.resolve(this.field, this.record, this.mode as ViewMode)
+            );
+        }));
     }
 
     getErrorPosition(): string {

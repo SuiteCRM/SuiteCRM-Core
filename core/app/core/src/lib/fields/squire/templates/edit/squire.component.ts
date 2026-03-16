@@ -921,6 +921,87 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
             })
         } as ButtonInterface;
 
+        this.availableButtons.textAlign = {
+            key: 'textAlign',
+            type: 'popup-button-list',
+            icon: 'text-left',
+            titleKey: 'LBL_ALIGN',
+            klass: 'squire-editor-button btn btn-sm ',
+            showPopup: (): boolean => {
+                return this.editorMode() !== 'code';
+            },
+            dynamicClass: computed((): string => {
+                if (this.editorMode() === 'code') {
+                    return 'disabled';
+                }
+            }),
+            disabled: computed((): boolean => {
+                return this.editorMode() === 'code';
+            }),
+            items: [
+                {
+                    key: 'alignLeft',
+                    icon: 'text-left',
+                    labelKey: 'LBL_ALIGN_LEFT',
+                    klass: 'squire-editor-button squire-editor-list-button btn btn-sm',
+                    onClick: () => this.editorMode() !== 'code' ? this?.editor?.setTextAlignment('left') : '',
+                    dynamicClass: computed((): string => {
+                        const path = this.currentEditorPath();
+                        if (this.editorMode() === 'code') {
+                            return 'disabled';
+                        }
+                        const alignment = this.getTextAlignment(path);
+                        return alignment === 'left' ? 'active squire-editor-button-active' : '';
+                    })
+                } as ButtonInterface,
+                {
+                    key: 'alignCenter',
+                    icon: 'text-center',
+                    labelKey: 'LBL_ALIGN_CENTER',
+                    klass: 'squire-editor-button squire-editor-list-button btn btn-sm',
+                    onClick: () => this.editorMode() !== 'code' ? this?.editor?.setTextAlignment('center') : '',
+                    dynamicClass: computed((): string => {
+                        const path = this.currentEditorPath();
+                        if (this.editorMode() === 'code') {
+                            return 'disabled';
+                        }
+                        const alignment = this.getTextAlignment(path);
+                        return alignment === 'center' ? 'active squire-editor-button-active' : '';
+                    })
+                } as ButtonInterface,
+                {
+                    key: 'alignRight',
+                    icon: 'text-right',
+                    labelKey: 'LBL_ALIGN_RIGHT',
+                    klass: 'squire-editor-button squire-editor-list-button btn btn-sm',
+                    onClick: () => this.editorMode() !== 'code' ? this?.editor?.setTextAlignment('right') : '',
+                    dynamicClass: computed((): string => {
+                        const path = this.currentEditorPath();
+                        if (this.editorMode() === 'code') {
+                            return 'disabled';
+                        }
+                        const alignment = this.getTextAlignment(path);
+                        return alignment === 'right' ? 'active squire-editor-button-active' : '';
+                    })
+                } as ButtonInterface,
+                {
+                    key: 'justify',
+                    icon: 'justify',
+                    labelKey: 'LBL_JUSTIFY',
+                    klass: 'squire-editor-button squire-editor-list-button btn btn-sm',
+                    onClick: () => this.editorMode() !== 'code' ? this?.editor?.setTextAlignment('justify') : '',
+                    dynamicClass: computed((): string => {
+                        const path = this.currentEditorPath();
+                        if (this.editorMode() === 'code') {
+                            return 'disabled';
+                        }
+                        const alignment = this.getTextAlignment(path);
+                        return alignment === 'justify' ? 'active squire-editor-button-active' : '';
+                    })
+                } as ButtonInterface,
+            ] as AnyButtonInterface[],
+        } as ButtonInterface;
+
         this.availableButtons.quote = {
             key: 'quote',
             type: 'button',
@@ -1096,10 +1177,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
                 'indentLess',
             ],
             [
-                'alignLeft',
-                'alignCenter',
-                'alignRight',
-                'justify',
+                'textAlign',
             ],
             [
                 'quote',

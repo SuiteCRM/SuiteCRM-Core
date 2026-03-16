@@ -31,9 +31,8 @@
 
         <div class="thumbnail-image" *ngIf="showThumbnail && uploadedFile()?.thumbnailUrl !== ''">
             <p-image
-                    [height]="maxHeight"
                     [loading]="'lazy'"
-                    [imageStyle]="{ 'max-height': maxHeight, 'width': '100%', 'max-width': maxWidth }"
+                    [imageStyle]="{ 'max-height': maxHeight, 'height': '100%', 'width': '100%', 'max-width': maxWidth }"
                     [previewImageSrc]="uploadedFile()?.contentUrl"
                     src="{{ uploadedFile()?.thumbnailUrl }}"
                     alt="{{ uploadedFile()?.name || 'uploaded-image' }}"
@@ -46,9 +45,8 @@
 
         <ng-container *ngIf="!showThumbnail || uploadedFile()?.thumbnailUrl === ''">
             <p-image
-                    [height]="maxHeight"
                     [loading]="'lazy'"
-                    [imageStyle]="{ 'max-height': maxHeight, 'width': '100%', 'max-width': maxWidth }"
+                    [imageStyle]="{ 'max-height': maxHeight, 'height': '100%', 'width': '100%', 'max-width': maxWidth }"
                     src="{{ uploadedFile()?.contentUrl }}"
                     alt="{{ uploadedFile()?.name || 'uploaded-image' }}"
                     [preview]="preview">

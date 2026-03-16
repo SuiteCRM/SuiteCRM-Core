@@ -101,6 +101,12 @@ export class BaseImageComponent extends BaseFileComponent {
             return maxWidth;
         }
 
+        const maxWidthDefault = this.systemConfigs.getConfigValue('image_field_width_default') ?? null;
+
+        if (maxWidthDefault) {
+            return maxWidthDefault;
+        }
+
         return '100%';
     }
 

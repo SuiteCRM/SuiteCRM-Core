@@ -271,7 +271,21 @@ export class TableBodyComponent implements OnInit, OnDestroy {
             return null;
         }
 
+        this.ensureAllFields(record);
         return this.fieldManager.addField(record, column);
+    }
+
+    protected ensureAllFields(record: Record): void {
+        const columns = this.columns();
+        if (!columns?.length) {
+            return;
+        }
+
+        for (const col of columns) {
+            if (!record.fields?.[col.name]) {
+                this.fieldManager.addField(record, col);
+            }
+        }
     }
 
     protected initLoading(): Observable<boolean> {

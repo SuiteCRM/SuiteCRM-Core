@@ -175,6 +175,15 @@ $dictionary['Email'] = array(
             'len' => '255',
             'comment' => 'The subject of the email',
             'inline_edit' => false,
+            'linkActions' => [
+                [
+                    'key' => 'open-draft-compose',
+                    'asyncProcess' => true,
+                    'activeOnFields' => [
+                        'status' => ['draft'],
+                    ],
+                ],
+            ],
         ),
         'type' => array(
             'name' => 'type',

@@ -428,6 +428,11 @@ class SubPanelDefinitionHandler extends LegacyHandler implements SubPanelDefinit
             $column['link'] = true;
         }
 
+        $linkActions = $column['linkActions'] ?? [];
+        if (!empty($linkActions)) {
+            $column['metadata']['linkActions'] = $linkActions;
+        }
+
         return $this->addFieldDefinition(
             $vardefs,
             strtolower($key),
@@ -662,6 +667,16 @@ class SubPanelDefinitionHandler extends LegacyHandler implements SubPanelDefinit
 
                 $fieldDefs['name'] = $definition['name'];
                 $fieldDefs['alias'] = $alias;
+
+                $linkActions = $definition['linkActions'] ?? [];
+                if (!empty($linkActions)) {
+                    $fieldDefs['metadata']['linkActions'] = $linkActions;
+                }
+
+                $linkActions = $fieldDefs['linkActions'] ?? [];
+                if (!empty($linkActions)) {
+                    $fieldDefs['metadata']['linkActions'] = $linkActions;
+                }
 
                 $multiModuleFieldVardefs[$module] = $fieldDefs;
             }

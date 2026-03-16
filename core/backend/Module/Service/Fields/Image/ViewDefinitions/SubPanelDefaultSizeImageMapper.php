@@ -83,6 +83,10 @@ class SubPanelDefaultSizeImageMapper implements ViewDefinitionMapperInterface
                     $metadata['maxHeight'] = $this->getMaxHeight();
                 }
 
+                if (empty($metadata['maxWidth'])) {
+                    $metadata['maxWidth'] = $this->getMaxWidth();
+                }
+
                 $col['metadata'] = $metadata;
                 $columns[$colKey] = $col;
             }
@@ -103,5 +107,16 @@ class SubPanelDefaultSizeImageMapper implements ViewDefinitionMapperInterface
         }
 
         return $defaultMaxHeight;
+    }
+
+    protected function getMaxWidth(): string
+    {
+        $defaultMaxWidth = $this->systemConfigProvider->getSystemConfig('image_field_subpanel_width_default')->getValue();
+
+        if (!$defaultMaxWidth) {
+            return '60px';
+        }
+
+        return $defaultMaxWidth;
     }
 }

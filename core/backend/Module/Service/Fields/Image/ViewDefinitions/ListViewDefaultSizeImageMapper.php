@@ -80,6 +80,10 @@ class ListViewDefaultSizeImageMapper implements ViewDefinitionMapperInterface
                 $metadata['maxHeight'] = $this->getMaxHeight();
             }
 
+            if (empty($metadata['maxWidth'])) {
+                $metadata['maxWidth'] = $this->getMaxWidth();
+            }
+
             $col['metadata'] = $metadata;
             $columns[$colKey] = $col;
         }
@@ -98,5 +102,16 @@ class ListViewDefaultSizeImageMapper implements ViewDefinitionMapperInterface
         }
 
         return $defaultMaxHeight;
+    }
+
+    protected function getMaxWidth(): string
+    {
+        $defaultMaxWidth = $this->systemConfigProvider->getSystemConfig('image_field_listview_width_default')->getValue();
+
+        if (!$defaultMaxWidth) {
+            return '60px';
+        }
+
+        return $defaultMaxWidth;
     }
 }

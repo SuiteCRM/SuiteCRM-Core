@@ -260,7 +260,7 @@
     .record-thread-item-body {
       box-shadow: none !important;
       background-color: transparent !important;
-      border-bottom: 1px solid lightgrey !important;
+      border-bottom: 1px solid #b1b2b5!important;
       border-radius: 0 !important;
       padding: 0 .5rem !important;
 
@@ -290,7 +290,7 @@
 
             .dynamic-label {
               display: inline-block;
-              max-width: 115px;
+              max-width: 175px;
               text-overflow: ellipsis;
               white-space: nowrap;
               overflow: hidden;
@@ -319,7 +319,7 @@
 
           scrm-varchar-detail {
             display: inline-block;
-            max-width: 135px;
+            max-width: 194px;
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;

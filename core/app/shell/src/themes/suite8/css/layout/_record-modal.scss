@@ -469,7 +469,7 @@ div.record-modal-backdrop {
         max-height: 94vh;
         width: 82vw;
         max-width: 82vw;
-        transform: translate(-84vw, -97vh);
+        transform: translate(calc(-91vw + 20px), -97vh);
         z-index: 1060;
         margin: 0;
 
@@ -555,8 +555,15 @@ div.record-modal-backdrop {
         }
       }
     }
+
+    &.drafts-active {
+      .detached-modal.maximized {
+        transform: translate(calc(-91vw + 108px), -97vh);
+      }
+    }
   }
 }
+
 
 @media (max-width: 575px) {
   #detached-modals {

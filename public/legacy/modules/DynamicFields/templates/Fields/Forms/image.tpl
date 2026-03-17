@@ -69,6 +69,20 @@
 </tr>
 <tr>
 	<td class="mbLBL"></td>
+	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_IMAGE_WIDTH"}:</td>
+	<td>
+		<input id="maxWidth" type="text" name="maxWidth"
+				{if !$vardef.metadata.maxWidth}
+					value=""
+				{else}
+					value="{$vardef.metadata.maxWidth}"
+				{/if}
+		>
+		{sugar_help text=$mod_strings.LBL_POPHELP_IMAGE_WIDTH FIXX=250 FIXY=80}
+	</td>
+</tr>
+<tr>
+	<td class="mbLBL"></td>
 	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_UPLOAD_MAXSIZE"}:</td>
 	<td>
 		<input id="upload_maxsize" type="text" name="upload_maxsize"

@@ -125,6 +125,7 @@ class EmailProcessProcessor extends LegacyHandler
         $emailRecord = $this->recordProvider->saveRecord($emailRecord);
 
         $this->saveEmailAddresses($outboundRecord->getAttributes(), $emailRecord->getAttributes(), $addresses);
+        $this->saveEmailText($outboundRecord->getAttributes(), $emailAttributes, $emailRecord->getAttributes(), $addresses);
 
         $this->close();
         return [
@@ -315,6 +316,135 @@ class EmailProcessProcessor extends LegacyHandler
         );
 
         return $attributes;
+    }
+
+    /**
+     * SuiteCRM 8 email compose sends address fields as arrays of entities (multiflexrelate).
+     * Legacy Emails expects string fields in emails_text (to_addrs/cc_addrs/bcc_addrs/from_addr).
+     *
+     * Without this, the email can be sent successfully but legacy list/detail views can show empty or incorrect recipients.
+     *
+     * @param array|null $outboundAttributes
+     * @param array $inputEmailAttributes Attributes as received from the process payload
+     * @param array $savedEmailAttributes Attributes from the saved record (needs id)
+     * @param array $addresses Flattened email address arrays (to/cc/bcc)
+     */
+    protected function saveEmailText(?array $outboundAttributes, array $inputEmailAttributes, array $savedEmailAttributes, array $addresses): void
+    {
+        $emailId = $savedEmailAttributes['id'] ?? '';
+        if (empty($emailId)) {
+            return;
+        }
+
+        $fromAddr = (string)($outboundAttributes['smtp_from_addr'] ?? '');
+        $replyToAddr = (string)($outboundAttributes['reply_to_addr'] ?? '');
+
+        // Prefer the structured input payload for nicer formatting (Name <email>), fallback to flattened lists.
+        $to = $this->formatLegacyAddressList($inputEmailAttributes['to_addrs_names'] ?? null);
+        $cc = $this->formatLegacyAddressList($inputEmailAttributes['cc_addrs_names'] ?? null);
+        $bcc = $this->formatLegacyAddressList($inputEmailAttributes['bcc_addrs_names'] ?? null);
+
+        if ($to === '') {
+            $to = implode(', ', array_filter($addresses['to'] ?? []));
+        }
+        if ($cc === '') {
+            $cc = implode(', ', array_filter($addresses['cc'] ?? []));
+        }
+        if ($bcc === '') {
+            $bcc = implode(', ', array_filter($addresses['bcc'] ?? []));
+        }
+
+        $description = (string)($inputEmailAttributes['description'] ?? '');
+        $descriptionHtml = (string)($inputEmailAttributes['description_html'] ?? '');
+
+        try {
+            // Keep raw_source untouched if it exists (we don't have the full MIME here).
+            $this->preparedStatementHandler->update(
+                'INSERT INTO emails_text (email_id, from_addr, reply_to_addr, to_addrs, cc_addrs, bcc_addrs, description, description_html, raw_source, deleted) ' .
+                'VALUES (:email_id, :from_addr, :reply_to_addr, :to_addrs, :cc_addrs, :bcc_addrs, :description, :description_html, \'\', 0) ' .
+                'ON DUPLICATE KEY UPDATE ' .
+                'from_addr = VALUES(from_addr), ' .
+                'reply_to_addr = VALUES(reply_to_addr), ' .
+                'to_addrs = VALUES(to_addrs), ' .
+                'cc_addrs = VALUES(cc_addrs), ' .
+                'bcc_addrs = VALUES(bcc_addrs), ' .
+                'description = VALUES(description), ' .
+                'description_html = VALUES(description_html)',
+                [
+                    'email_id' => $emailId,
+                    'from_addr' => $fromAddr,
+                    'reply_to_addr' => $replyToAddr,
+                    'to_addrs' => $to,
+                    'cc_addrs' => $cc,
+                    'bcc_addrs' => $bcc,
+                    'description' => $description,
+                    'description_html' => $descriptionHtml,
+                ],
+                [
+                    ['param' => 'email_id', 'type' => 'string'],
+                    ['param' => 'from_addr', 'type' => 'string'],
+                    ['param' => 'reply_to_addr', 'type' => 'string'],
+                    ['param' => 'to_addrs', 'type' => 'string'],
+                    ['param' => 'cc_addrs', 'type' => 'string'],
+                    ['param' => 'bcc_addrs', 'type' => 'string'],
+                    ['param' => 'description', 'type' => 'string'],
+                    ['param' => 'description_html', 'type' => 'string'],
+                ]
+            );
+        } catch (\Throwable $e) {
+            $this->logger->warning('Failed to persist legacy emails_text fields.', [
+                'email_id' => $emailId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Accepts multiple input formats and returns a legacy string list:
+     * - array of entities: [{name, email1|email}]
+     * - array of strings
+     * - comma/semicolon separated string
+     */
+    protected function formatLegacyAddressList(mixed $value): string
+    {
+        if (empty($value)) {
+            return '';
+        }
+
+        if (is_string($value)) {
+            $parts = preg_split('/[;,]+/', $value) ?: [];
+            $parts = array_map(static fn($s) => trim((string)$s), $parts);
+            $parts = array_filter($parts, static fn($s) => $s !== '');
+            return implode(', ', $parts);
+        }
+
+        if (!is_array($value)) {
+            return '';
+        }
+
+        $out = [];
+        foreach ($value as $item) {
+            if (is_string($item)) {
+                $s = trim($item);
+                if ($s !== '') {
+                    $out[] = $s;
+                }
+                continue;
+            }
+
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $email = (string)($item['email1'] ?? $item['email'] ?? '');
+            $name = trim((string)($item['name'] ?? ''));
+            if ($email === '') {
+                continue;
+            }
+            $out[] = $name !== '' ? ($name . ' <' . $email . '>') : $email;
+        }
+
+        return implode(', ', $out);
     }
 
 }

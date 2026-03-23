@@ -133,6 +133,8 @@ services:
       tags: [ 'app.legacy.migration.step' ]
     App\Install\Service\Installation\InstallStepInterface:
       tags: [ 'app.install.step' ]
+    App\Data\Service\Record\Duplicate\DuplicateFieldMapperInterface:
+      tags: [ 'record.duplicate.field.mapper' ]
     App\Schedulers\Service\SchedulerInterface:
       tags: [ 'app.scheduler' ]
     App\Install\Service\Cli\CliStepInterface:
@@ -471,6 +473,10 @@ services:
       - '@entity.fieldType.mapper.registry'
       - '@entity.record.mapper.registry'
       - '@App\FieldDefinitions\Service\FieldDefinitionsProviderInterface'
+
+  App\Data\Service\Record\Duplicate\DuplicateFieldMapperRegistry:
+    arguments:
+      - !tagged { tag: 'record.duplicate.field.mapper' }
 
   App\Data\Service\Record\RecordSaveHandlers\RecordFieldSaveHandlerRegistry:
     arguments:

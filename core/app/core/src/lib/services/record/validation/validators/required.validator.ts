@@ -174,6 +174,36 @@ export const fileRequiredValidator = (viewField: ViewFieldDefinition, record: Re
     }
 );
 
+export const imageRequiredValidator = (viewField: ViewFieldDefinition, record: Record, utils: FormControlUtils): StandardValidatorFn => (
+    (control: AbstractControl): StandardValidationErrors | null => {
+        const name = viewField.name || '';
+
+        if (!name || !record || !record.fields) {
+            return null;
+        }
+
+        const field = record?.fields[name] ?? {} as Field;
+
+        if (!field) {
+            return null;
+        }
+
+        if (field?.valueObject && (field.valueObject.id || field.valueObject.value)) {
+            return null;
+        }
+
+        return {
+            required: {
+                required: true,
+                message: {
+                    labelKey: 'LBL_VALIDATION_ERROR_REQUIRED',
+                    context: {}
+                }
+            }
+        };
+    }
+);
+
 export const attachmentsRequiredValidator = (viewField: ViewFieldDefinition, record: Record, utils: FormControlUtils): StandardValidatorFn => (
     (control: AbstractControl): StandardValidationErrors | null => {
         const name = viewField.name || '';
@@ -252,6 +282,10 @@ export class RequiredValidator implements ValidatorInterface {
 
         if (type === 'file') {
             return [fileRequiredValidator(viewField, record, this.utils)];
+        }
+
+        if (type === 'image') {
+            return [imageRequiredValidator(viewField, record, this.utils)];
         }
 
         if (type === 'attachment') {

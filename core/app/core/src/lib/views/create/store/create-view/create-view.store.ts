@@ -195,10 +195,9 @@ export class CreateViewStore extends RecordViewStore {
                 ...this.internalState,
                 loading: true
             });
-            return this.recordStore.retrieveRecord(
+            return this.duplicateService.getDuplicateRecord(
                 this.internalState.module,
-                this.params.originalId,
-                false
+                this.params.originalId
             ).pipe(
                 tap((data: Record) => {
 

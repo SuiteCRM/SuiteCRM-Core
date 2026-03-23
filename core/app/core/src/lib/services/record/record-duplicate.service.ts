@@ -28,13 +28,19 @@ import {SystemConfigStore} from "../../store/system-config/system-config.store";
 import {Record} from "../../common/record/record.model";
 import {FieldDefinitionMap} from "../../common/record/field.model";
 import {isTrue} from "../../common/utils/value-utils";
+import {ProcessService} from "../process/process.service";
+import {Observable} from "rxjs";
+import {map} from "rxjs/operators";
 
 @Injectable({
     providedIn: 'root'
 })
 export class RecordDuplicateService {
 
-    constructor(protected systemConfigStore: SystemConfigStore) {
+    constructor(
+        protected systemConfigStore: SystemConfigStore,
+        protected processService: ProcessService
+    ) {
     }
 
     public duplicateParse(record: Record, vardefs: FieldDefinitionMap): Record {
@@ -61,6 +67,33 @@ export class RecordDuplicateService {
         })
 
         return record;
+    }
+
+    public getDuplicateRecord(module: string, id: string): Observable<Record> {
+        return this.processService.submit('get-duplicate-record', {module, id}).pipe(
+            map(process => {
+                const record: Record = {
+                    type: '',
+                    module: '',
+                    attributes: {},
+                    acls: []
+                } as Record;
+
+                const data = process?.data?.record ?? null;
+                if (!data) {
+                    return record;
+                }
+
+                record.id = data.id ?? '';
+                record.module = data.module ?? module;
+                record.type = data.type ?? '';
+                record.attributes = data.attributes ?? {};
+                record.acls = data.acls ?? [];
+                record.favorite = data.favorite ?? false;
+
+                return record;
+            })
+        );
     }
 
 }

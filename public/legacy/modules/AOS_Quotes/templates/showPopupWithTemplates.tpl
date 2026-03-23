@@ -112,6 +112,32 @@
         window.event.stopImmediatePropagation();
     }
 
+    function printAsPdf(id, module) {
+        const options = {
+            type: 'run-global-async-action',
+            params: {
+                action: {
+                    key: 'record-print-as-pdf',
+                    id: id,
+                    module: module,
+                    asyncProcess: true,
+                    params: {
+                        recordId: id,
+                        module: module,
+                        selectModal: {
+                            module: 'AOS_PDF_Templates',
+                        }
+                    }
+                }
+            }
+        };
+
+        window.parent.postMessage(JSON.stringify(options));
+
+        window.event.preventDefault();
+        window.event.stopImmediatePropagation();
+    }
+
     /**
      *
      * @param task
@@ -129,6 +155,10 @@
             openEmailComposeModal(id, module);
             return false;
         {rdelim}
+        if (task ==='pdf') {ldelim}
+            printAsPdf(id, module);
+            return false;
+            {rdelim}
         var totalTemplates = {$TOTAL_TEMPLATES}
         if (totalTemplates === 1) {ldelim}
             form.task.value = task;

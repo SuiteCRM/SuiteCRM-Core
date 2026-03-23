@@ -86,7 +86,30 @@ class AOS_InvoicesViewDetail extends ViewDetail
                             }
                         };
 
-                        console.log(JSON.stringify(options));
+                        window.parent.postMessage(JSON.stringify(options));
+
+                        window.event.preventDefault();
+                        window.event.stopImmediatePropagation();
+                    }
+
+                    function printAsPdf(id, module) {
+                        const options = {
+                            type: "run-global-async-action",
+                            params: {
+                                action: {
+                                    key: "record-print-as-pdf",
+                                    id: id,
+                                    module: module,
+                                    asyncProcess: true,
+                                    params: {
+                                        selectModal: {
+                                            module: "AOS_PDF_Templates",
+                                        }
+                                    }
+                                }
+                            }
+                        };
+
                         window.parent.postMessage(JSON.stringify(options));
 
                         window.event.preventDefault();
@@ -100,7 +123,11 @@ class AOS_InvoicesViewDetail extends ViewDetail
 						if (task === \'emailpdf\') {
                             openEmailComposeModal(id, module);
                             return;
-}
+                            }
+ 						if (task === \'pdf\') {
+                            printAsPdf(id, module);
+                            return;
+                            }
 
 						var form=document.getElementById(\'popupForm\');
 						var ppd=document.getElementById(\'popupDivBack_ara\');

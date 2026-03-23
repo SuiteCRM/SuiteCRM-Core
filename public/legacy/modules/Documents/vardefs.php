@@ -127,6 +127,7 @@ $dictionary['Document'] = [
             'metadata' => [
                 'storage_type' => 'private-documents',
                 'upload_maxsize' => 10000000,
+                'allow_duplicate' => true
             ],
             'allowEapm' => true,
             'fileId' => 'document_revision_id',

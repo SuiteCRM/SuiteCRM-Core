@@ -598,6 +598,44 @@ class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectMana
         $this->saveMediaObject($type, $mediaObject);
     }
 
+    public function copyMediaObject(string $storageType, MediaObjectInterface $mediaObject): ?MediaObjectInterface
+    {
+        $contents = $this->getFieldContents($storageType, $mediaObject);
+
+        if ($contents === false) {
+            return null;
+        }
+
+        $ext = $this->getExtension($mediaObject);
+        $id = create_guid();
+        $path = $this->temporaryFileManager->getWorkingFilePath('copy', $id . $ext);
+
+        file_put_contents($path, $contents);
+
+        $attributes = [
+            'file' => new ReplacingFile($path),
+            'parent_field' => $mediaObject->getParentField() ?? 'file',
+            'parent_id' => null,
+            'parent_type' => null,
+            'mime_type' => $mediaObject->getMimeType(),
+            'name' => $mediaObject->getName(),
+            'original_name' => $mediaObject->getOriginalName(),
+            'temporary' => true,
+        ];
+
+        $newMediaObject = $this->createMediaObjectFromAttributes($storageType, $attributes);
+        $this->saveMediaObjectWithOriginalName($storageType, $newMediaObject, $mediaObject->getOriginalName());
+
+        $contentUrl = $this->buildContentUrl($storageType, $newMediaObject);
+        $newMediaObject->setContentUrl($contentUrl);
+
+        if (file_exists($path)) {
+            unlink($path);
+        }
+
+        return $newMediaObject;
+    }
+
     protected function getImagine(): ImagickImagine|Imagine|GmagickImagine|null
     {
         if (extension_loaded('gd')) {

@@ -211,4 +211,13 @@ interface MediaObjectManagerInterface
      */
     public function saveMediaObjectWithOriginalName(string $type, MediaObjectInterface $mediaObject, string $originalName): void;
 
+    /**
+     * Creates a physical copy of a media object with a new identity.
+     * The copy is marked temporary until linked to a parent record.
+     *
+     * @param string $storageType
+     * @param MediaObjectInterface $mediaObject
+     * @return MediaObjectInterface|null The new copy, or null on failure
+     */
+    public function copyMediaObject(string $storageType, MediaObjectInterface $mediaObject): ?MediaObjectInterface;
 }

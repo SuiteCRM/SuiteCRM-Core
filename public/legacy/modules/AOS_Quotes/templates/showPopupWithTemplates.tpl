@@ -96,7 +96,7 @@
                     key: 'quote-build-pdf-email',
                     asyncProcess: true,
                     params: {
-                        recordId: id,
+                        id: id,
                         module: module,
                         selectModal: {
                             module: 'AOS_PDF_Templates',
@@ -118,11 +118,9 @@
             params: {
                 action: {
                     key: 'record-print-as-pdf',
-                    id: id,
-                    module: module,
                     asyncProcess: true,
                     params: {
-                        recordId: id,
+                        id: id,
                         module: module,
                         selectModal: {
                             module: 'AOS_PDF_Templates',

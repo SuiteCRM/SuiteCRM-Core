@@ -76,8 +76,8 @@ class AOS_InvoicesViewDetail extends ViewDetail
                                     key: "invoice-build-pdf-email",
                                     asyncProcess: true,
                                     params: {
-                                        recordId: id,
                                         module: module,
+                                        id: id,
                                         selectModal: {
                                             module: "AOS_PDF_Templates",
                                         }
@@ -98,10 +98,10 @@ class AOS_InvoicesViewDetail extends ViewDetail
                             params: {
                                 action: {
                                     key: "record-print-as-pdf",
-                                    id: id,
-                                    module: module,
                                     asyncProcess: true,
                                     params: {
+                                        id: id,
+                                        module: module,
                                         selectModal: {
                                             module: "AOS_PDF_Templates",
                                         }
@@ -123,11 +123,11 @@ class AOS_InvoicesViewDetail extends ViewDetail
 						if (task === \'emailpdf\') {
                             openEmailComposeModal(id, module);
                             return;
-                            }
+                        }
  						if (task === \'pdf\') {
                             printAsPdf(id, module);
                             return;
-                            }
+                        }
 
 						var form=document.getElementById(\'popupForm\');
 						var ppd=document.getElementById(\'popupDivBack_ara\');

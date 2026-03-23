@@ -4357,4 +4357,5 @@ $app_strings['LBL_OPEN_DRAFT'] = 'Open Draft';
 $app_strings['LBL_DELETE_DRAFT'] = 'Delete Draft';
 $app_strings['LBL_UNABLE_TO_GET_DRAFT_ID'] = 'Unable to retrieve Draft ID.';
 $app_strings['LBL_UNABLE_TO_DELETE_DRAFT'] = 'Unable to delete draft.';
+$app_strings['LBL_EMAIL_NOT_DRAFT'] = 'Email is no longer a draft.';
 $app_strings['LBL_DRAFT_DELETED_SUCCESSFULLY'] = 'Draft Deleted Successfully.';

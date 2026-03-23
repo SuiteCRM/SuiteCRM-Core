@@ -43,6 +43,17 @@ export class RecordModalAsyncAction extends AsyncActionHandler {
 
     run(data: AsyncActionData): void {
         const options = data as RecordModalOptions;
+        const recordId = options.recordId ?? '';
+
+        if (recordId) {
+            const isAlreadyOpen = this.appStateStore.getActiveModals().some(
+                modal => modal?.componentInstance?.recordId === recordId
+            );
+            if (isAlreadyOpen) {
+                return;
+            }
+        }
+
         this.appStateStore.openRecordModal(options);
     }
 }

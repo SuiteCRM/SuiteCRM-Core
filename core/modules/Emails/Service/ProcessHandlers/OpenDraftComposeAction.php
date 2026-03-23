@@ -118,6 +118,13 @@ class OpenDraftComposeAction extends OpenDraftAction
 
         $emailRecord = $this->recordProvider->getRecord('Emails', $id);
 
+        $status = $emailRecord->getAttributes()['status'] ?? '';
+        if ($status !== 'draft') {
+            $process->setStatus('error');
+            $process->setMessages(['LBL_EMAIL_NOT_DRAFT']);
+            return;
+        }
+
         $params = $this->getModalData($emailRecord);
 
         $responseData = [

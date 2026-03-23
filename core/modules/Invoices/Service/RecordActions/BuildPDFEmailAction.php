@@ -108,7 +108,7 @@ class BuildPDFEmailAction extends BuildPDFEmail implements ProcessHandlerInterfa
     {
         $options = $process->getOptions();
         $module = $options['params']['module'] ?? '';
-        $id = $options['params']['recordId'] ?? '';
+        $id = $options['params']['id'] ?? '';
         $templateId = $options['params']['modalRecord']['id'] ?? '';
 
         if (empty($module) || empty($id) || empty($templateId)) {

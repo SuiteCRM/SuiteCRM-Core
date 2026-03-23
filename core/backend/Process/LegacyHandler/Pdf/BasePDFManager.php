@@ -329,7 +329,7 @@ class BasePDFManager extends LegacyHandler
 
         $mediaObject = $this->mediaObjectManager->createMediaObjectFromAttributes($storageType, $mediaObjectAttributes);
 
-        $this->mediaObjectManager->saveMediaObject($storageType, $mediaObject);
+        $this->mediaObjectManager->saveMediaObjectWithOriginalName($storageType, $mediaObject, $fileName);
 
         $this->deleteTempFile($tempFileName);
 

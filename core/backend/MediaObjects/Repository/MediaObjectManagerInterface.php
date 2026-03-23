@@ -199,4 +199,16 @@ interface MediaObjectManagerInterface
      * @return ?string
      */
     public function getStorageTypeFromClass(string $className): ?string;
+
+    /**
+     * Saves a media object and then corrects the original name.
+     * Vich's upload listener overwrites originalName with the temp file basename on first save.
+     * A second save (with no file set) updates only the column.
+     *
+     * @param string $type The type of media object
+     * @param MediaObjectInterface $mediaObject The media object to save
+     * @param string $originalName The correct original name to persist
+     */
+    public function saveMediaObjectWithOriginalName(string $type, MediaObjectInterface $mediaObject, string $originalName): void;
+
 }

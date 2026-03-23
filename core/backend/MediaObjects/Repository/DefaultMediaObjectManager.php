@@ -522,7 +522,7 @@ class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectMana
 
         $compressedMediaObject = $this->createMediaObjectFromAttributes($storageType, $compressedMediaObjectAttributes);
 
-        $this->saveMediaObject($storageType, $compressedMediaObject);
+        $this->saveMediaObjectWithOriginalName($storageType, $compressedMediaObject, $compressedMediaObjectAttributes['original_name']);
 
         $contentUrl = $this->buildContentUrl($storageType, $compressedMediaObject);
         $compressedMediaObject->setContentUrl($contentUrl);
@@ -592,6 +592,13 @@ class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectMana
     public function getStorageTypeFromClass(string $className): ?string
     {
         return $this->objectTypeMap[$className] ?? null;
+    }
+
+    public function saveMediaObjectWithOriginalName(string $type, MediaObjectInterface $mediaObject, string $originalName): void
+    {
+        $this->saveMediaObject($type, $mediaObject);
+        $mediaObject->setOriginalName($originalName);
+        $this->saveMediaObject($type, $mediaObject);
     }
 
     protected function getImagine(): ImagickImagine|Imagine|GmagickImagine|null

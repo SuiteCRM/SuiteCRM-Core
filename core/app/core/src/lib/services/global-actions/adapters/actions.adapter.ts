@@ -83,8 +83,8 @@ export class GlobalActionsAdapter extends BaseActionsAdapter<GlobalActionData> {
         this.appState.asyncActionEventEmitter.subscribe((options) => {
             const action = options?.action as Action;
             const context = {
-                id: options?.recordId,
-                module: options?.module
+                id: action?.params.id,
+                module: action?.params.module
             };
             this.runAction(action, context);
         });

@@ -50,10 +50,9 @@ $layout_defs['History'] = array(
         'subpanel_title' => 'LBL_DEFAULT_SUBPANEL_TITLE',
         'top_buttons' => array(
             array('widget_class' => 'SubPanelTopCreateNoteButton'),
-            array('widget_class' => 'SubPanelTopArchiveEmailButton'),
             array('widget_class' => 'SubPanelTopSummaryButton'),
         ),
-        
+
 //TODO try and merge with the activities
         'list_fields' => array(
             'Meetings' => array(

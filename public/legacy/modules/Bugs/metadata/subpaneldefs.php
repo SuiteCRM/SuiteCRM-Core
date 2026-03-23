@@ -104,7 +104,6 @@ $layout_defs['Bugs'] = array(
 
             'top_buttons' => array(
                 array('widget_class' => 'SubPanelTopCreateNoteButton'),
-                array('widget_class' => 'SubPanelTopArchiveEmailButton'),
                 array('widget_class' => 'SubPanelTopSummaryButton'),
             ),
 

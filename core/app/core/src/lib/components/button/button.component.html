@@ -47,6 +47,7 @@
                     [module]="config.labelModule ?? ''"></scrm-label>
         <scrm-dynamic-label *ngIf="config.dynamicLabelKey"
                             [labelKey]="config.dynamicLabelKey"
+                            class="{{ config.dynamicLabelKlass || '' }}"
                             [module]="config.labelModule ?? ''"
                             [fields]="config?.dynamicLabelFields"></scrm-dynamic-label>
         <scrm-image *ngIf="dynamicEndIcon()"

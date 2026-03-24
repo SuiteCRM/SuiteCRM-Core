@@ -134,8 +134,7 @@ export class AppComponent implements OnInit {
             klass: 'btn drafts-button btn-main',
             iconKlass: 'pr-1',
             dynamicLabelKey: 'LBL_DRAFTS_TOTAL',
-            endIcon: 'arrow_up_filled',
-            endIconKlass: 'drafts-caret',
+            dynamicLabelKlass: 'dropdown-toggle',
             dynamicLabelFields: {
                 count: {
                     value: count,

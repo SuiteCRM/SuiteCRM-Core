@@ -46,6 +46,19 @@
     height: 38px;
     padding: 0.375rem .25rem 0.375rem .5rem !important;
 
+    .dropdown-toggle:after {
+      display: inline-block;
+      margin-left: .1em;
+      vertical-align: .255em;
+      content: "";
+      border-top: 0!important;
+      border-right: .3em solid transparent!important;
+      border-bottom: .3em solid!important;
+      border-left: .3em solid transparent!important;
+      top: 1px;
+      position: relative;
+    }
+
     span, svg {
       color: $light-grey;
       fill: $light-grey;

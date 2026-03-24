@@ -1236,38 +1236,62 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
         }
     }
 
-    protected calculateDynamicBreakpoint(limitConfig, totalCollapsed: number, totalExpandedActions: number): number {
-        let buttonMax = 30;
+    protected calculateDynamicBreakpoint(limitConfig, totalCollapsed: number, totalExpandedActions: number, totalGroups: number): number {
+        const toolbar = this?.toolbarWrapper?.nativeElement?.querySelector('.squire-editor-toolbar');
+        const toolbarItems = toolbar?.querySelectorAll(':scope > .squire-editor-toolbar-item');
+        const dividers = toolbar?.querySelectorAll(':scope > .squire-editor-toolbar-divider');
 
-        if (limitConfig?.dynamicBreakpoint?.buttonMax) {
-            buttonMax = limitConfig?.dynamicBreakpoint?.buttonMax;
+        let buttonWidth = limitConfig?.dynamicBreakpoint?.buttonMax ?? 30;
+        let dividerWidth = limitConfig?.dynamicBreakpoint?.dividerWidth ?? 8;
+        let dropdownWidth = limitConfig?.dynamicBreakpoint?.dropdownMax ?? 40;
+
+        if (toolbarItems?.length) {
+            const firstItem = toolbarItems[0] as HTMLElement;
+            const measured = firstItem.offsetWidth;
+            if (measured > 0) {
+                const style = getComputedStyle(firstItem);
+                const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+                buttonWidth = measured + margin;
+            }
         }
 
-        let dropdownWidth = 40;
-        if (limitConfig?.dynamicBreakpoint?.dropdownMax) {
-            dropdownWidth = limitConfig?.dynamicBreakpoint?.dropdownMax;
+        if (dividers?.length) {
+            const firstDivider = dividers[0] as HTMLElement;
+            const measured = firstDivider.offsetWidth;
+            if (measured > 0) {
+                dividerWidth = measured;
+            }
         }
 
-        let containerWidth = this?.toolbarWrapper?.nativeElement?.parentElement?.parentElement?.offsetWidth ?? 560;
+        let containerWidth = toolbar?.clientWidth ?? 560;
 
-        if (!containerWidth || containerWidth < buttonMax) {
+        if (!containerWidth || containerWidth < buttonWidth) {
             return 6;
         }
-        containerWidth = containerWidth - 10;
 
+        const needsDropdown = totalCollapsed > 0 || totalExpandedActions > floor(containerWidth / buttonWidth);
+        const baseAvailable = needsDropdown ? containerWidth - dropdownWidth : containerWidth;
 
-        const fitting = floor(containerWidth / buttonMax);
-        const fittingWithDropdown = floor((containerWidth - dropdownWidth) / buttonMax);
+        const groups = this.baseButtonLayout();
+        let usedWidth = 0;
+        let fittingCount = 0;
 
-        if (totalCollapsed) {
-            return fittingWithDropdown;
+        for (let i = 0; i < groups.length; i++) {
+            const groupDivider = i > 0 ? dividerWidth : 0;
+            const groupWidth = groupDivider + (groups[i].length * buttonWidth);
+
+            if (usedWidth + groupWidth > baseAvailable) {
+                const remainingWidth = baseAvailable - usedWidth - groupDivider;
+                const partialFit = floor(remainingWidth / buttonWidth);
+                fittingCount += Math.max(partialFit, 0);
+                break;
+            }
+
+            usedWidth += groupWidth;
+            fittingCount += groups[i].length;
         }
 
-        if (totalExpandedActions <= fitting) {
-            return fitting;
-        }
-
-        return fittingWithDropdown;
+        return fittingCount;
     }
 
     protected calculateDynamicMaxHeight(): void {

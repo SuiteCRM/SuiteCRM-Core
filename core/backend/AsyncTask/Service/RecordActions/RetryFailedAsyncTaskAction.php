@@ -105,7 +105,8 @@ class RetryFailedAsyncTaskAction implements ProcessHandlerInterface
         $attrs = $task->getAttributes();
         $serviceKey = $attrs['service_key'] ?? '';
 
-        if (empty($attrs['allow_failure_retry_action']) || empty($attrs['completed_with_failures'])) {
+        $status = $attrs['status'] ?? '';
+        if (empty($attrs['allow_failure_retry_action']) || !in_array($status, ['completed_with_failures', 'failed'], true)) {
             $process->setStatus('error');
             $process->setMessages(['LBL_RETRY_FAILED_NOT_ELIGIBLE']);
             return;
@@ -118,7 +119,6 @@ class RetryFailedAsyncTaskAction implements ProcessHandlerInterface
         $attrs['status'] = 'running';
         $attrs['phase'] = 'processing';
         $attrs['progress'] = $progress;
-        $attrs['completed_with_failures'] = false;
 
         $task->setAttributes($attrs);
         $this->recordProvider->saveRecord($task);

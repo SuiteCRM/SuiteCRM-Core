@@ -60,7 +60,8 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
         }
 
         $this->markTaskAsCompleted($task, $message->getProgress());
-        $this->notificationDispatcher->dispatchNotification($task, 'completed', $this->getType());
+        $status = ($message->getProgress()['failed'] ?? 0) > 0 ? 'completed_with_failures' : 'completed';
+        $this->notificationDispatcher->dispatchNotification($task, $status, $this->getType());
     }
 
     /**
@@ -92,9 +93,8 @@ abstract class AsyncTaskCompletedHandler implements AsyncTaskCompletedHandlerInt
 
             $progress['percent'] = 100;
             $attributes['progress'] = $progress;
-            $attributes['status'] = 'completed';
+            $attributes['status'] = ($progress['failed'] ?? 0) > 0 ? 'completed_with_failures' : 'completed';
             $attributes['phase'] = 'completed';
-            $attributes['completed_with_failures'] = ($progress['failed'] ?? 0) > 0;
             $attributes['last_run_datetime'] = (new \DateTime())->format('Y-m-d H:i:s');
 
             $task->setAttributes($attributes);

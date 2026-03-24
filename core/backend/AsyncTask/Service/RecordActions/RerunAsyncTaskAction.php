@@ -105,7 +105,8 @@ class RerunAsyncTaskAction implements ProcessHandlerInterface
         $attrs = $task->getAttributes();
         $serviceKey = $attrs['service_key'] ?? '';
 
-        if (empty($attrs['allow_failure_rerun_action']) || empty($attrs['completed_with_failures'])) {
+        $status = $attrs['status'] ?? '';
+        if (empty($attrs['allow_failure_rerun_action']) || !in_array($status, ['completed_with_failures', 'failed'], true)) {
             $process->setStatus('error');
             $process->setMessages(['LBL_RERUN_NOT_ELIGIBLE']);
             return;
@@ -126,7 +127,6 @@ class RerunAsyncTaskAction implements ProcessHandlerInterface
         $attrs['status'] = 'running';
         $attrs['phase'] = 'queueing';
         $attrs['progress'] = $progress;
-        $attrs['completed_with_failures'] = false;
 
         $task->setAttributes($attrs);
         $this->recordProvider->saveRecord($task);

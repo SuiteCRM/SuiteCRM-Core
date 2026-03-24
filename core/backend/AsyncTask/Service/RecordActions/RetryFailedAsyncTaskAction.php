@@ -157,7 +157,7 @@ class RetryFailedAsyncTaskAction implements ProcessHandlerInterface
         $total = $dbTotal + $previouslyCompleted;
         $completed = $dbCompleted + $previouslyCompleted;
         $done = $completed + $failed + $skipped;
-        $percent = $total > 0 ? (int)round($done / $total * 100) : 0;
+        $percent = $total > 0 ? (int)floor($done / $total * 100) : 0;
 
         return [
             'phase' => 'processing',

@@ -455,7 +455,7 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         $progress['skipped'] = $skipped;
         $progress['queued'] = $queued;
         $progress['processing_count'] = $processingCount;
-        $progress['percent'] = $total > 0 ? (int)round($done / $total * 100) : 0;
+        $progress['percent'] = $total > 0 ? (int)floor($done / $total * 100) : 0;
 
         $this->log('debug', 'Calculated progress', [
             'taskId' => $taskId,

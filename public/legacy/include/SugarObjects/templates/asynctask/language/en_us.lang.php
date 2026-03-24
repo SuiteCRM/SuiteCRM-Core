@@ -97,7 +97,6 @@ $mod_strings = [
     // Capability flag field labels
     'LBL_ALLOW_FAILURE_RETRY_ACTION' => 'Allow Failure Retry Action',
     'LBL_ALLOW_FAILURE_RERUN_ACTION' => 'Allow Failure Rerun Action',
-    'LBL_COMPLETED_WITH_FAILURES' => 'Completed With Failures',
 
     // Subpanel
     'LBL_FAILED_ITEMS' => 'Failed Items',

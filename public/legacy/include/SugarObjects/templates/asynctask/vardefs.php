@@ -273,18 +273,5 @@ $vardefs = [
             'unified_search' => false,
         ],
 
-        'completed_with_failures' => [
-            'name' => 'completed_with_failures',
-            'vname' => 'LBL_COMPLETED_WITH_FAILURES',
-            'type' => 'bool',
-            'default' => false,
-            'display' => 'none',
-            'inline_edit' => false,
-            'reportable' => false,
-            'massupdate' => false,
-            'importable' => false,
-            'exportable' => false,
-            'unified_search' => false,
-        ],
     ],
 ];

@@ -794,6 +794,7 @@ $app_list_strings = array(
         'pending' => 'Pending',
         'running' => 'Running',
         'failed' => 'Failed',
+        'completed_with_failures' => 'Completed With Failures',
         'completed' => 'Completed'
     ],
 
@@ -807,6 +808,7 @@ $app_list_strings = array(
         'pending' => 'Pending',
         'running' => 'Running',
         'failed' => 'Failed',
+        'completed_with_failures' => 'Completed With Failures',
         'completed' => 'Completed'
     ],
 
@@ -4210,6 +4212,7 @@ $app_strings['LBL_FROM_SYSTEM'] = 'Send From System';
 $app_strings['LBL_SIGNATURE'] = 'Signature';
 $app_strings['LBL_NEW_NOTIFICATION'] = "You have {{context.unread}} new notifications";
 $app_strings['LBL_ALERT_STATUS_COMPLETED'] = 'Completed';
+$app_strings['LBL_ALERT_STATUS_COMPLETED_WITH_FAILURES'] = 'Completed With Failures';
 $app_strings['LBL_ALERT_STATUS_FAILED'] = 'Failed';
 $app_strings['LBL_NOTIFICATION_ITEM_DATE'] = 'Due: {{fields.date_start.value}}';
 $app_strings['LBL_NOTIFICATION_ITEM_DATE_ENTERED'] = 'Notified: {{fields.snooze.value}}';

@@ -66,13 +66,13 @@ $viewdefs[$module_name]['DetailView'] = [
                     'show-on-failures' => [
                         'modes' => ['detail'],
                         'params' => [
-                            'fieldDependencies' => ['allow_failure_rerun_action', 'completed_with_failures'],
+                            'fieldDependencies' => ['allow_failure_rerun_action', 'status'],
                             'activeOnFields' => [
                                 'allow_failure_rerun_action' => [
                                     ['operator' => 'is-true'],
                                 ],
-                                'completed_with_failures' => [
-                                    ['operator' => 'is-true'],
+                                'status' => [
+                                    ['operator' => 'is-equal', 'values' => ['completed_with_failures', 'failed']],
                                 ],
                             ],
                         ],
@@ -96,13 +96,13 @@ $viewdefs[$module_name]['DetailView'] = [
                     'show-on-failures' => [
                         'modes' => ['detail'],
                         'params' => [
-                            'fieldDependencies' => ['allow_failure_retry_action', 'completed_with_failures'],
+                            'fieldDependencies' => ['allow_failure_retry_action', 'status'],
                             'activeOnFields' => [
                                 'allow_failure_retry_action' => [
                                     ['operator' => 'is-true'],
                                 ],
-                                'completed_with_failures' => [
-                                    ['operator' => 'is-true'],
+                                'status' => [
+                                    ['operator' => 'is-equal', 'values' => ['completed_with_failures', 'failed']],
                                 ],
                             ],
                         ],
@@ -130,7 +130,7 @@ $viewdefs[$module_name]['DetailView'] = [
                                 'status' => [
                                     [
                                         'operator' => 'is-equal',
-                                        'values' => ['completed', 'failed']
+                                        'values' => ['completed', 'completed_with_failures', 'failed']
                                     ]
                                 ],
                             ]
@@ -190,11 +190,6 @@ $viewdefs[$module_name]['DetailView'] = [
                 ],
                 [
                     'name' => 'allow_failure_rerun_action',
-                ],
-            ],
-            [
-                [
-                    'name' => 'completed_with_failures',
                 ],
             ],
         ],

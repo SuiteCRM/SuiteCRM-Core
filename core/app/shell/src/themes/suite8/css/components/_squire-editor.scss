@@ -80,6 +80,14 @@
       &:hover {
         background-color: $very-light-grey;
       }
+
+      &:has(.squire-editor-button-active) {
+        background-color: $very-light-grey;
+      }
+
+      .squire-editor-button:hover:not(.disabled) {
+        background-color: transparent;
+      }
     }
 
     .squire-editor-button {
@@ -91,6 +99,7 @@
       &.squire-editor-button-active {
         background-color: $very-light-grey;
       }
+
 
       &:hover:not(.disabled) {
         background-color: $very-light-grey;
@@ -169,6 +178,10 @@
       .grid-popup-body {
         //width: 125px;
         width: 175px;
+      }
+
+      .squire-editor-button.squire-editor-button-active {
+        background-color: transparent;
       }
 
       background-color: $white;

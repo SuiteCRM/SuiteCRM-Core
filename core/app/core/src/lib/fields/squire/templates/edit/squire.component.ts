@@ -80,7 +80,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
     isMobile = signal(false);
     activeButtonLayout: WritableSignal<Array<DropdownButtonInterface[]>> = signal([]);
     baseButtonLayout: WritableSignal<Array<ButtonInterface[]>> = signal([]);
-    collapsedButtons: WritableSignal<ButtonInterface[]> = signal([]);
+    collapsedButtons: WritableSignal<AnyButtonInterface[]> = signal([]);
     collapsedDropdownButton: WritableSignal<ButtonInterface> = signal(null);
     minHeight: WritableSignal<string> = signal('40vh');
     height: WritableSignal<string> = signal('18vh');
@@ -1200,12 +1200,13 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
 
         const limitConfig = this?.field?.metadata?.squire?.edit?.limit ?? {};
 
-        const dynamicBreakpoint = this.calculateDynamicBreakpoint(limitConfig, totalCollapsed, totalExpandedActions);
+        const totalGroups = this.baseButtonLayout().length;
+        const dynamicBreakpoint = this.calculateDynamicBreakpoint(limitConfig, totalCollapsed, totalExpandedActions, totalGroups);
 
         if (totalExpandedActions > dynamicBreakpoint) {
             const activeLayout: Array<ButtonInterface[]> = [];
             let count = 0;
-            let collapsedButtons: ButtonInterface[] = [];
+            let collapsedButtons: AnyButtonInterface[] = [];
             this.baseButtonLayout().forEach((buttonGroup) => {
 
                 if (count > dynamicBreakpoint) {

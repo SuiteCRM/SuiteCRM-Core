@@ -23,10 +23,6 @@ array(
           array(
             'customCode' => '<input type="button" class="button" onClick="showPopup(\'emailpdf\');" value="{$MOD.LBL_EMAIL_PDF}">',
           ),
-          6 =>
-          array(
-            'customCode' => '<input type="button" class="button" onClick="showPopup(\'email\');" value="{$MOD.LBL_EMAIL_INVOICE}">',
-          ),
         ),
       ),
       'maxColumns' => '2',

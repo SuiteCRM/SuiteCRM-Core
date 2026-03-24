@@ -30,45 +30,55 @@ namespace App\Data\Service\Record\Duplicate;
 class DuplicateFieldMapperRegistry
 {
     /**
-     * @var DuplicateFieldMapperInterface[]
+     * Indexed by composite key: "{module}-{fieldType}-{fieldName}" for specific field names,
+     * or "{module}-{fieldType}" when getFieldName() returns null (matches any field name).
+     *
+     * @var array<string, DuplicateFieldMapperInterface>
      */
     protected array $mappers = [];
 
     public function __construct(iterable $mappers)
     {
         foreach ($mappers as $mapper) {
-            $this->mappers[] = $mapper;
+            $key = $this->buildKey($mapper->getModule(), $mapper->getFieldType(), $mapper->getFieldName());
+            $this->mappers[$key] = $mapper;
         }
     }
 
     /**
-     * Return all mappers that apply to the given module, field type and field name.
-     * Module-specific mappers are included alongside 'default' mappers.
-     * A mapper with a non-null getFieldName() only matches that exact field name.
-     *
-     * @return DuplicateFieldMapperInterface[]
+     * Return the most specific mapper for the given module, field type and field name.
+     * Priority (highest first):
+     *   1. exact module + exact field name
+     *   2. exact module + any field name
+     *   3. default module + exact field name
+     *   4. default module + any field name
      */
-    public function getMappers(string $module, string $fieldType, string $fieldName): array
+    public function getMapper(string $module, string $fieldType, string $fieldName): ?DuplicateFieldMapperInterface
     {
-        $result = [];
-
-        foreach ($this->mappers as $mapper) {
-            if ($mapper->getModule() !== 'default' && $mapper->getModule() !== $module) {
-                continue;
-            }
-
-            if ($mapper->getFieldType() !== $fieldType) {
-                continue;
-            }
-
-            $mapperFieldName = $mapper->getFieldName();
-            if ($mapperFieldName !== null && $mapperFieldName !== $fieldName) {
-                continue;
-            }
-
-            $result[] = $mapper;
+        $exactModuleExactField = $this->mappers[$module . '-' . $fieldType . '-' . $fieldName] ?? null;
+        if ($exactModuleExactField !== null) {
+            return $exactModuleExactField;
         }
 
-        return $result;
+        $exactModuleAnyField = $this->mappers[$module . '-' . $fieldType] ?? null;
+        if ($exactModuleAnyField !== null) {
+            return $exactModuleAnyField;
+        }
+
+        $defaultModuleExactField = $this->mappers['default-' . $fieldType . '-' . $fieldName] ?? null;
+        if ($defaultModuleExactField !== null) {
+            return $defaultModuleExactField;
+        }
+
+        return $this->mappers['default-' . $fieldType] ?? null;
+    }
+
+    protected function buildKey(string $module, string $fieldType, ?string $fieldName): string
+    {
+        if ($fieldName === null) {
+            return $module . '-' . $fieldType;
+        }
+
+        return $module . '-' . $fieldType . '-' . $fieldName;
     }
 }

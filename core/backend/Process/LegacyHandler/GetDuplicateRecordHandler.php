@@ -130,9 +130,9 @@ class GetDuplicateRecordHandler implements ProcessHandlerInterface
             }
 
             $fieldType = $fieldDef['type'] ?? '';
-            $mappers = $this->duplicateFieldMapperRegistry->getMappers($module, $fieldType, $fieldName);
+            $mapper = $this->duplicateFieldMapperRegistry->getMapper($module, $fieldType, $fieldName);
 
-            foreach ($mappers as $mapper) {
+            if ($mapper !== null) {
                 $mapper->duplicate($record, $fieldName, $fieldDef);
             }
         }
@@ -149,10 +149,10 @@ class GetDuplicateRecordHandler implements ProcessHandlerInterface
         $items = $config->getItems();
         $legacyModule = $this->moduleNameMapper->toLegacy($module);
 
-        return array_merge(
-            $items['default'] ?? [],
-            (array)($items[$legacyModule] ?? []),
-            (array)($items[$module] ?? [])
-        );
+        $default = $items['default'] ?? [];
+        $legacyModuleItems = (array)($items[$legacyModule] ?? []);
+        $moduleItems = (array)($items[$module] ?? []);
+
+        return array_merge($default, $legacyModuleItems, $moduleItems);
     }
 }

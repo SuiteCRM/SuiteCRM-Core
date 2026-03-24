@@ -172,18 +172,17 @@ body.modal-open.detached-modal-open {
   .detached-modal {
     position: relative;
     width: auto;
-    box-shadow: 0 0 0.8rem #0000005c !important;
     margin-left: 0.5rem;
+    top: 1px!important;
+    overflow-y: hidden !important;
+    filter: drop-shadow(0 0 .8rem #0000005c);
+    box-shadow: none !important;
 
     &.maximized {
       .modal-dialog {
         .modal-content {
         }
       }
-    }
-
-    &:first-child {
-      margin-left: 0;
     }
 
     .modal-header {
@@ -279,6 +278,7 @@ body.modal-open.detached-modal-open {
 
     .record-modal.minimized {
       width: 300px;
+      height: 38px;
 
       .modal-header {
         margin-bottom: 0;

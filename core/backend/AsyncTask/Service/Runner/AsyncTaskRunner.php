@@ -436,12 +436,16 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
     protected function calculateProgress(string $taskId, array $progress): array
     {
         $counts = $this->itemRepository->countByStatus($taskId);
-        $total = array_sum($counts);
-        $completed = $counts[self::STATUS_COMPLETED] ?? 0;
+        $dbTotal = array_sum($counts);
+        $dbCompleted = $counts[self::STATUS_COMPLETED] ?? 0;
         $failed = $counts[self::STATUS_FAILED] ?? 0;
         $skipped = $counts[self::STATUS_SKIPPED] ?? 0;
         $queued = $counts[self::STATUS_QUEUED] ?? 0;
         $processingCount = $counts[self::STATUS_PROCESSING] ?? 0;
+
+        $previouslyCompleted = $progress['previously_completed'] ?? 0;
+        $total = $dbTotal + $previouslyCompleted;
+        $completed = $dbCompleted + $previouslyCompleted;
         $done = $completed + $failed + $skipped;
 
         $progress['phase'] = self::PHASE_PROCESSING;
@@ -461,6 +465,7 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
             'skipped' => $skipped,
             'queued' => $queued,
             'processing' => $processingCount,
+            'previouslyCompleted' => $previouslyCompleted,
             'percent' => $progress['percent'],
         ]);
 

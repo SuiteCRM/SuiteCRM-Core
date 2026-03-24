@@ -112,9 +112,12 @@ class RetryFailedAsyncTaskAction implements ProcessHandlerInterface
             return;
         }
 
+        $previousProgress = $attrs['progress'] ?? [];
+        $previouslyCompleted = ($previousProgress['previously_completed'] ?? 0) + ($previousProgress['completed'] ?? 0);
+
         $this->itemRepository->resetFailedItems($id);
 
-        $progress = $this->recalculateProgress($id);
+        $progress = $this->recalculateProgress($id, $previouslyCompleted);
 
         $attrs['status'] = 'running';
         $attrs['phase'] = 'processing';
@@ -142,15 +145,19 @@ class RetryFailedAsyncTaskAction implements ProcessHandlerInterface
         );
     }
 
-    protected function recalculateProgress(string $id): array
+    protected function recalculateProgress(string $id, int $previouslyCompleted = 0): array
     {
         $counts = $this->itemRepository->countByStatus($id);
-        $total = array_sum($counts);
-        $completed = $counts['completed'] ?? 0;
+        $dbTotal = array_sum($counts);
+        $dbCompleted = $counts['completed'] ?? 0;
         $failed = $counts['failed'] ?? 0;
         $queued = $counts['queued'] ?? 0;
         $skipped = $counts['skipped'] ?? 0;
-        $percent = $total > 0 ? (int)round($completed / $total * 100) : 0;
+
+        $total = $dbTotal + $previouslyCompleted;
+        $completed = $dbCompleted + $previouslyCompleted;
+        $done = $completed + $failed + $skipped;
+        $percent = $total > 0 ? (int)round($done / $total * 100) : 0;
 
         return [
             'phase' => 'processing',
@@ -160,6 +167,7 @@ class RetryFailedAsyncTaskAction implements ProcessHandlerInterface
             'queued' => $queued,
             'skipped' => $skipped,
             'percent' => $percent,
+            'previously_completed' => $previouslyCompleted,
         ];
     }
 }

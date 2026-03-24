@@ -84,7 +84,31 @@ class AOS_ContractsViewDetail extends ViewDetail
                                     key: "contract-build-pdf-email",
                                     asyncProcess: true,
                                     params: {
-                                        recordId: id,
+                                        id: id,
+                                        module: module,
+                                        selectModal: {
+                                            module: "AOS_PDF_Templates",
+                                        }
+                                    }
+                                }
+                            }
+                        };
+
+                        window.parent.postMessage(JSON.stringify(options));
+
+                        window.event.preventDefault();
+                        window.event.stopImmediatePropagation();
+                    }
+
+                    function printAsPdf(id, module) {
+                        const options = {
+                            type: "run-global-async-action",
+                            params: {
+                                action: {
+                                    key: "record-print-as-pdf",
+                                    asyncProcess: true,
+                                    params: {
+                                        id: id,
                                         module: module,
                                         selectModal: {
                                             module: "AOS_PDF_Templates",
@@ -106,6 +130,11 @@ class AOS_ContractsViewDetail extends ViewDetail
 						const id = \'' . $this->bean->id . '\';
 						if (task === \'emailpdf\') {
                             openEmailComposeModal(id, module);
+                            return;
+                        }
+
+                        if (task === \'pdf\') {
+                            printAsPdf(id, module);
                             return;
                         }
 

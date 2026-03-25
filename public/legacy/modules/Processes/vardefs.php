@@ -50,6 +50,28 @@ $dictionary['Process'] = [
             'importable' => false,
             'exportable' => false,
             'unified_search' => false,
+            'footnotes' => [
+                [
+                    'labelKey' => 'LBL_TYPE_BACKGROUND_HELP',
+                    'displayModes' => ['detail'],
+                    'activeOn' => [
+                        [
+                            'operator' => 'is-equal',
+                            'values' => ['background'],
+                        ],
+                    ],
+                ],
+                [
+                    'labelKey' => 'LBL_TYPE_IMMEDIATE_HELP',
+                    'displayModes' => ['detail'],
+                    'activeOn' => [
+                        [
+                            'operator' => 'is-equal',
+                            'values' => ['immediate'],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         'status' => [

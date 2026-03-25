@@ -50,4 +50,8 @@ $mod_strings = [
     'LBL_RERUN_SUCCESS' => 'Process has been re-queued and will restart from the beginning.',
     'LBL_DISMISS_CONFIRMATION' => 'Are you sure you want to dismiss this process? This will remove it and all associated data.',
     'LBL_DISMISS_SUCCESS' => 'Process dismissed successfully.',
+
+    // Type footnotes
+    'LBL_TYPE_BACKGROUND_HELP' => 'This process runs in the background via the message queue worker. It processes items in batches and does not block the UI.',
+    'LBL_TYPE_IMMEDIATE_HELP' => 'This process runs immediately when triggered. It processes all items in a single request and may take longer for large datasets.',
 ];

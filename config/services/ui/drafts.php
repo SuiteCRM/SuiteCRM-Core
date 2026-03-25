@@ -57,7 +57,11 @@ return static function (ContainerConfigurator $containerConfig) {
                                     'expanded' => true,
                                     'disableOnRun' => true,
                                     'inlineConfirmation' => true,
-                                    'confirmationLabel' => 'LBL_DISMISS_INLINE_CONFIRM'
+                                    'confirmationLabel' => 'LBL_DISMISS_ALL_DRAFTS_CONFIRM',
+                                    'inlineConfirmationButtons' => [
+                                        'cancel' => ['labelKey' => 'LBL_CANCEL'],
+                                        'confirm' => ['labelKey' => 'LBL_CONFIRM'],
+                                    ],
                                 ],
                                 'modes' => ['detail', 'edit', 'create', 'list'],
                                 'acl' => ['delete']

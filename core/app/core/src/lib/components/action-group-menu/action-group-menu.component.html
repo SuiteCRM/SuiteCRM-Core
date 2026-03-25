@@ -32,10 +32,10 @@
         </ng-container>
         <ng-container *ngIf="inlineConfirmationEnabled() && !loading()">
             <div class="d-flex align-items-start justify-content-end inline-confirmation">
-                <div *ngIf="confirmationLabel" class="pl-1 inline-confirmation-label">
+                <div *ngIf="confirmationLabel && showInlineConfirmationLabel" class="pl-1 inline-confirmation-label">
                     <scrm-label [labelKey]="confirmationLabel"></scrm-label>
                 </div>
-                <div *ngIf="confirmationDynamicLabel && !confirmationLabel" class="pl-1 inline-confirmation-label">
+                <div *ngIf="confirmationDynamicLabel && !confirmationLabel && showInlineConfirmationLabel" class="pl-1 inline-confirmation-label">
                     <scrm-dynamic-label [labelKey]="confirmationDynamicLabel"
                                         [module]="actionContext?.module ?? ''"
                                         [fields]="actionContext?.record?.fields ?? {}"

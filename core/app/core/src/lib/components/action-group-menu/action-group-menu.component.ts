@@ -28,10 +28,13 @@ import {
     AfterViewInit,
     Component, computed,
     ElementRef,
+    EventEmitter,
     HostListener,
     Input,
     OnDestroy,
-    OnInit, Signal,
+    OnInit,
+    Output,
+    Signal,
     signal,
     ViewChild,
     WritableSignal
@@ -75,7 +78,8 @@ export class ActionGroupMenuComponent implements OnInit, AfterViewInit, OnDestro
     @Input() dynamicBreakpointButtonMax = 100;
     @Input() pushActiveToExpanded = false;
     @Input() isRunning: Signal<boolean> = signal(false);
-    @Output() confirmationActiveChange = new EventEmitter<{active: boolean, labelKey: string}>();
+    @Input() showInlineConfirmationLabel = true;
+    @Output() onInlineConfirmationToggle = new EventEmitter<{active: boolean, labelKey: string}>();
 
     @ViewChild('container') containerElement: ElementRef;
     protected screenSize$: Observable<ScreenSize>;
@@ -354,7 +358,7 @@ export class ActionGroupMenuComponent implements OnInit, AfterViewInit, OnDestro
         this.inlineCancelButton = this.buildInlineCancelButton(cancelConfig)
         this.inlineConfirmButton = this.buildInlineConfirmButton(confirmConfig, callback)
         this.inlineConfirmationEnabled.set(true);
-        this.confirmationActiveChange.emit({active: true, labelKey: this.confirmationLabel});
+        this.onInlineConfirmationToggle.emit({active: true, labelKey: this.confirmationLabel});
     }
 
     protected buildInlineCancelButton(config: ButtonInterface): ButtonInterface {
@@ -392,7 +396,7 @@ export class ActionGroupMenuComponent implements OnInit, AfterViewInit, OnDestro
 
     protected resetInlineConfirmation(): void {
         this.inlineConfirmationEnabled.set(false);
-        this.confirmationActiveChange.emit({active: false, labelKey: ''});
+        this.onInlineConfirmationToggle.emit({active: false, labelKey: ''});
         this.confirmationDynamicLabel = '';
         this.confirmationLabel = '';
         this.inlineConfirmButton = null;

@@ -68,6 +68,8 @@ return static function (ContainerConfigurator $containerConfig) {
                             ],
                         ]
                     ],
+                    'showFullHeaderConfirmation' => true,
+                    'headerConfirmationClass' => 'drafts-confirming',
                     'wrapperClass' => 'drafts-modal-wrapper',
                 ],
             ],

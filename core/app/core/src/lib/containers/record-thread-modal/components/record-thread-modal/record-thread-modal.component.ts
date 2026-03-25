@@ -77,6 +77,8 @@ export class RecordThreadModalComponent implements OnInit {
     @Input() closeConfirmationLabel: string = '';
     @Input() closeConfirmationMessages: string[] = [];
     @Input() closeConfirmationModal: boolean = false;
+    @Input() replaceTitleWithConfirmation: boolean = false;
+    @Input() headerConfirmingClass: string = '';
     @Input() dynamicTitleContext: WritableSignal<StringMap> = signal({});
     @Input() dynamicTitleFields: WritableSignal<FieldMap> = signal({});
 

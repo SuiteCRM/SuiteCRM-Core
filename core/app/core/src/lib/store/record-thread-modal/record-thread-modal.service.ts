@@ -123,6 +123,8 @@ export class RecordThreadModalService {
         modal.componentInstance.closeConfirmationMessages = modalConfig.closeConfirmationMessage ?? [];
         modal.componentInstance.closeConfirmationLabel = modalConfig.closeConfirmationLabel ?? '';
         modal.componentInstance.closeConfirmationModal = modalConfig.closeConfirmationModal ?? false;
+        modal.componentInstance.showFullHeaderConfirmation = modalConfig.showFullHeaderConfirmation ?? false;
+        modal.componentInstance.headerConfirmationClass = modalConfig.headerConfirmationClass ?? '';
 
         if (recordModalOptions.modalStore) {
             modal.componentInstance.modalStore = recordModalOptions.modalStore;

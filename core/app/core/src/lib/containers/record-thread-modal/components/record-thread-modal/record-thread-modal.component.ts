@@ -77,9 +77,12 @@ export class RecordThreadModalComponent implements OnInit {
     @Input() closeConfirmationLabel: string = '';
     @Input() closeConfirmationMessages: string[] = [];
     @Input() closeConfirmationModal: boolean = false;
-    @Input() replaceTitleWithConfirmation: boolean = false;
-    @Input() headerConfirmingClass: string = '';
+    @Input() showFullHeaderConfirmation: boolean = false;
+    @Input() headerConfirmationClass: string = '';
     @Input() dynamicTitleContext: WritableSignal<StringMap> = signal({});
+
+    isConfirming = signal(false);
+    confirmingLabelKey = signal('');
     @Input() dynamicTitleFields: WritableSignal<FieldMap> = signal({});
 
     recordThreadConfig: RecordThreadConfig;
@@ -96,6 +99,11 @@ export class RecordThreadModalComponent implements OnInit {
     ) {
     }
 
+
+    onInlineConfirmationToggle(event: {active: boolean, labelKey: string}): void {
+        this.isConfirming.set(event.active);
+        this.confirmingLabelKey.set(event.labelKey);
+    }
 
     ngOnInit(): void {
         this.recordThreadConfig = this.buildConfig();

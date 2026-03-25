@@ -32,21 +32,21 @@
             [openMinimised]="openMinimised"
             [titleIcon]="titleIcon"
             [titleClass]="titleClass"
-            [titleKey]="titleKey"
+            [titleKey]="(showFullHeaderConfirmation && isConfirming()) ? confirmingLabelKey() : titleKey"
             [descriptionKey]="descriptionKey"
             [minimizable]="minimizable"
             bodyKlass="m-0 p-0 small-font scrollbar-thin {{bodyClass}}"
             footerKlass="border-0 {{footerClass}}"
-            headerKlass="border-bottom {{headerClass}} "
+            [headerKlass]="'border-bottom ' + headerClass + (showFullHeaderConfirmation && isConfirming() ? ' ' + headerConfirmationClass : '')"
             klass="rounded {{wrapperClass}}"
 >
     <ng-container modal-header-actions>
-        <ng-container *ngIf="modalHeaderActionsAdapter">
-            <scrm-action-group-menu class="{{modalHeaderActionKlass}}"
-                                    [config]="modalHeaderActionsAdapter"
-            >
-            </scrm-action-group-menu>
-        </ng-container>
+        <scrm-action-group-menu class="{{modalHeaderActionKlass}}"
+                                [config]="modalHeaderActionsAdapter"
+                                [showInlineConfirmationLabel]="!showFullHeaderConfirmation"
+                                (onInlineConfirmationToggle)="onInlineConfirmationToggle($event)"
+        >
+        </scrm-action-group-menu>
     </ng-container>
     <div modal-body>
         <scrm-record-thread [config]="recordThreadConfig">

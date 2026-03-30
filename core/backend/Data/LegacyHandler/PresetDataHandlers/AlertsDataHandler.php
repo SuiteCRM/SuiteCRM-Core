@@ -113,13 +113,6 @@ class AlertsDataHandler extends ListDataHandler implements PresetListDataHandler
 
         $criteria = $this->getAlertCriteria($criteria);
 
-        $criteria['filters']['is_read'] = [
-            'field' => 'is_read',
-            'fieldType' => 'bool',
-            'operator' => '=',
-            'values' => ["0", ""]
-        ];
-
         $bean = $this->getBean($module);
 
         $legacyCriteria = $this->mapCriteria($criteria, [], $type);
@@ -129,7 +122,7 @@ class AlertsDataHandler extends ListDataHandler implements PresetListDataHandler
         global $timedate;
         $now = $timedate->nowDb();
 
-        $where .= " AND (alerts.snooze <= '$now' OR alerts.snooze IS NULL )";
+        $where .= " AND (alerts.snooze <= '$now' OR alerts.snooze IS NULL ) AND (alerts.is_read = 0 OR alerts.is_read IS NULL)";
 
         $queryParts = $this->getListDataPort()->getQueryParts($bean, $where, $filter_fields, $params);
         $queryParts['select'] = 'SELECT count(*) as unread';

@@ -54,6 +54,7 @@ class AsyncTaskNotificationDispatcher implements AsyncTaskNotificationDispatcher
         $taskName = $attrs['name'] ?? '';
         $subject  = $taskName;
         $type = $status === 'completed' ? 'info' : 'warning';
+        $lastRunDatetime = $attrs['last_run_datetime'] ?? '';
 
         $this->notificationDispatcher->dispatch(
             subject: $subject,
@@ -61,7 +62,10 @@ class AsyncTaskNotificationDispatcher implements AsyncTaskNotificationDispatcher
             targetModule: $module,
             targetRecordId: $task->getId(),
             type: $type,
-            data: ['status' => $status]
+            data: [
+                'status' => $status,
+                'snooze' => $lastRunDatetime,
+            ]
         );
     }
 }

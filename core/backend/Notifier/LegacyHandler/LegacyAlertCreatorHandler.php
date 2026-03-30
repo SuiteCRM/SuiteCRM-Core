@@ -67,7 +67,7 @@ class LegacyAlertCreatorHandler
             $alert->assigned_user_id = $notification->getAssignedUserId();
             $alert->type = $notification->getType();
             $alert->reminder_id = '';
-            $alert->snooze = $this->dateTimeHandler->nowDb();
+            $alert->snooze = $notification->getData()['snooze'] ?? $this->dateTimeHandler->nowDb();
             $alert->status = $notification->getData()['status'] ?? '';
             $alert->save();
         } catch (Throwable $e) {

@@ -64,11 +64,18 @@ class MigrateNotesFilesTaskHandler extends AbstractAsyncTaskHandler
 
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
-            $qb->select('id', 'filename', 'file_mime_type')
+            $qb->select('notes.id', 'notes.filename', 'notes.file_mime_type')
                 ->from('notes')
-                ->where('filename IS NOT NULL')
-                ->andWhere("filename != ''")
-                ->andWhere('deleted = 0')
+                ->leftJoin(
+                    'notes',
+                    'private_documents_media_objects',
+                    'pdmo',
+                    "pdmo.parent_id = notes.id AND pdmo.parent_type = 'Notes' AND pdmo.parent_field = 'file' AND pdmo.temporary = 0 AND pdmo.deleted = 0"
+                )
+                ->where('notes.filename IS NOT NULL')
+                ->andWhere("notes.filename != ''")
+                ->andWhere('notes.deleted = 0')
+                ->andWhere('pdmo.id IS NULL')
                 ->setFirstResult($offset)
                 ->setMaxResults($batchSize);
 

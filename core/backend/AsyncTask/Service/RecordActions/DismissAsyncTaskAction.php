@@ -42,7 +42,7 @@ class DismissAsyncTaskAction implements ProcessHandlerInterface
 
     protected const MSG_OPTIONS_NOT_FOUND = 'Process options are not defined';
 
-    protected const DISMISSABLE_STATUSES = ['completed', 'failed'];
+    protected const DISMISSABLE_STATUSES = ['completed', 'completed_with_failures', 'failed'];
 
     public function __construct(
         protected ModuleNameMapperInterface $moduleNameMapper,

@@ -122,13 +122,13 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
         ]);
 
         if ($result['status'] === 'completed') {
-            $this->cleanupItems($message->getTaskId());
+            $this->cleanupItems($message->getTaskId(), $handler);
             $this->dispatchTaskCompleted($message, $result['progress']);
             return;
         }
 
         if ($result['status'] === 'failed') {
-            $this->cleanupItems($message->getTaskId());
+            $this->cleanupItems($message->getTaskId(), $handler);
             $this->dispatchTaskFailure($message, $result['progress']);
             return;
         }
@@ -537,9 +537,15 @@ abstract class AsyncTaskRunner implements AsyncTaskRunnerInterface
     /**
      * Clean up items after task completion.
      * Uses selective purge: failed items are preserved for user review.
+     * Skips purge entirely if the handler opts to keep completed items.
      */
-    protected function cleanupItems(string $taskId): void
+    protected function cleanupItems(string $taskId, AsyncTaskHandlerInterface $handler): void
     {
+        if ($handler->keepCompletedItems()) {
+            $this->log('info', 'Skipping item cleanup for task ' . $taskId . ' (handler keeps completed items)');
+            return;
+        }
+
         try {
             $this->itemRepository->purgeCompletedItems($taskId);
             $this->log('info', 'Cleaned up non-failed items for task ' . $taskId);

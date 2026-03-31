@@ -101,4 +101,13 @@ interface AsyncTaskHandlerInterface
      * @return bool
      */
     public function allowsFailureRerun(): bool;
+
+    /**
+     * Whether completed items should be preserved after the task finishes.
+     * When false (default), completed and skipped items are purged on completion.
+     * When true, all items are kept for review or further processing.
+     *
+     * @return bool
+     */
+    public function keepCompletedItems(): bool;
 }

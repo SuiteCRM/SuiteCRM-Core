@@ -71,4 +71,12 @@ abstract class AbstractAsyncTaskHandler implements AsyncTaskHandlerInterface
     {
         return false;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function keepCompletedItems(): bool
+    {
+        return false;
+    }
 }

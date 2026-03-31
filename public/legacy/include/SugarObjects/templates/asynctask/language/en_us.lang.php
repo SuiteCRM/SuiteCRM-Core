@@ -104,4 +104,5 @@ $mod_strings = [
 
     // Subpanel
     'LBL_FAILED_ITEMS' => 'Failed Items',
+    'LBL_COMPLETED_ITEMS' => 'Completed Items',
 ];

@@ -16,7 +16,7 @@
  * details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see http://www.gnu.org/licenses.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License
  * version 3, these Appropriate Legal Notices must retain the display of the
@@ -29,23 +29,23 @@ if (!defined('sugarEntry') || !sugarEntry) {
     die('Not A Valid Entry Point');
 }
 
-$layout_defs['<module_name>'] = [
-    'subpanel_setup' => [
-        'failed_async_task_items' => [
-            'order' => 100,
-            'module' => 'AsyncTaskItems',
-            'subpanel_name' => 'ForAsyncTasks',
-            'get_subpanel_data' => 'function:getFailedAsyncTaskItems',
-            'generate_select' => true,
-            'title_key' => 'LBL_FAILED_ITEMS',
+$subpanel_layout = [
+    'top_buttons' => [],
+
+    'where' => '',
+
+    'list_fields' => [
+        'item_key' => [
+            'vname' => 'LBL_ITEM_KEY',
+            'width' => '30%',
         ],
-        'completed_async_task_items' => [
-            'order' => 110,
-            'module' => 'AsyncTaskItems',
-            'subpanel_name' => 'ForAsyncTasksCompleted',
-            'get_subpanel_data' => 'function:getCompletedAsyncTaskItems',
-            'generate_select' => true,
-            'title_key' => 'LBL_COMPLETED_ITEMS',
+        'result_data' => [
+            'vname' => 'LBL_RESULT_DATA',
+            'width' => '45%',
+        ],
+        'date_modified' => [
+            'vname' => 'LBL_DATE_MODIFIED',
+            'width' => '25%',
         ],
     ],
 ];

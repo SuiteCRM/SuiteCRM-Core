@@ -154,6 +154,22 @@ abstract class AsyncTask extends Basic
     }
 
     /**
+     * Build the WHERE clause used by the completed async task items subpanel.
+     */
+    public function getCompletedAsyncTaskItems(): array
+    {
+        $idQuoted = $this->db->quoted($this->id);
+
+        return [
+            'select' => '',
+            'from' => '',
+            'where' => "async_task_items.async_task_id = $idQuoted AND async_task_items.status = 'completed' ",
+            'join' => '',
+            'join_tables' => [],
+        ];
+    }
+
+    /**
      * Return true when $view is an action that must never be allowed on async task records.
      */
     protected function isNotAllowedAction(string $view): bool

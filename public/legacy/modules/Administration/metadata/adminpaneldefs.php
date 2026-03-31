@@ -308,13 +308,14 @@ $admin_option_defs['Administration']['migrations'] = [
     'index.php?module=ManualMigrationTasks&action=index',
     'admin-migrations'
 ];
-$admin_option_defs['Administration']['processes'] = [
-    'Processes',
-    'LBL_MANAGE_PROCESSES',
-    'LBL_MANAGE_PROCESSES_DESC',
-    'index.php?module=Processes&action=index',
-    'admin-processes'
-];
+// Processes admin entry hidden until properly tested
+// $admin_option_defs['Administration']['processes'] = [
+//     'Processes',
+//     'LBL_MANAGE_PROCESSES',
+//     'LBL_MANAGE_PROCESSES_DESC',
+//     'index.php?module=Processes&action=index',
+//     'admin-processes'
+// ];
 if (!isset($GLOBALS['sugar_config']['hide_admin_backup']) || !$GLOBALS['sugar_config']['hide_admin_backup']) {
     $admin_option_defs['Administration']['backup_management'] = [
         'Backups',

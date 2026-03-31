@@ -64,12 +64,13 @@ $global_control_links['employees'] = array(
 'submenu' => ''
 );
 
-$global_control_links['processes'] = array(
-    'linkinfo' => array(
-        $app_strings['LNK_USER_MENU_PROCESSES'] => './#/processes'
-    ),
-    'submenu' => ''
-);
+// Processes link hidden until properly tested
+// $global_control_links['processes'] = array(
+//     'linkinfo' => array(
+//         $app_strings['LNK_USER_MENU_PROCESSES'] => './#/processes'
+//     ),
+//     'submenu' => ''
+// );
 
 
 if (

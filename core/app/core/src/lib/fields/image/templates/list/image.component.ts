@@ -1,6 +1,6 @@
 /**
  * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
- * Copyright (C) 2025 SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -36,11 +36,11 @@ import {SystemConfigStore} from "../../../../store/system-config/system-config.s
 import {BaseImageComponent} from "../../../base/base-image.component";
 
 @Component({
-    selector: 'scrm-image-detail',
+    selector: 'scrm-image-list',
     templateUrl: './image.component.html',
     styles: [],
 })
-export class ImageDetailFieldComponent extends BaseImageComponent {
+export class ImageListFieldComponent extends BaseImageComponent {
 
     constructor(
         protected typeFormatter: DataTypeFormatter,
@@ -53,12 +53,20 @@ export class ImageDetailFieldComponent extends BaseImageComponent {
         super(typeFormatter, logic, logicDisplay, mediaObjects, legacyEntrypointLinkBuilder, systemConfigs);
     }
 
+    protected formatSize(value: string): string {
+        if (value === '100%' || value.endsWith('px')) {
+            return value;
+        }
+        return value + 'px';
+    }
+
     ngOnInit(): void {
         this.showThumbnail = this.field.metadata?.showThumbnail ?? true;
         this.thumbnailCreated = this.field.metadata?.createThumbnail ?? true;
-        this.maxHeight = this.getMaxHeight();
-        this.maxWidth = this.getMaxWidth();
+        this.maxHeight = this.formatSize(this.field?.metadata?.maxHeight || '60px');
+        this.maxWidth = this.formatSize(this.field?.metadata?.maxWidth || '100%');
         this.preview = this.isAllowedPreview();
+
         const hasFile = this.field?.valueObject &&
             (this.field.valueObject.id || this.field.valueObject.value);
 

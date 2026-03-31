@@ -136,6 +136,8 @@ import {ImageDetailFieldComponent} from "./image/templates/detail/image.componen
 import {ImageDetailFieldModule} from "./image/templates/detail/image.module";
 import {TextTemplateDetailFieldModule} from "./texttemplate/templates/detail/texttemplate.module";
 import {TextTemplateDetailFieldComponent} from "./texttemplate/templates/detail/texttemplate.component";
+import {ImageListFieldComponent} from "./image/templates/list/image.component";
+import {ImageListFieldModule} from "./image/templates/list/image.module";
 
 export const baseFieldModules = [
     VarcharDetailFieldModule,
@@ -175,6 +177,7 @@ export const baseFieldModules = [
     RadioEnumEditFieldModule,
     ImageEditFieldModule,
     ImageDetailFieldModule,
+    ImageListFieldModule,
     MultiEnumDetailFieldModule,
     MultiEnumEditFieldModule,
     MultiEnumFilterFieldModule,
@@ -236,6 +239,7 @@ export const baseFieldComponents = [
     RadioEnumEditFieldComponent,
     ImageEditFieldComponent,
     ImageDetailFieldComponent,
+    ImageListFieldComponent,
     MultiEnumDetailFieldComponent,
     MultiEnumEditFieldComponent,
     MultiEnumFilterFieldComponent,
@@ -323,7 +327,7 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'enum.filter': MultiEnumFilterFieldComponent,
     'image.edit': ImageEditFieldComponent,
     'image.detail': ImageDetailFieldComponent,
-    'image.list': ImageDetailFieldComponent,
+    'image.list': ImageListFieldComponent,
     'multienum.list': MultiEnumDetailFieldComponent,
     'multienum.detail': MultiEnumDetailFieldComponent,
     'multienum.edit': MultiEnumEditFieldComponent,

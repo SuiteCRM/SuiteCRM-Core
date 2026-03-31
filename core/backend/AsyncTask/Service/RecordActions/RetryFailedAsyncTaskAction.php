@@ -113,7 +113,7 @@ class RetryFailedAsyncTaskAction implements ProcessHandlerInterface
         }
 
         $previousProgress = $attrs['progress'] ?? [];
-        $previouslyCompleted = ($previousProgress['previously_completed'] ?? 0) + ($previousProgress['completed'] ?? 0);
+        $previouslyCompleted = $previousProgress['completed'] ?? 0;
 
         $this->itemRepository->resetFailedItems($id);
 

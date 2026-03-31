@@ -81,7 +81,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
     activeButtonLayout: WritableSignal<Array<DropdownButtonInterface[]>> = signal([]);
     baseButtonLayout: WritableSignal<Array<ButtonInterface[]>> = signal([]);
     collapsedButtons: WritableSignal<AnyButtonInterface[]> = signal([]);
-    collapsedDropdownButton: WritableSignal<ButtonInterface> = signal(null);
+    collapsedDropdownButton: WritableSignal<DropdownButtonInterface> = signal(null);
     minHeight: WritableSignal<string> = signal('40vh');
     height: WritableSignal<string> = signal('18vh');
     maxHeight: WritableSignal<string> = signal('45vh');

@@ -47,7 +47,7 @@
                                                [popoverClass]="''"
                                                [titleKey]="item.value.titleKey"
                                                [disabled]="item.value.disabled"
-                                               placement="bottom"
+                                               [placement]="item?.value?.placement || 'bottom'"
                                                [class.hide-popover]="!item.value.showPopup()"
                                                class="squire-editor-toolbar-item"
                             >
@@ -71,7 +71,7 @@
                                                [popoverClass]="''"
                                                [titleKey]="item.value.titleKey"
                                                [class.hide-popover]="!item.value.showPopup()"
-                                               placement="bottom"
+                                               [placement]="item?.value?.placement || 'bottom'"
                                                class="squire-editor-toolbar-item"
                             >
                                 <div popup-content class="grid-popup-body container-popover scrollbar-thin">
@@ -121,7 +121,7 @@
                     <scrm-popup-button [icon]="collapsedDropdownButton()?.icon"
                                        [klass]="collapsedDropdownButton()?.klass"
                                        [popoverClass]="''"
-                                       placement="bottom"
+                                       [placement]="collapsedDropdownButton()?.placement || 'bottom'"
                                        class="squire-editor-toolbar-item"
                     >
                         <div popup-content class="container container-popover scrollbar-thin">
@@ -144,7 +144,7 @@
                                                            [popoverClass]="''"
                                                            [titleKey]="item.titleKey"
                                                            [disabled]="item.disabled"
-                                                           placement="right"
+                                                           [placement]="item?.placement || 'left'"
                                                            class="squire-editor-toolbar-item w-100"
                                         >
                                             <div popup-content class="container container-popover scrollbar-thin">
@@ -168,7 +168,7 @@
                                                            [popoverClass]="''"
                                                            [titleKey]="item.titleKey"
                                                            [disabled]="item.disabled"
-                                                           placement="right"
+                                                           [placement]="item?.placement || 'left'"
                                                            class="squire-editor-toolbar-item w-100"
                                         >
                                             <div popup-content class="grid-popup-body container-popover scrollbar-thin">

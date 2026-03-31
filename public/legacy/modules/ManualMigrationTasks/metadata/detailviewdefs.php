@@ -142,9 +142,9 @@ $viewdefs[$module_name]['DetailView'] = [
                     ],
                 ],
             ],
-            'dismiss-async-task' => [
+            'dismiss-completed' => [
                 'key' => 'dismiss-async-task',
-                'labelKey' => 'LBL_DISMISS',
+                'labelKey' => 'LBL_DELETE',
                 'asyncProcess' => true,
                 'priority' => 200,
                 'modes' => ['detail'],
@@ -153,22 +153,73 @@ $viewdefs[$module_name]['DetailView'] = [
                     'expanded' => true,
                     'disableOnRun' => true,
                     'displayConfirmation' => true,
-                    'confirmationMessages' => ['LBL_DISMISS_CONFIRMATION'],
+                    'confirmationMessages' => ['LBL_DELETE_COMPLETED_CONFIRMATION'],
                 ],
                 'displayLogic' => [
-                    'show-on-finished' => [
+                    'show-on-completed' => [
                         'modes' => ['detail'],
                         'params' => [
                             'fieldDependencies' => ['status'],
                             'activeOnFields' => [
                                 'status' => [
-                                    [
-                                        'operator' => 'is-equal',
-                                        'values' => ['completed', 'completed_with_failures', 'failed']
-                                    ]
+                                    ['operator' => 'is-equal', 'values' => ['completed']],
                                 ],
-                            ]
-                        ]
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'dismiss-completed-with-failures' => [
+                'key' => 'dismiss-async-task',
+                'labelKey' => 'LBL_DELETE',
+                'asyncProcess' => true,
+                'priority' => 200,
+                'modes' => ['detail'],
+                'display' => 'hide',
+                'params' => [
+                    'expanded' => true,
+                    'disableOnRun' => true,
+                    'displayConfirmation' => true,
+                    'confirmationMessages' => ['LBL_DELETE_COMPLETED_WITH_FAILURES_CONFIRMATION'],
+                ],
+                'displayLogic' => [
+                    'show-on-completed-with-failures' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'fieldDependencies' => ['status'],
+                            'activeOnFields' => [
+                                'status' => [
+                                    ['operator' => 'is-equal', 'values' => ['completed_with_failures']],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'dismiss-failed' => [
+                'key' => 'dismiss-async-task',
+                'labelKey' => 'LBL_DELETE',
+                'asyncProcess' => true,
+                'priority' => 200,
+                'modes' => ['detail'],
+                'display' => 'hide',
+                'params' => [
+                    'expanded' => true,
+                    'disableOnRun' => true,
+                    'displayConfirmation' => true,
+                    'confirmationMessages' => ['LBL_DELETE_FAILED_CONFIRMATION'],
+                ],
+                'displayLogic' => [
+                    'show-on-failed' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'fieldDependencies' => ['status'],
+                            'activeOnFields' => [
+                                'status' => [
+                                    ['operator' => 'is-equal', 'values' => ['failed']],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
             ],

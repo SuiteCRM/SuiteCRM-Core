@@ -84,6 +84,10 @@ $mod_strings = [
     'LBL_RETRY' => 'Retry',
     'LBL_RERUN' => 'Re-run',
     'LBL_DISMISS' => 'Dismiss',
+    'LBL_DELETE' => 'Delete',
+    'LBL_DELETE_COMPLETED_CONFIRMATION' => 'Are you sure you want to delete this completed task?',
+    'LBL_DELETE_COMPLETED_WITH_FAILURES_CONFIRMATION' => 'This task completed with failures. Deleting it will remove all task data including failed item details. Are you sure you want to proceed?',
+    'LBL_DELETE_FAILED_CONFIRMATION' => 'This task has failed. Deleting it will remove all task data including error details. Are you sure you want to proceed?',
 
     // Retry action messages (shared — generic phrasing)
     'LBL_RETRY_CONFIRMATION' => 'Are you sure you want to retry? This will re-queue all failed items for processing.',

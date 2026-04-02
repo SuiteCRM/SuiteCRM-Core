@@ -51,6 +51,7 @@ export class MultiEnumEditFieldComponent extends BaseMultiEnumComponent {
     maxSelectedLabels: number = 20;
     selectAll: boolean = false;
     clearButton: ButtonInterface;
+    optionValueFn = (item: any): any => item;
 
     constructor(
         protected languages: LanguageStore,

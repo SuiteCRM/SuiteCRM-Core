@@ -49,6 +49,7 @@ export class MultiEnumFilterFieldComponent extends BaseMultiEnumComponent implem
     emptyFilterLabel: string = '';
     maxSelectedLabels: number = 20;
     selectAll: boolean = false;
+    optionValueFn = (item: any): any => item;
 
     constructor(
         protected languages: LanguageStore,

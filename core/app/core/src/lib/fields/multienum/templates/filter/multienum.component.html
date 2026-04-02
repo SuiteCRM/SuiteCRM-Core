@@ -31,6 +31,8 @@
         [options]="options"
         [(ngModel)]="selectedValues"
         [optionLabel]="'label'"
+        [optionValue]="optionValueFn"
+        dataKey="value"
         (onChange)="onAdd()"
         (onSelectAllChange)="onSelectAll($event)"
         (onRemove)="onRemove()"

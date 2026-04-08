@@ -130,8 +130,8 @@ class DefaultEmailQueueManager implements EmailQueueManagerInterface
     ): array {
 
         $timedate = $this->dateTimeHandler->getDateTime();
+        $timedate->allow_cache = false; // Ensure we get the current time without caching
         $now = $timedate->nowDb();
-        $str = $timedate->fromString("-1 day")?->asDb();
 
         $queryBuilder = $this->preparedStatementHandler->createQueryBuilder();
         $queryBuilder->select('*')
@@ -155,7 +155,7 @@ class DefaultEmailQueueManager implements EmailQueueManagerInterface
                      ->setMaxResults($batchSize)
                      ->setParameter('mkt_id', $marketingId)
                      ->setParameter('now', $now)
-                     ->setParameter('queue_date', $str);
+                     ->setParameter('queue_date', $now);
 
         try {
             $results = $queryBuilder->fetchAllAssociative();

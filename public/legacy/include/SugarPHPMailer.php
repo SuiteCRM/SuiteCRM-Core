@@ -111,7 +111,33 @@ class SugarPHPMailer extends PHPMailer
         $this->SMTPAutoTLS = false;
     }
 
+    public function setMailerFromId($id)
+    {
+        global $current_user;
 
+        require_once 'include/OutboundEmail/OutboundEmail.php';
+        $oe = new OutboundEmail();
+        $oe = $oe->getUserMailerSettings($current_user, $id);
+
+        // ssl or tcp - keeping outside isSMTP b/c a default may inadvertently set ssl://
+        $this->protocol = $oe->mail_smtpssl ? 'ssl://' : 'tcp://';
+
+        if (isSmtp($oe->mail_sendtype ?? '')) {
+            //Set mail send type information
+            $this->Mailer = 'smtp';
+            $this->Host = $oe->mail_smtpserver;
+            $this->Port = $oe->mail_smtpport;
+            $this->setSecureProtocol($oe->mail_smtpssl);
+            $this->initSMTPAuth(
+                $oe->auth_type ?? '',
+                $oe->external_oauth_connection_id ?? '',
+                $oe->mail_smtpuser ?? '',
+                $oe->mail_smtppass ?? '',
+            );
+        }
+
+        $this->oe = $oe;
+    }
 
     /**
      * Prefills outbound details

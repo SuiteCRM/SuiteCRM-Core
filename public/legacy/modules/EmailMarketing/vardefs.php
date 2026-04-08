@@ -258,6 +258,13 @@ $dictionary['EmailMarketing'] = [
             'required' => false,
             'reportable' => false,
         ],
+        'pause_reason' => [
+            'name' => 'pause_reason',
+            'vname' => 'LBL_PAUSE_REASON',
+            'type' => 'text',
+            'required' => false,
+            'reportable' => false,
+        ],
         'trackers_enabled' => [
             'name' => 'trackers_enabled',
             'vname' => 'LBL_TRACKER_LINKS_ENABLED',

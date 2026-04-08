@@ -30,6 +30,8 @@ namespace App\Module\Campaigns\Service\Email\Queue;
 use App\Data\Entity\Record;
 use App\Data\Service\RecordProviderInterface;
 use App\Emails\LegacyHandler\EmailProcessProcessor;
+use App\Languages\Service\LanguageManagerInterface;
+use App\Module\Campaigns\Service\Email\LegacyHandler\OutboundEmailAccountChecker;
 use App\Module\Campaigns\Service\Email\Log\EmailCampaignLogManagerInterface;
 use App\Module\Campaigns\Service\Email\Parser\CampaignEmailParserManager;
 use App\Module\Campaigns\Service\Email\Targets\EmailTargetValidatorManager;
@@ -43,6 +45,8 @@ use Psr\Log\LoggerInterface;
 
 class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
 {
+    public int $failedRecords = 0;
+
     public function __construct(
         protected EmailQueueManagerInterface $queueManager,
         protected EmailProcessProcessor $emailProcessor,
@@ -51,12 +55,15 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
         protected EmailTargetValidatorManager $targetValidatorManager,
         protected SystemConfigHandler $systemConfigHandler,
         protected SettingsProviderInterface $settingsProvider,
+        protected LanguageManagerInterface $languageManager,
         protected LoggerInterface $logger,
         protected EmailMarketingManagerInterface $emailMarketingManager,
         protected EmailQueueManagerInterface $emailQueueManager,
         protected ModuleNameMapperInterface $moduleNameMapper,
         protected CampaignEmailParserManager $emailParserManager,
-    ) {
+        protected OutboundEmailAccountChecker $outboundEmailAccountChecker,
+    )
+    {
     }
 
     public function processQueue(array $options = []): void
@@ -67,6 +74,36 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
             $emailMarketingId = $emailMarketing['id'];
             $campaignId = $emailMarketing['campaign_id'];
             $failedRecords = 0;
+
+            if (!$this->isOutboundEmailConfigured($emailMarketing)) {
+                $this->logger->warning(
+                    'Campaigns:DefaultEmailQueueProcessor::processQueue - Outbound Email Account not configured - pausing | email marketing id - ' . $emailMarketingId,
+                    [
+                        'emailMarketingId' => $emailMarketingId,
+                        'campaignId' => $campaignId,
+                    ]
+                );
+                $emRecord = $this->getEmailMarketingRecord($emailMarketingId);
+                if ($emRecord !== null) {
+                    $this->emailMarketingManager->setPaused($emRecord, $this->languageManager->getAppLabel('LBL_DEFAULT_OUTBOUND_NOT_CONFIGURED'));
+                }
+                continue;
+            }
+
+            if (!$this->canOutboundConnect($emailMarketing)) {
+                $this->logger->warning(
+                    'Campaigns:DefaultEmailQueueProcessor::processQueue - Outbound Email Account not configured - pausing | email marketing id - ' . $emailMarketingId,
+                    [
+                        'emailMarketingId' => $emailMarketingId,
+                        'campaignId' => $campaignId,
+                    ]
+                );
+                $emRecord = $this->getEmailMarketingRecord($emailMarketingId);
+                if ($emRecord !== null) {
+                    $this->emailMarketingManager->setPaused($emRecord, $this->languageManager->getAppLabel('LBL_SMTP_UNABLE_TO_CONNECT'));
+                }
+                continue;
+            }
 
             $queueEntries = $this->getQueueEntries($emailMarketingId);
             $emRecord = $this->getEmailMarketingRecord($emailMarketingId);
@@ -98,6 +135,8 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
                 $this->setSending($emRecord);
             }
 
+            $paused = false;
+
             foreach ($queueEntries as $entry) {
                 $targetType = $entry['related_type'] ?? '';
                 $targetId = $entry['related_id'] ?? '';
@@ -123,10 +162,20 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
                 }
 
                 $trackerId = create_guid();
-
                 $emailRecord = $this->buildEmailRecord($emRecord, $targetRecord);
+                $targetEmail = $targetRecord->getAttributes()['email1'] ?? $targetRecord->getAttributes()['email'] ?? '';
+
+                $sent = false;
+                $lastSendError = '';
+                $maxRetries = $this->getMaxRetries();
 
                 $result = $this->sendEmail($emailRecord, $emRecord, $targetRecord, $campaignRecord, $trackerId);
+                if ($result !== null && $result['success']) {
+                    $sent = true;
+                }
+                if ($result !== null && !empty($result['message'])) {
+                    $lastSendError = $result['message'];
+                }
 
                 if (!$sent) {
                     $this->emailQueueManager->updateSendAttempts($entry['id']);
@@ -181,6 +230,10 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
                 );
             }
 
+            if ($paused) {
+                continue;
+            }
+
             $nextQueueEntries = $this->getQueueEntries($emailMarketingId);
             if (empty($nextQueueEntries) && !$isQueueingFinished) {
                 continue;
@@ -192,6 +245,50 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
         }
     }
 
+
+    protected function getThreshold(): int
+    {
+        $threshold = $this->settingsProvider->get('massemailer', 'campaign_emails_threshold');
+
+        if ($threshold === null || $threshold === '') {
+            $threshold = (int)($this->systemConfigHandler->getSystemConfig('campaign_emails_threshold_default')?->getValue() ?? 10);
+        }
+
+        return (int)$threshold;
+    }
+
+    protected function getMaxRetries(): int
+    {
+        $maxRetries = $this->settingsProvider->get('massemailer', 'campaign_emails_max_retries');
+
+        if ($maxRetries === null || $maxRetries === '') {
+            $maxRetries = (int)($this->systemConfigHandler->getSystemConfig('campaign_emails_max_retries_default')?->getValue() ?? 3);
+        }
+
+        return (int)$maxRetries;
+    }
+
+    protected function isOutboundEmailConfigured(array $emailMarketing): bool
+    {
+        $outboundEmailId = $emailMarketing['outbound_email_id'] ?? '';
+
+        if (empty($outboundEmailId)) {
+            return false;
+        }
+
+        return $this->outboundEmailAccountChecker->isConfigured($outboundEmailId);
+    }
+
+    protected function canOutboundConnect(array $emailMarketing): bool
+    {
+        $outboundEmailId = $emailMarketing['outbound_email_id'] ?? '';
+
+        if (empty($outboundEmailId)) {
+            return false;
+        }
+
+        return $this->outboundEmailAccountChecker->isConnected($outboundEmailId);
+    }
 
     protected function getBatchSize(): int
     {

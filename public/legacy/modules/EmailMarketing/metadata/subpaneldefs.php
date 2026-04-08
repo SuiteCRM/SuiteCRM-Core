@@ -80,7 +80,7 @@ $layout_defs['EmailMarketing'] = [
             'function_parameters' => [
                 0 => ['send error', 'invalid email'],
             ],
-            'subpanel_name' => 'default',
+            'subpanel_name' => 'ForSendError',
             'title_key' => 'LBL_LOG_ENTRIES_BOUNCED_TITLE',
             'sort_order' => 'desc',
             'sort_by' => 'campaign_log.id'

@@ -123,6 +123,18 @@ class ViewCampaignconfig extends SugarView
             $this->ss->assign("CAMPAIGN_MARKETING_RECORDS_PER_RUN", $sugar_config['campaign_marketing_items_per_run_default'] ?? 3);
         }
 
+        if (isset($focus->settings['massemailer_campaign_emails_max_retries']) && is_numeric($focus->settings['massemailer_campaign_emails_max_retries'])) {
+            $this->ss->assign("CAMPAIGN_MAX_RETRIES", $focus->settings['massemailer_campaign_emails_max_retries']);
+        } else {
+            $this->ss->assign("CAMPAIGN_MAX_RETRIES", $sugar_config['campaign_emails_max_retries_default'] ?? 3);
+        }
+
+        if (isset($focus->settings['massemailer_campaign_emails_threshold']) && is_numeric($focus->settings['massemailer_campaign_emails_threshold'])) {
+            $this->ss->assign("CAMPAIGN_THRESHOLD", $focus->settings['massemailer_campaign_emails_threshold']);
+        } else {
+            $this->ss->assign("CAMPAIGN_THRESHOLD", $sugar_config['campaign_emails_threshold_default'] ?? 10);
+        }
+
         if (!isset($focus->settings['massemailer_tracking_entities_location_type']) || empty($focus->settings['massemailer_tracking_entities_location_type']) || $focus->settings['massemailer_tracking_entities_location_type']=='1') {
             $this->ss->assign("default_checked", "checked");
             $this->ss->assign("TRACKING_ENTRIES_LOCATION_STATE", "disabled");

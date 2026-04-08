@@ -66,6 +66,7 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
         foreach ($emailMarketingRecords as $emailMarketing) {
             $emailMarketingId = $emailMarketing['id'];
             $campaignId = $emailMarketing['campaign_id'];
+            $failedRecords = 0;
 
             $queueEntries = $this->getQueueEntries($emailMarketingId);
             $emRecord = $this->getEmailMarketingRecord($emailMarketingId);
@@ -113,7 +114,7 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
 
                 if ($feedback === null) {
                     $this->handleException($campaignId, $emailMarketingId, 'blocked-validation-exception', $targetListId, $targetId, $targetType);
-                    return;
+                    continue;
                 }
 
                 if (!$feedback->isSuccess()) {
@@ -127,17 +128,43 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
 
                 $result = $this->sendEmail($emailRecord, $emRecord, $targetRecord, $campaignRecord, $trackerId);
 
-                if ($result === null || !$result['success']) {
-                    $this->handlerFailedSend(
-                        $campaignId,
-                        $emailMarketingId,
-                        $targetRecord->getAttributes()['email1'] ?? $targetRecord->getAttributes()['email'] ?? '',
-                        'send error',
-                        $targetListId,
-                        $targetId,
-                        $targetType,
-                        $trackerId
-                    );
+                if (!$sent) {
+                    $this->emailQueueManager->updateSendAttempts($entry['id']);
+                    $attempts = $entry['send_attempts'] + 1;
+                    $failedRecords++;
+
+                    if ($attempts >= ($maxRetries + 1)) {
+                        $this->handlerFailedSend(
+                            $campaignId,
+                            $emailMarketingId,
+                            $targetEmail,
+                            'send error',
+                            $targetListId,
+                            $targetId,
+                            $targetType,
+                            $trackerId
+                        );
+                    }
+
+                    $threshold = $this->getThreshold();
+                    if ($threshold > 0 && $failedRecords >= $threshold) {
+                        $pauseReason = $lastSendError
+                            ? sprintf('Send error threshold (%d) exceeded: %s', $threshold, $lastSendError)
+                            : sprintf('Send failure threshold of %d exceeded', $threshold);
+
+                        $this->emailMarketingManager->setPaused($emRecord, $pauseReason);
+                        $paused = true;
+                        $this->logger->warning(
+                            'Campaigns:DefaultEmailQueueProcessor::processQueue - Threshold reached, pausing campaign | email marketing id - ' . $emailMarketingId,
+                            [
+                                'emailMarketingId' => $emailMarketingId,
+                                'campaignId' => $campaignId,
+                                'threshold' => $threshold,
+                            ]
+                        );
+                        break;
+                    }
+
                     continue;
                 }
 
@@ -228,40 +255,25 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
         string $trackerId = '',
         string $relatedId = '',
         string $relatedType = ''
-    ): void {
+    ): void
+    {
+        $this->campaignLogManager->createCampaignLogEntry(
+            $campaignId,
+            $marketingId,
+            $email,
+            $activityType,
+            $prospectListId,
+            $targetId,
+            $targetType,
+            $trackerId,
+            $relatedId,
+            $relatedType
+        );
 
-        $entry = $this->emailQueueManager->getQueueEntry($marketingId, $targetId, $targetType);
-        $sendAttempts = (int)($entry['send_attempts'] ?? 0);
+        $this->emailQueueManager->deleteFromQueue($marketingId, $targetId, $targetType);
 
-        if ($sendAttempts > 5) {
-            $this->campaignLogManager->createCampaignLogEntry(
-                $campaignId,
-                $marketingId,
-                $email,
-                $activityType,
-                $prospectListId,
-                $targetId,
-                $targetType,
-                $trackerId,
-                $relatedId,
-                $relatedType
-            );
-
-            $this->emailQueueManager->deleteFromQueue($marketingId, $targetId, $targetType);
-            $this->logger->debug(
-                'Campaigns:DefaultEmailQueueProcessor::handlerFailedSend - Failed to send email after 5 attempts | email marketing id - ' . $marketingId . ' | target - ' . $targetType . '-' . $targetId, [
-                    'emailMarketingId' => $marketingId,
-                    'targetId' => $targetId,
-                    'targetType' => $targetType,
-                    'campaignId' => $campaignId,
-                ]
-            );
-            return;
-        }
-
-        $this->emailQueueManager->updateSendAttempts($entry['id']);
         $this->logger->debug(
-            'Campaigns:DefaultEmailQueueProcessor::handlerFailedSend - Failed to send email - increasing attempt count | email marketing id - ' . $marketingId . ' | target - ' . $targetType . '-' . $targetId, [
+            'Campaigns:DefaultEmailQueueProcessor::handlerFailedSend - Failed to send email after ' . $this->getMaxRetries() . ' attempts | email marketing id - ' . $marketingId . ' | target - ' . $targetType . '-' . $targetId, [
                 'emailMarketingId' => $marketingId,
                 'targetId' => $targetId,
                 'targetType' => $targetType,
@@ -386,7 +398,8 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
         string $trackerId = '',
         string $relatedId = '',
         string $relatedType = ''
-    ): void {
+    ): void
+    {
         $this->campaignLogManager->createCampaignLogEntry(
             $campaignId,
             $emailMarketingId,

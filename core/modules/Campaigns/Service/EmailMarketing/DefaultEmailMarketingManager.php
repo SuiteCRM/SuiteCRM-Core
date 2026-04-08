@@ -97,6 +97,15 @@ class DefaultEmailMarketingManager implements EmailMarketingManagerInterface
         $this->recordProvider->saveRecord($record);
     }
 
+    public function setPaused(Record $record, string $pauseReason): void
+    {
+        $attributes = $record->getAttributes();
+        $attributes['pause_reason'] = $pauseReason;
+        $record->setAttributes($attributes);
+
+        $this->updateStatus($record, 'paused');
+    }
+
     public function updateQueueingStatus(Record $record, string $queueingStatus): void
     {
         $attributes = $record->getAttributes();

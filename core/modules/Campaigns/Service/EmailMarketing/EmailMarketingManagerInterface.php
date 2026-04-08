@@ -54,4 +54,6 @@ interface EmailMarketingManagerInterface
 
     public function setQueueingInProgress(Record $record);
 
+    public function setPaused(Record $record, string $pauseReason): void;
+
 }

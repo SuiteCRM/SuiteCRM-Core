@@ -50,6 +50,55 @@ $viewdefs ['EmailMarketing'] = [
             ]
         ],
         'headerWidgets' => [
+            'paused-banner' => [
+                'type' => 'banner-grid',
+                'modes' => ['detail'],
+                'options' => [
+                    'mainRowClass' => 'd-flex h-100 row justify-content-center align-items-center w-100 mb-0 mr-0 ml-0 alert alert-danger',
+                    'bannerGrid' => [
+                        'rows' => [
+                            [
+                                'display' => 'none',
+                                'cols' => [
+                                    [
+                                        'statistic' => 'email-marketing-pause-reason',
+                                        'params' => [],
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'center',
+                                'cols' => [
+                                    [
+                                        'class' => 'd-flex align-items-start',
+                                        'icon' => 'exclamation-triangle',
+                                    ],
+                                    [
+                                        'bold' => true,
+                                        'class' => 'd-flex align-items-center ml-1 mr-1',
+                                        'labelKey' => 'LBL_CAMPAIGN_PAUSED_THRESHOLD',
+                                        'labelClass' => 'd-inline-block',
+                                    ],
+                                    [
+                                        'class' => 'd-flex align-items-center',
+                                        'dynamicLabel' => 'LBL_CAMPAIGN_PAUSED_DYNAMIC_LABEL',
+                                        'dynamicLabelClass' => 'd-inline-block',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'acls' => [],
+                'activeOnFields' => [
+                    'status' => [
+                        [
+                            'operator' => 'is-equal',
+                            'values' => ['paused'],
+                        ],
+                    ],
+                ],
+            ],
             'test-data-banner' => [
                 'type' => 'banner-grid',
                 'modes' => ['detail'],

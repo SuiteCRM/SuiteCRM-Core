@@ -33,6 +33,7 @@ use App\Data\Service\RecordProviderInterface;
 use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;
 use App\Languages\LegacyHandler\AppStringsHandler;
+use App\Module\Campaigns\Service\Email\LegacyHandler\OutboundEmailAccountChecker;
 use App\Statistics\Entity\Statistic;
 use App\Statistics\Service\StatisticsProviderInterface;
 use App\Statistics\StatisticsHandlingTrait;
@@ -76,6 +77,7 @@ class EmailMarketingDiagnostics extends LegacyHandler implements StatisticsProvi
         protected RecordProviderInterface $recordProvider,
         protected AppStringsHandler $appStringsHandler,
         protected UserHandler $userHandler,
+        protected OutboundEmailAccountChecker $outboundEmailAccountChecker
     ) {
         parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState, $session);
     }
@@ -122,6 +124,8 @@ class EmailMarketingDiagnostics extends LegacyHandler implements StatisticsProvi
         $result = $this->addJobIntervalValues($params['jobs'], $result);
 
         $result = $this->addBounceExists($result);
+
+        $result = $this->addOutboundConnected($id, $result);
 
         $statistic = $this->buildSingleValueResponse(self::KEY, 'string', $result);
 
@@ -298,5 +302,26 @@ class EmailMarketingDiagnostics extends LegacyHandler implements StatisticsProvi
         }
 
         return 'false';
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function addOutboundConnected(string $marketingId, array $result): array
+    {
+        $marketingRecord = $this->recordProvider->getRecord('EmailMarketing', $marketingId);
+        $outboundEmailId = $marketingRecord->getAttributes()['outbound_email_id'] ?? null;
+
+        if (!$outboundEmailId) {
+            $value = 'false';
+        } else {
+            $this->outboundEmailAccountChecker->isConnected($outboundEmailId) ? $value = 'true' : $value = 'false';
+        }
+
+        $result['fields']['outbound_connected'] = [
+            'value' => $value,
+        ];
+
+        return $result;
     }
 }

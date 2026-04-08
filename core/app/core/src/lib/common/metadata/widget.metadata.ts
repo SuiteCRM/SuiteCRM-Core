@@ -63,6 +63,7 @@ export interface StatisticWidgetLayoutRow {
     class?: string;
     display?: string;
     activeOnFields?: any;
+    hideIfLoading?: boolean;
     active?: boolean;
 }
 

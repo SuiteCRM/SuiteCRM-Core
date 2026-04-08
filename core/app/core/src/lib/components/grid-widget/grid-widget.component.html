@@ -35,7 +35,7 @@
 
     <ng-container *ngFor="let item of layout()">
 
-        <div *ngIf="!item?.activeOnFields || (item?.activeOnFields && item?.active)" class="d-flex {{getJustify(item.justify)}} {{getAlign(item.align)}} {{getRowClass()}} {{getLayoutRowClass(item)}}">
+        <div *ngIf="(!item?.activeOnFields || (item?.activeOnFields && item?.active) && !(item.hideIfLoading && loading()))" class="d-flex {{getJustify(item.justify)}} {{getAlign(item.align)}} {{getRowClass()}} {{getLayoutRowClass(item)}}">
 
             <ng-container *ngFor="let col of item.cols">
                 <ng-container *ngIf="!(col.hideIfLoading && loading())">

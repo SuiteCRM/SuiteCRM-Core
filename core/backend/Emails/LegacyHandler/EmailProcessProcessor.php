@@ -104,17 +104,19 @@ class EmailProcessProcessor extends LegacyHandler
         $emailRecord = $this->parseEmail($emailRecord);
 
         $success = false;
+        $errorMessage = '';
         try {
             $success = $this->sendEmailHandler->sendEmail($emailRecord, $outboundRecord, $isTest);
         } catch (\Exception $e) {
-
+            $errorMessage = $e->getMessage();
+            $this->logger->error('EmailProcessProcessor: Failed to send email - ' . $errorMessage);
         }
 
         if (!$success) {
             $this->close();
             return [
                 'success' => false,
-                'message' => 'Unable to send email'
+                'message' => $this->sendEmailHandler->getLastError() ?: ($errorMessage ?: 'Unable to send email')
             ];
         }
 

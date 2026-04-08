@@ -548,6 +548,7 @@ $viewdefs ['EmailMarketing'] = [
                         'selectModal' => [
                             'module' => 'EmailTemplates'
                         ],
+                        'disableOnRun' => true,
                         'displayConfirmation' => true,
                         'confirmationMessages' => ['LBL_TEMPLATE_CONFIRMATION'],
                         'setFieldSubject' => 'subject',
@@ -562,6 +563,7 @@ $viewdefs ['EmailMarketing'] = [
                     'params' => [
                         'expanded' => true,
                         'displayConfirmation' => true,
+                        'disableOnRun' => true,
                         'confirmationMessages' => ['NTC_SCHEDULE_CONFIRMATION', 'NTC_DELETE_TEST_ENTRIES', 'NTC_PROCEED'],
                     ],
                     'acl' => ['view'],
@@ -589,6 +591,7 @@ $viewdefs ['EmailMarketing'] = [
                     'params' => [
                         'expanded' => true,
                         'displayConfirmation' => true,
+                        'disableOnRun' => true,
                         'confirmationMessages' => ['NTC_UNSCHEDULE_CONFIRMATION', 'NTC_UNSCHEDULE_CONFIRMATION_OTHER', 'NTC_PROCEED'],
                     ],
                     'acl' => ['view'],
@@ -608,6 +611,36 @@ $viewdefs ['EmailMarketing'] = [
                         ],
                     ],
                 ],
+                'resume-email-marketing' => [
+                    'key' => 'resume-email-marketing',
+                    'labelKey' => 'LBL_RESUME',
+                    'asyncProcess' => true,
+                    'modes' => ['detail'],
+                    'params' => [
+                        'expanded' => true,
+                        'disableOnRun' => true,
+                        'displayConfirmation' => true,
+                        'confirmationMessages' => ['NTC_RESUME_CONFIRMATION', 'NTC_PROCEED'],
+                    ],
+                    'acl' => ['view'],
+                    'display' => 'hide',
+                    'displayLogic' => [
+                        'show-on-paused' => [
+                            'modes' => ['detail'],
+                            'params' => [
+                                'fieldDependencies' => ['status'],
+                                'activeOnFields' => [
+                                    'status' => [
+                                        [
+                                            'operator' => 'is-equal',
+                                            'values' => ['paused'],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
                 'abort-email-marketing' => [
                     'key' => 'abort-email-marketing',
                     'labelKey' => 'LBL_ABORT',
@@ -617,6 +650,7 @@ $viewdefs ['EmailMarketing'] = [
                     'klass' => ['btn-danger'],
                     'params' => [
                         'expanded' => true,
+                        'disableOnRun' => true,
                         'displayConfirmation' => true,
                         'confirmationMessages' => ['NTC_ABORT_CONFIRMATION'],
                     ],

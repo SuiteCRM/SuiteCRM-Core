@@ -290,5 +290,36 @@ class LegacyMailer extends LegacyHandler
         return $recipients;
     }
 
+    protected function getSugarMailer(): \SugarPHPMailer
+    {
+        $this->init();
+        $this->startLegacyApp();
+        /* @noinspection PhpIncludeInspection */
+        require_once ('include/SugarPHPMailer.php');
+
+        $class = new \SugarPHPMailer();
+
+        $this->close();
+        return $class;
+    }
+
+    public function isConnected($id): bool
+    {
+        $this->init();
+        $this->startLegacyApp();
+        $mailer = $this->getSugarMailer();
+        $mailer->setMailerFromId($id);
+        try {
+            $connection = $mailer->smtpConnect();
+        } catch (\Exception $e) {
+            $this->logger->error('LegacyMailer::isConnected | Error connecting to SMTP server for Outbound Email Account with id - ' . $id . ' | message - ' . $e->getMessage(), ['trace' => $e->getTrace()]);
+            $connection = false;
+        } finally {
+            $this->close();
+        }
+
+        return $connection;
+    }
+
 
 }

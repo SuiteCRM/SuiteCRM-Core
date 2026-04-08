@@ -78,7 +78,8 @@ $layout_defs['EmailMarketing'] = [
             'module' => 'CampaignLog',
             'get_subpanel_data' => "function:trackLogEntries",
             'function_parameters' => [
-                0 => ['send error', 'invalid email'],
+                0 => 'invalid email',
+                1 => 'send error',
             ],
             'subpanel_name' => 'ForSendError',
             'title_key' => 'LBL_LOG_ENTRIES_BOUNCED_TITLE',

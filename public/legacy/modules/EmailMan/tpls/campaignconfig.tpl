@@ -107,6 +107,22 @@ function clearQueryParamsAndNavigate() {
 					</td>
 				</tr>
 				<tr>
+					<td width="40%" scope="row">
+						{$MOD.LBL_CAMPAIGN_MAX_RETRIES}&nbsp;<span class="required">{$APP.LBL_REQUIRED_SYMBOL}</span>
+					</td>
+					<td width="50%" >
+						<input name='massemailer_campaign_emails_max_retries' tabindex='1' maxlength='128' type="text" value="{$CAMPAIGN_MAX_RETRIES}">
+					</td>
+				</tr>
+				<tr>
+					<td width="40%" scope="row">
+						{$MOD.LBL_CAMPAIGN_THRESHOLD}&nbsp;<span class="required">{$APP.LBL_REQUIRED_SYMBOL}</span>
+					</td>
+					<td width="50%" >
+						<input name='massemailer_campaign_emails_threshold' tabindex='1' maxlength='128' type="text" value="{$CAMPAIGN_THRESHOLD}">
+					</td>
+				</tr>
+				<tr>
 					<td scope="row">
 						{$MOD.LBL_TRACKER_LINKS_ENABLED}&nbsp;<span class="required">{$APP.LBL_REQUIRED_SYMBOL}</span>
 					</td>

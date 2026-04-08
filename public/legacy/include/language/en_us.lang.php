@@ -989,7 +989,8 @@ $app_list_strings = array(
         'pending_send' => 'Pending Send',
         'aborted' => 'Aborted',
         'sending' => 'Sending',
-        'sent' => 'Sent'
+        'sent' => 'Sent',
+        'paused' => 'Paused',
     ),
     'email_marketing_duplicate_dom' => [
         'email' => 'Prevent sending to duplicate records and email addresses',

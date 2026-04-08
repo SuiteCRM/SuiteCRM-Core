@@ -1439,6 +1439,7 @@ $app_strings = array(
     'LBL_EMAIL_SENDING_EMAIL' => 'Sending Email',
 
     'LBL_EMAIL_SETTINGS' => 'Settings',
+    'LBL_EMAIL_SETTINGS_TITLE' => 'Email Settings',
     'LBL_EMAIL_SETTINGS_ACCOUNTS' => 'Mail Accounts',
     'LBL_EMAIL_SETTINGS_ADD_ACCOUNT' => 'Clear Form',
     'LBL_EMAIL_SETTINGS_CHECK_INTERVAL' => 'Check for New Mail',
@@ -1943,6 +1944,11 @@ $app_strings = array(
     'NTC_TEMPLATES_IS_USED' => 'The following templates are used in email marketing records. Are you sure you want to delete them?' . PHP_EOL,
     'NTC_DELETE_CONFIRMATION' => 'Are you sure you want to delete this record?',
     'NTC_ABORT_CONFIRMATION' => 'Are you sure you want to abort?',
+    'LBL_EMAIL_MARKETING_NOT_SENT' => 'Email Marketing status is not Sent, cannot reschedule',
+    'NTC_RESUME_CONFIRMATION' => 'Resuming will re-queue failed recipients and continue sending.',
+    'LBL_EMAIL_MARKETING_NOT_PAUSED' => 'Email Marketing status is not Paused, cannot resume',
+    'LBL_CAMPAIGN_PAUSED_THRESHOLD' => 'This campaign has been paused —',
+    'LBL_CAMPAIGN_PAUSED_DYNAMIC_LABEL' => '{{ fields.email-marketing-pause-reason.value }}',
     'NTC_SCHEDULE_CONFIRMATION' => "When Scheduled, The Sending Process will begin once the Scheduled Run Date has been reached.",
     'NTC_DELETE_TEST_ENTRIES' => 'Scheduling will Delete Test Entries.',
     'NTC_DELETE_TEST_ENTRIES_CONFIRMATION' => 'Are you sure you want to delete test entries?',
@@ -4269,6 +4275,7 @@ $app_strings['LBL_UNABLE_TO_GET_ID'] = 'Unable to retrieve Email Marketing ID';
 $app_strings['LBL_UNABLE_TO_DELETE_TEST_ENTRIES'] = 'Error Deleting Test Entries. See logs for more info';
 $app_strings['LBL_SECTION_KEY_NOT_DEFINED'] = 'Section key not defined';
 $app_strings['LBL_DOES_BOUNCE_EXIST'] = 'Does a Bounce Email exist?';
+$app_strings['LBL_IS_OUTBOUND_CONNECTED'] = 'Is Outbound Email Connected?';
 $app_strings['LBL_CAMPAIGN_SETTINGS'] = 'Settings';
 
 $app_strings['LBL_SEND_FROM_QUEUE_DYNAMIC_LABEL'] = '{{ fields.send-from-queue.value }}';
@@ -4321,6 +4328,7 @@ $app_strings['LBL_UNSUPPORTED_IMAGE_TYPE'] = 'The image type is not supported.';
 $app_strings['LBL_UNSUPPORTED_FILE_TYPE'] = 'The file type is not supported.';
 
 $app_strings['LBL_DEFAULT_OUTBOUND_NOT_SET'] = 'Unable to retrieve Default Outbound Email';
+$app_strings['LBL_SMTP_UNABLE_TO_CONNECT']='Unable to connect to SMTP server with the current Outbound Email settings.';
 $app_strings['LBL_DEFAULT_OUTBOUND_NOT_CONFIGURED'] = 'Outbound Email Account not correctly configured.';
 
 $app_strings['LBL_CRON_UNRECOMMENDED_USER'] = 'You are currently running as root, this is NOT recommended, would you like to continue (y,n)? ';

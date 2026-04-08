@@ -317,14 +317,14 @@ $viewdefs ['EmailMarketing'] = [
                                         'class' => 'campaign-sidebar-header-icon'
                                     ],
                                     [
-                                        'labelKey' => 'LBL_INBOUND_EMAIL',
+                                        'labelKey' => 'LBL_EMAIL_SETTINGS_TITLE',
                                         'class' => 'campaign-sidebar-header',
                                     ],
                                 ]
                             ],
                             [
                                 'justify' => 'start',
-                                'class' => 'campaign-status-check-row border-bottom pb-2 mb-1',
+                                'class' => 'campaign-status-check-row pb-2 mb-1',
                                 'cols' => [
                                     [
                                         'labelKey' => 'LBL_DOES_BOUNCE_EXIST',
@@ -348,10 +348,11 @@ $viewdefs ['EmailMarketing'] = [
                             ],
                             [
                                 'justify' => 'start',
-                                'class' => 'campaign-status-check-row border-bottom pb-2 mb-1',
+                                'class' => 'campaign-status-check-row pb-2 mb-1',
                                 'cols' => [
                                     [
                                         'labelKey' => 'LBL_DOES_BOUNCE_EXIST',
+                                        'hideIfLoading' => true,
                                         'class' => 'campaign-status-check-row-label text-uppercase',
                                         'bold' => true
                                     ],
@@ -365,6 +366,58 @@ $viewdefs ['EmailMarketing'] = [
                                 ],
                                 'activeOnFields' => [
                                     'bounce_exists' => [
+                                        [
+                                            'operator' => 'is-equal',
+                                            'values' => [false, 'false', 0, '0']
+                                        ],
+                                    ],
+                                ]
+                            ],
+                            [
+                                'justify' => 'start',
+                                'class' => 'campaign-status-check-row border-bottom pb-2 mb-1',
+                                'cols' => [
+                                    [
+                                        'labelKey' => 'LBL_IS_OUTBOUND_CONNECTED',
+                                        'class' => 'campaign-status-check-row-label text-uppercase',
+                                        'bold' => true
+                                    ],
+                                    [
+                                        'labelKey' => 'LBL_YES',
+                                        'hideIfLoading' => true,
+                                        'class' => 'campaign-status-check-row-value',
+                                    ]
+                                ],
+                                'activeOnFields' => [
+                                    'outbound_connected' => [
+                                        [
+                                            'operator' => 'is-equal',
+                                            'values' => [true]
+                                        ],
+                                    ],
+                                ]
+                            ],
+                            [
+                                'justify' => 'start',
+                                'class' => 'campaign-status-check-row border-bottom pb-2 mb-1',
+                                'hideIfLoading' => true,
+                                'cols' => [
+                                    [
+                                        'labelKey' => 'LBL_IS_OUTBOUND_CONNECTED',
+                                        'class' => 'campaign-status-check-row-label text-uppercase',
+                                        'hideIfLoading' => true,
+                                        'bold' => true
+                                    ],
+                                    [
+                                        'labelKey' => 'LBL_NO',
+                                        'hideIfLoading' => true,
+                                        'class' => 'campaign-status-check-row-value w-fit-content alert alert-warning d-flex align-items-center m-0 pb-1 pl-2 pr-2 pt-1',
+                                        'icon' => 'exclamation-triangle',
+                                        'labelClass' => 'd-inline-block ml-1',
+                                    ]
+                                ],
+                                'activeOnFields' => [
+                                    'outbound_connected' => [
                                         [
                                             'operator' => 'is-equal',
                                             'values' => [false, 'false', 0, '0']

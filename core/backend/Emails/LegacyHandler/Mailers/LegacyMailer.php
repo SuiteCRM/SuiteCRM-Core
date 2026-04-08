@@ -59,9 +59,16 @@ class LegacyMailer extends LegacyHandler
         );
     }
 
+    protected string $lastError = '';
+
     public function getHandlerKey(): string
     {
         return 'legacy-mailer';
+    }
+
+    public function getLastError(): string
+    {
+        return $this->lastError;
     }
 
     public function send(Email $message, ?Envelope $envelope = null, Record $outbound = null, array $options = []): bool
@@ -101,6 +108,7 @@ class LegacyMailer extends LegacyHandler
         }
 
         if (!$sent) {
+            $this->lastError = $email->ErrorInfo ?? '';
             $recipients = array_keys($email->getAllRecipientAddresses());
 
             foreach ($recipients as $recipient) {

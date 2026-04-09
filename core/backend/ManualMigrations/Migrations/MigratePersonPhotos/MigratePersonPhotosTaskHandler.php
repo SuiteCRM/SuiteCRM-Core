@@ -82,7 +82,7 @@ abstract class MigratePersonPhotosTaskHandler extends AbstractAsyncTaskHandler
         try {
             $results = $this->preparedStatementHandler
                 ->createQueryBuilder()
-                ->select('t.id', 't.photo')
+                ->select('t.id', 't.photo', "CONCAT(COALESCE(t.first_name, ''), ' ', COALESCE(t.last_name, '')) AS full_name")
                 ->from($table, 't')
                 ->leftJoin(
                     't', 'private_images_media_objects', 'm',
@@ -117,7 +117,10 @@ abstract class MigratePersonPhotosTaskHandler extends AbstractAsyncTaskHandler
                     'record_id' => $row['id'],
                     'module' => $module,
                     'photo' => $row['photo'],
-                ]
+                ],
+                null,
+                $module,
+                trim($row['full_name'] ?? '')
             );
         }
 

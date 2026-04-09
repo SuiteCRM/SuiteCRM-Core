@@ -35,9 +35,15 @@ $subpanel_layout = [
     'where' => '',
 
     'list_fields' => [
-        'item_key' => [
-            'vname' => 'LBL_ITEM_KEY',
+        'item_name' => [
+            'vname' => 'LBL_ITEM_NAME',
             'width' => '25%',
+        ],
+        'item_key' => [
+            'usage' => 'query_only',
+        ],
+        'item_module' => [
+            'usage' => 'query_only',
         ],
         'error_message' => [
             'vname' => 'LBL_ERROR_MESSAGE',

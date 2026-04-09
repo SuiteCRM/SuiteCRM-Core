@@ -77,6 +77,40 @@ $dictionary['AsyncTaskItem'] = [
             'display' => 'readonly',
             'reportable' => false,
         ],
+        'item_name' => [
+            'name' => 'item_name',
+            'vname' => 'LBL_ITEM_NAME',
+            'type' => 'varchar',
+            'len' => 255,
+            'required' => false,
+            'comment' => 'Display name for this item (record name, filename, etc.); falls back to item_key.',
+            'display' => 'readonly',
+            'reportable' => false,
+            'linkActions' => [
+                [
+                    'key' => 'record-link',
+                    'params' => [
+                        'moduleField' => 'item_module',
+                        'recordField' => 'item_key',
+                    ],
+                    'activeOnFields' => [
+                        'item_module' => [
+                            ['operator' => 'not-empty'],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'item_module' => [
+            'name' => 'item_module',
+            'vname' => 'LBL_ITEM_MODULE',
+            'type' => 'varchar',
+            'len' => 100,
+            'required' => false,
+            'comment' => 'Legacy module name when item_key is a record ID; empty otherwise.',
+            'display' => 'readonly',
+            'reportable' => false,
+        ],
         'status' => [
             'name' => 'status',
             'vname' => 'LBL_STATUS',

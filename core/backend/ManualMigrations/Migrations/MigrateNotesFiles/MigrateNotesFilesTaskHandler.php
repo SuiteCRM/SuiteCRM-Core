@@ -66,14 +66,6 @@ class MigrateNotesFilesTaskHandler extends AbstractAsyncTaskHandler
         return true;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function allowsFailureRerun(): bool
-    {
-        return true;
-    }
-
     public function getNextBatchToQueue(Record $task, array $progress, int $batchSize): array
     {
         $offset = $progress['enqueue_offset'] ?? 0;

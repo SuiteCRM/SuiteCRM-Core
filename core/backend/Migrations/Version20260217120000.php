@@ -72,7 +72,7 @@ final class Version20260217120000 extends BaseMigration implements ContainerAwar
             'assigned_user_id' => 1,
             'deleted' => 0,
             'allow_failure_retry_action' => 1,
-            'allow_failure_rerun_action' => 1
+            'allow_failure_rerun_action' => 0
         ]);
 
         $this->log('Migration Version20260217120000: Task added successfully');

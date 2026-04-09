@@ -103,7 +103,10 @@ class MigrateDocumentRevisionsTaskHandler extends AbstractAsyncTaskHandler
                     'record_id' => $row['id'],
                     'filename' => $filename,
                     'file_mime_type' => $row['file_mime_type'],
-                ]
+                ],
+                null,
+                'DocumentRevisions',
+                $filename
             );
         }
 

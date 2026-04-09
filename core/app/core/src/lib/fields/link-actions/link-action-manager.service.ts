@@ -29,6 +29,7 @@ import {BaseActionManager} from '../../services/actions/base-action-manager.serv
 import {LinkActionData} from './link-action.model';
 import {DefaultLinkAction} from './default/default-link-action';
 import {AsyncProcessLinkAction} from './async-process/async-process-link-action';
+import {RecordLinkAction} from './record-link/record-link-action';
 
 @Injectable({
     providedIn: 'root'
@@ -37,10 +38,12 @@ export class LinkActionManager extends BaseActionManager<LinkActionData> {
 
     constructor(
         protected defaultLinkAction: DefaultLinkAction,
-        protected asyncProcessLinkAction: AsyncProcessLinkAction
+        protected asyncProcessLinkAction: AsyncProcessLinkAction,
+        protected recordLinkAction: RecordLinkAction
     ) {
         super();
         this.defaultLinkAction.modes.forEach(mode => this.actions[mode][this.defaultLinkAction.key] = this.defaultLinkAction);
         this.asyncProcessLinkAction.modes.forEach(mode => this.actions[mode][this.asyncProcessLinkAction.key] = this.asyncProcessLinkAction);
+        this.recordLinkAction.modes.forEach(mode => this.actions[mode][this.recordLinkAction.key] = this.recordLinkAction);
     }
 }

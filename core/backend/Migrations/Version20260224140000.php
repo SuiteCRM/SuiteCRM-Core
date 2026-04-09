@@ -95,7 +95,7 @@ final class Version20260224140000 extends BaseMigration implements ContainerAwar
                     'assigned_user_id' => 1,
                     'deleted' => 0,
                     'allow_failure_retry_action' => 1,
-                    'allow_failure_rerun_action' => 1,
+                    'allow_failure_rerun_action' => 0,
                     'completed_with_failures' => 0,
                 ]
             );

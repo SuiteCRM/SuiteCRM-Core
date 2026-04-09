@@ -147,7 +147,7 @@ class ResetPasswordHandler extends LegacyHandler implements ProcessHandlerInterf
     /**
      * @inheritDoc
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }

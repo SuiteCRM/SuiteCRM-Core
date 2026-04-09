@@ -218,7 +218,7 @@ class LinkRelationHandler extends LegacyHandler implements ProcessHandlerInterfa
     /**
      * @inheritDoc
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }

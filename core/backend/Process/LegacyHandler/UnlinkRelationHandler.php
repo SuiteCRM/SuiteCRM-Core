@@ -236,7 +236,7 @@ class UnlinkRelationHandler extends LegacyHandler implements ProcessHandlerInter
     /**
      * @inheritDoc
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }

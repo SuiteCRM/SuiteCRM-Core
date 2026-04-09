@@ -72,7 +72,7 @@ class MigrateNotesFilesTaskHandler extends AbstractAsyncTaskHandler
 
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
-            $qb->select('notes.id', 'notes.filename', 'notes.file_mime_type')
+            $qb->select('notes.id', 'notes.name', 'notes.filename', 'notes.file_mime_type')
                 ->from('notes')
                 ->leftJoin(
                     'notes',
@@ -104,7 +104,10 @@ class MigrateNotesFilesTaskHandler extends AbstractAsyncTaskHandler
                     'record_id' => $row['id'],
                     'filename' => $row['filename'],
                     'file_mime_type' => $row['file_mime_type'] ?? 'application/octet-stream',
-                ]
+                ],
+                null,
+                'Notes',
+                $row['name'] ?? ''
             );
         }
 

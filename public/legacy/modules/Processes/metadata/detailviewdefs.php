@@ -118,6 +118,7 @@ $viewdefs[$module_name]['DetailView'] = [
                 'display' => 'hide',
                 'params' => [
                     'expanded' => true,
+                    'disableOnRun' => true,
                     'displayConfirmation' => true,
                     'confirmationMessages' => ['LBL_DELETE_COMPLETED_CONFIRMATION'],
                 ],
@@ -144,6 +145,7 @@ $viewdefs[$module_name]['DetailView'] = [
                 'display' => 'hide',
                 'params' => [
                     'expanded' => true,
+                    'disableOnRun' => true,
                     'displayConfirmation' => true,
                     'confirmationMessages' => ['LBL_DELETE_COMPLETED_WITH_FAILURES_CONFIRMATION'],
                 ],
@@ -170,6 +172,7 @@ $viewdefs[$module_name]['DetailView'] = [
                 'display' => 'hide',
                 'params' => [
                     'expanded' => true,
+                    'disableOnRun' => true,
                     'displayConfirmation' => true,
                     'confirmationMessages' => ['LBL_DELETE_FAILED_CONFIRMATION'],
                 ],

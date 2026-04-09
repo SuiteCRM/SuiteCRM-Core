@@ -55,6 +55,7 @@ class AsyncTaskItemRepository
         foreach ($items as $index => $item) {
             $id = Uuid::uuid4()->toString();
             $itemKey = $item->getItemKey();
+            $itemName = $item->getName() !== '' ? $item->getName() : $itemKey;
             $data = !empty($item->getData()) ? json_encode($item->getData()) : null;
             $sortOrder = $item->getSortOrder() ?? $index;
 
@@ -65,6 +66,8 @@ class AsyncTaskItemRepository
                    ->setValue('name', ':name')
                    ->setValue('async_task_id', ':async_task_id')
                    ->setValue('item_key', ':item_key')
+                   ->setValue('item_name', ':item_name')
+                   ->setValue('item_module', ':item_module')
                    ->setValue('status', ':status')
                    ->setValue('data', ':data')
                    ->setValue('sort_order', ':sort_order')
@@ -72,9 +75,11 @@ class AsyncTaskItemRepository
                    ->setValue('date_modified', ':date_modified')
                    ->setValue('deleted', '0')
                    ->setParameter('id', $id)
-                   ->setParameter('name', $itemKey)
+                   ->setParameter('name', $itemName)
                    ->setParameter('async_task_id', $taskId)
                    ->setParameter('item_key', $itemKey)
+                   ->setParameter('item_name', $itemName)
+                   ->setParameter('item_module', $item->getModule())
                    ->setParameter('status', 'queued')
                    ->setParameter('data', $data)
                    ->setParameter('sort_order', $sortOrder)
@@ -106,7 +111,7 @@ class AsyncTaskItemRepository
     {
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
-            $qb->select('id', 'async_task_id', 'item_key', 'status', 'error_message', 'data', 'result_data', 'sort_order')
+            $qb->select('id', 'async_task_id', 'item_key', 'item_name', 'item_module', 'status', 'error_message', 'data', 'result_data', 'sort_order')
                ->from(self::TABLE)
                ->where('async_task_id = :async_task_id')
                ->andWhere('status = :status')
@@ -280,7 +285,7 @@ class AsyncTaskItemRepository
     {
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
-            $qb->select('id', 'async_task_id', 'item_key', 'status', 'error_message', 'data', 'result_data', 'sort_order')
+            $qb->select('id', 'async_task_id', 'item_key', 'item_name', 'item_module', 'status', 'error_message', 'data', 'result_data', 'sort_order')
                ->from(self::TABLE)
                ->where('async_task_id = :async_task_id')
                ->andWhere('status = :status')

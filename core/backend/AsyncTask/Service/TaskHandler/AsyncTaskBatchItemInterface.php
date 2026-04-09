@@ -57,4 +57,18 @@ interface AsyncTaskBatchItemInterface
      * within each batch.  Return null to use insertion order (default).
      */
     public function getSortOrder(): ?int;
+
+    /**
+     * Optional display name for this item (e.g. record name, filename).
+     * When non-empty, the subpanel shows this instead of the raw item key.
+     * Return empty string to fall back to item_key as the display value.
+     */
+    public function getName(): string;
+
+    /**
+     * Legacy module name for the record identified by getItemKey(), or empty string
+     * when the item key is not a record ID (e.g. CSV row number, filename).
+     * Stored in the item_module column and used by the frontend to build record links.
+     */
+    public function getModule(): string;
 }

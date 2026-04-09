@@ -45,7 +45,9 @@ class AsyncTaskBatchItem implements AsyncTaskBatchItemInterface
     public function __construct(
         private string $itemKey,
         private array $data = [],
-        private ?int $sortOrder = null
+        private ?int $sortOrder = null,
+        private string $module = '',
+        private string $name = ''
     ) {
     }
 
@@ -62,5 +64,15 @@ class AsyncTaskBatchItem implements AsyncTaskBatchItemInterface
     public function getSortOrder(): ?int
     {
         return $this->sortOrder;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getModule(): string
+    {
+        return $this->module;
     }
 }

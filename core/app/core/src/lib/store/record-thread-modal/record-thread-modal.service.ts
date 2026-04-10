@@ -197,6 +197,10 @@ export class RecordThreadModalService {
             metadata.fields = deepClone(options.item.fields);
         }
 
+        if (options?.item && options?.item?.clickActions) {
+            metadata.clickActions = deepClone(options?.item?.clickActions);
+        }
+
         if ((options?.item?.collapseActions ?? null) !== null) {
             metadata.collapseActions = options?.item?.collapseActions;
         }

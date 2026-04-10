@@ -180,7 +180,7 @@ export class BaseFileComponent extends BaseFieldComponent {
             }
         }
 
-        if (containerWidth) {
+        if (containerWidth && containerWidth !== '0') {
             containerWidth = containerWidth + 'px';
         } else {
             containerWidth = this?.field?.metadata?.width ?? '200px';

@@ -113,6 +113,15 @@ return static function (ContainerConfigurator $containerConfig) {
                                 'type' => 'relate',
                             ],
                         ],
+                        'clickActions' => [
+                            [
+                                'key' => 'open-draft',
+                                'asyncProcess' => true,
+                                'modes' => ['detail', 'edit', 'list'],
+                                'acl' => ['edit'],
+                                'default' => true,
+                            ],
+                        ],
                         'layout' => [
                             'body' => [
                                 'class' => 'itemContentClass',

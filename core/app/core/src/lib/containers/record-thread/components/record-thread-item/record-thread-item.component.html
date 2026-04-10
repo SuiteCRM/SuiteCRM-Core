@@ -27,6 +27,8 @@
 -->
 
 <div *ngIf="config"
+     (click)="onItemClick($event)"
+     [class.clickable]="hasClickAction"
      class="d-flex flex-column record-thread-item {{(config && config.klass) || ''}} {{dynamicClass}}">
     <div class="record-thread-item-header flex-grow-1">
 

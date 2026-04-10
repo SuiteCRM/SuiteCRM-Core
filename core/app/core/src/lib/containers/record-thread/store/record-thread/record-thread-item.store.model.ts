@@ -27,11 +27,13 @@
 import {FieldFlexbox} from '../../../../components/record-flexbox/record-flexbox.model';
 import {Action} from '../../../../common/actions/action.model';
 import {ViewFieldDefinitionMap} from '../../../../common/metadata/metadata.model';
+import {RecordThreadItemClickActionConfig} from '../../actions/click-actions/record-thread-item-click-action.model';
 
 export interface RecordThreadItemMetadata {
     headerLayout?: FieldFlexbox;
     bodyLayout?: FieldFlexbox;
     actions?: Action[];
+    clickActions?: RecordThreadItemClickActionConfig[];
     collapseActions?: boolean;
     fields?: ViewFieldDefinitionMap;
 }

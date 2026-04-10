@@ -32,6 +32,7 @@ import {RecordThreadItemConfig} from '../record-thread-item/record-thread-item.m
 import {Observable} from 'rxjs';
 import {RecordThreadStore} from '../../store/record-thread/record-thread.store';
 import {FieldFlexbox} from '../../../../components/record-flexbox/record-flexbox.model';
+import {RecordThreadItemClickActionConfig} from '../../actions/click-actions/record-thread-item-click-action.model';
 
 export interface RecordThreadConfig {
 
@@ -69,6 +70,7 @@ export interface ThreadItemMetadataConfig {
     header?: FieldFlexbox;
     body?: FieldFlexbox;
     actions?: Action[];
+    clickActions?: RecordThreadItemClickActionConfig[];
     fields?: FieldDefinitionMap;
     collapseActions?: boolean;
 }

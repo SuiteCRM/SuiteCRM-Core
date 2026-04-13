@@ -272,3 +272,7 @@ parameters:
       index: true
       list: true
       record: true
+    calendar-account:
+      index: true
+      list: true
+      record: false

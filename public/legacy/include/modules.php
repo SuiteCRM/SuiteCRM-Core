@@ -569,6 +569,7 @@ $modInvisList[] = 'SurveyQuestionOptions';
 
 $beanList['CalendarAccount'] = 'CalendarAccount';
 $beanFiles['CalendarAccount'] = 'modules/CalendarAccount/CalendarAccount.php';
+$modInvisList[] = 'CalendarAccount';
 $modules_exempt_from_availability_check['CalendarAccount'] = 'CalendarAccount';
 $report_include_modules['CalendarAccount'] = 'CalendarAccount';
 

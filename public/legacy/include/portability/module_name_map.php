@@ -78,6 +78,10 @@ $module_name_map = [
         'frontend' => 'accounts',
         'core' => 'Accounts'
     ],
+    'CalendarAccount' => [
+        'frontend' => 'calendar-account',
+        'core' => 'CalendarAccount'
+    ],
     'Opportunities' => [
         'frontend' => 'opportunities',
         'core' => 'Opportunities'

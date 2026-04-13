@@ -3938,8 +3938,6 @@ $app_list_strings['surveys_matrix_options'][0] = 'Satisfied';
 $app_list_strings['surveys_matrix_options'][1] = 'Neither Satisfied nor Dissatisfied';
 $app_list_strings['surveys_matrix_options'][2] = 'Dissatisfied';
 
-$app_list_strings['moduleList']['CalendarAccount'] = 'Calendar Accounts';
-
 $app_strings['LBL_OPT_IN_PENDING_EMAIL_NOT_SENT'] = 'Pending Confirm opt in, Confirm opt in not sent';
 $app_strings['LBL_OPT_IN_PENDING_EMAIL_FAILED'] = 'Confirm opt in email sending failed';
 $app_strings['LBL_OPT_IN_PENDING_EMAIL_SENT'] = 'Pending Confirm opt in, Confirm opt in sent';

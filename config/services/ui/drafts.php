@@ -28,7 +28,8 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 return static function (ContainerConfigurator $containerConfig) {
-    $containerConfig->parameters()->set('drafts', [
+    $containerConfig->parameters()->set(
+        'drafts', [
             'modalConfig' => [
                 'detached' => true,
                 'module' => 'emails',
@@ -198,18 +199,8 @@ return static function (ContainerConfigurator $containerConfig) {
                                         ],
                                     ],
                                 ],
-                            ], 'actions' => [
-                                [
-                                    'key' => 'open-draft',
-                                    'icon' => 'no-fill-pencil',
-                                    'titleKey' => 'LBL_OPEN_DRAFT',
-                                    'asyncProcess' => true,
-                                    'klass' => ['btn fill-complementary pr-1 fill-hover-complementary-light border-0 btn-sm p-0 m-0'],
-                                    'modes' => ['detail', 'edit', 'list'],
-                                    'acl' => [
-                                        'edit'
-                                    ],
-                                ],
+                            ],
+                            'actions' => [
                                 [
                                     'key' => 'dismiss-record',
                                     'icon' => 'trash',
@@ -220,7 +211,7 @@ return static function (ContainerConfigurator $containerConfig) {
                                         'successLabel' => 'LBL_DRAFT_DELETED_SUCCESSFULLY',
                                     ],
                                     'klass' => [
-                                        'btn fill-complementary fill-hover-complementary-light border-0 btn-sm p-0 m-0'
+                                        'btn fill-complementary fill-hover-complementary-light border-0 btn-sm p-0 m-0 touch-btn'
                                     ],
                                     'modes' => [
                                         'detail', 'edit', 'list'

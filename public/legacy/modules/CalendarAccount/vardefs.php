@@ -32,7 +32,6 @@ if (!defined('sugarEntry') || !sugarEntry) {
 $dictionary['CalendarAccount'] = [
     'table' => 'calendar_accounts',
     'comment' => 'Calendar Account',
-    'audited' => true,
     'inline_edit' => false,
     'duplicate_merge' => true,
     'massupdate' => false,

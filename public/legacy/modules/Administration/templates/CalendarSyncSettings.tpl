@@ -73,9 +73,9 @@
                             >
                             <input
                                     title="{$APP.LBL_CANCEL_BUTTON_TITLE}"
-                                    class="button"
-                                    onclick="this.form.action.value='index'; this.form.module.value='Administration';"
-                                    type="submit"
+                                    class="button primary"
+                                    type="button"
+                                    onclick="document.location.href='index.php?module=Administration&action=index';"
                                     name="button"
                                     value="{$APP.LBL_CANCEL_BUTTON_LABEL}"
                             >

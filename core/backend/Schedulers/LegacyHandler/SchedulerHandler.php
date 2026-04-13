@@ -112,7 +112,7 @@ class SchedulerHandler extends LegacyHandler
         $schedulerTable = $this->getSchedulerTable();
         $jobQueueTable = $this->getJobQueueTable();
 
-        $query = "SELECT * FROM $schedulerTable sched WHERE status = 'Active' ";
+        $query = "SELECT * FROM $schedulerTable sched WHERE status = 'Active' AND deleted = 0 ";
         $query .= "AND NOT EXISTS(SELECT id FROM $jobQueueTable WHERE scheduler_id = sched.id AND status != 'done')";
         $schedulers = [];
 
@@ -130,6 +130,11 @@ class SchedulerHandler extends LegacyHandler
         foreach ($schedulers as $scheduler) {
             $this->init();
             $schedulerBean = \BeanFactory::getBean('Schedulers', $scheduler['id']);
+
+            if (!$schedulerBean) {
+                $this->logger->error('Unable to retrieve scheduler bean for id ' . $scheduler['id']);
+                continue;
+            }
 
             $this->close();
 

@@ -363,6 +363,43 @@
           .sicon {
             color: $bright-purple !important;
           }
+
+          .touch-btn {
+            width: 27px;
+            height: 27px;
+            border-radius: 50% !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 0;
+            transition: background-color 0.15s ease-in-out;
+
+            scrm-image,
+            svg-icon {
+              display: contents;
+            }
+
+            .sicon svg {
+              display: block;
+              width: 16px;
+              height: 16px;
+            }
+
+            &:hover {
+              background-color: rgba($dusky-blue, 0.18);
+            }
+
+            // Touch devices: briefly show the circle on tap (while pressed)
+            @media (hover: none) {
+              &:hover {
+                background-color: transparent;
+              }
+
+              &:active {
+                background-color: rgba($dusky-blue, 0.18);
+              }
+            }
+          }
         }
       }
     }

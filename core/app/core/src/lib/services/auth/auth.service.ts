@@ -135,6 +135,12 @@ export class AuthService {
             onSuccess(response);
             this.isUserLoggedIn.next(true);
             this.setCurrentUser(response);
+
+            if (this.redirectToReturnUrl()) {
+                // Page is navigating away — skip notification/draft initialisation
+                return;
+            }
+
             setTimeout(() => {
                 this.notificationStore.enableNotifications();
                 this.notificationStore.refreshNotifications();
@@ -242,6 +248,10 @@ export class AuthService {
     }
 
     setLanguage(result: any): void {
+        // Captured synchronously — HashLocationStrategy never changes window.location.search,
+        // so this is stable for the lifetime of the login/2FA page.
+        const returnUrl = this.getReturnUrl();
+
         this.languageStore.setSessionLanguage()
             .pipe(catchError(() => of({})))
             .subscribe(() => {
@@ -254,10 +264,15 @@ export class AuthService {
                     return;
                 }
 
+                if (returnUrl) {
+                    window.location.href = returnUrl;
+                    return;
+                }
+
                 if (this.appStateStore.getPreLoginUrl()) {
-                    this.router.navigateByUrl(this.appStateStore.getPreLoginUrl()).then(() => {
-                        this.appStateStore.setPreLoginUrl('');
-                    });
+                    const preLoginUrl = this.appStateStore.getPreLoginUrl();
+                    this.appStateStore.setPreLoginUrl('');
+                    this.router.navigateByUrl(preLoginUrl).then();
                     return;
                 }
 
@@ -328,6 +343,34 @@ export class AuthService {
                     }
                 }
             );
+    }
+
+    /**
+     * Get a validated return_url from the current page's query string.
+     * Only accepts same-origin paths (starts with '/' but not '//') to prevent open redirects.
+     *
+     * @returns validated URL string, or empty string if absent/invalid
+     */
+    protected getReturnUrl(): string {
+        const returnUrl = new URLSearchParams(window.location.search).get('return_url') ?? '';
+        if (returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//')) {
+            return returnUrl;
+        }
+        return '';
+    }
+
+    /**
+     * Redirect to return_url if present in the query string.
+     *
+     * @returns true if a redirect was performed
+     */
+    protected redirectToReturnUrl(): boolean {
+        const returnUrl = this.getReturnUrl();
+        if (!returnUrl) {
+            return false;
+        }
+        window.location.href = returnUrl;
+        return true;
     }
 
     /**

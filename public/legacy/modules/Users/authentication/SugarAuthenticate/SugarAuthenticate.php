@@ -622,14 +622,18 @@ class SugarAuthenticate
      */
     public function redirectToLogin(SugarApplication $app)
     {
-        $base = $_SERVER['REQUEST_URI'];
+        $returnUrl = $_SERVER['REQUEST_URI'];
 
-        $legacyCheck = explode('legacy/', $base);
-        $base = count($legacyCheck) > 1 ? $legacyCheck[0] : $base;
+        $legacyCheck = explode('legacy/', $returnUrl);
+        $base = count($legacyCheck) > 1 ? $legacyCheck[0] : $returnUrl;
 
         $epCheck = explode('ep/', $base);
         $base = count($epCheck) > 1 ? $epCheck[0] : $base;
 
-        SugarApplication::redirect($base . '#/Login');
+        // Strip any query string from $base so the login URL is always well-formed.
+        // $returnUrl retains the full original URI including query params.
+        $base = strtok($base, '?');
+
+        SugarApplication::redirect($base . '?return_url=' . urlencode($returnUrl) . '#/Login');
     }
 }

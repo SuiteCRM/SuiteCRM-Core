@@ -78,7 +78,30 @@ class LegacyApiRedirectHandler extends LegacyRedirectHandler
 
         foreach ($this->legacyApiPaths as $path => $replace) {
             if ($this->inPath($request, $path)) {
-                return str_replace($path, $replace, $legacyPath);
+                $parsedPath = parse_url($legacyPath, PHP_URL_PATH);
+                $urlPath = is_string($parsedPath) ? $parsedPath : $legacyPath;
+                $replacePath = parse_url($replace, PHP_URL_PATH) ?? $replace;
+                $replaceQuery = parse_url($replace, PHP_URL_QUERY) ?? '';
+
+                $newPath = str_replace($path, $replacePath, $urlPath);
+                $requestQuery = $request->getQueryString() ?? '';
+
+                if (empty($replaceQuery)) {
+                    $mergedQuery = $requestQuery;
+                } elseif (empty($requestQuery)) {
+                    $mergedQuery = $replaceQuery;
+                } else {
+                    parse_str($requestQuery, $requestParams);
+                    parse_str($replaceQuery, $replaceParams);
+                    $mergedQuery = http_build_query(
+                        array_merge($requestParams, $replaceParams),
+                        '',
+                        '&',
+                        PHP_QUERY_RFC3986
+                    );
+                }
+
+                return empty($mergedQuery) ? $newPath : $newPath . '?' . $mergedQuery;
             }
         }
 
@@ -99,12 +122,22 @@ class LegacyApiRedirectHandler extends LegacyRedirectHandler
 
                 $base = $_SERVER['BASE'] ?? $_SERVER['REDIRECT_BASE'] ?? '';
 
-                $scriptName = $base . '/legacy/' . $info['dir'] . '/' . $info['file'];
+                if (empty($info['dir'])) {
+                    $scriptName = $base . '/legacy/' . $info['file'];
+                } else {
+                    $scriptName = $base . '/legacy/' . $info['dir'] . '/' . $info['file'];
+                }
+
+                $originalRequestUri = $_SERVER['REQUEST_URI'];
+
+                if (!empty($info['request-uri'])) {
+                    $originalRequestUri = $base . $info['request-uri'];
+                }
 
                 if (!empty($base)) {
-                    $requestUri = str_replace($base, $base . '/legacy', $_SERVER['REQUEST_URI']);
+                    $requestUri = str_replace($base, $base . '/legacy', $originalRequestUri);
                 } else {
-                    $requestUri = '/legacy' . $_SERVER['REQUEST_URI'];
+                    $requestUri = '/legacy' . $originalRequestUri;
                 }
 
                 $info['script-name'] = $scriptName;

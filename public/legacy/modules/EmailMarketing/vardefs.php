@@ -286,8 +286,7 @@ $dictionary['EmailMarketing'] = [
                     'displayModes' => ['edit', 'create', 'detail'],
                     'activeOn' => [
                         [
-                            'operator' => 'is-equal',
-                            'values' => ['1', 'true', true, 1]
+                            'operator' => 'is-true',
                         ]
                     ]
                 ],
@@ -296,8 +295,7 @@ $dictionary['EmailMarketing'] = [
                     'displayModes' => ['edit', 'create', 'detail'],
                     'activeOn' => [
                         [
-                            'operator' => 'is-equal',
-                            'values' => ['0', 'false', false, 0]
+                            'operator' => 'is-false',
                         ]
                     ]
                 ]

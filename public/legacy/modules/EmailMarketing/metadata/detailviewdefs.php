@@ -136,8 +136,7 @@ $viewdefs ['EmailMarketing'] = [
                 'activeOnFields' => [
                     'has_test_data' => [
                         [
-                            'operator' => 'is-equal',
-                            'values' => [true, 'true', 1, '1']
+                            'operator' => 'is-true',
                         ],
                     ],
                 ]
@@ -340,8 +339,7 @@ $viewdefs ['EmailMarketing'] = [
                                 'activeOnFields' => [
                                     'bounce_exists' => [
                                         [
-                                            'operator' => 'is-equal',
-                                            'values' => [true]
+                                            'operator' => 'is-true',
                                         ],
                                     ],
                                 ]
@@ -367,8 +365,7 @@ $viewdefs ['EmailMarketing'] = [
                                 'activeOnFields' => [
                                     'bounce_exists' => [
                                         [
-                                            'operator' => 'is-equal',
-                                            'values' => [false, 'false', 0, '0']
+                                            'operator' => 'is-false',
                                         ],
                                     ],
                                 ]
@@ -391,8 +388,7 @@ $viewdefs ['EmailMarketing'] = [
                                 'activeOnFields' => [
                                     'outbound_connected' => [
                                         [
-                                            'operator' => 'is-equal',
-                                            'values' => [true]
+                                            'operator' => 'is-true',
                                         ],
                                     ],
                                 ]
@@ -419,8 +415,7 @@ $viewdefs ['EmailMarketing'] = [
                                 'activeOnFields' => [
                                     'outbound_connected' => [
                                         [
-                                            'operator' => 'is-equal',
-                                            'values' => [false, 'false', 0, '0']
+                                            'operator' => 'is-false',
                                         ],
                                     ],
                                 ]

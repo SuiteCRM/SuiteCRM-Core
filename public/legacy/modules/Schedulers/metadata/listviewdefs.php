@@ -99,8 +99,7 @@ $viewdefs['Schedulers'] = [
                                         'activeOnFields' => [
                                             'validUser' => [
                                                 [
-                                                    'operator' => 'is-equal',
-                                                    'value' => 'false',
+                                                    'operator' => 'is-false',
                                                 ],
                                             ],
                                         ]
@@ -116,8 +115,7 @@ $viewdefs['Schedulers'] = [
                                         'activeOnFields' => [
                                             'validUser' => [
                                                 [
-                                                    'operator' => 'is-equal',
-                                                    'value' => 'true',
+                                                    'operator' => 'is-true',
                                                 ],
                                             ],
                                         ]

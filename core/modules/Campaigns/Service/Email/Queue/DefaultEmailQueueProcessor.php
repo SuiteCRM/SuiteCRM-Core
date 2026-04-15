@@ -198,8 +198,8 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
                     $threshold = $this->getThreshold();
                     if ($threshold > 0 && $failedRecords >= $threshold) {
                         $pauseReason = $lastSendError
-                            ? sprintf('Send error threshold (%d) exceeded: %s', $threshold, $lastSendError)
-                            : sprintf('Send failure threshold of %d exceeded', $threshold);
+                            ? sprintf($this->languageManager->getAppLabel('LBL_CAMPAIGN_SEND_ERROR_THRESHOLD_EXCEEDED'), $threshold, $lastSendError)
+                            : sprintf($this->languageManager->getAppLabel('LBL_CAMPAIGN_SEND_FAILURE_THRESHOLD_EXCEEDED'), $threshold);
 
                         $this->emailMarketingManager->setPaused($emRecord, $pauseReason);
                         $paused = true;

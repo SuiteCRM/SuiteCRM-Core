@@ -74,17 +74,13 @@ class ListViewDefaultSizeImageMapper implements ViewDefinitionMapperInterface
                 continue;
             }
 
-            $metadata = $col['metadata'] ?? [];
+            $metadata = $col['fieldDefinition']['metadata'] ?? [];
 
-            if (empty($metadata['maxHeight'])) {
-                $metadata['maxHeight'] = $this->getMaxHeight();
-            }
+            $metadata['maxHeight'] = $this->getMaxHeight();
 
-            if (empty($metadata['maxWidth'])) {
-                $metadata['maxWidth'] = $this->getMaxWidth();
-            }
+            $metadata['maxWidth'] = $this->getMaxWidth();
 
-            $col['metadata'] = $metadata;
+            $col['fieldDefinition']['metadata'] = $metadata;
             $columns[$colKey] = $col;
         }
 

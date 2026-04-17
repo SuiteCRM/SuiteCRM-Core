@@ -3,7 +3,7 @@ parameters:
     SubPanelTopSelectButton:
       key: select
       labelKey: LBL_LINK_UNLINK
-      action: select
+      action: link
       modes:
         - list
       acl:

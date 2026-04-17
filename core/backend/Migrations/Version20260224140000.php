@@ -51,16 +51,11 @@ final class Version20260224140000 extends BaseMigration implements ContainerAwar
             'name' => 'Migrate Prospect Photos',
             'description' => 'Migrates photo field files from the Prospects (Targets) module from legacy storage (upload/{record_id}_photo) to the new media object storage system.',
         ],
-        [
-            'service_key' => 'migrate-user-photos',
-            'name' => 'Migrate User Photos',
-            'description' => 'Migrates photo field files from the Users module from legacy storage (upload/{record_id}_photo) to the new media object storage system.',
-        ],
     ];
 
     public function getDescription(): string
     {
-        return 'Add per-module Person Photo migration tasks (Contacts, Leads, Prospects, Users)';
+        return 'Add per-module Person Photo migration tasks (Contacts, Leads, Prospects)';
     }
 
     public function up(Schema $schema): void

@@ -42,6 +42,26 @@
             <br>
         </td>
     </tr>
+    {if $googleSyncMigrationStatus == 'pending' || $googleSyncMigrationStatus == 'failed'}
+    <tr>
+        <td colspan='100'>
+            <div class="alert {if $googleSyncMigrationStatus == 'failed'}alert-danger{else}alert-warning{/if}" role="alert">
+                <strong>
+                    {if $googleSyncMigrationStatus == 'failed'}
+                        {$MOD.LBL_GOOGLE_SYNC_MIGRATION_FAILED_TITLE}
+                    {else}
+                        {$MOD.LBL_GOOGLE_SYNC_MIGRATION_PENDING_TITLE}
+                    {/if}
+                </strong>
+                {if $googleSyncMigrationStatus == 'failed'}
+                    {$MOD.LBL_GOOGLE_SYNC_MIGRATION_FAILED_DESC}
+                {else}
+                    {$MOD.LBL_GOOGLE_SYNC_MIGRATION_PENDING_DESC}
+                {/if}
+            </div>
+        </td>
+    </tr>
+    {/if}
     <tr>
         <td colspan='100'>
 

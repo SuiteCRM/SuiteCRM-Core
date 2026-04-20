@@ -95,4 +95,11 @@ $smarty->assign('message', $message);
 $smarty->assign('success', $success);
 $smarty->assign('calendarSyncConfig', $calendarSync->getConfig());
 $smarty->assign('conflictResolutionOptions', $conflictResolutionOptions);
+
+$db = DBManagerFactory::getInstance();
+$migrationStatusRow = $db->fetchByAssoc($db->query(
+    "SELECT value FROM config WHERE category = 'calendar_sync' AND name = 'google_sync_migration_status' LIMIT 1"
+));
+$smarty->assign('googleSyncMigrationStatus', $migrationStatusRow['value'] ?? null);
+
 $smarty->display('modules/Administration/templates/CalendarSyncSettings.tpl');

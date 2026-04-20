@@ -201,6 +201,24 @@ class DefaultEmailQueueManager implements EmailQueueManagerInterface
         return $result;
     }
 
+    public function countEntries(string $marketingId): int
+    {
+        $queryBuilder = $this->preparedStatementHandler->createQueryBuilder();
+        $queryBuilder->select('COUNT(*) as total')
+                     ->from('emailman')
+                     ->where('marketing_id = :mkt_id')
+                     ->andWhere('deleted = 0')
+                     ->setParameter('mkt_id', $marketingId);
+
+        try {
+            $result = $queryBuilder->fetchAssociative();
+            return (int)($result['total'] ?? 0);
+        } catch (Exception $e) {
+            $this->logger->error('Campaigns:DefaultEmailQueueManager::countEntries | Exception - ' . $e->getMessage(), ['trace' => $e->getTrace()]);
+            return 0;
+        }
+    }
+
     /**
      * @param mixed $id
      * @return void

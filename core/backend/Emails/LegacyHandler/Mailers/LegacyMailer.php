@@ -292,15 +292,10 @@ class LegacyMailer extends LegacyHandler
 
     protected function getSugarMailer(): \SugarPHPMailer
     {
-        $this->init();
-        $this->startLegacyApp();
         /* @noinspection PhpIncludeInspection */
         require_once ('include/SugarPHPMailer.php');
 
-        $class = new \SugarPHPMailer();
-
-        $this->close();
-        return $class;
+        return new \SugarPHPMailer();
     }
 
     public function isConnected($id): bool

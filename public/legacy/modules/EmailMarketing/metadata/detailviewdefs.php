@@ -174,6 +174,16 @@ $viewdefs ['EmailMarketing'] = [
                                                     'type' => 'int'
                                                 ],
                                                 [
+                                                    'key' => 'campaign_emails_max_retries',
+                                                    'defaultKey' => 'campaign_emails_max_retries_default',
+                                                    'type' => 'int'
+                                                ],
+                                                [
+                                                    'key' => 'campaign_emails_threshold',
+                                                    'defaultKey' => 'campaign_emails_threshold_default',
+                                                    'type' => 'int'
+                                                ],
+                                                [
                                                     'key' => 'trackers_enabled',
                                                     'default' => false,
                                                     'hasConfig' => false,
@@ -460,6 +470,36 @@ $viewdefs ['EmailMarketing'] = [
                                     ],
                                     [
                                         'dynamicLabel' => 'LBL_EMAILS_PER_RUN_DYNAMIC_LABEL',
+                                        'class' => 'campaign-status-check-row-value',
+                                    ]
+                                ]
+                            ],
+                            [
+                                'justify' => 'start',
+                                'class' => 'campaign-status-check-row',
+                                'cols' => [
+                                    [
+                                        'labelKey' => 'LBL_EMAILS_MAX_RETRIES',
+                                        'class' => 'campaign-status-check-row-label text-uppercase',
+                                        'bold' => true
+                                    ],
+                                    [
+                                        'dynamicLabel' => 'LBL_EMAILS_MAX_RETRIES_DYNAMIC_LABEL',
+                                        'class' => 'campaign-status-check-row-value',
+                                    ]
+                                ]
+                            ],
+                            [
+                                'justify' => 'start',
+                                'class' => 'campaign-status-check-row',
+                                'cols' => [
+                                    [
+                                        'labelKey' => 'LBL_EMAILS_THRESHOLD',
+                                        'class' => 'campaign-status-check-row-label text-uppercase',
+                                        'bold' => true
+                                    ],
+                                    [
+                                        'dynamicLabel' => 'LBL_EMAILS_THRESHOLD_DYNAMIC_LABEL',
                                         'class' => 'campaign-status-check-row-value',
                                     ]
                                 ]

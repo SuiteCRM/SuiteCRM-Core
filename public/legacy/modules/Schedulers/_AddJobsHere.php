@@ -549,6 +549,17 @@ function calendarSyncJob(SchedulersJob $job, string $data = ''): bool
 
     require_once 'include/CalendarSync/CalendarSync.php';
 
+    $db = DBManagerFactory::getInstance();
+    $statusRow = $db->fetchByAssoc($db->query(
+        "SELECT value FROM config WHERE category = 'calendar_sync' AND name = 'google_sync_migration_status' LIMIT 1"
+    ));
+    $migrationStatus = $statusRow['value'] ?? null;
+
+    if ($migrationStatus !== null && $migrationStatus !== 'completed' && $migrationStatus !== 'not_required') {
+        $GLOBALS['log']->warn('[JOB][CalendarSyncJob] Skipping: google_sync_migration_status is "' . $migrationStatus . '". Run the migration from Admin → Migrations first.');
+        return true;
+    }
+
     try {
         $decodedData = html_entity_decode($data, ENT_QUOTES, 'UTF-8');
 

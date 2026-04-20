@@ -95,6 +95,37 @@ class LegacyGoogleSyncMigrationService
         $GLOBALS['current_user']->retrieve(1);
     }
 
+    /**
+     * Migrate a single meeting record for use with per-meeting async batching.
+     *
+     * Ensures the OAuth provider and user's CalendarAccount exist (both idempotent),
+     * then delegates to MeetingMigrationService::migrateMeetingById().
+     *
+     * @param array{meetingId: string, userId: string, gsyncId: string, gsyncLastsync: string} $meetingData
+     * @return bool True if migrated (or already migrated), false on failure
+     */
+    public function migrateMeeting(array $meetingData): bool
+    {
+        $providerId = $this->getProviderOrFail(false);
+
+        if ($providerId === null) {
+            $this->logger->error('[LegacyGoogleSyncMigrationService][migrateMeeting] Could not get/create OAuth provider');
+            return false;
+        }
+
+        $userData = $this->userMigrationService->findUserForMigrationById($meetingData['userId']);
+        if ($userData !== null) {
+            $this->userMigrationService->migrateUser($userData, $providerId, false);
+        }
+
+        return $this->meetingMigrationService->migrateMeetingById(
+            $meetingData['meetingId'],
+            $meetingData['userId'],
+            $meetingData['gsyncId'],
+            $meetingData['gsyncLastsync']
+        );
+    }
+
     public function migrateLegacySchedulers(): UserMigrationStatus
     {
         $this->migrateSchedulerOrFail(false);

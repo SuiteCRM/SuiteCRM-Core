@@ -193,6 +193,60 @@ class MeetingMigrationService
     }
 
     /**
+     * Migrate a single meeting by ID for use with per-meeting batching.
+     *
+     * Looks up the CalendarAccount for the given user and creates the
+     * calendar_account_meetings record, then clears legacy gsync fields.
+     * Returns true if migrated (or already migrated), false if skipped.
+     *
+     * @param string $meetingId Meeting ID to migrate
+     * @param string $userId Assigned user ID for the meeting
+     * @param string $gsyncId Legacy Google event ID
+     * @param string $gsyncLastsync Legacy last-sync Unix timestamp (may be empty)
+     * @return bool
+     */
+    public function migrateMeetingById(
+        string $meetingId,
+        string $userId,
+        string $gsyncId,
+        string $gsyncLastsync
+    ): bool {
+        $calendarAccountId = $this->findCalendarAccountForUser($userId);
+
+        if (!$calendarAccountId) {
+            $this->logger->warn("[MeetingMigrationService][migrateMeetingById] No calendar account for user $userId, skipping meeting $meetingId");
+            return false;
+        }
+
+        if ($this->hasExistingCalendarAccountMeeting($calendarAccountId, $meetingId)) {
+            $this->logger->info("[MeetingMigrationService][migrateMeetingById] Meeting $meetingId already migrated, skipping");
+            return true;
+        }
+
+        $lastSync = null;
+        if (!empty($gsyncLastsync)) {
+            try {
+                $lastSync = new DateTime("@{$gsyncLastsync}");
+            } catch (Throwable) {
+                $lastSync = null;
+            }
+        }
+
+        $eventData = new LegacyEventData(
+            event_id: $meetingId,
+            event_name: '',
+            user_id: $userId,
+            external_event_id: $gsyncId,
+            external_event_last_sync: $lastSync
+        );
+
+        $this->createCalendarAccountMeeting($eventData, $calendarAccountId, false);
+        $this->cleanupLegacyMeetingSync($meetingId, false);
+
+        return true;
+    }
+
+    /**
      * Find all meetings with legacy Google sync data
      *
      * @param LegacyUserData $userData

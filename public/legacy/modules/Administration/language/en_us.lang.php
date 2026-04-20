@@ -170,6 +170,10 @@ $mod_strings = array(
     'LBL_CONFIG_TABS_DESC' => 'Drag and Drop the names of the modules below to set them to be displayed or hidden in the top navigation bar or as subpanels. To control access to modules, use <a href="?module=ACLRoles&action=index">Role Management.</a>',
     'LBL_CONFIG_LANGS_DESC' => 'Drag and Drop the names of the languages below to enable and disable them.',
     'LBL_CONFIG_TABS_ALLOW_USERS_HIDE_TABS_HELP' => 'Select this option to allow users to choose which module tabs they can view. When selected, users will be able to choose which module tabs are visible by managing the tabs within their User Settings.',
+    'LBL_GOOGLE_SYNC_MIGRATION_PENDING_TITLE' => 'Google Calendar Sync Migration Required',
+    'LBL_GOOGLE_SYNC_MIGRATION_PENDING_DESC' => 'Legacy Google Calendar sync data has been detected. Please navigate to Migrations via the Admin Menu to run the Google Calendar Sync migration before enabling calendar sync.',
+    'LBL_GOOGLE_SYNC_MIGRATION_FAILED_TITLE' => 'Google Calendar Sync Migration Failed',
+    'LBL_GOOGLE_SYNC_MIGRATION_FAILED_DESC' => 'The Google Calendar Sync migration encountered errors. Please navigate to Migrations via the Admin Menu to re-run or retry the migration.',
     'LBL_CALENDAR_SYNC_SETTINGS' => 'Calendar Synchronization Settings',
     'LBL_CALENDAR_SYNC_SETTINGS_DESC' => 'Configure automatic calendar synchronization settings and performance parameters',
     'LBL_CALENDAR_SYNC_DESCRIPTION' => 'Manage automatic two-way synchronization between SuiteCRM and external calendar systems (Google Calendar, Outlook, etc.).',
@@ -226,7 +230,7 @@ $mod_strings = array(
     'LBL_CALENDAR_SYNC_ALLOW_INTERNAL_DELETION_DESC' => 'Automatically remove SuiteCRM events when their linked external calendar events are deleted (caution: this permanently removes data)',
     'LBL_CALENDAR_SYNC_ALLOW_EXTERNAL_DELETION' => 'Auto-Delete External Events:',
     'LBL_CALENDAR_SYNC_ALLOW_EXTERNAL_DELETION_DESC' => 'Automatically remove external calendar events when their linked SuiteCRM events are deleted (caution: affects external calendars)',
-    
+
     'LBL_CALENDAR_SYNC_MANUAL_TRIGGER_TITLE' => 'Immediate Synchronization',
     'LBL_CALENDAR_SYNC_MANUAL_TRIGGER_DESC' => 'Force an immediate synchronization for all users with active calendar connections, regardless of scheduler status',
     'LBL_CALENDAR_SYNC_MANUAL_TRIGGER_BUTTON' => 'Sync All Users Now',

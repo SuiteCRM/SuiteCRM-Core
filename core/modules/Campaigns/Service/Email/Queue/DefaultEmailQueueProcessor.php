@@ -70,10 +70,11 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
     {
         $emailMarketingRecords = $this->emailMarketingManager->getRecordsForQueueProcessing($this->getEmailMarketingBatchSize());
 
+        $failedRecords = 0;
+
         foreach ($emailMarketingRecords as $emailMarketing) {
             $emailMarketingId = $emailMarketing['id'];
             $campaignId = $emailMarketing['campaign_id'];
-            $failedRecords = 0;
 
             if (!$this->isOutboundEmailConfigured($emailMarketing)) {
                 $this->logger->warning(
@@ -135,6 +136,8 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
                 $this->setSending($emRecord);
             }
 
+            $totalEntries = $this->emailQueueManager->countEntries($emailMarketingId);
+            $threshold = $this->getEffectiveThreshold($totalEntries);
             $paused = false;
 
             foreach ($queueEntries as $entry) {
@@ -195,7 +198,6 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
                         );
                     }
 
-                    $threshold = $this->getThreshold();
                     if ($threshold > 0 && $failedRecords >= $threshold) {
                         $pauseReason = $lastSendError
                             ? sprintf($this->languageManager->getAppLabel('LBL_CAMPAIGN_SEND_ERROR_THRESHOLD_EXCEEDED'), $threshold, $lastSendError)
@@ -245,6 +247,21 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
         }
     }
 
+
+    protected function getEffectiveThreshold(int $totalEntries): int
+    {
+        $threshold = $this->getThreshold();
+
+        if ($threshold <= 0) {
+            return 0;
+        }
+
+        if ($totalEntries < $threshold) {
+            return (int)ceil($totalEntries / 2);
+        }
+
+        return $threshold;
+    }
 
     protected function getThreshold(): int
     {

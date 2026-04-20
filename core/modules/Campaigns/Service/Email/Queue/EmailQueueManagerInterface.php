@@ -58,4 +58,6 @@ interface EmailQueueManagerInterface
     ): array;
 
     public function updateSendAttempts(string $id): void;
+
+    public function countEntries(string $marketingId): int;
 }

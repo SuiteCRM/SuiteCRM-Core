@@ -35,6 +35,7 @@ use App\Process\Service\ProcessHandlerInterface;
 class MigrateGoogleCalendarSyncUsersAction implements ProcessHandlerInterface
 {
     protected const MSG_OPTIONS_NOT_FOUND = 'Process options are not defined';
+    protected const MSG_SIBLING_RUNNING = 'LBL_MIGRATE_GOOGLE_CALENDAR_SYNC_USERS_SIBLING_RUNNING';
     protected const PROCESS_TYPE = 'migration-task-migrate-google-calendar-sync-users';
     protected const SIBLING_SERVICE_KEY = 'migrate-google-calendar-sync';
 
@@ -75,6 +76,12 @@ class MigrateGoogleCalendarSyncUsersAction implements ProcessHandlerInterface
         if (empty($options['module']) || empty($options['id'])) {
             throw new InvalidArgumentException(self::MSG_OPTIONS_NOT_FOUND);
         }
+    }
+
+    public function configure(Process $process): void
+    {
+        $options = $process->getOptions();
+        $process->setId($options['id'] ?? '');
 
         $siblingStatus = $this->preparedStatementHandler->createQueryBuilder()
             ->select('status')
@@ -82,20 +89,15 @@ class MigrateGoogleCalendarSyncUsersAction implements ProcessHandlerInterface
             ->where('service_key = :service_key')
             ->andWhere('deleted = 0')
             ->setParameter('service_key', self::SIBLING_SERVICE_KEY)
-            ->executeQuery()
             ->fetchOne();
 
-        if ($siblingStatus === 'running') {
-            throw new InvalidArgumentException(
-                'Cannot run this migration while "Migrate Google Calendar Sync" is currently running.'
-            );
+        if ($siblingStatus === 'running' || $siblingStatus === 'pending') {
+            $process->setAsync(false);
+            $process->setStatus('error');
+            $process->setMessages([self::MSG_SIBLING_RUNNING]);
+            return;
         }
-    }
 
-    public function configure(Process $process): void
-    {
-        $options = $process->getOptions();
-        $process->setId($options['id'] ?? '');
         $process->setAsync(true);
         $process->setAsyncHandlerKey('migrate-google-calendar-sync-users');
         $process->setAsyncRunnerType('manual-migration-tasks');

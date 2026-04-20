@@ -78,7 +78,7 @@ class MigrateGoogleCalendarSyncUsersTaskHandler extends AbstractAsyncTaskHandler
 
         try {
             $qb = $this->preparedStatementHandler->createQueryBuilder();
-            $qb->select('u.id', 'u.user_name')
+            $qb->select('u.id', 'u.user_name', 'up.contents')
                 ->from('users', 'u')
                 ->innerJoin('u', 'user_preferences', 'up', 'u.id = up.assigned_user_id')
                 ->leftJoin(
@@ -90,7 +90,6 @@ class MigrateGoogleCalendarSyncUsersTaskHandler extends AbstractAsyncTaskHandler
                 ->where("u.deleted = '0'")
                 ->andWhere("up.category = 'GoogleSync'")
                 ->andWhere('up.contents IS NOT NULL')
-                ->andWhere("from_base64(up.contents) LIKE '%GoogleApiToken%'")
                 ->andWhere('ca.id IS NULL')
                 ->setFirstResult($offset)
                 ->setMaxResults($batchSize);
@@ -106,6 +105,11 @@ class MigrateGoogleCalendarSyncUsersTaskHandler extends AbstractAsyncTaskHandler
 
         $items = [];
         foreach ($results as $row) {
+            $decoded = base64_decode($row['contents'] ?? '', true);
+            if ($decoded === false || strpos($decoded, 'GoogleApiToken') === false) {
+                continue;
+            }
+
             $items[] = new AsyncTaskBatchItem(
                 $row['id'],
                 [

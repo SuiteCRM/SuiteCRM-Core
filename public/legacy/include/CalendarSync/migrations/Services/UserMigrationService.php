@@ -198,9 +198,22 @@ class UserMigrationService
      */
     protected function extractLegacyUserData(User $user): ?LegacyUserData
     {
-        $googleApiToken = $user->getPreference('GoogleApiToken', 'GoogleSync');
-        $googleApiRefreshToken = $user->getPreference('GoogleApiRefreshToken', 'GoogleSync');
-        $googleSyncEnabled = $user->getPreference('syncGCal', 'GoogleSync');
+        $row = $this->db->fetchByAssoc($this->db->query(
+            "SELECT contents FROM user_preferences WHERE assigned_user_id='" . $this->db->quote($user->id) . "' AND category='GoogleSync' AND deleted=0 LIMIT 1"
+        ));
+
+        if (empty($row['contents'])) {
+            return null;
+        }
+
+        $prefs = unserialize(base64_decode($row['contents']), ['allowed_classes' => false]);
+        if (!is_array($prefs)) {
+            return null;
+        }
+
+        $googleApiToken = $prefs['GoogleApiToken'] ?? null;
+        $googleApiRefreshToken = $prefs['GoogleApiRefreshToken'] ?? null;
+        $googleSyncEnabled = $prefs['syncGCal'] ?? null;
 
         if (empty($googleApiToken)) {
             return null;

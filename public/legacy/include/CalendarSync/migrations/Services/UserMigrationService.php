@@ -114,6 +114,22 @@ class UserMigrationService
     }
 
     /**
+     * Find a single user's migration data by user ID
+     *
+     * @param string $userId User ID to look up
+     * @return LegacyUserData|null User data if legacy sync is configured, null otherwise
+     */
+    public function findUserForMigrationById(string $userId): ?LegacyUserData
+    {
+        $user = $this->getUserBean($userId);
+        if (!$user) {
+            return null;
+        }
+
+        return $this->extractLegacyUserData($user);
+    }
+
+    /**
      * Find all users that need calendar sync migration (both legacy and new)
      *
      * @return LegacyUserData[] Array of user data that need migration

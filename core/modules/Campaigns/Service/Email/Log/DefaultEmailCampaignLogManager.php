@@ -28,8 +28,10 @@
 namespace App\Module\Campaigns\Service\Email\Log;
 
 use App\Data\Entity\Record;
+use App\Data\LegacyHandler\PreparedStatementHandler;
 use App\Data\Service\RecordProviderInterface;
 use App\DateTime\LegacyHandler\DateTimeHandler;
+use Doctrine\DBAL\Exception;
 use Psr\Log\LoggerInterface;
 
 class DefaultEmailCampaignLogManager implements EmailCampaignLogManagerInterface
@@ -37,7 +39,8 @@ class DefaultEmailCampaignLogManager implements EmailCampaignLogManagerInterface
     public function __construct(
         protected RecordProviderInterface $recordProvider,
         protected LoggerInterface $logger,
-        protected DateTimeHandler $dateTimeHandler
+        protected DateTimeHandler $dateTimeHandler,
+        protected PreparedStatementHandler $preparedStatementHandler,
     ) {
     }
 
@@ -99,5 +102,29 @@ class DefaultEmailCampaignLogManager implements EmailCampaignLogManagerInterface
                 'is_test_entry' => $isTest,
             ]
         );
+    }
+
+    public function countEntries(string $marketingId): int
+    {
+        $queryBuilder = $this->preparedStatementHandler->createQueryBuilder();
+        $queryBuilder->select('COUNT(*) as total')
+                     ->from('campaign_log')
+                     ->where('marketing_id = :mkt_id')
+                     ->andWhere('activity_type IN (:activity_types)')
+                     ->andWhere('is_test_entry = 0')
+                     ->andWhere('deleted = 0')
+                     ->setParameter('mkt_id', $marketingId)
+                     ->setParameter('activity_types', ['targeted', 'send error'], \Doctrine\DBAL\ArrayParameterType::STRING);
+
+        try {
+            $result = $queryBuilder->fetchAssociative();
+            return (int)($result['total'] ?? 0);
+        } catch (Exception $e) {
+            $this->logger->error(
+                'Campaigns:DefaultEmailCampaignLogManager::countEntries | Exception - ' . $e->getMessage(),
+                ['trace' => $e->getTrace()]
+            );
+            return 0;
+        }
     }
 }

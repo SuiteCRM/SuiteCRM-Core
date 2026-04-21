@@ -45,8 +45,6 @@ use Psr\Log\LoggerInterface;
 
 class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
 {
-    public int $failedRecords = 0;
-
     public function __construct(
         protected EmailQueueManagerInterface $queueManager,
         protected EmailProcessProcessor $emailProcessor,
@@ -69,8 +67,6 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
     public function processQueue(array $options = []): void
     {
         $emailMarketingRecords = $this->emailMarketingManager->getRecordsForQueueProcessing($this->getEmailMarketingBatchSize());
-
-        $failedRecords = 0;
 
         foreach ($emailMarketingRecords as $emailMarketing) {
             $emailMarketingId = $emailMarketing['id'];
@@ -136,8 +132,10 @@ class DefaultEmailQueueProcessor implements EmailQueueProcessorInterface
                 $this->setSending($emRecord);
             }
 
-            $totalEntries = $this->emailQueueManager->countEntries($emailMarketingId);
+            $totalLogEntries = $this->campaignLogManager->countEntries($emailMarketingId);
+            $totalEntries = $this->emailQueueManager->countEntries($emailMarketingId) + $totalLogEntries;
             $threshold = $this->getEffectiveThreshold($totalEntries);
+            $failedRecords = 0;
             $paused = false;
 
             foreach ($queueEntries as $entry) {

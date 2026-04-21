@@ -43,4 +43,11 @@ interface EmailCampaignLogManagerInterface
         bool $isTest = false,
     ): void;
 
+    /**
+     * Count the number of successfully-attempted entries (targeted + send error, non-test)
+     * for the given email marketing ID. Used together with the remaining queue count to
+     * determine the real total-target size for threshold calculations.
+     */
+    public function countEntries(string $marketingId): int;
+
 }

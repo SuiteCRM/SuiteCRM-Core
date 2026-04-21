@@ -333,7 +333,7 @@ export class SquireEditFieldComponent extends BaseFieldComponent implements OnDe
         const variables = {
             key: 'variables',
             type: 'tiered-menu',
-            icon: 'tags',
+            icon: 'braces-asterisk',
             titleKey: 'LBL_INSERT_TEMPLATE_VARIABLE',
             klass: 'squire-editor-button btn btn-sm ',
             disabled: computed((): boolean => {

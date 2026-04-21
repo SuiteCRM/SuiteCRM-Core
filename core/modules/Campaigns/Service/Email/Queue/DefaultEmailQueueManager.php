@@ -131,7 +131,7 @@ class DefaultEmailQueueManager implements EmailQueueManagerInterface
 
         $timedate = $this->dateTimeHandler->getDateTime();
         $now = $timedate->nowDb();
-        $str = $timedate->fromString("-1 day")?->asDb();
+        $queueDate = $this->relativeDbDateTime($timedate, '-1 day', $now);
 
         $queryBuilder = $this->preparedStatementHandler->createQueryBuilder();
         $queryBuilder->select('*')
@@ -155,7 +155,7 @@ class DefaultEmailQueueManager implements EmailQueueManagerInterface
                      ->setMaxResults($batchSize)
                      ->setParameter('mkt_id', $marketingId)
                      ->setParameter('now', $now)
-                     ->setParameter('queue_date', $str);
+                     ->setParameter('queue_date', $queueDate);
 
         try {
             $results = $queryBuilder->fetchAllAssociative();
@@ -217,7 +217,7 @@ class DefaultEmailQueueManager implements EmailQueueManagerInterface
             ->set('in_queue_date', ':in_queue_date')
             ->where('id = :id')
             ->setParameter('in_queue', '1')
-            ->setParameter('in_queue_date', (new \DateTime())->format('Y-m-d H:i:s'))
+            ->setParameter('in_queue_date', $timedate->nowDb())
             ->setParameter('id', $id);
 
         try {
@@ -225,5 +225,12 @@ class DefaultEmailQueueManager implements EmailQueueManagerInterface
         } catch (Exception $e) {
             $this->logger->error('DefaultEmailQueueManager::updateSendAttempts | Failed to update send attempts for ID: ' . $id . ' | Error: ' . $e->getMessage(), ['trace' => $e->getTrace()]);
         }
+    }
+
+    protected function relativeDbDateTime(\TimeDate $timedate, string $modifier, string $fallback): string
+    {
+        $date = $timedate->fromString($modifier);
+
+        return $date?->asDb() ?? $fallback;
     }
 }

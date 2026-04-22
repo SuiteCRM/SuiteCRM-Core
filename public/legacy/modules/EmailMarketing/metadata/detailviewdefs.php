@@ -68,21 +68,21 @@ $viewdefs ['EmailMarketing'] = [
                             ],
                             [
                                 'justify' => 'center',
+                                'class' => 'paused-banner-content-row',
                                 'cols' => [
                                     [
-                                        'class' => 'd-flex align-items-start',
+                                        'class' => 'd-flex align-items-start flex-shrink-0',
                                         'icon' => 'exclamation-triangle',
                                     ],
                                     [
                                         'bold' => true,
-                                        'class' => 'd-flex align-items-center ml-1 mr-1',
+                                        'class' => 'd-flex align-items-center ml-1 mr-1 flex-shrink-0',
                                         'labelKey' => 'LBL_CAMPAIGN_PAUSED_THRESHOLD',
-                                        'labelClass' => 'd-inline-block',
                                     ],
                                     [
-                                        'class' => 'd-flex align-items-center',
+                                        'class' => 'd-flex align-items-center paused-banner-dynamic-col',
                                         'dynamicLabel' => 'LBL_CAMPAIGN_PAUSED_DYNAMIC_LABEL',
-                                        'dynamicLabelClass' => 'd-inline-block',
+                                        'dynamicLabelClass' => 'paused-banner-dynamic-label',
                                         'dynamicLabelTooltip' => true,
                                     ],
                                 ],

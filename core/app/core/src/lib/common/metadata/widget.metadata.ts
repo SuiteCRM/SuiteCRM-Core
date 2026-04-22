@@ -74,6 +74,7 @@ export interface StatisticWidgetLayoutCol {
     hideIfLoading?: boolean;
     descriptionKey?: string;
     dynamicLabel?: string;
+    dynamicLabelTooltip?: boolean;
     statistic?: string;
     store?: SingleValueStatisticsStoreInterface;
     display?: string;

@@ -100,7 +100,8 @@
 
                                     <scrm-dynamic-label [context]="getMessageContext()"
                                                         [fields]="getMessageFields(statisticsMap())"
-                                                        [labelKey]="col.dynamicLabel">
+                                                        [labelKey]="col.dynamicLabel"
+                                                        [displayTitle]="col.dynamicLabelTooltip ?? false">
                                     </scrm-dynamic-label>
 
                                 </div>

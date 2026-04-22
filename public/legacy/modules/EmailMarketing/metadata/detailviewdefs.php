@@ -83,6 +83,7 @@ $viewdefs ['EmailMarketing'] = [
                                         'class' => 'd-flex align-items-center',
                                         'dynamicLabel' => 'LBL_CAMPAIGN_PAUSED_DYNAMIC_LABEL',
                                         'dynamicLabelClass' => 'd-inline-block',
+                                        'dynamicLabelTooltip' => true,
                                     ],
                                 ],
                             ],

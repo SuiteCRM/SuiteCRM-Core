@@ -77,6 +77,25 @@
   border-bottom: none;
 }
 
+@media (max-width: $breakpoint-medium) {
+  .paused-banner-content-row {
+    flex-wrap: wrap;
+  }
+
+  .paused-banner-dynamic-col {
+    flex: 0 0 100%;
+    min-width: 0;
+  }
+
+  .paused-banner-dynamic-label {
+    white-space: normal !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    text-overflow: unset !important;
+  }
+}
+
 .cron-code-label {
   .widget-entry-dynamic-label, .widget-entry-label {
     font-family: 'Fira Mono', 'Consolas', 'Monaco', monospace;

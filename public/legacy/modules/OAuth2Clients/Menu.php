@@ -81,6 +81,6 @@ $module_menu[] = [
 
 $module_menu[] = [
     "index.php?module=OAuth2AuthCodes&action=index",
-    $mod_strings['LNK_OAUTH2_AUTHCODE_LIST'],
+    $mod_strings['LNK_OAUTH2_AUTHCODE_LIST'] ?? '',
     "List"
 ];

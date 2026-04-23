@@ -107,7 +107,9 @@ abstract class BuildPDFEmail
             'module' => 'emails',
             'metadataView' => 'modalComposeView',
             'detached' => true,
+            'headerActionsKlass' => 'draft-modal-action',
             'headerClass' => 'left-aligned-title',
+            'closable' => false,
             'dynamicTitleKey' => 'LBL_EMAIL_MODAL_DYNAMIC_TITLE',
             'modalOptions' => [
                 'size' => 'lg',

@@ -78,48 +78,9 @@ if (!empty($_REQUEST['sample'])) {
     $content = exportSample($the_module);
 } else {
     if (!empty($_REQUEST['uid'])) {
-        $ids = explode(',', $_REQUEST['uid']);
+        $content = export($the_module, $_REQUEST['uid'], isset($_REQUEST['members']) ? $_REQUEST['members'] : false);
     } else {
-        $ids = array();
-        $bean = BeanFactory::getBean($the_module);
-
-        if(trim($_SESSION["export_where"]) !== "where " . strtolower($_REQUEST["module"]) .".deleted=0"){
-            // handle select all queries with filters
-            $whereArr = explode(" ", trim($_SESSION['export_where']));
-            if ($whereArr[0] === trim('where')) {
-                array_shift($whereArr);
-            }
-            $query = $bean->create_new_list_query(
-                "",
-                implode(" ", $whereArr),
-                array(),
-                array(),
-                0,
-                '',
-                false,
-                $bean,
-                true,
-                true
-            );
-            $result = $db->query($query, true);
-        } else {
-            // handle default select all
-            $result = $db->query("SELECT id FROM $bean->table_name WHERE deleted=0;");
-        }
-
-        while ($val = $db->fetchByAssoc($result, false)) {
-            $ids[] = $val['id'];
-        }
-
-        unset($result, $bean);
-    }
-
-    $idChunks = array_chunk($ids, 1000, true);
-    $content = '';
-    $displayHeaders = true;
-    foreach($idChunks as $chunk) {
-        $content .= export($the_module, implode(",", $chunk), isset($_REQUEST['members']) ? $_REQUEST['members'] : false, false, $displayHeaders);
-        $displayHeaders = false;
+        $content = export($the_module);
     }
 }
 $filename = $_REQUEST['module'];

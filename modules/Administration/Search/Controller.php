@@ -66,8 +66,7 @@ class Controller extends AbstractController
      */
     public function doSave(): void
     {
-        $searchEngine = filter_input(INPUT_POST, 'search-engine', FILTER_SANITIZE_STRING);
-        $aod = $searchEngine === 'BasicAndAodEngine';
+        $searchEngine = filter_input(INPUT_POST, 'search-engine');
 
         SearchConfigurator::make()
             ->setEngine($searchEngine)

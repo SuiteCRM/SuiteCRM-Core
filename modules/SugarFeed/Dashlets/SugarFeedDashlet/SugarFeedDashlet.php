@@ -451,9 +451,9 @@ class SugarFeedDashlet extends DashletGeneric
                 'UserFeed',
                 $GLOBALS['current_user']->id,
                 $GLOBALS['current_user']->id,
-                $_REQUEST['link_type'],
-                $_REQUEST['link_url']
-                                );
+                $_REQUEST['link_type'] ?? null,
+                $_REQUEST['link_url'] ?? null
+            );
         }
     }
 

@@ -126,6 +126,11 @@ class BasicSearchEngine extends SearchEngine
 
                 $unifiedSearchFields = [];
                 $innerJoins = [];
+                
+                if (!isset($unifiedSearchModules[$moduleName]['fields'])) {
+                    continue;
+                }
+                
                 foreach ($unifiedSearchModules[$moduleName]['fields'] as $field => $def) {
                     $listViewCheckField = strtoupper($field);
                     // Check to see if the field is in listview defs

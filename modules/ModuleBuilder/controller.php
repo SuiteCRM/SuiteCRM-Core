@@ -617,7 +617,7 @@ class ModuleBuilderController extends SugarController
                 $df->setup($seed) ;
                 //Need to load the entire field_meta_data for some field types
                 $field = $df->getFieldWidget($moduleName, $field->name);
-                $field->delete($df) ;
+                $field?->delete($df);
 
                 $GLOBALS [ 'mod_strings' ]['LBL_ALL_MODULES'] = 'all_modules';
                 $_REQUEST['execute_sql'] = true;
@@ -631,7 +631,7 @@ class ModuleBuilderController extends SugarController
             $mb = new ModuleBuilder() ;
             $module = & $mb->getPackageModule($_REQUEST [ 'view_package' ], $_REQUEST [ 'view_module' ]) ;
             $field = $module->getField($field->name);
-            $field->delete($module) ;
+            $field?->delete($module);
             $mb->save() ;
         }
         $module->removeFieldFromLayouts($field->name);

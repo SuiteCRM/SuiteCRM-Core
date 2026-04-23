@@ -47,6 +47,7 @@ require_once __DIR__ . '/../../include/EmailInterface.php';
 require_once __DIR__ . '/../Emails/EmailUI.php';
 
 // User is used to store customer information.
+#[\AllowDynamicProperties]
 class User extends Person implements EmailInterface
 {
 
@@ -110,6 +111,8 @@ class User extends Person implements EmailInterface
     );
     public $emailAddress;
     public $new_schema = true;
+
+    public $default_team;
 
     /**
      * @var bool
@@ -681,7 +684,7 @@ class User extends Person implements EmailInterface
 
         if (!$this->verify_data()) {
             SugarApplication::appendErrorMessage($this->error_string);
-            return SugarApplication::redirect('Location: index.php?action=Error&module=Users');
+            return SugarApplication::redirect('index.php?action=Error&module=Users');
         }
 
         if (
@@ -715,11 +718,11 @@ class User extends Person implements EmailInterface
             if (!$this->change_password($_POST['old_password'], $_POST['new_password'])) {
                 if (isset($_POST['page']) && $_POST['page'] === 'EditView') {
                     SugarApplication::appendErrorMessage($this->error_string);
-                    SugarApplication::redirect("Location: index.php?action=EditView&module=Users&record=" . $_POST['record']);
+                    SugarApplication::redirect("index.php?action=EditView&module=Users&record=" . $_POST['record']);
                 }
                 if (isset($_POST['page']) && $_POST['page'] === 'Change') {
                     SugarApplication::appendErrorMessage($this->error_string);
-                    SugarApplication::redirect("Location: index.php?action=ChangePassword&module=Users&record=" . $_POST['record']);
+                    SugarApplication::redirect("index.php?action=ChangePassword&module=Users&record=" . $_POST['record']);
                 }
             }
         }
@@ -773,7 +776,7 @@ class User extends Person implements EmailInterface
             }
 
             if (isset($_POST['mailmerge_on']) && !empty($_POST['mailmerge_on'])) {
-                $this->setPreference('mailmerge_on', 'on', 0, 'global');
+                $this->setPreference('mailmerge_on', isTrue($_POST['mailmerge_on']) ? 'on' : 'off', 0, 'global');
             } else {
                 $mailMerge = $this->getCurrentPreference('mailmerge_on');
                 $this->setPreference('mailmerge_on', $mailMerge ?? 'off', 0, 'global');
@@ -950,7 +953,7 @@ class User extends Person implements EmailInterface
                 $this->setPreference('default_export_charset', $_POST['default_export_charset'], 0, 'global');
             }
             if (isset($_POST['use_real_names'])) {
-                $this->setPreference('use_real_names', 'on', 0, 'global');
+                $this->setPreference('use_real_names', isTrue($_POST['use_real_names']) ? 'on' : 'off', 0, 'global');
             } elseif (!isset($_POST['use_real_names']) && !isset($_POST['from_dcmenu'])) {
                 // Make sure we're on the full form and not the QuickCreate.
                 $useRealNames = $this->getCurrentPreference('use_real_names');
@@ -1022,12 +1025,7 @@ class User extends Person implements EmailInterface
             if (isset($_POST['subtheme'])) {
                 $this->setPreference('subtheme', $_POST['subtheme'], 0, 'global');
             }
-            if (isset($_POST['gsync_cal'])) {
-                $this->setPreference('syncGCal', 1, 0, 'GoogleSync');
-            } else {
-                $syncGCal = $this->getCurrentPreference('syncGCal');
-                $this->setPreference('syncGCal', $syncGCal ?? 0, 0, 'GoogleSync');
-            }
+
             if ($this->user_hash === null) {
                 $newUser = true;
                 clear_register_value('user_array', $this->object_name);
@@ -1318,7 +1316,7 @@ EOQ;
         $result = $db->limitQuery($query, 0, 1, false);
         if (!empty($result)) {
             $row = $db->fetchByAssoc($result);
-            if (!$checkPasswordMD5 || self::checkPasswordMD5($password, $row['user_hash'])) {
+            if ($row !== false && (!$checkPasswordMD5 || self::checkPasswordMD5($password, $row['user_hash']))) {
                 return $row;
             }
         }
@@ -2478,7 +2476,7 @@ EOQ;
     {
         $editorType = $this->getPreference('editor_type');
         if (!$editorType) {
-            $editorType = 'mozaik';
+            $editorType = 'tinymce';
             $this->setPreference('editor_type', $editorType);
         }
 

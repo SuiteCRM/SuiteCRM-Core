@@ -162,6 +162,7 @@ trait IndexingLockFileTrait
      */
     protected function formatInterval(float $seconds): string
     {
+        $seconds = $seconds < 0 ? $seconds * -1 : $seconds; 
         $interval = new \DateInterval('PT' . round($seconds) . 'S');
         $reference = new \DateTimeImmutable();
         $endTime = $reference->add($interval);

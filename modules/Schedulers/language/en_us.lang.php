@@ -57,6 +57,7 @@ $mod_strings = array(
     'LBL_OOTB_REMOVE_DOCUMENTS_FROM_FS' => 'Removal of documents from filesystem',
     'LBL_OOTB_GOOGLE_CAL_SYNC' => 'Google Calendar Sync',
     'LBL_OOTB_ELASTIC_INDEX' => 'Perform Elasticsearch Index',
+    'LBL_OOTB_CAL_ACC_SYNC' => 'Calendar Accounts Sync',
 
 // List Labels
     'LBL_LIST_JOB_INTERVAL' => 'Interval:',
@@ -156,6 +157,7 @@ $mod_strings = array(
     'LBL_PROCESSAOW_WORKFLOW' => 'Process AOW Workflow',
 
     'LBL_RUNELASTICSEARCHINDEXERSCHEDULER' => 'Elasticsearch indexer',
+    'LBL_CALENDARSYNCJOB' => 'Sync Calendar Accounts',
 
     'LBL_SCHEDULER_TIMES' => 'Scheduler Times',
     'LBL_SYNCGOOGLECALENDAR' => 'Sync Google Calendars',

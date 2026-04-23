@@ -268,6 +268,17 @@ EOQ;
             sugar_cleanup(true);
         }
 
+        // if dates changed
+        if (!empty($focus->id)) {
+            $oldBean = BeanFactory::newBean('Calls');
+            $oldBean->retrieve($focus->id);
+            if (($focus->date_start != $oldBean->date_start) || ($focus->date_end != $oldBean->date_end)) {
+                $focus->date_changed = true;
+            } else {
+                $focus->date_changed = false;
+            }
+        }
+
         $newBean = true;
         if (!empty($focus->id)) {
             $newBean = false;
@@ -453,7 +464,7 @@ EOQ;
                     if (!isset($acceptStatusUsers[$user_id])) {
                         $focus->load_relationship('users');
                         $focus->users->add($user_id);
-                    } else {
+                    } else if (!$focus->date_changed) {
                         // update query to preserve accept_status
                         $qU  = 'UPDATE calls_users SET deleted = 0, accept_status = \''.$acceptStatusUsers[$user_id].'\' ';
                         $qU .= 'WHERE call_id = \''.$focus->id.'\' ';
@@ -476,7 +487,7 @@ EOQ;
                     if (!isset($acceptStatusContacts[$contact_id])) {
                         $focus->load_relationship('contacts');
                         $focus->contacts->add($contact_id);
-                    } else {
+                    } else if (!$focus->date_changed) {
                         // update query to preserve accept_status
                         $qU  = 'UPDATE calls_contacts SET deleted = 0, accept_status = \''.$acceptStatusContacts[$contact_id].'\' ';
                         $qU .= 'WHERE call_id = \''.$focus->id.'\' ';
@@ -498,7 +509,7 @@ EOQ;
                     if (!isset($acceptStatusLeads[$lead_id])) {
                         $focus->load_relationship('leads');
                         $focus->leads->add($lead_id);
-                    } else {
+                    } else if (!$focus->date_changed) {
                         // update query to preserve accept_status
                         $qU  = 'UPDATE calls_leads SET deleted = 0, accept_status = \''.$acceptStatusLeads[$lead_id].'\' ';
                         $qU .= 'WHERE call_id = \''.$focus->id.'\' ';

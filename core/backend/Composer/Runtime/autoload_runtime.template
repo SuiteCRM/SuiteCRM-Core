@@ -46,7 +46,7 @@ global $legacyRoute;
 
 $legacyRoute = $kernel->getLegacyRoute($request);
 
-if (!empty($legacyRoute)) {
+if (!empty($legacyRoute) && (empty($legacyRoute['redirect']) === true)) {
 
     $path = './legacy';
     if (!empty($legacyRoute['dir'])) {

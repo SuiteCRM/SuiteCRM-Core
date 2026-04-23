@@ -522,12 +522,13 @@
                         <slot>
                             <select tabindex='14'
                                 name='fdow'>{html_options options=$FDOWOPTIONS selected=$FDOWCURRENT}</select>
-                    </slot>
-                </td>
-            </tr>
-        </table>
+                        </slot>
+                    </div>
+                    <div class="bottom-dotted-border" style="margin-bottom: 1em;"></div>
+                </div>
+            </div>
+        </div>
     </div>
-
 </div>
 {if $ID}
 <div id="eapm_area" style='display:{$HIDE_FOR_GROUP_AND_PORTAL};' class="user-tab-content">

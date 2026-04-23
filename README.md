@@ -40,7 +40,7 @@ SuiteCRM 8 is still in active development, and all current releases are not yet 
 
 If you have found an issue you think we should know about, or have a suggestion/feedback, please [Submit An Issue](https://github.com/salesagility/SuiteCRM-Core/issues).
 
-If you want to get involved or submit a Fix, fork the repo, and when read,y please [Submit An PR](https://github.com/salesagility/SuiteCRM-Core/pulls) - More details for developers will be coming soon, so stay tuned
+If you want to get involved or submit a Fix, fork the repo, and when ready please [Submit An PR](https://github.com/salesagility/SuiteCRM-Core/pulls) - More details for developers will be coming soon, so stay tuned
 
 ### Security ###
 

@@ -549,14 +549,14 @@ class Scheduler extends SugarBean
         global $app_strings;
         /* [0]:min [1]:hour [2]:day of month [3]:month [4]:day of week */
         $days = array(
-            1 => $app_strings['LBL_MON'],
-            2 => $app_strings['LBL_TUE'],
-            3 => $app_strings['LBL_WED'],
-            4 => $app_strings['LBL_THU'],
-            5 => $app_strings['LBL_FRI'],
-            6 => $app_strings['LBL_SAT'],
-            0 => $app_strings['LBL_SUN'],
-            '*' => $app_strings['LBL_ALL']
+            1 => $app_strings['LBL_MON'] ?? 'LBL_MON',
+            2 => $app_strings['LBL_TUE'] ?? 'LBL_TUE',
+            3 => $app_strings['LBL_WED'] ?? 'LBL_WED',
+            4 => $app_strings['LBL_THU'] ?? 'LBL_THU',
+            5 => $app_strings['LBL_FRI'] ?? 'LBL_FRI',
+            6 => $app_strings['LBL_SAT'] ?? 'LBL_SAT',
+            0 => $app_strings['LBL_SUN'] ?? 'LBL_SUN',
+            '*' => $app_strings['LBL_ALL'] ?? 'LBL_ALL'
         );
         switch ($type) {
             case 0: // minutes
@@ -618,8 +618,8 @@ class Scheduler extends SugarBean
         }
         $ints = $this->intervalParsed;
         $intVal = array('-', ',');
-        $intSub = array($app_strings['LBL_RANGE'], $app_strings['LBL_AND']);
-        $intInt = array(0 => $app_strings['LBL_MINS'], 1 => $app_strings['LBL_HOUR']);
+        $intSub = array($app_strings['LBL_RANGE'] ?? 'LBL_RANGE', $app_strings['LBL_AND'] ?? 'LBL_AND');
+        $intInt = array(0 => $app_strings['LBL_MINS'] ?? 'LBL_MINS', 1 => $app_strings['LBL_HOUR'] ?? 'LBL_HOUR');
         $tempInt = '';
         $iteration = '';
 
@@ -971,8 +971,8 @@ class Scheduler extends SugarBean
         $sched15->save();
 
         $sched16 = new Scheduler();
-        $sched16->name = $mod_strings['LBL_OOTB_GOOGLE_CAL_SYNC'];
-        $sched16->job = 'function::syncGoogleCalendar';
+        $sched16->name = $mod_strings['LBL_OOTB_CAL_ACC_SYNC'];
+        $sched16->job = 'function::calendarSyncJob';
         $sched16->date_time_start = create_date(2015, 1, 1) . ' ' . create_time(0, 0, 1);
         $sched16->date_time_end = null;
         $sched16->job_interval = '*/15::*::*::*::*';
@@ -1071,7 +1071,7 @@ class Scheduler extends SugarBean
         $this->setIntervalHumanReadable();
         $temp_array['JOB_INTERVAL'] = $this->intervalHumanReadable;
         if ($this->date_time_end == '2020-12-31 23:59' || $this->date_time_end == '') {
-            $temp_array['DATE_TIME_END'] = $mod_strings['LBL_PERENNIAL'];
+            $temp_array['DATE_TIME_END'] = $mod_strings['LBL_PERENNIAL'] ?? 'LBL_PERENNIAL';
         }
         $this->created_by_name = get_assigned_user_name($this->created_by);
         $this->modified_by_name = get_assigned_user_name($this->modified_user_id);
@@ -1098,7 +1098,8 @@ class Scheduler extends SugarBean
             // job functions
             self::$job_strings = array('url::' => 'URL');
             foreach ($job_strings as $k => $v) {
-                self::$job_strings['function::' . $v] = $modStrings['LBL_' . strtoupper($v)];
+                $label = 'LBL_' . strtoupper($v);
+                self::$job_strings['function::' . $v] = $modStrings[$label] ?? $label;
             }
         }
 

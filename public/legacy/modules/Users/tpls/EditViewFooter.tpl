@@ -279,13 +279,18 @@
             <div class="row-container">
                 <div class="left-col d-flex flex-column">
                     <div class="row-label"><slot>{$MOD.LBL_USE_REAL_NAMES}:</slot>&nbsp;{sugar_help text=$MOD.LBL_USE_REAL_NAMES_DESC }</div>
-                    <div class="row-bottom flex-grow-1"><slot style="line-height: 2.3"><input style="margin-top: -1em;" tabindex='12' type="checkbox" name="use_real_names" {$USE_REAL_NAMES}></slot></div>
+                    <div class="row-bottom flex-grow-1"><slot style="line-height: 2.3">
+                        <input type="hidden" name="use_real_names" value="false">
+                        <input style="margin-top: -1em;" tabindex='12' type="checkbox" name="use_real_names" {$USE_REAL_NAMES}>
+                    </slot></div>
                     <div class="bottom-dotted-border"></div>
                 </div>
                 <div class="right-col d-flex flex-column">
                     <div class="row-label"><slot>{$MOD.LBL_MAILMERGE}:</slot>&nbsp;{sugar_help text=$MOD.LBL_MAILMERGE_TEXT }</div>
                     <div class="row-bottom flex-grow-1">
-                    <slot style="line-height: 1"><input style="margin-top: -1em;" tabindex='12' name='mailmerge_on' class="checkbox" type="checkbox" {$MAILMERGE_ON}>
+                    <slot style="line-height: 1">
+                        <input type="hidden" name="mailmerge_on" value="false">
+                        <input style="margin-top: -1em;" tabindex='12' name="mailmerge_on" class="checkbox" type="checkbox" {$MAILMERGE_ON}>
                     </slot>
                     </div>
                     <div class="bottom-dotted-border"></div>
@@ -517,38 +522,7 @@
                         <slot>
                             <select tabindex='14'
                                 name='fdow'>{html_options options=$FDOWOPTIONS selected=$FDOWCURRENT}</select>
-                        </slot>
-                    </div>
-                    <div class="bottom-dotted-border" style="margin-bottom: 1em;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="google_options" style="display:{$HIDE_IF_GAUTH_UNCONFIGURED}">
-        <table width="100%" border="0" cellspacing="1" cellpadding="0" class="edit view">
-            <tr>
-                <th align="left" scope="row" colspan="4"><h4>{$MOD.LBL_GOOGLE_API_SETTINGS}</h4></th>
-            </tr>
-            <tr>
-                <td width="17%" scope="row">
-                    <slot>{$MOD.LBL_GOOGLE_API_TOKEN}:</slot>&nbsp;{sugar_help text=$MOD.LBL_GOOGLE_API_TOKEN_HELP}
-                </td>
-                <td width="20%">
-                    <slot>Current API Token is: <span style="color:{$GOOGLE_API_TOKEN_COLOR}">{$GOOGLE_API_TOKEN}</span>
-                        &nbsp;&nbsp;<input style="display:{$GOOGLE_API_TOKEN_ENABLE_NEW}" class="btn btn-primary btn-sm"
-                                       id="google_gettoken" type="button" value="{$GOOGLE_API_TOKEN_BTN}"
-                                       onclick="window.open('{$GOOGLE_API_TOKEN_NEW_URL}', '_blank')"/></slot>
-                </td>
-                <td width="63%">
-                    <slot>&nbsp;</slot>
-                </td>
-            </tr>
-            <tr>
-                <td width="17%" scope="row">
-                    <slot>{$MOD.LBL_GSYNC_CAL}:</slot>
-                </td>
-                <td>
-                    <slot><input tabindex='12' name='gsync_cal' class="checkbox" type="checkbox" {$GSYNC_CAL}></slot>
+                    </slot>
                 </td>
             </tr>
         </table>

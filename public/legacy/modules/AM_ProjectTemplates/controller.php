@@ -82,11 +82,10 @@ class AM_ProjectTemplatesController extends SugarController
                     $open_h = $bh ? $bh->opening_hours : 9;
                     $close_h = $bh ? $bh->closing_hours : 17;
 
-                    $start_time = DateTime::createFromFormat('Y-m-d', $start);
-
+                    $start_time = DateTime::createFromFormat('Y-m-d', date('Y-m-d'));
                     $start_time = $start_time->modify('+'.$open_h.' Hours');
 
-                    $end_time = DateTime::createFromFormat('Y-m-d', $start);
+                    $end_time = DateTime::createFromFormat('Y-m-d', date('Y-m-d'));
                     $end_time = $end_time->modify('+'.$close_h.' Hours');
 
                     $hours = ($end_time->getTimestamp() - $start_time->getTimestamp())/(60*60);
@@ -115,7 +114,7 @@ class AM_ProjectTemplatesController extends SugarController
         //create project from template
         $project = BeanFactory::newBean('Project');
         $project->name = $project_name;
-        $project->estimated_start_date = $start;
+        $project->estimated_start_date = $start ?? null;
         $project->status = $template->status;
         $project->priority = strtolower($template->priority);
         $project->description = $template->description;
@@ -191,46 +190,47 @@ class AM_ProjectTemplatesController extends SugarController
             //
             //code block to calculate end date based on user's business hours
             //
+            
+            if (isset($startdate)) {
+                $duration = $project_task->duration;
+                $enddate = $startdate;
 
-            $duration = $project_task->duration;
-            $enddate = $startdate;
+                $d = 0;
 
-            $d = 0;
+                while ($duration > $d) {
+                    $day = $enddate->format('l');
 
-            while ($duration > $d) {
-                $day = $enddate->format('l');
-
-                if ($bhours[$day] != 0) {
-                    $d += 1;
+                    if ($bhours[$day] != 0) {
+                        $d += 1;
+                    }
+                    $enddate = $enddate->modify('+1 Days');
                 }
-                $enddate = $enddate->modify('+1 Days');
+                $enddate = $enddate->modify('-1 Days');//readjust it back to remove 1 additional day added
+
+                //----------------------------------
+
+                if ($count == '1') {
+                    $project_task->date_start = $start;
+                    $end = $enddate->format('Y-m-d');
+                    $project_task->date_finish = $end;
+
+                    //add one day to let the next task start on next day of it's finish.
+                    $enddate_array[$count] = $enddate->modify('+1 Days')->format('Y-m-d');
+                } else {
+                    $start_date = $count - 1;
+                    $startdate = DateTime::createFromFormat('Y-m-d', $enddate_array[$start_date]);
+                    $start = $startdate->format('Y-m-d');
+                    $project_task->date_start = $start;
+                    $end = $enddate->format('Y-m-d');
+                    $project_task->date_finish = $end;
+
+                    $startdate = $enddate;
+                    //add one day to let the next task start on next day of it's finish.
+                    $enddate_array[$count] = $enddate->modify('+1 Days')->format('Y-m-d'); //$end;
+                    $enddate = $end;
+                }
             }
-            $enddate = $enddate->modify('-1 Days');//readjust it back to remove 1 additional day added
 
-            //----------------------------------
-
-
-
-            if ($count == '1') {
-                $project_task->date_start = $start;
-                $end = $enddate->format('Y-m-d');
-                $project_task->date_finish = $end;
-
-                //add one day to let the next task start on next day of it's finish.
-                $enddate_array[$count] = $enddate->modify('+1 Days')->format('Y-m-d');
-            } else {
-                $start_date = $count - 1;
-                $startdate = DateTime::createFromFormat('Y-m-d', $enddate_array[$start_date]);
-                $start = $startdate->format('Y-m-d');
-                $project_task->date_start = $start;
-                $end = $enddate->format('Y-m-d');
-                $project_task->date_finish = $end;
-
-                $startdate = $enddate;
-                //add one day to let the next task start on next day of it's finish.
-        $enddate_array[$count] = $enddate->modify('+1 Days')->format('Y-m-d'); //$end;
-                $enddate = $end;
-            }
             $project_task->save();
             //link tasks to the newly created project
             $project_task->load_relationship('projects');

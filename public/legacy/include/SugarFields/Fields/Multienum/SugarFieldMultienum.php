@@ -87,7 +87,7 @@ class SugarFieldMultienum extends SugarFieldEnum
     {
         if (isset($params[$prefix.$field])) {
             if (is_array($params[$prefix.$field])){
-                if ($params[$prefix.$field][0] === '' && !empty($params[$prefix.$field][1])) {
+                if (($params[$prefix.$field][0] ?? '') === '' && !empty($params[$prefix.$field][1])) {
                     unset($params[$prefix.$field][0]);
                 }
             }

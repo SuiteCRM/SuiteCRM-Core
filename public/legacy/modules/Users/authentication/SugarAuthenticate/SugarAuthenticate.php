@@ -214,7 +214,7 @@ class SugarAuthenticate
         require_once 'include/TemplateHandler/TemplateHandler.php';
         TemplateHandler::clearAll();
 
-        if (str_contains($sugar_config['disabled_languages'] ?? '', $authenticated_user_language)){
+        if (!empty($sugar_config['disabled_languages']) && str_contains($sugar_config['disabled_languages'] ?? '', $authenticated_user_language)){
             $authenticated_user_language = $sugar_config['default_language'];
         }
 

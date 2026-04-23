@@ -143,6 +143,7 @@ class SearchResultsController extends Controller
         $smarty->assign('headers', $headers);
         $smarty->assign('results', $this->results);
         $smarty->assign('APP', $app_strings);
+        $smarty->assign('APP_CONFIG', $GLOBALS['sugar_config']);
         $smarty->assign('SITE_URL', $siteUrl);
         $moduleName = [];
         try {
@@ -230,8 +231,8 @@ class SearchResultsController extends Controller
 
         return [
             'label' => $this->getListViewHeaderLabel($bean, $fieldValue, $fieldDef),
-            'comment' => $fieldDef['comment'] ?? null,
-            'field' => $fieldDef['name'],
+            'comment' => is_array($fieldDef) ? ($fieldDef['comment'] ?? null) : null,
+            'field' => is_array($fieldDef) ? ($fieldDef['name'] ?? null) : null,
         ];
     }
 

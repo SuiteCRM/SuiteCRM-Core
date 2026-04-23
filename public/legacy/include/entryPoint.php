@@ -190,8 +190,10 @@ if (empty($GLOBALS['installing']) && !empty($sugar_config['dbconfig']['db_name']
         $gcProbability = $sessionGCConfig['gc_probability'] ?? 1;
         $gcDivisor = $sessionGCConfig['gc_divisor'] ?? 100;
 
-        ini_set('session.gc_probability', $gcProbability);
-        ini_set('session.gc_divisor', $gcDivisor);
+        if (!headers_sent()) {
+            ini_set('session.gc_probability', $gcProbability);
+            ini_set('session.gc_divisor', $gcDivisor);
+        }
     }
 
     if (!empty($sugar_config['session_dir']) && session_status() !== PHP_SESSION_ACTIVE) {

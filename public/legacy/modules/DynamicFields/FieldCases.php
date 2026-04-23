@@ -72,6 +72,7 @@ require_once('modules/DynamicFields/templates/Fields/TemplateDecimal.php');
 require_once('modules/DynamicFields/templates/Fields/TemplateFile.php');
 function get_widget($type)
 {
+    $type = (string) $type;
     $local_temp = null;
     switch (strtolower($type)) {
             case 'char':

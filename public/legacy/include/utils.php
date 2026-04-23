@@ -308,6 +308,12 @@ function make_sugar_config(&$sugar_config)
         'web_to_lead_allowed_redirect_hosts' => [],
         'trusted_hosts' => [],
         'external_trusted_hosts' => [],
+        'oauth_token_delete_threshold' => '-7 days',
+        'oauth_code_delete_threshold' => '-7 days',
+        'email_import_per_run_threshold' => 25,
+        'email_import_fetch_unread_only' => false,
+        'email_import_timeframe_start' => '-30 days',
+        'email_calendar_invite_type' => 'rsvp_ics',
         'installed' => true,
         'max_migration_items_to_queue_per_run' => 50,
         'max_migration_items_to_process_per_run' => 20,
@@ -640,6 +646,12 @@ function get_sugar_config_defaults(): array
         'web_to_lead_allowed_redirect_hosts' => [],
         'trusted_hosts' => [],
         'external_trusted_hosts' => [],
+        'oauth_token_delete_threshold' => '-7 days',
+        'oauth_code_delete_threshold' => '-7 days',
+        'email_import_per_run_threshold' => 25,
+        'email_import_fetch_unread_only' => false,
+        'email_import_timeframe_start' => '-30 days',
+        'email_calendar_invite_type' => 'rsvp_ics',
         'installed' => true,
         'max_migration_items_to_queue_per_run' => 50,
         'max_migration_items_to_process_per_run' => 20,
@@ -1787,9 +1799,18 @@ function is_guid($guid)
 }
 
 /**
- * A temporary method of generating GUIDs of the correct format for our DB.
+ * Generates a UUID v4 (random) in the format required by SuiteCRM database.
  *
- * @return string contianing a GUID in the format: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+ * Uses symfony/polyfill-uuid to generate RFC 4122 compliant UUIDs.
+ * This replaces the legacy microtime-based implementation to fix PHP 8.4
+ * compatibility issues where record IDs were incorrectly starting with "00000".
+ *
+ * @return string UUID v4 in the format: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+ *
+ * @throws RuntimeException if UUID generation fails
+ *
+ * @since SuiteCRM 7.15 Updated to use symfony/polyfill-uuid for PHP 8.4 compatibility
+ * @see https://tools.ietf.org/html/rfc4122 RFC 4122 UUID specification
  *
  * Portions created by SugarCRM are Copyright (C) SugarCRM, Inc.
  * All Rights Reserved.
@@ -1798,26 +1819,6 @@ function is_guid($guid)
 function create_guid()
 {
     return uuid_create();
-}
-
-function create_guid_section($characters)
-{
-    $return = '';
-    for ($i = 0; $i < $characters; ++$i) {
-        $return .= dechex(mt_rand(0, 15));
-    }
-
-    return $return;
-}
-
-function ensure_length(&$string, $length)
-{
-    $strlen = strlen((string) $string);
-    if ($strlen < $length) {
-        $string = str_pad($string, $length, '0');
-    } elseif ($strlen > $length) {
-        $string = substr((string) $string, 0, $length);
-    }
 }
 
 function microtime_diff($a, $b)
@@ -2028,7 +2029,8 @@ function get_select_options_with_id_separate_key($label_list, $key_list, $select
         $key_list = array();
     }
     //create the type dropdown domain and set the selected value if $opp value already exists
-    foreach ($key_list as $option_key => $option_value) {
+    $key_list_array = is_array($key_list) ? $key_list : [$key_list];
+    foreach ($key_list_array as $option_key => $option_value) {
         $selected_string = '';
 
         if (is_string($selected_key)) {
@@ -2821,7 +2823,7 @@ function purify_html(?string $value, array $extraOptions = []): string {
 
     $sanitizer = new SuiteCRM\HtmlSanitizer($extraOptions);
 
-    $cleanedValue = htmlentities($sanitizer->clean($value, true));
+    $cleanedValue = htmlentities($sanitizer->clean((string) $value, true));
     $decoded = html_entity_decode($cleanedValue);
     $doubleDecoded = html_entity_decode($decoded);
 
@@ -5335,6 +5337,7 @@ function unencodeMultienum($string)
     if (is_array($string)) {
         return $string;
     }
+    $string = (string) ($string ?? '');
     if (substr($string, 0, 1) == '^' && substr($string, -1) == '^') {
         $string = substr(substr($string, 1), 0, strlen($string) - 2);
     }
@@ -5401,7 +5404,7 @@ function create_export_query_relate_link_patch($module, $searchFields, $where)
             $join = $seed->$fieldLink->getJoin($params, true);
             $join_table_alias = 'join_' . $field['name'];
             if (isset($field['db_concat_fields'])) {
-                $db_field = DBManager::concat($join_table_alias, $field['db_concat_fields']);
+                $db_field = $seed->db->concat($join_table_alias, $field['db_concat_fields']);
                 $where = preg_replace('/' . $field['name'] . '/', $db_field, (string) $where);
             } else {
                 $where = preg_replace('/(^|[\s(])' . $field['name'] . '/', '${1}' . $join_table_alias . '.' . $field['rname'], (string) $where);

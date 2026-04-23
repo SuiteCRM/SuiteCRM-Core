@@ -84,6 +84,7 @@ $app_list_strings = array(
         'Roles' => 'Roles',
         'Notifications' => 'Notifications',
         'Sync' => 'Sync',
+        'CalendarAccount' => 'Calendar Accounts',
         'Users' => 'Users',
         'Employees' => 'Employees',
         'Administration' => 'Administration',

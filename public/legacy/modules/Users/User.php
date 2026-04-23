@@ -2630,7 +2630,7 @@ EOQ;
      * Check if current user can save the current user record
      * @return bool
      */
-    protected function hasSaveAccess(): bool
+    public function hasSaveAccess(): bool
     {
         global $current_user;
 

@@ -250,4 +250,26 @@ class UsersController extends SugarController
         SugarApplication::appendSuccessMessage($mod_strings['LBL_FACTOR_AUTH_DISABLE']);
         SugarApplication::redirect('index.php?module=Users&action=DetailView&record=' . $this->bean->id);
     }
+
+    public function action_save()
+    {
+        global $app_strings;
+
+        /** @var User $bean */
+        $bean = $this->bean;
+
+        $redirectUrl = 'index.php?module=Users&action=EditView';
+        if (!$bean->hasSaveAccess()) {
+            SugarApplication::appendErrorMessage($app_strings['LBL_NOT_AUTHORIZED']);
+            SugarApplication::redirect($redirectUrl);
+            return;
+        }
+
+        if (!$bean->verify_data()) {
+            SugarApplication::appendErrorMessage($bean->error_string);
+            SugarApplication::redirect($redirectUrl);
+            return;
+        }
+        parent::action_save();
+    }
 }

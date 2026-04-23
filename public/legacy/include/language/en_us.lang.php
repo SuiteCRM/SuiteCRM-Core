@@ -4502,3 +4502,5 @@ $app_list_strings['email_import_timeframe_start_dom'] = [
     '-1 days' => '1 Day',
     '0 days' => '0 Days',
 ];
+
+$app_strings['LBL_NOT_AUTHORIZED'] = 'Not authorized';

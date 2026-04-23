@@ -61,7 +61,7 @@ class ShowSchedulersCommand extends BaseCommand {
     {
         $appStrings = $this->getAppStrings();
 
-        $query = "SELECT name, status, job FROM schedulers ";
+        $query = "SELECT name, status, job FROM schedulers where deleted = 0";
         $where = '';
         $title = $appStrings['LBL_ALL_SCHEDULERS'];
 

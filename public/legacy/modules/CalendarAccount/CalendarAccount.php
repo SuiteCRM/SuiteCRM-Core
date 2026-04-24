@@ -141,7 +141,9 @@ class CalendarAccount extends Basic
         global $current_user;
 
         require_once 'modules/CalendarAccount/services/CalendarAccountACLService.php';
-        if (!(new CalendarAccountACLService($this, $current_user))->hasAccess($view)) {
+        $calendarAccountAclService = new CalendarAccountACLService($this, $current_user);
+        if (!($calendarAccountAclService)->hasAccess($view)) {
+            $calendarAccountAclService->logAccessDenied($view);
             return false;
         }
 

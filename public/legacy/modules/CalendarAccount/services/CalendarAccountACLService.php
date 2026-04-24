@@ -22,7 +22,6 @@ class CalendarAccountACLService
         }
 
         if ($this->isNotAllowedAction($view)) {
-            $this->logAccessDenied($view);
             return false;
         }
 
@@ -50,7 +49,6 @@ class CalendarAccountACLService
             return true;
         }
 
-        $this->logAccessDenied($view);
         return false;
     }
 
@@ -100,7 +98,7 @@ class CalendarAccountACLService
         };
     }
 
-    private function logAccessDenied(string $view): void
+    public function logAccessDenied(string $view): void
     {
         global $log;
 

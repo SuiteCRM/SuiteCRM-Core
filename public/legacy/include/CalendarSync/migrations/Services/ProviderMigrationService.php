@@ -169,10 +169,11 @@ class ProviderMigrationService
     {
         global $db;
 
-        $query = "SELECT id 
-        FROM external_oauth_providers 
-        WHERE connector = 'Google' 
-            AND JSON_SEARCH(scope, 'one', 'https://www.googleapis.com/auth/calendar') IS NOT NULL 
+        $query = "SELECT id
+        FROM external_oauth_providers
+        WHERE connector = 'Google'
+            AND JSON_SEARCH(scope, 'one', 'https://www.googleapis.com/auth/calendar') IS NOT NULL
+            AND deleted = 0
         LIMIT 1";
 
         $result = $db->query($query);

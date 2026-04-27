@@ -64,7 +64,7 @@ class ListViewParentTypeMapper implements ViewDefinitionMapperInterface
         foreach ($columns as $colKey => $col) {
             $dynamicType = $col['dynamic_module'] ?? '';
             $type = $col['type'] ?? '';
-            if ($dynamicType !== 'dynamic_module' && $type !== 'grouped-field') {
+            if (!($dynamicType === 'dynamic_module' && $type === 'grouped-field')) {
                 continue;
             }
 

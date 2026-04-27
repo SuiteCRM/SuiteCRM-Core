@@ -109,13 +109,13 @@ class DocumentRevisionDeleteRecordAction implements ProcessHandlerInterface
         $recordId = $options['id'] ?? '';
         $baseRecordId = $payload['baseRecordId'] ?? '';
 
-        if (!$recordId) {
+        if (!$recordId || !$baseRecordId) {
             $process->setStatus('error');
             $process->setMessages(['LBL_NO_RECORD_ID_PROVIDED']);
             return;
         }
 
-        $latestRevisionId = $this->documentsManager->getLatestRevisionId($recordId);
+        $latestRevisionId = $this->documentsManager->getLatestRevisionId($baseRecordId);
 
         if ($recordId === $latestRevisionId) {
             $process->setStatus('error');

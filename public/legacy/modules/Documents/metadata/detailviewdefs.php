@@ -86,10 +86,10 @@ $viewdefs ['Documents'] = [
                         ],
                         'lineActions' => [
                             [
-                                'key' => 'delete',
+                                'key' => 'document-revision-delete',
                                 'labelKey' => 'LBL_DELETE_RECORD',
                                 'titleKey' => 'LBL_DELETE_RECORD',
-                                'action' => 'delete',
+                                'action' => 'document-revision-delete',
                                 'icon' => 'trash-filled',
                                 'klass' => 'delete-revision-line-action',
                                 'aclModule' => 'Documents',

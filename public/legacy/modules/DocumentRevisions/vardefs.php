@@ -229,7 +229,14 @@ $dictionary['DocumentRevision'] = array('table' => 'document_revisions'
       'len' => '255',
       'source' => 'non-db',
   ),
-  
+  'filecontents' =>
+  array(
+       'name' => 'filecontents',
+       'vname' => 'LBL_FILE_CONTENTS',
+       'type' => 'varchar',
+       'source' => 'non-db',
+  ),
+
 ),
 'relationships'=>array(
    'revisions_created_by' => array('lhs_module'=> 'Users', 'lhs_table'=> 'users', 'lhs_key' => 'id',

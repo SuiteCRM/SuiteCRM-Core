@@ -73,7 +73,8 @@ class CalDAVProvider extends AbstractCalendarProvider
             );
 
             if ($response['httpCode'] < 200 || $response['httpCode'] >= 300) {
-                throw new RuntimeException("CalDAV server error: HTTP {$response['httpCode']}. Message: {$response['body']}");
+                $messageBody = mb_convert_encoding((string)$response['body'], 'UTF-8', 'UTF-8');
+                throw new RuntimeException("CalDAV server error: HTTP {$response['httpCode']}. Message: {$messageBody}");
             }
 
             $log->info('CalDAVProvider: Successfully connected to CalDAV server');

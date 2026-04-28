@@ -61,6 +61,7 @@ final class Version20231108164138  extends BaseMigration implements ContainerAwa
         if (isset($systemConfigs['allowed_preview']) && in_array('pdf', $systemConfigs['allowed_preview'])) {
             $key = array_search('pdf', $systemConfigs['allowed_preview']);
             unset($systemConfigs['allowed_preview'][$key]);
+            $systemConfigs['allowed_preview'] = array_values($systemConfigs['allowed_preview']);
             $systemConfigsHandler->updateSystemConfig($systemConfigs);
             $this->log('Removed PDF from allowed_preview inside config file.');
             return;

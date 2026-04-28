@@ -2805,7 +2805,9 @@ function purify_html(?string $value, array $extraOptions = []): string {
 
     $sanitizer = new SuiteCRM\HtmlSanitizer($extraOptions);
 
-    $cleanedValue = htmlentities($sanitizer->clean($value, true));
+    //htmlentities destroys multi-byte characters : https://stackoverflow.com/questions/5679715/htmlentities-destroys-utf-8-strings 
+    //$cleanedValue = htmlentities($sanitizer->clean($value, true));
+    $cleanedValue=htmlspecialchars($sanitizer->clean($value, true), ENT_QUOTES);
     $decoded = html_entity_decode($cleanedValue);
     $doubleDecoded = html_entity_decode($decoded);
 
@@ -2813,7 +2815,8 @@ function purify_html(?string $value, array $extraOptions = []): string {
         $doubleDecoded = '';
     }
 
-    $doubleCleanedValue = htmlentities($sanitizer->clean($doubleDecoded, true));
+    //$doubleCleanedValue = htmlentities($sanitizer->clean($doubleDecoded, true));
+    $doubleCleanedValue = htmlspecialchars($sanitizer->clean($doubleDecoded, true), ENT_QUOTES);
 
     return $doubleCleanedValue;
 }

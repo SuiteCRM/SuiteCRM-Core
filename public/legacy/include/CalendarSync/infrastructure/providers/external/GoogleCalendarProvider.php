@@ -68,10 +68,11 @@ class GoogleCalendarProvider extends AbstractCalendarProvider
 
         } catch (Throwable $e) {
             $log->error("GoogleCalendarProvider: testCalendarConnection error: " . $e->getMessage());
+            $errorMessage = mb_convert_encoding($e->getMessage(), 'UTF-8', 'UTF-8');
             return new CalendarConnectionTestResult(
                 success: false,
                 connection: $this->connection,
-                errorMessage: $e->getMessage(),
+                errorMessage: $errorMessage,
                 errorCode: (string)$e->getCode(),
                 authenticationStatus: 'failed'
             );

@@ -90,10 +90,6 @@ export class GroupFieldBuilder extends FieldBuilder {
                 fieldDefinition
             };
 
-            if (viewFieldDefinitions.length > 0 && viewFieldDefinitions.find(vf => vf.name === fieldDefinition.name)) {
-                groupViewField.fieldDefinition = viewFieldDefinitions.find(vf => vf.name === fieldDefinition.name).fieldDefinition;
-            }
-
             const groupField = buildFieldFunction(record, groupViewField, language);
             groupField.source = 'groupField';
             addRecordFunction(record, fieldDefinition.name, groupField);

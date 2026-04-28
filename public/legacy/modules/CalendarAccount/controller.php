@@ -351,7 +351,7 @@ class CalendarAccountController extends SugarController
         ob_clean();
         header('Content-Type: application/json');
         try {
-            echo json_encode($response, JSON_THROW_ON_ERROR);
+            echo json_encode($response, JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE);
         } catch (JsonException $e) {
             echo '{"error":"Internal server error","message":"' . addslashes($e->getMessage() ?? '') . '"}';
         }

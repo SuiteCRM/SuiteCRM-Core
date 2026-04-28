@@ -403,7 +403,8 @@ class UserMigrationService
             throw new RuntimeException('Access token is required for OAuth connection');
         }
 
-        $connection->name = "Google Calendar - " . ($userData->full_name ?? 'User');
+        $fullName = mb_convert_encoding($userData->full_name ?? 'User', 'UTF-8', 'UTF-8');
+        $connection->name = "Google Calendar - " . $fullName;
         $connection->type = 'personal';
         $connection->access_token = $accessToken;
         $connection->refresh_token = $refreshToken;
@@ -429,6 +430,11 @@ class UserMigrationService
         try {
             if (!$connection->save()) {
                 throw new RuntimeException('Failed to save ExternalOAuthConnection');
+            }
+
+            $connection = BeanFactory::getReloadedBean('ExternalOAuthConnection', $connection->id);
+            if (!$connection) {
+                throw new RuntimeException('Failed to re-retrieve ExternalOAuthConnection after save');
             }
 
             $this->validateAndRefreshOAuthConnection($connection);
@@ -495,13 +501,14 @@ class UserMigrationService
             throw new RuntimeException('Unable to create CalendarAccount bean');
         }
 
-        $account->name = "Google Calendar - $userData->full_name";
+        $fullName = mb_convert_encoding($userData->full_name ?? '', 'UTF-8', 'UTF-8');
+        $account->name = "Google Calendar - $fullName";
         $account->source = 'google';
         $account->type = 'personal';
         $account->oauth_connection_id = $oauthConnection->id;
         $account->oauth_connection_name = $oauthConnection->name;
         $account->calendar_user_id = $userData->user_id;
-        $account->calendar_user_name = $userData->full_name;
+        $account->calendar_user_name = $fullName;
         $account->last_connection_status = 1;
         $account->last_connection_test = date('Y-m-d H:i:s');
         $account->assigned_user_id = $userData->user_id;

@@ -113,7 +113,7 @@ export abstract class BaseRecordActionsAdapter<D extends RecordBasedActionData> 
 
         const keyFieldName = action?.params?.asyncProcessKeyField ?? '';
         const record = context?.record ?? null;
-        const keyField = record?.fields[keyFieldName ?? ''] ?? null;
+        const keyField = record?.fields?.[keyFieldName ?? ''] ?? null;
         const keyFieldValue = keyField?.value ?? null;
         if (keyFieldValue && isString(keyFieldValue)) {
             return `${prefix}-${keyFieldValue}`;

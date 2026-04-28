@@ -368,7 +368,7 @@ export abstract class BaseActionsAdapter<D extends ActionData> implements Action
      * @param process
      */
     protected shouldReloadRecentlyViewed(process: Process): boolean {
-        return !!(process.data && process.data.reloadRecentlyViewed);
+        return !!(process?.data && process?.data?.reloadRecentlyViewed);
     }
 
     /**
@@ -376,7 +376,7 @@ export abstract class BaseActionsAdapter<D extends ActionData> implements Action
      * @param process
      */
     protected shouldReloadFavorites(process: Process): boolean {
-        return !!(process.data && process.data.reloadFavorites);
+        return !!(process?.data && process?.data?.reloadFavorites);
     }
 
     /**

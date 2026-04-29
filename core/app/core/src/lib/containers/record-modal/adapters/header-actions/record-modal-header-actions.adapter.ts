@@ -256,6 +256,6 @@ export class RecordModalHeaderActionsAdapter extends BaseModalHeaderActionsAdapt
      * @param process
      */
     protected shouldCloseModal(process: Process): boolean {
-        return !!(process.data && process.data.closeModal);
+        return !!(process?.data && process?.data?.closeModal);
     }
 }

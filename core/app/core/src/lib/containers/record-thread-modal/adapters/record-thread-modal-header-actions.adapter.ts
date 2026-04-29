@@ -269,6 +269,6 @@ export class RecordThreadModalHeaderActionsAdapter extends BaseRecordThreadModal
      * @param process
      */
     protected shouldCloseModal(process: Process): boolean {
-        return !!(process.data && process.data.closeModal);
+        return !!(process?.data && process?.data?.closeModal);
     }
 }

@@ -53,13 +53,17 @@ export class ClassicViewUiComponent implements OnInit, OnDestroy, AfterViewInit 
     @HostListener('window:message', ['$event'])
     onMessage(event) {
 
-        if (isString(event.data) && event.data === 'cache-reload') {
+        if (!isString(event?.data)) {
+            return;
+        }
+
+        if (event.data === 'cache-reload') {
             this.auth.clearBackendCacheable();
             this.router.navigateByUrl(this.router.url).then();
             return;
         }
 
-        const options = JSON.parse(event?.data) ?? '';
+        const options = JSON.parse(event.data) ?? '';
 
         if (options === '' || !options.type) {
             return;

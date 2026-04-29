@@ -53,6 +53,7 @@ export interface AsyncActionInput {
     id?: string;
     payload?: { [key: string]: any };
     modalRecord?: Record;
+    modalRecords?: Record[];
     record?: Record;
 
     [key: string]: any

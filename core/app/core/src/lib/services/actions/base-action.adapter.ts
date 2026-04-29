@@ -159,13 +159,25 @@ export abstract class BaseActionsAdapter<D extends ActionData> implements Action
      */
     public showSelectModal(selectModule: string, asyncAction: Action, context: ActionContext = null) {
 
-        this.selectModalService.showSelectModal(selectModule, (modalRecord: Record) => {
-            if (modalRecord) {
-                const {fields, formGroup, ...baseRecord} = modalRecord;
+        const selectModalOptions = asyncAction?.params?.selectModal ?? {};
+
+        this.selectModalService.showSelectModal(selectModule, (result: Record | Record[]) => {
+
+            if (Array.isArray(result)) {
+
+                asyncAction.params.modalRecords = result.map(record => {
+                    const {fields, formGroup, ...baseRecord} = record;
+                    return baseRecord;
+                });
+
+            } else if (result) {
+
+                const {fields, formGroup, ...baseRecord} = result;
                 asyncAction.params.modalRecord = baseRecord;
             }
+
             this.callAction(asyncAction, context);
-        });
+        }, selectModalOptions);
     }
 
     /**

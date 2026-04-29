@@ -40,8 +40,6 @@ import {deepClone} from "../../common/utils/object-utils";
 })
 export class SelectModalService {
 
-    isMultiSelect: boolean = false;
-
     constructor(
         protected languageStore: LanguageStore,
         protected message: MessageService,
@@ -63,8 +61,9 @@ export class SelectModalService {
         const modal = this.modalService.open(RecordListModalComponent, {size: 'xl', scrollable: true});
         modal.componentInstance.module = selectModule;
 
-        if (isTrue(options?.multiSelect ?? false)) {
-            this.isMultiSelect = true;
+        const isMultiSelect = isTrue(options?.multiSelect ?? false);
+
+        if (isMultiSelect) {
             modal.componentInstance.multiSelect = true;
             modal.componentInstance.multiSelectButtonLabelKey = options.multiSelectButtonLabelKey || 'LBL_SAVE';
         }
@@ -80,7 +79,7 @@ export class SelectModalService {
                     return;
                 }
 
-                if (this.isMultiSelect) {
+                if (isMultiSelect) {
                     const records: Record[] = this.getSelectedRecords(result);
                     if (onSelectCallback !== null) {
                         onSelectCallback(records);

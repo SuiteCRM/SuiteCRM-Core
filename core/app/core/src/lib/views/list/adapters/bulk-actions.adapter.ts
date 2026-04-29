@@ -130,7 +130,7 @@ export class BulkActionsAdapter implements BulkActionDataSource {
         const displayConfirmation = params.displayConfirmation || false;
         const confirmationLabel = params.confirmationLabel || '';
         const confirmationMessages = params.confirmationMessages || [];
-        const selectModal = definition.params && definition.params.selectModal;
+        const selectModal = definition?.params?.selectModal ?? {};
         const selectModule = selectModal && selectModal.module;
         const recordPanel = definition.params && definition.params.recordPanel;
 
@@ -147,7 +147,7 @@ export class BulkActionsAdapter implements BulkActionDataSource {
                     this.runBulkAction(actionName, data);
                     return;
                 }
-                this.showSelectModal(selectModal.module, actionName, data);
+                this.showSelectModal(selectModal.module, actionName, data, selectModal);
             });
 
             return;
@@ -157,7 +157,7 @@ export class BulkActionsAdapter implements BulkActionDataSource {
             this.runBulkAction(actionName, data);
             return;
         }
-        this.showSelectModal(selectModal.module, actionName, data);
+        this.showSelectModal(selectModal.module, actionName, data, selectModal);
 
     }
 
@@ -165,19 +165,30 @@ export class BulkActionsAdapter implements BulkActionDataSource {
      * Run async buk action
      *
      * @returns void
-     * @param {string} selectModule: module for which records are listed in Select Modal/Popup
-     * @param {string} asyncAction: bulk action name
-     * @param {AsyncActionInput} asyncData: data passed to the async process
+     * @param selectModule
+     * @param asyncAction
+     * @param asyncData
+     * @param selectModalOptions
      */
-    public showSelectModal(selectModule: string, asyncAction: string, asyncData: AsyncActionInput) {
+    public showSelectModal(selectModule: string, asyncAction: string, asyncData: AsyncActionInput, selectModalOptions: any = {}) {
 
-        this.selectModalService.showSelectModal(selectModule, (modalRecord: Record) => {
-            if (modalRecord) {
-                const {fields, formGroup, ...baseRecord} = modalRecord;
+        this.selectModalService.showSelectModal(selectModule, (result: Record | Record[]) => {
+
+            if (Array.isArray(result)) {
+
+                asyncData.modalRecords = result.map(record => {
+                    const {fields, formGroup, ...baseRecord} = record;
+                    return baseRecord;
+                });
+
+            } else if (result) {
+
+                const {fields, formGroup, ...baseRecord} = result;
                 asyncData.modalRecord = baseRecord;
             }
+
             this.runBulkAction(asyncAction, asyncData);
-        });
+        }, selectModalOptions);
     }
 
     /**

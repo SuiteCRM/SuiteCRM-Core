@@ -55,7 +55,7 @@ class DescriptionHtmlFieldDefinitionMapper implements FieldDefinitionMapperInter
      */
     public function getModule(): string
     {
-        return 'default';
+        return 'emails';
     }
 
     /**

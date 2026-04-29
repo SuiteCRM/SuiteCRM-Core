@@ -99,6 +99,11 @@ class DocumentFilenameRetrieveEntityMapper implements EntityRecordFieldTypeMappe
         );
 
         if (empty($mediaObjects)) {
+            $mediaObjects = $this->mediaObjectManager->getLinkedMediaObjects('legacy-documents', 'DocumentRevisions', $revisionId, 'filename');
+            $storageType = 'legacy-documents';
+        }
+
+        if (empty($mediaObjects)) {
             return;
         }
 

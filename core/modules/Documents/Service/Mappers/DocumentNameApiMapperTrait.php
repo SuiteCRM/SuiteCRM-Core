@@ -58,6 +58,11 @@ trait DocumentNameApiMapperTrait
         $mediaObjects = $mediaObjectManager->getLinkedMediaObjects($storageType, $module, $revisionRecord->getId(), $revisionField);
 
         if (empty($mediaObjects)) {
+            $mediaObjects = $mediaObjectManager->getLinkedMediaObjects('legacy-documents', $module, $revisionRecord->getId(), $revisionField);
+            $storageType = 'legacy-documents';
+        }
+
+        if (empty($mediaObjects)) {
             return;
         }
 

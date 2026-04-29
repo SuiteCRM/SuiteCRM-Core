@@ -60,7 +60,7 @@ class SquireHtmlFieldDefinitionMapper implements FieldDefinitionMapperInterface
      */
     public function getModule(): string
     {
-        return 'default';
+        return 'email-marketing';
     }
 
     /**
@@ -70,29 +70,33 @@ class SquireHtmlFieldDefinitionMapper implements FieldDefinitionMapperInterface
     {
         $vardefs = $definition->getVardef();
 
-        if (empty($vardefs)) {
+        if (empty($vardefs['body'])) {
             return;
         }
 
-        foreach ($vardefs as $fieldName => $fieldDefinition) {
+        $legacyModuleName = $this->moduleNameMapper->toLegacy($definition->getId());
+        $moduleList = $this->calculateTemplateInjectorVariables->getModules($legacyModuleName);
+        $fieldDefs = $this->calculateTemplateInjectorVariables->getFieldDefs($legacyModuleName, $moduleList);
 
-            if ($fieldDefinition['type'] !== 'html') {
-                continue;
-            }
+        $variables = array_merge(
+            $vardefs['body']['metadata']['squire']['variables'] ?? [],
+            [
+                'modules' => $moduleList,
+                'fieldDefs' => $fieldDefs,
+            ]
+        );
 
-            if (!isset($fieldDefinition['displayType']) || $fieldDefinition['displayType'] !== 'squire') {
-                continue;
-            }
+        $vardefs['body']['metadata']['squire']['variables'] = $variables;
 
-            $legacyModuleName = $this->moduleNameMapper->toLegacy($definition->getId());
-
-            $moduleList = $this->calculateTemplateInjectorVariables->getModules($legacyModuleName);
-            $fieldDefs = $this->calculateTemplateInjectorVariables->getFieldDefs($legacyModuleName, $moduleList);
-
-            $fieldDefinition['metadata']['squire']['variables'] = [];
-            $fieldDefinition['metadata']['squire']['variables']['modules'] = $moduleList;
-            $fieldDefinition['metadata']['squire']['variables']['fieldDefs'] = $fieldDefs;
-            $vardefs[$fieldName] = $fieldDefinition;
+        if (!empty($vardefs['email_marketing_template']['groupFields']['body'])) {
+            $groupedVariables = array_merge(
+                $vardefs['email_marketing_template']['groupFields']['body']['metadata']['squire']['variables'] ?? [],
+                [
+                    'modules' => $moduleList,
+                    'fieldDefs' => $fieldDefs,
+                ]
+            );
+            $vardefs['email_marketing_template']['groupFields']['body']['metadata']['squire']['variables'] = $groupedVariables;
         }
 
         $definition->setVardef($vardefs);

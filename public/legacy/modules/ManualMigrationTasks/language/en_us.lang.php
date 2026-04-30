@@ -58,4 +58,12 @@ $mod_strings = [
     // Type footnotes
     'LBL_TYPE_BACKGROUND_HELP' => 'This migration runs in the background via the message queue worker. It processes items in batches and does not block the UI.',
     'LBL_TYPE_IMMEDIATE_HELP' => 'This migration runs immediately when triggered. It processes all items in a single request and may take longer for large datasets.',
+
+
+    // Messenger setup widget
+    'LBL_MESSENGER_SETUP' => 'Background Task Configuration',
+    'LBL_MESSENGER_SETUP_DESC1' => 'Migration tasks are processed in the background.',
+    'LBL_MESSENGER_SETUP_DESC2' => 'To ensure these tasks complete successfully, please ensure a Symfony Messenger worker is running.',
+    'LBL_MESSENGER_SETUP_DESC3' => 'Without an active worker, tasks will stay in a "Pending" state.',
+    'LBL_MESSENGER_SETUP_DOC_LINK' => 'View Setup Guide (Supervisor, systemd, Cron)',
 ];

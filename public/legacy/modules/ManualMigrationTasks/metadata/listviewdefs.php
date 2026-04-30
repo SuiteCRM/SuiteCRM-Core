@@ -35,6 +35,58 @@ $module_name = 'ManualMigrationTasks';
 $viewdefs[$module_name] = [
     'ListView' =>  [
         'sidebarWidgets' => [
+            'messenger-setup-widget' => [
+                'type' => 'statistics',
+                'modes' => ['list'],
+                'allowCollapse' => true,
+                'labelKey' => 'LBL_MESSENGER_SETUP',
+                'options' => [
+                    'sidebarStatistic' => [
+                        'rows' => [
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'labelKey' => 'LBL_MESSENGER_SETUP_DESC1',
+                                        'hideIfLoading' => true,
+                                        'class' => 'cron-label',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'labelKey' => 'LBL_MESSENGER_SETUP_DESC2',
+                                        'hideIfLoading' => true,
+                                        'class' => 'cron-label pt-2',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'labelKey' => 'LBL_MESSENGER_SETUP_DESC3',
+                                        'hideIfLoading' => true,
+                                        'class' => 'cron-label pt-2',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'statistic' => 'messenger-setup-url',
+                                        'hideIfLoading' => true,
+                                        'class' => 'cron-label pt-1',
+                                    ],
+                                ],
+                            ],
+                        ]
+                    ]
+                ],
+            ],
         ],
         'bulkActions' => [
             'actions' => [

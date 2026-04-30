@@ -8,6 +8,7 @@ services:
       $projectDir: '%kernel.project_dir%'
       $cacheDir: '%kernel.cache_dir%'
       $upgradePackageDir: '%packages.upgrade.dir%'
+      $docsUrls: '%docs.urls%'
       $legacyDir: '%legacy.dir%'
       $legacyPath: '%legacy.path%'
       $legacySessionName: '%legacy.session_name%'

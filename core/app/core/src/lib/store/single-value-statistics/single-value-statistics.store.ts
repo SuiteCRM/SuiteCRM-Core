@@ -87,6 +87,12 @@ export class SingleValueStatisticsStore extends StatisticsStore implements Singl
                 digits: 0
             };
 
+            if (statistic.data.linkTextLabelKey) {
+                field.metadata.linkText = this.language.getFieldLabel(statistic.data.linkTextLabelKey, this.internalState?.module);
+            } else if (statistic.data.linkText) {
+                field.metadata.linkText = statistic.data.linkText;
+            }
+
             this.updateState({
                 ...this.internalState,
                 statistic,

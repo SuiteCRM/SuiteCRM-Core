@@ -63,7 +63,11 @@ export class ClassicViewUiComponent implements OnInit, OnDestroy, AfterViewInit 
             return;
         }
 
-        const options = JSON.parse(event.data) ?? '';
+        let options: any = '';
+        try {
+            options = JSON.parse(event.data);
+        } catch (e) {
+        }
 
         if (options === '' || !options.type) {
             return;

@@ -112,7 +112,7 @@ class SchedulerHandler extends LegacyHandler
         $schedulerTable = $this->getSchedulerTable();
         $jobQueueTable = $this->getJobQueueTable();
 
-        $query = "SELECT * FROM $schedulerTable sched WHERE status = 'Active' ";
+        $query = "SELECT * FROM $schedulerTable sched WHERE status = 'Active' AND deleted = 0 ";
         $query .= "AND NOT EXISTS(SELECT id FROM $jobQueueTable WHERE scheduler_id = sched.id AND status != 'done')";
         $schedulers = [];
 

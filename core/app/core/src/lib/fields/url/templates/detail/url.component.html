@@ -25,4 +25,4 @@
 * the words "Supercharged by SuiteCRM".
 */
 -->
-<a [target]="target" href="{{ this.field.value }}">{{ this.field.value }}</a>
+<a [target]="target" href="{{ this.field.value }}">{{ this.field.metadata?.linkText || this.field.value }}</a>

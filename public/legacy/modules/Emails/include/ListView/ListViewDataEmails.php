@@ -186,6 +186,11 @@ class ListViewDataEmails extends ListViewData
                 $this->searchType = "crm";
                 break;
 
+            case "archived":
+                // Archived emails are SuiteCRM records (not an IMAP mailbox).
+                $this->searchType = "crm";
+                break;
+
             case "trash":
                 $this->searchType = "imap";
                 break;
@@ -741,6 +746,14 @@ class ListViewDataEmails extends ListViewData
                     $where .= ' AND ';
                 }
                 $where .= ' emails.status LIKE "draft" AND emails.deleted LIKE "0" ';
+            }
+
+            // archived is a CRM-only view (emails.type='archived')
+            if ($folderObj->getType() === 'archived' && !array_key_exists('type', $filter_fields)) {
+                if (!empty($where)) {
+                    $where .= ' AND ';
+                }
+                $where .= ' emails.type LIKE "archived" AND emails.deleted LIKE "0" ';
             }
 
 

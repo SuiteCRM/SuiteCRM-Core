@@ -87,6 +87,9 @@
      style="top:0px;left:0px;position:fixed;height:100%;width:100%;background-color:#E9E9E9;opacity:0.7;display:none;vertical-align:middle;text-align:center;z-index:9998;">
 </div>
 <script>
+    {if $PRINT_AS_PDF_ACTION}
+    const printAsPdfConfig = {$PRINT_AS_PDF_ACTION};
+    {/if}
     {literal}
     function openEmailComposeModal(id, module) {
         const options = {
@@ -113,19 +116,22 @@
     }
 
     function printAsPdf(id, module) {
+        const config = typeof printAsPdfConfig !== 'undefined' ? printAsPdfConfig : {
+            key: 'record-print-as-pdf',
+            asyncProcess: true,
+            params: {
+                selectModal: {
+                    module: 'AOS_PDF_Templates',
+                }
+            }
+        };
         const options = {
             type: 'run-global-async-action',
             params: {
                 action: {
-                    key: 'record-print-as-pdf',
-                    asyncProcess: true,
-                    params: {
-                        id: id,
-                        module: module,
-                        selectModal: {
-                            module: 'AOS_PDF_Templates',
-                        }
-                    }
+                    key: config.key,
+                    asyncProcess: config.asyncProcess,
+                    params: Object.assign({}, config.params, { id: id, module: module })
                 }
             }
         };

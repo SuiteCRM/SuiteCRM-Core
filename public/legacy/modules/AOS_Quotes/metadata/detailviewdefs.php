@@ -115,6 +115,23 @@ array(
           ),
       ),
     ),
+    'recordActions' => [
+          'actions' => [
+              'print-as-pdf' => [
+                  'key' => 'print-as-pdf',
+                  'labelKey' => 'LBL_PRINT_AS_PDF',
+                  'asyncProcess' => true,
+                  'modes' => ['detail'],
+                  'acl' => ['view'],
+                  'aclModule' => 'AOS_PDF_Templates',
+                  'params' => [
+                      'selectModal' => [
+                          'module' => 'AOS_PDF_Templates'
+                      ]
+                  ]
+              ]
+          ],
+      ],
     'panels' =>
     array(
       'LBL_PANEL_OVERVIEW' =>

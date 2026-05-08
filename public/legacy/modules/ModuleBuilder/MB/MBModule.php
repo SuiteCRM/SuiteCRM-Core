@@ -171,6 +171,12 @@ class MBModule
         if (! empty($vardef [ 'source' ]) && $vardef [ 'source' ] == 'custom_fields') {
             unset($vardef [ 'source' ]) ;
         }
+        $metadata = [];
+        foreach ($field->metadataMap as $metaKey => $vardefKey) {
+            $metadata[$metaKey] = $field->$vardefKey;
+        }
+
+        $vardef['metadata'] = $metadata;
 
         $this->mbvardefs->load();
         $this->addField($vardef) ;

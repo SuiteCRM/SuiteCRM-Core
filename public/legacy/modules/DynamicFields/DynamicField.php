@@ -183,7 +183,12 @@ class DynamicField
                 $vardef ['source'] = 'custom_fields';
             }
 
-            $vardef['metadata'] = json_decode($row['metadata'], true) ?? [];
+            if (!empty($row['metadata']) && is_string($row['metadata'])) {
+                $vardef['metadata'] = json_decode($row['metadata'], true) ?? [];
+            } elseif (!empty($row['metadata']) && is_array($row['metadata'])) {
+                $vardef['metadata'] = $row['metadata'];
+            }
+
 
             if (empty($results [$row ['custom_module']])) {
                 $results [$row ['custom_module']] = array();

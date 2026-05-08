@@ -176,6 +176,13 @@ class StandardField extends DynamicField
             $this->custom_def['source'] = 'non-db';
         }
 
+        $metadata = [];
+        foreach ($field->metadataMap as $metaKey => $vardefKey) {
+            $metadata[$metaKey] = $field->$vardefKey;
+        }
+
+        $this->custom_def['metadata'] = $metadata;
+
         $this->writeVardefExtension($bean_name, $field, $this->custom_def);
     }
 }

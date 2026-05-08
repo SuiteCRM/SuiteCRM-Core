@@ -231,7 +231,12 @@ class BasePDFManager extends LegacyHandler
         $templateBean = $this->getBean('AOS_PDF_Templates', $templateId);
 
         $pdfConfig = $this->pdfLegacyHandler->buildPDFConfig($templateBean);
-        $fileName = $this->getPdfName($templateBean->name);
+        $fileNaming = $options['fileNaming'] ?? 'record';
+        if ($fileNaming === 'template') {
+            $fileName = str_replace(' ', '_', $templateBean->name) . '.pdf';
+        } else {
+            $fileName = $this->getPdfName($module, $moduleBean->name);
+        }
         $objectArr = $this->setObjectArray($moduleBean);
 
         [$header, $footer, $printable] = $this->pdfLegacyHandler->parseTemplate($moduleBean, $templateBean, $objectArr, true);
@@ -248,7 +253,7 @@ class BasePDFManager extends LegacyHandler
             return $this->createPDFMediaObject($parentRecord, $fileName, $pdfConfig, $pdfContent, $temp);
         }
 
-        if (isset($options['createNote']) && $options['createNote'] === true) {
+        if ($options['createNote'] ?? true) {
             $note = $this->createNote($moduleBean, $fileName, $options);
             return $this->createPDFMediaObject($note, $fileName, $pdfConfig, $pdfContent, $temp);
         }
@@ -358,9 +363,22 @@ class BasePDFManager extends LegacyHandler
         ];
     }
 
-    protected function getPdfName(string $name): string
+    protected function getPdfName(string $module, string $name): string
     {
-        return str_replace(" ", "_", $name) . ".pdf";
+        $legacyModule = $this->moduleNameMapper->toLegacy($module);
+        $moduleLabel = $this->getModuleSingularLabel($legacyModule);
+        return $moduleLabel . '_' . str_replace(' ', '_', $name) . '.pdf';
+    }
+
+    protected function getModuleSingularLabel(string $legacyModule): string
+    {
+        $this->init();
+        $modStrings = return_module_language($GLOBALS['current_language'] ?? 'en_us', $legacyModule);
+        $this->close();
+
+        $singular = $modStrings['LBL_MODULE_NAME_SINGULAR'] ?? $this->moduleNameMapper->toCore($legacyModule);
+
+        return str_replace(' ', '_', $singular);
     }
 
     protected function retrieveBean(SugarBean $moduleBean, string $id): ?SugarBean

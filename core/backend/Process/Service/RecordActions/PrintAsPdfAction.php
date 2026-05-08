@@ -194,11 +194,7 @@ class PrintAsPdfAction implements ProcessHandlerInterface
             ];
         }
 
-        $options = [
-            'createNote' => true,
-        ];
-
-        $record = $this->pdfManager->generatePdf($module, $recordId, $modalId, $options);
+        $record = $this->pdfManager->generatePdf($module, $recordId, $modalId, $options['params'] ?? []);
 
         if ($record === null) {
             return [

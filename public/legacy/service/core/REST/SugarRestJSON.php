@@ -84,7 +84,9 @@ class SugarRestJSON extends SugarRest{
 	 */
 	public function serve(){
 		$GLOBALS['log']->info('Begin: SugarRestJSON->serve');
-		$json_data = !empty($_REQUEST['rest_data'])? $GLOBALS['RAW_REQUEST']['rest_data']: '';
+        $raw_json_data = $GLOBALS['RAW_REQUEST']['rest_data'];
+        $json_data = !empty($raw_json_data)? html_entity_decode($raw_json_data): '';
+
 		if(empty($_REQUEST['method']) || !method_exists($this->implementation, $_REQUEST['method'])){
 			$er = new SoapError();
 			$er->set_error('invalid_call');

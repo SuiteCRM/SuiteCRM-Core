@@ -208,6 +208,8 @@ $viewdefs ['Contacts'] =
                             'acl' => ['view'],
                             'aclModule' => 'AOS_PDF_Templates',
                             'params' => [
+                                'createNote' => true,
+                                'fileNaming' => 'template',
                                 'selectModal' => [
                                     'module' => 'AOS_PDF_Templates'
                                 ]

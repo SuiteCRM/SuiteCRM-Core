@@ -50,7 +50,7 @@ class StandardField extends DynamicField
     public $custom_def = array();
     public $base_def = array();
     public $baseField;
-    
+
     protected function loadCustomDef($field)
     {
         global $beanList;
@@ -75,7 +75,7 @@ class StandardField extends DynamicField
             }
         }
     }
-    
+
     /**
      * Adds a custom field using a field object
      *
@@ -85,8 +85,8 @@ class StandardField extends DynamicField
     public function addFieldObject(&$field)
     {
         global $dictionary, $beanList;
-        
-        
+
+
         if (empty($beanList[$this->module])) {
             return false;
         }
@@ -114,7 +114,7 @@ class StandardField extends DynamicField
         $this->loadCustomDef($field->name);
         $this->loadBaseDef($field->name);
         $newDef = $field->get_field_def();
-        
+
         require_once('modules/DynamicFields/FieldCases.php') ;
         $this->baseField = get_widget($field->type) ;
         foreach ($field->vardef_map as $property => $fmd_col) {
@@ -136,7 +136,7 @@ class StandardField extends DynamicField
                 $this->custom_def[$property] =
                     is_string($newDef[$property]) ? htmlspecialchars_decode($newDef[$property], ENT_QUOTES) : $newDef[$property];
             }
-            
+
             //Remove any orphaned entries
             if (isset($this->custom_def[$property]) && !isset($newDef[$property])) {
                 unset($this->custom_def[$property]);
@@ -160,11 +160,22 @@ class StandardField extends DynamicField
                 }
             }
         }
-        
+
+        foreach ($newDef['metadata'] ?? [] as $property => $value) {
+            if (!isset($this->custom_def['metadata'][$property]) || $this->custom_def['metadata'][$property] != $value) {
+                $this->custom_def['metadata'][$property] = is_string($value) ? htmlspecialchars_decode($value, ENT_QUOTES) : $value;
+            }
+
+        }
+
         if (isset($this->custom_def["duplicate_merge_dom_value"]) && !isset($this->custom_def["duplicate_merge"])) {
             unset($this->custom_def["duplicate_merge_dom_value"]);
         }
-        
+
+        if (isset($newDef['source']) && $newDef['source'] == 'non-db') {
+            $this->custom_def['source'] = 'non-db';
+        }
+
         $this->writeVardefExtension($bean_name, $field, $this->custom_def);
     }
 }

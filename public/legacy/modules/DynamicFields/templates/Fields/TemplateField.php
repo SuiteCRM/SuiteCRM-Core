@@ -107,7 +107,6 @@ class TemplateField
         'reportable' => 'reportable',
         'ext2'=>'ext2',
         'ext4'=>'ext4',
-        'source' => 'source',
         'ext3'=>'ext3',
         'labelValue' => 'label_value',
         'unified_search'=>'unified_search',

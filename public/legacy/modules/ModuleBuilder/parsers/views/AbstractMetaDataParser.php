@@ -150,6 +150,10 @@ abstract class AbstractMetaDataParser
             }
         }
 
+        if ($def['type'] === 'image' || $def['type'] === 'file' || $def['type'] === 'attachment') {
+            return true;
+        }
+
         // bug 19656: this test changed after 5.0.0b - we now remove all ID type fields - whether set as type, or dbtype, from the fielddefs
         return
             (

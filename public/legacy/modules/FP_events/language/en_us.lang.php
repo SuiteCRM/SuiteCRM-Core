@@ -129,5 +129,7 @@ $mod_strings = array(
     // Email links
     'LBL_ACCEPT_LINK' => 'Accept',
     'LBL_DECLINE_LINK' => 'Decline',
+    // Export Delegates
+    'LBL_EXPORT_DELEGATES_CSV' => 'Export Delegates (CSV)',
     
 );

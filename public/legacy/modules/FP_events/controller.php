@@ -637,4 +637,73 @@ class FP_eventsController extends SugarController
         }
         return false;
     }
+    public function action_exportdelegates()
+    {
+        $db = DBManagerFactory::getInstance();
+        $eventId = $db->quote($_REQUEST['record']);
+
+        $event = BeanFactory::getBean('FP_events', $eventId);
+        if (empty($event->id)) {
+            sugar_die("Event not found.");
+        }
+
+        // Nome file dinamico
+        $filename = "Delegates_" . preg_replace('/[^A-Za-z0-9\-]/', '_', $event->name) . "_" . date("Ymd") . ".csv";
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        $output = fopen('php://output', 'w');
+        // Scrive la BOM (Byte Order Mark) per Excel
+        fputs($output, $bom =(chr(0xEF) . chr(0xBB) . chr(0xBF)));
+
+        // Intestazioni (Headers) CSV - Idealmente andrebbero tradotte, ma per un CSV l'inglese o le chiavi sono standard accettati
+        fputcsv($output, array(
+            'Type', 'First Name', 'Last Name', 'Account Name', 'Office Phone', 'Email', 'Invite Status', 'Accept Status', 'Last Modified Date'
+        ), ';');
+
+        // 1. Estrazione Contatti (Contacts)
+        $qContacts = "
+            SELECT 'Contact' as type, c.first_name, c.last_name, a.name as account_name, c.phone_work, ea.email_address,
+                   ec.invite_status, ec.accept_status, ec.date_modified
+            FROM fp_events_contacts_c ec
+            INNER JOIN contacts c ON ec.fp_events_contactscontacts_idb = c.id AND c.deleted = 0
+            LEFT JOIN accounts_contacts ac ON c.id = ac.contact_id AND ac.deleted = 0
+            LEFT JOIN accounts a ON ac.account_id = a.id AND a.deleted = 0
+            LEFT JOIN email_addr_bean_rel eabl ON c.id = eabl.bean_id AND eabl.bean_module = 'Contacts' AND eabl.primary_address = 1 AND eabl.deleted = 0
+            LEFT JOIN email_addresses ea ON eabl.email_address_id = ea.id AND ea.deleted = 0
+            WHERE ec.fp_events_contactsfp_events_ida = '{$eventId}' AND ec.deleted = 0
+        ";
+        $res = $db->query($qContacts);
+        while($row = $db->fetchByAssoc($res)) { fputcsv($output, $row, ';'); }
+
+        // 2. Estrazione Lead (Leads)
+        $qLeads = "
+            SELECT 'Lead' as type, l.first_name, l.last_name, l.account_name, l.phone_work, ea.email_address,
+                   el.invite_status, el.accept_status, el.date_modified
+            FROM fp_events_leads_1_c el
+            INNER JOIN leads l ON el.fp_events_leads_1leads_idb = l.id AND l.deleted = 0
+            LEFT JOIN email_addr_bean_rel eabl ON l.id = eabl.bean_id AND eabl.bean_module = 'Leads' AND eabl.primary_address = 1 AND eabl.deleted = 0
+            LEFT JOIN email_addresses ea ON eabl.email_address_id = ea.id AND ea.deleted = 0
+            WHERE el.fp_events_leads_1fp_events_ida = '{$eventId}' AND el.deleted = 0
+        ";
+        $res = $db->query($qLeads);
+        while($row = $db->fetchByAssoc($res)) { fputcsv($output, $row, ';'); }
+
+        // 3. Estrazione Obiettivi (Prospects/Targets)
+        $qProspects = "
+            SELECT 'Target' as type, p.first_name, p.last_name, p.account_name, p.phone_work, ea.email_address,
+                   ep.invite_status, ep.accept_status, ep.date_modified
+            FROM fp_events_prospects_1_c ep
+            INNER JOIN prospects p ON ep.fp_events_prospects_1prospects_idb = p.id AND p.deleted = 0
+            LEFT JOIN email_addr_bean_rel eabl ON p.id = eabl.bean_id AND eabl.bean_module = 'Prospects' AND eabl.primary_address = 1 AND eabl.deleted = 0
+            LEFT JOIN email_addresses ea ON eabl.email_address_id = ea.id AND ea.deleted = 0
+            WHERE ep.fp_events_prospects_1fp_events_ida = '{$eventId}' AND ep.deleted = 0
+        ";
+        $res = $db->query($qProspects);
+        while($row = $db->fetchByAssoc($res)) { fputcsv($output, $row, ';'); }
+
+        fclose($output);
+        sugar_cleanup(true);
+    }
 }

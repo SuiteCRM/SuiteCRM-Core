@@ -161,13 +161,6 @@ class StandardField extends DynamicField
             }
         }
 
-        foreach ($newDef['metadata'] ?? [] as $property => $value) {
-            if (!isset($this->custom_def['metadata'][$property]) || $this->custom_def['metadata'][$property] != $value) {
-                $this->custom_def['metadata'][$property] = is_string($value) ? htmlspecialchars_decode($value, ENT_QUOTES) : $value;
-            }
-
-        }
-
         if (isset($this->custom_def["duplicate_merge_dom_value"]) && !isset($this->custom_def["duplicate_merge"])) {
             unset($this->custom_def["duplicate_merge_dom_value"]);
         }

@@ -142,10 +142,15 @@ class BasePDFManager extends LegacyHandler
     {
         $objectArr = [];
         $objectArr[$moduleBean->module_dir] = $moduleBean->id;
+        $objectArr['Accounts'] = $moduleBean->billing_account_id ?? '';
 
         if ($moduleBean->module_dir === 'Contacts') {
             $objectArr['Accounts'] = $moduleBean->account_id;
         }
+
+        $objectArr['Contacts'] = $moduleBean->billing_contact_id ?? '';
+        $objectArr['Users'] = $moduleBean->assigned_user_id ?? '';
+        $objectArr['Currencies'] = $moduleBean->currency_id ?? '';
 
         return $objectArr;
     }

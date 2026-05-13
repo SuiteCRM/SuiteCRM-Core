@@ -2,7 +2,7 @@
   <img width="180px" height="41px" src="https://suitecrm.com/wp-content/uploads/2017/12/logo.png" align="right" />
 </a>
 
-# SuiteCRM 8.10.0
+# SuiteCRM 8.10.1
 
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/SuiteCRM/SuiteCRM/issues)
 [![GitHub Contributors](https://img.shields.io/github/contributors/SuiteCRM/suitecrm)](https://github.com/SuiteCRM/SuiteCRM/graphs/contributors)

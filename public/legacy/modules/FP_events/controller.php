@@ -654,10 +654,14 @@ class FP_eventsController extends SugarController
         header('Content-Disposition: attachment; filename="' . $filename . '"');
 
         $output = fopen('php://output', 'w');
-        // Scrive la BOM (Byte Order Mark) per Excel
+        
+        // Scrive la BOM (Byte Order Mark) per supportare i caratteri UTF-8 in Excel
         fputs($output, $bom =(chr(0xEF) . chr(0xBB) . chr(0xBF)));
+        
+        // FORZA EXCEL A USARE IL PUNTO E VIRGOLA COME SEPARATORE (Richiesta compatibilità V7)
+        fputs($output, "sep=;\n");
 
-        // Intestazioni (Headers) CSV - Idealmente andrebbero tradotte, ma per un CSV l'inglese o le chiavi sono standard accettati
+        // Intestazioni (Headers) CSV
         fputcsv($output, array(
             'Type', 'First Name', 'Last Name', 'Account Name', 'Office Phone', 'Email', 'Invite Status', 'Accept Status', 'Last Modified Date'
         ), ';');

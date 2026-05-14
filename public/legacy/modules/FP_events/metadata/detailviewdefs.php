@@ -14,6 +14,9 @@ $viewdefs [$module_name] =
                                         1 => 'DUPLICATE',
                                         2 => 'DELETE',
                                         3 => 'FIND_DUPLICATES',
+                                        4 => array(
+                                            'customCode' => '<input type="button" class="button" onClick="window.location.href=\'index.php?module=FP_events&action=exportdelegates&record={$fields.id.value}\';" value="{$MOD.LBL_EXPORT_DELEGATES_CSV}">',
+                                        ),
                                     ),
                                 'hidden' =>
                                     array(

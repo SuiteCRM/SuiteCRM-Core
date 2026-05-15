@@ -43,12 +43,19 @@ class EditAction implements ProcessHandlerInterface
     private $moduleNameMapper;
 
     /**
+     * @var string
+     */
+    private $legacyDir;
+
+    /**
      * EditAction constructor.
      * @param ModuleNameMapperInterface $moduleNameMapper
+     * @param string $legacyDir
      */
-    public function __construct(ModuleNameMapperInterface $moduleNameMapper)
+    public function __construct(ModuleNameMapperInterface $moduleNameMapper, string $legacyDir)
     {
         $this->moduleNameMapper = $moduleNameMapper;
+        $this->legacyDir = $legacyDir;
     }
 
     /**
@@ -144,20 +151,44 @@ class EditAction implements ProcessHandlerInterface
     public function run(Process $process)
     {
         $options = $process->getOptions();
+        $relationshipEdit = $options['payload']['relationshipEdit'] ?? [];
+        $relationshipEditEnabled = ($relationshipEdit['enabled'] ?? false) === true;
 
-        //parent module
+        $responseData = $this->buildRelationshipEditResponseData($options, $relationshipEdit);
+        if (!empty($responseData)) {
+            $process->setStatus('success');
+            $process->setMessages([]);
+            $process->setData($responseData);
+            return;
+        }
+
+        if ($relationshipEditEnabled && !$this->shouldFallbackToRecordEdit($relationshipEdit)) {
+            $process->setStatus('error');
+            $process->setMessages(['LBL_ACTION_ERROR']);
+            $process->setData(null);
+            return;
+        }
+
+        $responseData = $this->buildRecordEditResponseData($options);
+        $process->setStatus('success');
+        $process->setMessages([]);
+        $process->setData($responseData);
+    }
+
+    /**
+     * Build default subpanel record edit response.
+     */
+    protected function buildRecordEditResponseData(array $options): array
+    {
         $baseModule = $this->moduleNameMapper->toLegacy($options['payload']['baseModule']);
         $baseRecordId = $options['payload']['baseRecordId'];
-
-        //linked(subpanel) module
         $linkedModule = $options["payload"]["recordModule"];
         $linkedRecordId = $options['id'];
-        $linkedAction = 'edit';
 
-        $responseData = [
+        return [
             'handler' => 'redirect',
             'params' => [
-                'route' => $linkedModule . '/' . $linkedAction . '/' . $linkedRecordId,
+                'route' => $linkedModule . '/edit/' . $linkedRecordId,
                 'queryParams' => [
                     'action_module' => $linkedModule,
                     'return_action' => 'DetailView',
@@ -166,9 +197,83 @@ class EditAction implements ProcessHandlerInterface
                 ]
             ]
         ];
+    }
 
-        $process->setStatus('success');
-        $process->setMessages([]);
-        $process->setData($responseData);
+    /**
+     * Build relationship-edit redirect response, if supported by legacy action.
+     */
+    protected function buildRelationshipEditResponseData(array $options, array $relationshipEdit): array
+    {
+        if (($relationshipEdit['enabled'] ?? false) !== true) {
+            return [];
+        }
+
+        $relationshipModule = $relationshipEdit['module'] ?? '';
+        $relationshipAction = $relationshipEdit['action'] ?? '';
+        $relationshipRecordId = $relationshipEdit['recordId'] ?? '';
+
+        if ($relationshipModule === '' || $relationshipAction === '' || $relationshipRecordId === '') {
+            return [];
+        }
+
+        if (!$this->isLegacyActionImplemented($relationshipModule, $relationshipAction)) {
+            return [];
+        }
+
+        $baseModule = $this->moduleNameMapper->toLegacy($options['payload']['baseModule']);
+        $baseRecordId = $options['payload']['baseRecordId'];
+
+        return [
+            'handler' => 'redirect',
+            'params' => [
+                'route' => $relationshipModule . '/' . $relationshipAction . '/' . $relationshipRecordId,
+                'queryParams' => [
+                    'action_module' => $relationshipModule,
+                    'return_action' => 'DetailView',
+                    'return_module' => $baseModule,
+                    'return_id' => $baseRecordId
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Check if target legacy action has a backing php entry file.
+     */
+    protected function isLegacyActionImplemented(string $module, string $action): bool
+    {
+        $legacyModule = $this->moduleNameMapper->toLegacy($module);
+        if (!$this->isSafeLegacyIdentifier($legacyModule) || !$this->isSafeLegacyIdentifier($action)) {
+            return false;
+        }
+
+        $paths = [
+            $this->legacyDir . '/custom/modules/' . $legacyModule . '/' . $action . '.php',
+            $this->legacyDir . '/modules/' . $legacyModule . '/' . $action . '.php',
+        ];
+
+        foreach ($paths as $path) {
+            if (is_readable($path)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Validate module/action values used to build legacy file paths.
+     */
+    protected function isSafeLegacyIdentifier(string $value): bool
+    {
+        return $value !== '' && preg_match('/^[A-Za-z0-9_]+$/', $value) === 1;
+    }
+
+    /**
+     * Whether relation edit should fallback to standard record edit.
+     */
+    protected function shouldFallbackToRecordEdit(array $relationshipEdit): bool
+    {
+        return ($relationshipEdit['fallbackToRecordEdit'] ?? true) !== false;
     }
 }

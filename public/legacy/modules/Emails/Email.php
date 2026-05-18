@@ -3117,12 +3117,92 @@ class Email extends Basic
         $this->validateBeforeSend($mail);
 
         if ($mail->send()) {
+            $this->storeSentMessageInSentFolder($mail, $outboundEmailAccount);
+
             return true;
         }
 
         $GLOBALS['log']->debug($app_strings['LBL_EMAIL_ERROR_PREPEND'] . $mail->ErrorInfo);
 
         return false;
+    }
+
+    protected function storeSentMessageInSentFolder(
+        SugarPHPMailer $mail,
+        OutboundEmailAccounts $outboundEmailAccount,
+        string $options = "\\Seen"
+    ): void {
+        try {
+            $outboundId = (string)($outboundEmailAccount->id ?? '');
+            $inboundId = $this->resolveInboundEmailIdForSentFolder($outboundId);
+            if ($inboundId === '') {
+                return;
+            }
+
+            /** @var InboundEmail $inboundEmail */
+            $inboundEmail = BeanFactory::getBean('InboundEmail', $inboundId);
+            if (empty($inboundEmail) || empty($inboundEmail->id)) {
+                LoggerManager::getLogger()->warn(
+                    "IMAP Sent append skipped: inbound account not found (outbound_email_id={$outboundId}, inbound_email_id={$inboundId})"
+                );
+                return;
+            }
+
+            $handler = new NonGmailSentFolderHandler();
+            $stored = $handler->storeInSentFolder($inboundEmail, $mail, $options);
+            if (!$stored) {
+                $handlerError = $handler->getLastError();
+                LoggerManager::getLogger()->warn(
+                    "Unable to store outgoing email in IMAP Sent folder (outbound_email_id={$outboundId}, inbound_email_id={$inboundId}, handler_last_error={$handlerError})"
+                );
+            }
+        } catch (Throwable $e) {
+            // Sent-folder append is best-effort and must never block successful send.
+            LoggerManager::getLogger()->warn('Failed to store outgoing email in IMAP Sent folder: ' . $e->getMessage());
+        }
+    }
+
+    protected function resolveInboundEmailIdForSentFolder(string $outboundId): string
+    {
+        if (!empty($_REQUEST['inbound_email_id'])) {
+            return (string)$_REQUEST['inbound_email_id'];
+        }
+
+        if (!empty($this->mailbox_id)) {
+            return (string)$this->mailbox_id;
+        }
+
+        if ($outboundId === '') {
+            return '';
+        }
+
+        $db = DBManagerFactory::getInstance();
+        if (!is_object($db)) {
+            return '';
+        }
+
+        $currentUserId = $GLOBALS['current_user']->id ?? '';
+        $searchScopes = [];
+
+        if (!empty($currentUserId)) {
+            $searchScopes[] = "AND (group_id = " . $db->quoted($currentUserId) .
+                " OR created_by = " . $db->quoted($currentUserId) . " OR is_personal = 1)";
+        }
+        $searchScopes[] = '';
+
+        foreach ($searchScopes as $scope) {
+            $q = "SELECT id FROM inbound_email WHERE deleted=0 AND status='Active' " .
+                "AND outbound_email_id = " . $db->quoted($outboundId) . " " .
+                $scope . " ORDER BY is_personal DESC, date_modified DESC";
+            $r = $db->query($q, true);
+            $a = $db->fetchByAssoc($r);
+            $inboundId = $a['id'] ?? '';
+            if (!empty($inboundId)) {
+                return (string)$inboundId;
+            }
+        }
+
+        return '';
     }
 
     /**

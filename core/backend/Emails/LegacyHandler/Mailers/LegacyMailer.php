@@ -92,13 +92,13 @@ class LegacyMailer extends LegacyHandler
             return false;
         }
 
-        $result = $this->sendEmail($sugarMailer);
+        $result = $this->sendEmail($sugarMailer, false, $outboundBean);
 
         $this->close();
         return $result;
     }
 
-    public function sendEmail(\SugarPHPMailer $email, $isTest = false): bool
+    public function sendEmail(\SugarPHPMailer $email, $isTest = false, ?\OutboundEmailAccounts $outboundBean = null): bool
     {
 
         $sent = $email->send();
@@ -118,7 +118,89 @@ class LegacyMailer extends LegacyHandler
             return false;
         }
 
+        $outboundId = '';
+        if (!empty($outboundBean?->id)) {
+            $outboundId = (string)$outboundBean->id;
+        } elseif (!empty($email->oe?->id)) {
+            $outboundId = (string)$email->oe->id;
+        }
+
+        if ($outboundId !== '') {
+            $this->storeInImapSentFolder($email, $outboundId);
+        }
+
         return true;
+    }
+
+    protected function storeInImapSentFolder(\SugarPHPMailer $email, string $outboundId): void
+    {
+        try {
+            require_once 'modules/Emails/NonGmailSentFolderHandler.php';
+
+            $db = $GLOBALS['db'] ?? null;
+            if (!is_object($db)) {
+                return;
+            }
+
+            $ieId = $this->resolveInboundEmailId($db, $outboundId);
+
+            if (empty($ieId)) {
+                return;
+            }
+
+            /** @var \InboundEmail $ie */
+            $ie = \BeanFactory::getBean('InboundEmail', $ieId);
+            if (empty($ie) || empty($ie->id)) {
+                $this->logger->warning('IMAP Sent store skipped: inbound email account not found.', [
+                    'outbound_email_id' => $outboundId,
+                    'inbound_email_id' => $ieId,
+                ]);
+                return;
+            }
+
+            $handler = new \NonGmailSentFolderHandler();
+            $stored = $handler->storeInSentFolder($ie, $email, "\\Seen");
+
+            if (!$stored) {
+                $this->logger->warning('Unable to store outgoing email in IMAP Sent folder.', [
+                    'outbound_email_id' => $outboundId,
+                    'inbound_email_id' => $ieId,
+                    'handler_last_error' => $handler->getLastError(),
+                ]);
+            }
+        } catch (\Throwable $e) {
+            // Never fail sending just because Sent-folder append failed.
+            $this->logger->warning('Failed to store outgoing email in IMAP Sent folder.', [
+                'outbound_email_id' => $outboundId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    protected function resolveInboundEmailId($db, string $outboundId): string
+    {
+        $currentUserId = $GLOBALS['current_user']->id ?? '';
+        $searchScopes = [];
+
+        if (!empty($currentUserId)) {
+            $searchScopes[] = "AND (group_id = " . $db->quoted($currentUserId) .
+                " OR created_by = " . $db->quoted($currentUserId) . " OR is_personal = 1)";
+        }
+        $searchScopes[] = '';
+
+        foreach ($searchScopes as $scope) {
+            $q = "SELECT id FROM inbound_email WHERE deleted=0 AND status='Active' " .
+                "AND outbound_email_id = " . $db->quoted($outboundId) . " " .
+                $scope . " ORDER BY is_personal DESC, date_modified DESC";
+            $r = $db->query($q, true);
+            $a = $db->fetchByAssoc($r);
+            $ieId = $a['id'] ?? '';
+            if (!empty($ieId)) {
+                return $ieId;
+            }
+        }
+
+        return '';
     }
 
     /**
@@ -251,6 +333,9 @@ class LegacyMailer extends LegacyHandler
         } else {
             $mail->Mailer = 'sendmail';
         }
+
+        // Keep legacy mailer metadata aligned with the selected outbound account.
+        $mail->oe = $outboundEmail;
     }
 
     protected function handleBodyInHTMLFormat(\SugarPHPMailer $mail, string $body): void

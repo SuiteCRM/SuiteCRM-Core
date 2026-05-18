@@ -604,15 +604,189 @@ class SubPanelDefinitionHandler extends LegacyHandler implements SubPanelDefinit
                 ) {
                     $lineAction = $subpanelLineActions[$list_field['name']];
                     $moduleName = $this->moduleNameMapper->toFrontEnd($subpanelModule);
-                    $lineActions[] = $this->subpanelLineActionDefinitionProvider->getLineAction(
+                    $lineActionDefinition = $this->subpanelLineActionDefinitionProvider->getLineAction(
                         $moduleName,
                         $lineAction
+                    );
+
+                    if (empty($lineActionDefinition)) {
+                        continue;
+                    }
+
+                    $lineActions[] = $this->mapRelationshipEditLineAction(
+                        $lineActionDefinition,
+                        $list_field,
+                        $subpanelModule
                     );
                 }
             }
         }
 
         return $lineActions;
+    }
+
+    /**
+     * Map relation-edit widget data to line action params.
+     */
+    protected function mapRelationshipEditLineAction(
+        array $lineAction,
+        array $listField,
+        string $subpanelModule
+    ): array {
+        if (($lineAction['key'] ?? '') !== 'edit') {
+            return $lineAction;
+        }
+
+        $relationshipEditConfig = $this->buildRelationshipEditConfig($listField, $subpanelModule);
+        if (empty($relationshipEditConfig)) {
+            return $lineAction;
+        }
+
+        $lineAction['params'] = $lineAction['params'] ?? [];
+        $lineAction['params']['relationshipEdit'] = $relationshipEditConfig;
+
+        return $lineAction;
+    }
+
+    /**
+     * Build relationship edit action configuration for special edit widgets.
+     */
+    protected function buildRelationshipEditConfig(array $listField, string $subpanelModule): array
+    {
+        $widgetClass = $listField['widget_class'] ?? '';
+        if (!$this->isRelationshipEditWidgetClass($widgetClass)) {
+            return [];
+        }
+
+        $widgetConfig = $this->extractRelationshipEditFromWidgetClass($widgetClass);
+        $relationshipAction = $widgetConfig['action'] ?? '';
+        if ($relationshipAction === '') {
+            return [];
+        }
+
+        $relationshipModule = $widgetConfig['module'] ?? '';
+        if ($relationshipModule === '') {
+            $relationshipModule = $listField['module'] ?? $subpanelModule;
+        }
+
+        $recordField = $widgetConfig['recordField'] ?? '';
+        if ($recordField === '' && !empty($listField['role_id'])) {
+            $recordField = strtoupper((string)$listField['role_id']);
+        }
+
+        $moduleName = $this->moduleNameMapper->toFrontEnd($relationshipModule);
+        if ($moduleName === '') {
+            $moduleName = $relationshipModule;
+        }
+
+        return [
+            'enabled' => true,
+            'module' => $moduleName,
+            'action' => $relationshipAction,
+            'recordField' => $recordField,
+            'fallbackToRecordEdit' => true,
+        ];
+    }
+
+    /**
+     * Determine if widget represents a relationship edit action.
+     */
+    protected function isRelationshipEditWidgetClass(string $widgetClass): bool
+    {
+        if ($widgetClass === '' || $widgetClass === 'SubPanelEditButton') {
+            return false;
+        }
+
+        if (!str_starts_with($widgetClass, 'SubPanelEdit')) {
+            return false;
+        }
+
+        return str_ends_with($widgetClass, 'Button');
+    }
+
+    /**
+     * Extract relationship edit metadata from the legacy widget class.
+     */
+    protected function extractRelationshipEditFromWidgetClass(string $widgetClass): array
+    {
+        $widgetFilePath = $this->getWidgetClassFilePath($widgetClass);
+        if ($widgetFilePath === '') {
+            return [];
+        }
+
+        $widgetSource = file_get_contents($widgetFilePath);
+        if ($widgetSource === false || $widgetSource === '') {
+            return [];
+        }
+
+        return [
+            'action' => $this->findActionNameInWidgetClass($widgetSource),
+            'module' => $this->findModuleNameInWidgetClass($widgetSource),
+            'recordField' => $this->findRecordFieldInWidgetClass($widgetSource),
+        ];
+    }
+
+    /**
+     * Get widget file path from class name.
+     */
+    protected function getWidgetClassFilePath(string $widgetClass): string
+    {
+        $paths = [
+            $this->legacyDir . '/custom/include/generic/SugarWidgets/SugarWidget' . $widgetClass . '.php',
+            $this->legacyDir . '/include/generic/SugarWidgets/SugarWidget' . $widgetClass . '.php',
+        ];
+
+        foreach ($paths as $path) {
+            if (is_readable($path)) {
+                return $path;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Find relationship action name from widget source.
+     */
+    protected function findActionNameInWidgetClass(string $widgetSource): string
+    {
+        $patterns = [
+            "/&action='\\s*\\.\\s*'([A-Za-z0-9_]+)'/i",
+            '/&action="\\s*\\.\\s*"([A-Za-z0-9_]+)"/i',
+            '/[?&]action=([A-Za-z0-9_]+)/i',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $widgetSource, $matches) === 1) {
+                return $matches[1] ?? '';
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Find relationship module name from widget source.
+     */
+    protected function findModuleNameInWidgetClass(string $widgetSource): string
+    {
+        if (preg_match('/index\\.php\\?module=([A-Za-z0-9_]+)/i', $widgetSource, $matches) === 1) {
+            return $matches[1] ?? '';
+        }
+
+        return '';
+    }
+
+    /**
+     * Find relation-record field name used in widget source.
+     */
+    protected function findRecordFieldInWidgetClass(string $widgetSource): string
+    {
+        if (preg_match('/\\$layout_def\\[[\'"]fields[\'"]\\]\\[[\'"]([A-Za-z0-9_]+)[\'"]\\]/i', $widgetSource, $matches) === 1) {
+            return $matches[1] ?? '';
+        }
+
+        return '';
     }
 
     /**

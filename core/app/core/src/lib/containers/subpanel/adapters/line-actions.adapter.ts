@@ -108,6 +108,11 @@ export class SubpanelLineActionsAdapter extends BaseActionsAdapter<SubpanelLineA
         return 'list' as ViewMode;
     }
 
+    runAction(action: Action, context: ActionContext = null): void {
+        this.applyRelationshipEditFieldModalDefaults(action, context);
+        super.runAction(action, context);
+    }
+
     protected getModuleName(context?: ActionContext): string {
         return this.store.metadata.module;
     }
@@ -147,6 +152,8 @@ export class SubpanelLineActionsAdapter extends BaseActionsAdapter<SubpanelLineA
             })
         }
 
+        const relationshipEdit = this.getRelationshipEditPayload(action, context, module);
+
         return {
             action: actionName,
             module: moduleName,
@@ -158,7 +165,183 @@ export class SubpanelLineActionsAdapter extends BaseActionsAdapter<SubpanelLineA
                 recordModule: module,
                 relateModule: this.store.metadata.module,
                 relateRecordId: (context && context.record && context.record.id) || '',
+                ...(relationshipEdit ? {relationshipEdit} : {}),
             }
         } as AsyncActionInput;
+    }
+
+    /**
+     * Build relationship edit payload for special subpanel edit widgets.
+     */
+    protected getRelationshipEditPayload(
+        action: Action,
+        context: ActionContext,
+        module: string
+    ): {[key: string]: any} | null {
+        const relationshipEdit = action?.params?.relationshipEdit ?? null;
+        if (!relationshipEdit || relationshipEdit.enabled !== true) {
+            return null;
+        }
+
+        const relationshipAction = relationshipEdit.action ?? '';
+        const relationshipModule = relationshipEdit.module ?? module;
+        if (!relationshipAction || !relationshipModule) {
+            return null;
+        }
+
+        const relationshipValues = this.getRelationshipEditFieldValues(action);
+
+        return {
+            enabled: true,
+            module: relationshipModule,
+            action: relationshipAction,
+            recordId: this.resolveRelationshipRecordId(context, relationshipEdit.recordField ?? ''),
+            fallbackToRecordEdit: relationshipEdit.fallbackToRecordEdit !== false,
+            ...(relationshipEdit.modern ? {modern: relationshipEdit.modern} : {}),
+            ...(relationshipValues ? {values: relationshipValues} : {}),
+        };
+    }
+
+    /**
+     * Apply current row role value as default for modern relationship edit field modal.
+     */
+    protected applyRelationshipEditFieldModalDefaults(action: Action, context: ActionContext): void {
+        const relationshipEdit = action?.params?.relationshipEdit ?? null;
+        const fieldModal = action?.params?.fieldModal ?? null;
+        const modernConfig = relationshipEdit?.modern ?? null;
+
+        if (!relationshipEdit || !fieldModal || !modernConfig || modernConfig.enabled !== true) {
+            return;
+        }
+
+        const roleField = modernConfig.roleField ?? '';
+        const valueField = modernConfig.valueField ?? roleField;
+        if (!roleField || !valueField) {
+            return;
+        }
+
+        const attributes = context?.record?.attributes ?? null;
+        if (!attributes) {
+            return;
+        }
+
+        const rawValue = this.getRecordAttribute(attributes, valueField);
+        if (rawValue === undefined || rawValue === null) {
+            return;
+        }
+
+        const defaultValue = this.normalizeRelationshipEditValue(rawValue);
+        fieldModal.fields = (fieldModal.fields ?? []).map((field: {[key: string]: any}) => {
+            if ((field?.name ?? '') !== roleField) {
+                return field;
+            }
+
+            const fieldDefinition = field?.fieldDefinition ?? {};
+            return {
+                ...field,
+                defaultValue,
+                fieldDefinition: {
+                    ...fieldDefinition,
+                    default: defaultValue,
+                    defaultValue
+                }
+            };
+        });
+    }
+
+    /**
+     * Extract field-modal values to relation edit payload values map.
+     */
+    protected getRelationshipEditFieldValues(action: Action): {[key: string]: string} | null {
+        const fields = action?.params?.fields ?? null;
+        if (!fields || typeof fields !== 'object') {
+            return null;
+        }
+
+        const values: {[key: string]: string} = {};
+        Object.keys(fields).forEach(fieldName => {
+            const fieldValue = fields[fieldName]?.value;
+            if (fieldValue === undefined || fieldValue === null) {
+                return;
+            }
+
+            values[fieldName] = this.normalizeRelationshipEditValue(fieldValue);
+        });
+
+        if (!Object.keys(values).length) {
+            return null;
+        }
+
+        return values;
+    }
+
+    /**
+     * Normalize modal field values into string payload values.
+     */
+    protected normalizeRelationshipEditValue(value: any): string {
+        if (value === undefined || value === null) {
+            return '';
+        }
+
+        if (typeof value === 'object') {
+            if (value?.value !== undefined && value?.value !== null) {
+                return `${value.value}`;
+            }
+
+            if (value?.name !== undefined && value?.name !== null) {
+                return `${value.name}`;
+            }
+
+            if (value?.id !== undefined && value?.id !== null) {
+                return `${value.id}`;
+            }
+
+            return '';
+        }
+
+        return `${value}`;
+    }
+
+    /**
+     * Resolve relation row id from subpanel record attributes.
+     */
+    protected resolveRelationshipRecordId(context: ActionContext, recordField: string): string {
+        const attributes = context?.record?.attributes ?? null;
+        if (!attributes || !recordField) {
+            return '';
+        }
+
+        const value = this.getRecordAttribute(attributes, recordField);
+        if (value === undefined || value === null) {
+            return '';
+        }
+
+        if (typeof value === 'object') {
+            if (value && value.id) {
+                return `${value.id}`;
+            }
+
+            return '';
+        }
+
+        return `${value}`;
+    }
+
+    /**
+     * Read attribute with a case-insensitive key match.
+     */
+    protected getRecordAttribute(attributes: {[key: string]: any}, key: string): any {
+        if (!Object.prototype.hasOwnProperty.call(attributes, key)) {
+            const normalizedKey = key.toLowerCase();
+            const matchedKey = Object.keys(attributes).find(attributeKey => attributeKey.toLowerCase() === normalizedKey);
+
+            if (!matchedKey) {
+                return null;
+            }
+
+            return attributes[matchedKey];
+        }
+
+        return attributes[key];
     }
 }

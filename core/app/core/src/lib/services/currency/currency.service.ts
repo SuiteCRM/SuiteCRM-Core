@@ -46,6 +46,13 @@ export class CurrencyService {
         const isBase = this.isBase(field);
         const currencyId = this.getCurrencyId(record);
 
+        // If currency_id is -99, don't do any conversion
+        // Just return the value as-is (it's already in USD)
+        // Created by Advocotek
+        if (currencyId === '-99') {
+            return field.value;
+        }
+
         if (!isBase && currencyId !== null) {
             return field.value;
         }
@@ -91,7 +98,16 @@ export class CurrencyService {
     }
 
     getCurrencyId(record: Record): string {
-        return record?.fields?.currency_id?.value ?? null;
+        // First try to get from fields (standard way)
+        let currencyId = record?.fields?.currency_id?.value ?? null;
+
+        // Fallback to attributes (for fields not in listviewdefs)
+        // Created by Advocotek
+        if (currencyId === null) {
+            currencyId = record?.attributes?.currency_id ?? null;
+        }
+
+        return currencyId;
     }
 
     isBase(field: Field): boolean {

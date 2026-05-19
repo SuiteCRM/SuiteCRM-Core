@@ -67,6 +67,7 @@
 		addToValidateIsInArray('popup_form', 'name', 'in_array', true,'{sugar_translate module="DynamicFields" label="ERR_RESERVED_FIELD_NAME"}', '{$field_name_exceptions}', 'u==');
 		{if $hideLevel == 0}	
 		addToValidateIsInArray('popup_form', 'name', 'in_array', true, '{sugar_translate module="DynamicFields" label="ERR_FIELD_NAME_ALREADY_EXISTS"}', '{$existing_field_names}', 'u==');
+		addToValidateIsInArray('popup_form', 'label_key_id', 'in_array', true, '{sugar_translate module="DynamicFields" label="ERR_LABEL_NAME_ALREADY_EXISTS"}', '{$existing_label_names}', 'u==');
 		{/if}	
 		</script>
 	</td>

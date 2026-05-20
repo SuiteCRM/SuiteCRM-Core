@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -113,13 +113,26 @@ class RecordViewGroupTypeMapper implements ViewDefinitionMapperInterface
 
             $type = $cell['type'] ?? '';
             $groupedType = $typesConfig[$type] ?? [];
+            $cellDefinition = $cell['fieldDefinition'] ?? [];
 
             if (empty($groupedType)) {
+                $typeName = $cellDefinition['type_name'] ?? '';
+                if ($typeName === 'parent_type') {
+                    $cellDefinition['metadata'] = array_merge(
+                        [
+                            'dynamicFieldLabel' => 'LBL_PARENT_FIELD_DYNAMIC_LABEL',
+                            'emptyFieldLabel' => 'LBL_RELATED_TO'
+                        ],
+                        $cellDefinition['metadata'] ?? [],
+                    );
+                }
+
+                $cell['fieldDefinition'] = $cellDefinition;
                 $cols[$cellKey] = $cell;
+
                 continue;
             }
 
-            $cellDefinition = $cell['fieldDefinition'] ?? [];
             $group = $cellDefinition['group'] ?? '';
             $groupDefinition = $vardefs[$group] ?? [];
 
@@ -157,6 +170,17 @@ class RecordViewGroupTypeMapper implements ViewDefinitionMapperInterface
                     array_keys($groupFields),
                     $vardefs,
                     $groupedType
+                );
+            }
+
+            $typeName = $cellDefinition['type_name'] ?? '';
+            if ($typeName === 'parent_type') {
+                $cellDefinition['metadata'] = array_merge(
+                    [
+                        'dynamicFieldLabel' => 'LBL_PARENT_FIELD_DYNAMIC_LABEL',
+                        'emptyFieldLabel' => 'LBL_RELATED_TO'
+                    ],
+                    $cellDefinition['metadata'] ?? [],
                 );
             }
 

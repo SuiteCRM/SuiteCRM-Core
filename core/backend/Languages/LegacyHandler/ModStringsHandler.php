@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -29,7 +29,7 @@
 namespace App\Languages\LegacyHandler;
 
 
-use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Exception\ItemNotFoundException;
 use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;
 use App\Languages\Entity\ModStrings;
@@ -46,7 +46,10 @@ class ModStringsHandler extends LegacyHandler
         'SecurityGroups',
         'Bugs',
         'History',
-        'Activities'
+        'Activities',
+        'Meetings',
+        'Tasks',
+        'Notes'
     ];
 
     /**
@@ -59,6 +62,8 @@ class ModStringsHandler extends LegacyHandler
      */
     private $moduleRegistry;
 
+    protected array $language;
+
     /**
      * SystemConfigHandler constructor.
      * @param string $projectDir
@@ -69,6 +74,7 @@ class ModStringsHandler extends LegacyHandler
      * @param ModuleNameMapperInterface $moduleNameMapper
      * @param ModuleRegistryInterface $moduleRegistry
      * @param RequestStack $session
+     * @param array $language
      */
     public function __construct(
         string $projectDir,
@@ -78,11 +84,13 @@ class ModStringsHandler extends LegacyHandler
         LegacyScopeState $legacyScopeState,
         ModuleNameMapperInterface $moduleNameMapper,
         ModuleRegistryInterface $moduleRegistry,
-        RequestStack $session
+        RequestStack $session,
+        array $language
     ) {
         parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState, $session);
         $this->moduleNameMapper = $moduleNameMapper;
         $this->moduleRegistry = $moduleRegistry;
+        $this->language = $language;
     }
 
     /**
@@ -95,7 +103,7 @@ class ModStringsHandler extends LegacyHandler
 
     /**
      * Get mod strings for given $language
-     * @param $language
+     * @param string $language
      * @return ModStrings|null
      */
     public function getModStrings(string $language): ?ModStrings
@@ -121,6 +129,9 @@ class ModStringsHandler extends LegacyHandler
             $frontendName = $this->moduleNameMapper->toFrontEnd($module);
             $moduleStrings = return_module_language($language, $module) ?? [];
             $moduleStrings = $this->decodeLabels($moduleStrings);
+
+            $moduleStrings = $this->injectPluginModStrings($language, $frontendName, $moduleStrings);
+
             if (!empty($moduleStrings)) {
                 $moduleStrings = $this->removeEndingColon($moduleStrings);
             }
@@ -147,20 +158,22 @@ class ModStringsHandler extends LegacyHandler
      */
     protected function removeEndingColon(array $stringArray): array
     {
-        $stringArray = array_map(static function ($label) {
-            if (is_string($label)) {
-                return preg_replace('/:$/', '', $label);
-            }
+        $stringArray = array_map(
+            static function ($label) {
+                if (is_string($label)) {
+                    return preg_replace('/:$/', '', $label);
+                }
 
-            return $label;
-        }, $stringArray);
+                return $label;
+            }, $stringArray
+        );
 
         return $stringArray;
     }
 
     protected function decodeLabels(array $moduleStrings): array
     {
-        foreach($moduleStrings as $key => $string){
+        foreach ($moduleStrings as $key => $string) {
             if (!is_array($string)) {
                 $string = html_entity_decode($string ?? '', ENT_QUOTES);
             }
@@ -169,4 +182,17 @@ class ModStringsHandler extends LegacyHandler
 
         return $moduleStrings;
     }
+
+    /**
+     * @param string $language
+     * @param string $moduleName
+     * @param array $modStringsArray
+     * @return array
+     */
+    protected function injectPluginModStrings(string $language, string $moduleName, array $modStringsArray): array
+    {
+        $modStrings = $this->language[$language]['module'][$moduleName] ?? [];
+        return array_merge($modStringsArray, $modStrings);
+    }
+
 }

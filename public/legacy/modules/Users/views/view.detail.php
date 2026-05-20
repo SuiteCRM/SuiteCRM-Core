@@ -120,9 +120,14 @@ class UsersViewDetail extends ViewDetail
                 is_admin($current_user)|| $GLOBALS['current_user']->isAdminForModule('Users')
             )) {
                 if (!$current_user->is_group) {
+
                     $this->dv->defs['templateMeta']['form']['buttons'][] = array('customCode' => "<input id='duplicate_button' title='" . $app_strings['LBL_DUPLICATE_BUTTON_TITLE'] . "' accessKey='" . $app_strings['LBL_DUPLICATE_BUTTON_KEY'] . "' class='button' onclick=\"this.form.return_module.value='Users'; this.form.return_action.value='DetailView'; this.form.isDuplicate.value=true; this.form.action.value='EditView'\" type='submit' name='Duplicate' value='" . $app_strings['LBL_DUPLICATE_BUTTON_LABEL'] . "'>");
 
                     $this->dv->defs['templateMeta']['form']['buttons'][] = array('customCode' => "<input name='delete' id='delete_button' title='" . $app_strings['LBL_DELETE_BUTTON_LABEL'] . "' type='button' class='button' onclick='confirmDelete();' value='" . $app_strings['LBL_DELETE_BUTTON_LABEL'] . "'>");
+
+                    if (isTrue($this->bean->is_totp_enabled)){
+                        $this->dv->defs['templateMeta']['form']['buttons'][] = array('customCode' => "<input id='disable_two_factor' title='" . $app_strings['LBL_DISABLE_USER_2FA'] . "' class='button' type='button' onclick=\"this.form.action.value='disableTwoFactor'\" value='" . $app_strings['LBL_DISABLE_USER_2FA'] . "'>");
+                    }
 
                     if (!$this->bean->portal_only && !$this->bean->is_group && !$this->bean->external_auth_only
                         && isset($sugar_config['passwordsetting']['SystemGeneratedPasswordON']) && $sugar_config['passwordsetting']['SystemGeneratedPasswordON']) {

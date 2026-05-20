@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,35 +26,55 @@
 
 .history-timeline-viewport {
   height: 45em;
+  overflow-x: auto;
 }
 
 .history-timeline-viewport-no-data {
   height: 100px;
 }
 
-.history-timeline .card {
-  border: 0.17em solid;
-}
-
-.history-timeline .circle {
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 0.17em solid;
-}
-
-.history-timeline .history-timeline-image svg {
-  font-size: x-large;
-}
-
 .history-timeline {
   font-size: small;
   font-weight: bold;
+  padding-top: 0 !important;
+
+  .card {
+    border: none;
+    margin-left: 7px;
+    padding-left: 18px;
+    border-left: 1px solid $lightgray;
+    border-bottom: 1px solid $lightgray;
+  }
+
+  .history-timeline-entry {
+
+    .history-timeline-entry-icon {
+      z-index: 2;
+      margin-right: -1.5rem;
+
+      .icon-square {
+        width: 2rem;
+        height: 2rem;
+        border: 2px solid $lightgray;
+        background: $white;
+      }
+    }
+  }
+
+  .history-timeline-image svg {
+    font-size: 150%;
+  }
 
   .history-timeline-entry-title {
+    margin-bottom: 0;
+    line-height: 1;
+  }
+
+  .history-timeline-entry-date{
+    line-height: 1;
   }
 
   .history-timeline-entry-user {
-    border-top-style: double;
   }
 }
 
@@ -74,22 +94,29 @@
 }
 
 .history-timeline .history-timeline-entry.entry-yellow {
-  color: $dark-yellow;
-  border-color: $dark-yellow;
+}
+
+.history-timeline .history-timeline-entry.entry-yellow .icon-square{
+  border-color: $goldenrod;
 }
 
 .history-timeline .entry-yellow .card {
-  background: $light-yellow;
 }
 
 .history-timeline .history-timeline-entry.entry-yellow svg {
-  fill: $dark-yellow;
-  stroke: $dark-yellow;
+  fill: $goldenrod;
+  stroke: $goldenrod;
+}
+
+.history-timeline .history-timeline-entry.entry-yellow a {
+  color: $goldenrod;
 }
 
 .history-timeline .history-timeline-entry.entry-purple {
-  color: $dark-purple;
-  border-color: $dark-purple;
+}
+
+.history-timeline .history-timeline-entry.entry-purple .icon-square {
+  border-color: $dark-purple
 }
 
 .history-timeline .history-timeline-entry.entry-purple svg {
@@ -97,12 +124,17 @@
   stroke: $dark-purple;
 }
 
+.history-timeline .history-timeline-entry.entry-purple a {
+  color: $dark-purple;
+}
+
 .history-timeline .entry-purple .card {
-  background: $light-purple;
 }
 
 .history-timeline .history-timeline-entry.entry-blue {
-  color: $mild-blue;
+}
+
+.history-timeline .history-timeline-entry.entry-blue .icon-square{
   border-color: $mild-blue;
 }
 
@@ -111,26 +143,36 @@
   stroke: $mild-blue;
 }
 
+.history-timeline .history-timeline-entry.entry-blue a {
+  color: $mild-blue;
+}
+
 .history-timeline .entry-blue .card {
-  background: $light-blue;
 }
 
 .history-timeline .history-timeline-entry.entry-orange {
-  color: $thick-orange;
-  border-color: $thick-orange;
+}
+
+.history-timeline .history-timeline-entry.entry-orange .icon-square{
+  border-color: $dark-yellow;
 }
 
 .history-timeline .history-timeline-entry.entry-orange svg {
-  fill: $thick-orange;
-  stroke: $thick-orange;
+  fill: $dark-yellow;
+  stroke: $dark-yellow;
+}
+
+.history-timeline .history-timeline-entry.entry-orange a {
+  color: $dark-yellow;
 }
 
 .history-timeline .entry-orange .card {
-  background: $very-lighter-orange;
 }
 
 .history-timeline .history-timeline-entry.entry-green {
-  color: $thick-green;
+}
+
+.history-timeline .history-timeline-entry.entry-green .icon-square{
   border-color: $thick-green;
 }
 
@@ -139,6 +181,30 @@
   stroke: $thick-green;
 }
 
-.history-timeline .entry-green .card {
-  background: $lighter-green;
+.history-timeline .history-timeline-entry.entry-green a {
+  color: $thick-green;
+}
+
+.history-timeline .entry-grey .card {
+}
+
+.history-timeline .history-timeline-entry.entry-grey {
+}
+
+.history-timeline .history-timeline-entry.entry-grey .icon-square{
+  border-color: $light-grey;
+  background-color: $white;
+
+}
+
+.history-timeline .history-timeline-entry.entry-grey svg {
+  fill: $white;
+  stroke: $white;
+}
+
+.history-timeline .history-timeline-entry.entry-grey a {
+  color: $light-grey;
+}
+
+.history-timeline .entry-grey .card {
 }

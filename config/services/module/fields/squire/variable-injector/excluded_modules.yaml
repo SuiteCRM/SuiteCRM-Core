@@ -1,0 +1,29 @@
+parameters:
+  module.fields.squire.variable_injector.excluded_modules:
+    default:
+      - Home
+      - ResourceCalendar
+      - Calendar
+      - Activities
+      - Feeds
+      - iFrames
+      - TimePeriods
+      - ContractType
+      - Connectors
+      - Notifications
+      - Sync
+      - Queues
+      - UpgradeWizard
+      - TrackerSessions
+      - TrackerQueries
+      - FAQ
+      - Newsletters
+      - SugarFavorites
+      - Library
+      - KBDocuments
+      - AOW_Workflow
+      - AOW_Conditions
+      - AOW_Processed
+      - AOW_Actions
+      - jjwp_Partners
+      - TemplateEditor

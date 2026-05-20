@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,9 +25,14 @@
  */
 
 import {Injectable} from '@angular/core';
-import {Field, Record, StringArrayMap, StringArrayMatrix, isFalse, isTrue, LogicRuleValues} from "common";
-import {isEmpty} from "lodash-es";
+import {Record} from '../../common/record/record.model';
+import {Field} from '../../common/record/field.model';
+import {StringArrayMap} from '../../common/types/string-map';
+import {isEmpty, isObject} from "lodash-es";
 import {ConditionOperatorManager} from "./condition-operator.manager";
+import {isFalse, isTrue} from "../../common/utils/value-utils";
+import {LogicRuleValues} from "../../common/metadata/metadata.model";
+import {ObjectArrayMatrix} from "../../common/types/object-map";
 
 @Injectable({
     providedIn: 'root'
@@ -50,7 +55,7 @@ export class ActiveFieldsChecker {
         record: Record,
         activeOnFields: StringArrayMap,
         relatedAttributesFields: string[],
-        activeOnAttributes: StringArrayMatrix
+        activeOnAttributes: ObjectArrayMatrix
     ) {
         let isActive = true;
         if (!isEmpty(activeOnFields)) {
@@ -70,10 +75,10 @@ export class ActiveFieldsChecker {
      * @param {object} record
      * @param {object} activeOnAttributes
      */
-    protected areAttributesActive(
+    public areAttributesActive(
         relatedAttributesFields: string[],
         record: Record,
-        activeOnAttributes: StringArrayMatrix
+        activeOnAttributes: ObjectArrayMatrix
     ): boolean {
         return relatedAttributesFields.every(fieldKey => {
 
@@ -102,7 +107,7 @@ export class ActiveFieldsChecker {
      * @param {object} record
      * @param {object} activeOnFields
      */
-    protected areFieldsActive(relatedFields: string[], record: Record, activeOnFields: StringArrayMap): boolean {
+    public areFieldsActive(relatedFields: string[], record: Record, activeOnFields: StringArrayMap): boolean {
         return relatedFields.every(fieldKey => {
             const fields = record.fields;
             const field = (fields && record.fields[fieldKey]) || null;
@@ -120,7 +125,13 @@ export class ActiveFieldsChecker {
      * @param {object} field
      * @param {array} activeValues
      */
-    protected isValueActive(record: Record, field: Field, activeValues: string[] | any): boolean {
+    public isValueActive(record: Record, field: Field, activeValues: string[] | any): boolean {
+
+        const fields = Object.keys(record.fields);
+
+        if (isObject(activeValues) && (activeValues as any)?.operator) {
+            return this.checkOperatorActiveValue(record, field, fields, activeValues);
+        }
 
         let isActive = false;
         if (field.valueList && field.valueList.length) {
@@ -136,34 +147,49 @@ export class ActiveFieldsChecker {
             return isActive;
         }
 
-        const fields = Object.keys(record.fields);
         let opsArr: boolean[] = [];
 
         activeValues.some(activeValue => {
 
-            if (activeValue.field && !fields.includes(activeValue.field)) {
-                return;
-            }
-
             if (isTrue(activeValue) || isFalse(activeValue)) {
                 isActive = activeValue.toString() === field.value.toString();
-                return;
+                return isActive;
             }
-
-            const operatorKey = activeValue?.operator ?? 'is-equal';
 
             if (typeof activeValue === 'string') {
                 activeValue = {
-                    operator: operatorKey,
+                    operator: 'is-equal',
                     values: [activeValue]
                 } as LogicRuleValues;
             }
 
-            const operator = this.operatorManager.get(operatorKey);
-            opsArr.push(operator.run(record, field, activeValue))
+            opsArr.push(this.checkOperatorActiveValue(record, field, fields, activeValue));
             isActive = opsArr.every(data => data);
         })
 
         return isActive;
+    }
+
+    protected checkOperatorActiveValue(record: Record, field: Field, fields: string[], activeValue: any): boolean {
+
+        let isActive = false;
+        if (!isObject(activeValue)) {
+            return isActive;
+        }
+
+        activeValue = activeValue as any;
+
+        if (activeValue.field && !fields.includes(activeValue.field)) {
+            return isActive;
+        }
+
+        const operatorKey = activeValue?.operator ?? 'is-equal';
+
+        const operator = this.operatorManager.get(operatorKey);
+        if (!operator) {
+            return isActive;
+        }
+
+        return operator.run(record, field, activeValue)
     }
 }

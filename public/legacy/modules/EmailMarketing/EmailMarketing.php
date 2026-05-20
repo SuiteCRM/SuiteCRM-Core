@@ -64,14 +64,19 @@ class EmailMarketing extends SugarBean
     public $campaign_id;
     public $all_prospect_lists;
     public $status;
+    public $queueing_status;
     public $inbound_email_id;
     public $outbound_email_id;
+    public $prospectlists;
+    public $duplicate;
 
     public $table_name = 'email_marketing';
     public $object_name = 'EmailMarketing';
     public $module_dir = 'EmailMarketing';
 
     public $new_schema = true;
+    public $log_entries;
+    public $queueitems;
 
     public function __construct()
     {
@@ -79,22 +84,25 @@ class EmailMarketing extends SugarBean
     }
 
 
-
-
     public function save($check_notify = false)
     {
         global $current_user;
 
-        $date_start = trim($this->date_start);
-        $time_start = trim($this->time_start);
+        $date_start = trim($this->date_start ?? '');
+        $time_start = trim($this->time_start ?? '');
         if ($time_start && strpos($date_start, $time_start) === false) {
             $this->date_start = "$date_start $time_start";
             $this->time_start = '';
         }
 
+        $userTimeZone = $current_user->getPreference('timezone');
+
+        if (empty($userTimeZone)) {
+            return parent::save($check_notify);
+        }
+
         $timedate = TimeDate::getInstance();
 
-        $userTimeZone = $current_user->getPreference('timezone');
         $timeZone = new DateTimeZone($userTimeZone);
 
         if ($dateTime = DateTime::createFromFormat($current_user->getPreference('datef') . ' ' . $current_user->getPreference('timef'), $this->date_start, $timeZone)) {
@@ -102,22 +110,10 @@ class EmailMarketing extends SugarBean
             $this->date_start = $dateStart;
         }
 
+
         return parent::save($check_notify);
     }
 
-    public function retrieve($id = -1, $encode=true, $deleted=true)
-    {
-        parent::retrieve($id, $encode, $deleted);
-
-        global $timedate;
-        $date_start_array=explode(" ", trim($this->date_start));
-        if (count($date_start_array)==2) {
-            $this->time_start = $date_start_array[1];
-            $this->date_start = $date_start_array[0];
-        }
-
-        return $this;
-    }
 
     public function get_summary_text()
     {
@@ -251,5 +247,114 @@ class EmailMarketing extends SugarBean
             $errors['from_addr'] = isset($mod_strings['LBL_NO_FROM_ADDR_OR_INVALID']) ? $mod_strings['LBL_NO_FROM_ADDR_OR_INVALID'] : 'LBL_NO_FROM_ADDR_OR_INVALID';
         }
         return $errors;
+    }
+
+    public function fill_in_additional_list_fields(): void {
+        $this->created_by_name = get_assigned_user_name($this->created_by);
+    }
+
+    public function trackLogLeads()
+    {
+        $this->load_relationship('log_entries');
+        $query_array = $this->log_entries->getQuery(true);
+
+        $query_array['select'] = 'SELECT campaign_log.* ';
+        $query_array['where'] .= " AND activity_type = 'lead' AND archived = 0 AND target_id IS NOT NULL";
+
+        return implode(' ', $query_array);
+    }
+
+    public function trackLogEntries($type = array())
+    {
+        global $db;
+        $args = func_get_args();
+
+        $this->load_relationship('log_entries');
+        $query_array = $this->log_entries->getQuery(true);
+
+
+        foreach ($args as $arg) {
+            if (isset($arg['group_by'])) {
+                $query_array['group_by'] = $arg['group_by'];
+            }
+        }
+
+        $params = $type['params'] ?? [];
+
+        if (empty($type)) {
+            $type[0] = 'targeted';
+        }
+
+        if (is_array($type[0])) {
+            $type = $type[0];
+        }
+
+        $mkt_id = $this->db->quote($this->id);
+        $query_array['select'] = "SELECT campaign_log.*, campaign_log.more_information as recipient_email";
+
+        if (!empty($params['selectFields'])){
+            foreach ($params['selectFields'] as $field) {
+                $query_array['select'] .= ', ' . $field;
+            }
+        }
+
+        if (!empty($params['join'])) {
+            $query_array['from'] .= ' ' . $params['join'];
+        }
+
+        $query_array['where'] .= " AND campaign_log.archived=0 ";
+
+        $typeClauses = [];
+        foreach ($type as $item) {
+            if (is_array($item)){
+                continue;
+            }
+            $typeClauses[] = " activity_type like '" . $db->quote($item) . "%'";
+        }
+
+        if (!empty($typeClauses)) {
+            $query_array['where'] .= " AND (" . implode(" OR ", $typeClauses) . ") ";
+        }
+
+        if (isset($query_array['group_by'])) {
+            $group_by = str_replace("campaign_log", "cl", (string)$query_array['group_by']);
+            $join_where = str_replace("campaign_log", "cl", $query_array['where']);
+            $query_array['from'] .= " INNER JOIN (select min(id) as id from campaign_log cl $join_where GROUP BY $group_by  ) secondary
+					on campaign_log.id = secondary.id	";
+            unset($query_array['group_by']);
+        }
+
+        return (implode(" ", $query_array));
+    }
+
+    public function getQueueItems(...$args)
+    {
+        $mkt_id = $this->db->quote($this->id);
+
+        $this->load_relationship('queueitems');
+        $query_array = $this->queueitems->getQuery(true);
+
+        foreach ($args as $arg) {
+
+            if (isset($arg['group_by'])) {
+                $query_array['group_by'] = $arg['group_by'];
+            }
+        }
+
+        $query_array['where'] .= " AND marketing_id ='$mkt_id' ";
+
+        $man = BeanFactory::newBean('EmailMan');
+
+        $listQuery = $man->create_queue_items_query('', str_replace(array("WHERE", "where"), "", (string)$query_array['where']), null, $query_array);
+
+        return $listQuery;
+    }
+
+    public function mark_deleted($id): void
+    {
+        $id = $this->db->quote($id);
+        $query = "UPDATE campaign_log SET deleted = '1' WHERE marketing_id = '" . $id . "'";
+        $this->db->query($query);
+        parent::mark_deleted($id);
     }
 }

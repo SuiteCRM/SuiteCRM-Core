@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -27,13 +27,11 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {animate, transition, trigger} from '@angular/animations';
-import {ButtonInterface} from 'common';
-import {
-    AnyModalButtonInterface,
-    ModalButtonGroupInterface,
-    ModalCloseFeedBack
-} from 'common';
+import {ButtonInterface} from '../../../../common/components/button/button.model';
+import {AnyModalButtonInterface, ModalButtonGroupInterface, ModalCloseFeedBack} from '../../../../common/components/modal/modal.model';
 import {Observable, of} from 'rxjs';
+import {StringMap} from "../../../../common/types/string-map";
+import {FieldMap} from "../../../../common/record/field.model";
 
 
 @Component({
@@ -51,8 +49,13 @@ import {Observable, of} from 'rxjs';
 export class MessageModalComponent implements OnInit {
 
     @Input() titleKey: string;
+    @Input() labelKeys: [];
+    @Input() descriptionKey: string;
+    @Input() context: StringMap = {};
+    @Input() fields: FieldMap = {};
     @Input() textKey: string;
     @Input() buttons: AnyModalButtonInterface[] = [];
+    @Input() onClose: Function = () => {};
 
     buttonGroup$: Observable<ModalButtonGroupInterface>;
     closeButton: ButtonInterface;
@@ -69,6 +72,7 @@ export class MessageModalComponent implements OnInit {
         this.closeButton = {
             klass: ['btn', 'btn-outline-light', 'btn-sm'],
             onClick: (): void => {
+                this.onClose();
                 this.activeModal.close({
                     type: 'close-button'
                 } as ModalCloseFeedBack);

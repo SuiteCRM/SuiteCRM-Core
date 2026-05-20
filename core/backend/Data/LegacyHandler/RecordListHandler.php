@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -27,11 +27,13 @@
 
 namespace App\Data\LegacyHandler;
 
+use App\Data\Entity\RecordList;
+use App\Data\Service\Record\EntityRecordMappers\EntityRecordMapperRunner;
+use App\Data\Service\RecordListProviderInterface;
 use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;
-use App\Data\Entity\RecordList;
+use App\Module\LegacyHandler\ModuleRegistryHandler;
 use App\Module\Service\ModuleNameMapperInterface;
-use App\Data\Service\RecordListProviderInterface;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -57,6 +59,7 @@ class RecordListHandler extends LegacyHandler implements RecordListProviderInter
      * @var PresetListDataHandlers
      */
     private $presetHandlers;
+    protected EntityRecordMapperRunner $entityRecordMapperRunner;
 
     /**
      * SystemConfigHandler constructor.
@@ -68,6 +71,8 @@ class RecordListHandler extends LegacyHandler implements RecordListProviderInter
      * @param ModuleNameMapperInterface $moduleNameMapper
      * @param ListDataHandler $listDataHandler
      * @param PresetListDataHandlers $presetHandlers
+     * @param RequestStack $session
+     * @param EntityRecordMapperRunner $entityRecordMapperRunner
      */
     public function __construct(
         string $projectDir,
@@ -78,13 +83,22 @@ class RecordListHandler extends LegacyHandler implements RecordListProviderInter
         ModuleNameMapperInterface $moduleNameMapper,
         ListDataHandler $listDataHandler,
         PresetListDataHandlers $presetHandlers,
-        RequestStack $session
+        RequestStack $session,
+        EntityRecordMapperRunner $entityRecordMapperRunner,
+        protected ModuleRegistryHandler $moduleRegistryHandler
     ) {
-        parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState,
-            $session);
+        parent::__construct(
+            $projectDir,
+            $legacyDir,
+            $legacySessionName,
+            $defaultSessionName,
+            $legacyScopeState,
+            $session
+        );
         $this->moduleNameMapper = $moduleNameMapper;
         $this->listDataHandler = $listDataHandler;
         $this->presetHandlers = $presetHandlers;
+        $this->entityRecordMapperRunner = $entityRecordMapperRunner;
     }
 
     /**
@@ -110,8 +124,20 @@ class RecordListHandler extends LegacyHandler implements RecordListProviderInter
         int $limit = -1,
         array $sort = []
     ): RecordList {
+
+        $legacyModuleName = $this->moduleNameMapper->toLegacy($moduleName);
+
         $this->init();
         $this->startLegacyApp();
+
+        $accessibleModules = $this->moduleRegistryHandler->getUserAccessibleModules() ?? [];
+
+        if (!in_array($legacyModuleName, $accessibleModules)){
+            $recordList = new RecordList();
+            $recordList->setId($moduleName);
+            $recordList->setRecords([]);
+            return $recordList;
+        }
 
         $moduleName = $this->validateModuleName($moduleName);
 
@@ -126,6 +152,7 @@ class RecordListHandler extends LegacyHandler implements RecordListProviderInter
 
         $records = [];
         foreach ($listData->getRecords() as $record) {
+            $this->entityRecordMapperRunner->toExternal($record, 'list');
             $records[] = $record->toArray();
         }
 
@@ -137,11 +164,45 @@ class RecordListHandler extends LegacyHandler implements RecordListProviderInter
                     'ordering' => $listData->getOrdering()
                 ],
                 $listData->getMeta() ?? []
-            ));
+            )
+        );
 
         $this->close();
 
         return $recordList;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function fetchRecordIds(array $options, int $offset, int $batchSize): array
+    {
+        $ids = $options['ids'] ?? [];
+
+        if (!empty($ids) && is_array($ids)) {
+            return array_values(array_slice($ids, $offset, $batchSize));
+        }
+
+        $criteria = $options['criteria'] ?? [];
+        if (empty($criteria)) {
+            return [];
+        }
+
+        $module = $options['module'] ?? '';
+        $sort = $options['sort'] ?? [];
+
+        $recordList = $this->getList($module, $criteria, $offset, $batchSize, $sort);
+        $records = $recordList->getRecords() ?? [];
+
+        $recordIds = [];
+        foreach ($records as $record) {
+            $id = $record['id'] ?? '';
+            if (!empty($id)) {
+                $recordIds[] = $id;
+            }
+        }
+
+        return $recordIds;
     }
 
     /**

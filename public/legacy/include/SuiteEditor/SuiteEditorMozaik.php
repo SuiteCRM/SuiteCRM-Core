@@ -46,6 +46,7 @@ if (!defined('sugarEntry') || !sugarEntry) {
  * Class SuiteEditorMozaik
  *
  * Use Mozaik Editor as SuiteEditor
+ * @deprecated since SuiteCRM 8.9.0
  */
 class SuiteEditorMozaik implements SuiteEditorInterface
 {
@@ -64,7 +65,7 @@ class SuiteEditorMozaik implements SuiteEditorInterface
      *
      * @param SuiteEditorSettings $settings
      */
-    public function setup(SuiteEditorSettings $settings = null)
+    public function setup(?SuiteEditorSettings $settings = null)
     {
         $this->settings = $settings;
         require_once('include/SuiteMozaik.php');

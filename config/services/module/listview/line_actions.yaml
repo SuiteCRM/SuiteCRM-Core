@@ -32,15 +32,110 @@ parameters:
                 create:
                   module: tasks
                   returnAction: DetailView
+          acl:
+            - edit
+        modal-create:
+          key: modal-create
+          related_modules:
             emails:
               name: create-emails
               module: emails
               icon: email
-              action: compose
               labelKey: LBL_COMPOSE_EMAIL_BUTTON_LABEL
+              modes: ['list']
+              metadataView: 'modalComposeView'
               params:
-                create:
-                  module: emails
-                  returnAction: index
+                detached: true
+                headerClass: 'left-aligned-title'
+                closable: false
+                headerActionsKlass: 'draft-modal-action'
+                dynamicTitleKey: 'LBL_EMAIL_MODAL_DYNAMIC_TITLE'
+                modalOptions:
+                  size: 'lg'
+                  scrollable: false
+                mapFields:
+                  default:
+                    parent_id: id
+                    parent_name: fields.name
+                    parent_type: attributes.module_name
+                    to_addrs_names:
+                      - id: id
+                        name: fields.name
+                        email1: attributes.email1
+                        module_name: attributes.module_name
+
           acl:
             - edit
+    schedulers:
+      exclude:
+        - modal-create
+        - create
+    notes:
+      exclude:
+        - modal-create
+    emailman:
+      exclude:
+        - modal-create
+    workflow:
+      exclude:
+        - modal-create
+    campaigns:
+      exclude:
+        - modal-create
+    documents:
+      exclude:
+        - modal-create
+    calls:
+      exclude:
+        - modal-create
+    meetings:
+      exclude:
+        - modal-create
+    prospect-lists:
+      exclude:
+        - modal-create
+    project-templates:
+      exclude:
+        - modal-create
+    events:
+      exclude:
+        - modal-create
+    event-locations:
+      exclude:
+        - modal-create
+    product-categories:
+      exclude:
+        - modal-create
+    pdf-templates:
+      exclude:
+        - modal-create
+    reports:
+      exclude:
+        - modal-create
+    knowledge-base:
+      exclude:
+        - modal-create
+    email-templates:
+      exclude:
+        - modal-create
+    inbound-email:
+      exclude:
+        - modal-create
+    outbound-email-accounts:
+      exclude:
+        - modal-create
+    external-oauth-connection:
+      exclude:
+        - modal-create
+    external-oauth-provider:
+      exclude:
+        - modal-create
+    surveys:
+      exclude:
+        - modal-create
+    manual-migration-tasks:
+      exclude:
+        - modal-create
+    processes:
+      exclude:
+        - modal-create

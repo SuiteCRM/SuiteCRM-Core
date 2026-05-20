@@ -4,8 +4,8 @@
  * SugarCRM Community Edition is a customer relationship management program developed by
  * SugarCRM, Inc. Copyright (C) 2004-2013 SugarCRM Inc.
  *
- * SuiteCRM is an extension to SugarCRM Community Edition developed by SalesAgility Ltd.
- * Copyright (C) 2011 - 2021 SalesAgility Ltd.
+ * SuiteCRM is an extension to SugarCRM Community Edition developed by SuiteCRM Ltd.
+ * Copyright (C) 2011 - 2025 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -72,26 +72,27 @@ global $sugar_config, $mod_strings;
                     <br>
                     <h3><?php echo $mod_strings['LBL_CONTRIBUTORS']; ?></h3>
                     <ul id="about_menu">
-                        <li><?php echo $mod_strings['LBL_FEATURING']; ?>(<a 
-                                    href="https://www.salesagility.com" target="_blank">https://www.salesagility.com</a>)
+
+                        <li><?php echo $mod_strings['LBL_MAINTAINER_SUITECRM']; ?> (<a
+                                    href="https://suitecrm.com/about/about-us/suitecrm-ltd"
+                                    target="_blank">https://suitecrm.com</a>)
                         </li>
                         <li><?php echo $mod_strings['LBL_CONTRIBUTOR_SECURITY_SUITE']; ?> (<a
-                                    href="https://www.sugaroutfitters.com" target="_blank">https://www.sugaroutfitters.com</a>)
+                                    href="https://store.suitecrm.com/addons/securitysuite?tag=suitecrm"
+                                    target="_blank" rel="noreferrer">https://store.suitecrm.com/</a>)
                         </li>
-                        <li><?php echo $mod_strings['LBL_CONTRIBUTOR_JJW_GMAPS']; ?> (<a 
-                                   href="https://www.jjwdesign.com" target="_blank">https://www.jjwdesign.com</a>)
+                        <li><?php echo $mod_strings['LBL_CONTRIBUTOR_JJW_GMAPS']; ?>
                         </li>
                         <li><?php echo $mod_strings['LBL_CONTRIBUTOR_CONSCIOUS']; ?> (<a
-                                    href="https://www.conscious.co.uk/" target="_blank">https://www.conscious.co.uk</a>)
+                                    href="http://www.conscious.co.uk" target="_blank" rel="noreferrer">https://www.conscious.co.uk</a>)
                         </li>
                         <li><?php echo $mod_strings['LBL_CONTRIBUTOR_RESPONSETAP']; ?> (<a
-                                    href="https://www.responsetap.com" target="_blank">https://www.responsetap.com</a>)
+                                    href="https://www.responsetap.com" target="_blank" rel="noreferrer">https://www.responsetap.com</a>)
                         </li>
-                        <li><?php echo $mod_strings['LBL_SOURCE_SUGAR']; ?> (<a 
-                                    href="https://www.sugarcrm.com" target="_blank">https://www.sugarcrm.com</a>)
+                        <li><?php echo $mod_strings['LBL_SOURCE_SUGAR']; ?> (<a href="http://www.sugarcrm.com"
+                                                                                target="_blank" rel="noreferrer">https://www.sugarcrm.com</a>)
                         </li>
-                        <li><?php echo $mod_strings['LBL_CONTRIBUTOR_GMBH']; ?> (<a 
-                                   href="https://www.diligentsols.com/" target="_blank">https://www.diligentsols.com</a>)
+                        <li><?php echo $mod_strings['LBL_CONTRIBUTOR_GMBH']; ?>
                         </li>
                     </ul>
                 </div>
@@ -103,7 +104,7 @@ global $sugar_config, $mod_strings;
                         <li><?php echo $mod_strings['LBL_LANGUAGE_COMMUNITY_ABOUT']; ?>
                         </li>
                         <li><?php echo $mod_strings['LBL_LANGUAGE_COMMUNITY_PACKS']; ?> (<a
-                                href="https://crowdin.com/project/suitecrmtranslations" target="_blank">https://crowdin.com/project/suitecrmtranslations</a>)
+                                href="https://crowdin.com/project/suitecrmtranslations" target="_blank" rel="noreferrer">https://crowdin.com/project/suitecrmtranslations</a>)
                         </li>
                     </ul>
                 </div>

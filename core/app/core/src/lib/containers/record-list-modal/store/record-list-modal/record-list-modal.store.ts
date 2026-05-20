@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,13 +26,17 @@
 
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {ColumnDefinition, emptyObject, RecordListMeta, RecordSelection, SearchMeta, SelectionStatus} from 'common';
+import {ColumnDefinition, SearchMeta, RecordListMeta}  from '../../../../common/metadata/list.metadata.model';
+import {emptyObject} from '../../../../common/utils/object-utils';
+import {RecordSelection, SelectionStatus} from '../../../../common/views/list/record-selection.model';
+
 import {map, take, tap} from 'rxjs/operators';
 import {RecordListStoreFactory} from '../../../../store/record-list/record-list.store.factory';
 import {MetadataStore} from '../../../../store/metadata/metadata.store.service';
 import {RecordList, RecordListStore} from '../../../../store/record-list/record-list.store';
 import {StateStore} from '../../../../store/state';
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
+import {SavedFilter} from "../../../../store/saved-filters/saved-filter.model";
 
 @Injectable()
 export class RecordListModalStore implements StateStore {
@@ -85,8 +89,9 @@ export class RecordListModalStore implements StateStore {
      *
      * @param {string} module name
      * @param {string} parentModule
+     * @param filter
      */
-    public init(module: string, parentModule: string = ''): void {
+    public init(module: string, parentModule: string = '', filter: SavedFilter = null): void {
         this.module = module;
         this.parentModule = parentModule;
 
@@ -103,7 +108,7 @@ export class RecordListModalStore implements StateStore {
         );
         this.listMetadata$ = meta$.pipe(map(meta => meta.listView));
         this.searchMetadata$ = meta$.pipe(map(meta => meta.search));
-        this.recordList.init(module, false, 'list_max_entries_per_modal');
+        this.recordList.init(module, false, 'list_max_entries_per_modal', filter);
         this.columns$ = this.listMetadata$.pipe(map(metadata => metadata.fields));
     }
 

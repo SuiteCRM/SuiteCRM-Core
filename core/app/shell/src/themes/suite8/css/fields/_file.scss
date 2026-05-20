@@ -1,0 +1,79 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2025 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+.file-field-container {
+
+  .file-upload {
+
+    border: 2px dashed $lightgray;
+    border-radius: 6px;
+    padding: 0px;
+    text-align: center;
+    cursor: pointer;
+    background: $off-white;
+    transition: border-color .2s;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover, &:focus-within {
+      border-color: $bright-purple;
+      background: $off-white;
+    }
+
+    .upload-label-container {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      height: inherit;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+
+      .upload-label {
+        display: flex;
+        font-size: 1.1em;
+        cursor: pointer;
+        flex-grow: 1;
+        height: 100%;
+        align-items: center;
+        flex-direction: column;
+        margin: 0;
+      }
+
+      .error {
+        color: $danger;
+        margin-top: 12px;
+      }
+    }
+
+  }
+
+  .uploaded-files {
+    width: fit-content;
+  }
+}

@@ -117,6 +117,18 @@ $mod_strings = array(
 
     'LBL_OWNER' => 'Owner',
     'LBL_OWNER_NAME' => 'Owner',
+    'LBL_IS_DEFAULT' => 'Default',
+    'LBL_IS_PERSONAL' => 'Is Personal',
+    'LBL_SET_AS_DEFAULT_BUTTON' => 'Set as default',
 
-    'LNK_EXTERNAL_OAUTH_CONNECTIONS' => 'External OAuth Connections'
+    'LBL_AUTH_TYPE' => 'Auth Type',
+
+    'LBL_EXTERNAL_OAUTH_CONNECTION' => 'External OAuth Connection',
+    'LBL_EXTERNAL_OAUTH_CONNECTION_ID' => 'External OAuth Connection id',
+    'LBL_EXTERNAL_OAUTH_CONNECTION_NAME' => 'External OAuth Connection',
+    'LNK_EXTERNAL_OAUTH_CONNECTIONS' => 'External OAuth Connections',
+
+    'LBL_ERROR_OUTBOUND_EMAIL_SYSTEM_EXISTS' => 'System Outbound Email Account already exists. Please remove it before creating a new one.',
+    'LBL_ERROR_OUTBOUND_EMAIL_SYSTEM_IS_NOT_GROUP' => 'When configuring the System Outbound account using OAuth, you must select a Group-Type External Oauth Connection',
+    'LBL_ERROR_OUTBOUND_EMAIL_CONNECTION_TYPE_MISMATCH' => 'When configuring the Outbound account using OAuth, you must select a External Oauth Connection the same type as the Outbound Email Account (Group or Personal)',
 );

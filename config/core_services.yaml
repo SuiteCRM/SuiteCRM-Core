@@ -8,6 +8,7 @@ services:
       $projectDir: '%kernel.project_dir%'
       $cacheDir: '%kernel.cache_dir%'
       $upgradePackageDir: '%packages.upgrade.dir%'
+      $docsUrls: '%docs.urls%'
       $legacyDir: '%legacy.dir%'
       $legacyPath: '%legacy.path%'
       $legacySessionName: '%legacy.session_name%'
@@ -20,6 +21,7 @@ services:
       $copyLegacyAssetPaths: '%legacy.copy_asset_paths%'
       $legacyApiPaths: '%legacy.api_paths%'
       $legacyApiPathFiles: '%legacy.api_path_files%'
+      $legacyEntrypointPaths: '%legacy.entrypoint_paths%'
       $legacyEntrypointFiles: '%legacy.entrypoint_files%'
       $exposedUserPreferences: '%legacy.exposed_user_preferences%'
       $userPreferencesKeyMap: '%legacy.user_preferences_key_map%'
@@ -30,6 +32,11 @@ services:
       $cacheResetActions: '%legacy.cache_reset_actions%'
       $navigationTabLimits: '%themes.navigation_tab_limits%'
       $baseActions: '%module.base_actions%'
+      $variableInjectorBadFields: '%module.fields.squire.variable_injector.bad_fields%'
+      $variableInjectorExcludedModules: '%module.fields.squire.variable_injector.excluded_modules%'
+      $variableInjectorMappedModuleLabels: '%module.fields.squire.variable_injector.mapped_module_labels%'
+      $variableInjectorShowOnlyModules: '%module.fields.squire.variable_injector.modules_to_show%'
+      $actionAclModuleOverride: '%module.action_acl_module_override%'
       $filterRangeSearchTypes: '%module.filter.range_search_types%'
       $listViewBulkActions: '%module.listview.bulk_action%'
       $listViewLineActions: '%module.listview.line_action%'
@@ -40,12 +47,18 @@ services:
       $listViewColumnLimits: '%module.listview.column_limits%'
       $listViewSettingsLimits: '%module.listview.settings_limits%'
       $listViewActionsLimits: '%module.listview.actions_limits%'
+      $metadataEntries: '%module.metadata.entries%'
       $recordViewActions: '%module.recordview.actions%'
       $recordViewActionLimits: '%module.recordview.actions_limits%'
+      $recordViewSectionTabLimits: '%module.recordview.section_tab_limits%'
+      $recordModalActions: '%module.recordmodal.actions%'
       $recordViewSidebarWidgets: '%module.recordview.sidebar_widgets%'
       $recordViewBottomWidgets: '%module.recordview.bottom_widgets%'
+      $recordViewHeaderWidgets: '%module.recordview.header_widgets%'
       $recordViewTopWidgets: '%module.recordview.top_widgets%'
       $recordViewConvertIgnore: '%module.recordview.convert_ignore%'
+      $recordViewDuplicateIgnore: '%module.recordview.duplicate_ignore%'
+      $recordViewSubpanelButtonLimits: '%module.recordview.subpanel_button_limits%'
       $subpanelViewActionLimits: '%module.subpanelview.actions_limits%'
       $groupedFieldsTypeMap: '%record.fields.grouped_fields_type_map%'
       $currencyFieldsTypeMap: '%record.fields.currency_fields_type_map%'
@@ -55,6 +68,7 @@ services:
       $massupdate: '%massupdate%'
       $uiConfigs: '%ui%'
       $notificationsConfigs: '%notifications%'
+      $draftsConfigs: '%drafts%'
       $notificationsReloadActions: '%notifications_reload_actions%'
       $globalRecentlyViewedReloadActions: '%global_recently_viewed_reload_actions%'
       $systemSettings: '%system.settings%'
@@ -69,8 +83,22 @@ services:
       $sessionExpiredConfig: '%auth.session-expired%'
       $adminOnlyModuleActions: '%system.admin_only_module_actions%'
       $navbarAdministrationOverrides: '%navbar.administration_override%'
+      $navbarOverrides: '%navbar.overrides%'
       $quickActions: '%quick_actions%'
       $graphqlShowDocs: '%graphql.graphql_show_docs%'
+      $language: '%language%'
+      $apiRecordMapperRegistry: '@api.record.mapper.registry'
+      $apiFieldMapperRegistry: '@api.field.mapper.registry'
+      $apiFieldTypeMapperRegistry: '@api.fieldType.mapper.registry'
+      $entityRecordMapperRegistry: '@entity.record.mapper.registry'
+      $entityFieldMapperRegistry: '@entity.field.mapper.registry'
+      $entityFieldTypeMapperRegistry: '@entity.fieldType.mapper.registry'
+      $transportMapConfig: '%async-task.routes%'
+      $transportMapEnv: '%env(ASYNC_TASK_ROUTES)%'
+      $temporaryFileBaseDir: '%temporary_file.base_dir%'
+
+
+
 
   _instanceof:
     App\Process\Service\ProcessHandlerInterface:
@@ -81,8 +109,14 @@ services:
       tags: [ 'system.config.mapper' ]
     App\FieldDefinitions\LegacyHandler\FieldDefinitionMapperInterface:
       tags: [ 'field.definition.mapper' ]
+    App\FieldDefinitions\Service\VardefConfigMapperInterface:
+      tags: [ 'vardef.mapper' ]
     App\ViewDefinitions\LegacyHandler\ViewDefinitionMapperInterface:
       tags: [ 'view.definition.mapper' ]
+    App\ViewDefinitions\LegacyHandler\ViewConfigMapperInterface:
+      tags: [ 'view.config.mapper' ]
+    App\ViewDefinitions\LegacyHandler\Widgets\WidgetDefinitionParserInterface:
+      tags: [ 'widget.parser' ]
     App\Data\LegacyHandler\PresetListDataHandlerInterface:
       tags: [ 'app.data.preset.handler' ]
     App\Engine\Service\ActionAvailabilityChecker\ActionAvailabilityCheckerInterface:
@@ -100,10 +134,58 @@ services:
       tags: [ 'app.legacy.migration.step' ]
     App\Install\Service\Installation\InstallStepInterface:
       tags: [ 'app.install.step' ]
+    App\Data\Service\Record\Duplicate\DuplicateFieldMapperInterface:
+      tags: [ 'record.duplicate.field.mapper' ]
+    App\Schedulers\Service\SchedulerInterface:
+      tags: [ 'app.scheduler' ]
     App\Install\Service\Cli\CliStepInterface:
       tags: ['cli.install.step']
     App\ViewDefinitions\Service\MassUpdateDefinitionMapperInterface:
       tags: [ 'massupdate.definition.mapper' ]
+    App\Data\Service\Record\ApiRecordMappers\ApiRecordFieldMapperInterface:
+      tags: [ 'mappers.api.record.field' ]
+    App\Data\Service\Record\ApiRecordMappers\ApiRecordFieldTypeMapperInterface:
+      tags: [ 'mappers.api.record.fieldType' ]
+    App\Data\Service\Record\ApiRecordMappers\ApiRecordMapperInterface:
+      tags: [ 'mappers.api.record.record' ]
+    App\Data\Service\Record\EntityRecordMappers\EntityRecordFieldMapperInterface:
+      tags: [ 'mappers.entity.record.field' ]
+    App\Data\Service\Record\EntityRecordMappers\EntityRecordFieldTypeMapperInterface:
+      tags: [ 'mappers.entity.record.fieldType' ]
+    App\Data\Service\Record\EntityRecordMappers\EntityRecordMapperInterface:
+      tags: [ 'mappers.entity.record.record' ]
+    App\Data\Service\Record\RecordSaveHandlers\RecordFieldSaveHandlerInterface:
+      tags: [ 'record.saveHandlers.field' ]
+    App\Data\Service\Record\RecordSaveHandlers\RecordFieldTypeSaveHandlerInterface:
+      tags: [ 'record.saveHandlers.fieldType' ]
+    App\Data\Service\Record\RecordSaveHandlers\RecordSaveHandlerInterface:
+      tags: [ 'record.saveHandlers.record' ]
+    App\Data\Service\Record\RecordDeleteHandlers\RecordFieldDeleteHandlerInterface:
+      tags: [ 'record.deleteHandlers.field' ]
+    App\Data\Service\Record\RecordDeleteHandlers\RecordFieldTypeDeleteHandlerInterface:
+      tags: [ 'record.deleteHandlers.fieldType' ]
+    App\Data\Service\Record\RecordDeleteHandlers\RecordDeleteHandlerInterface:
+      tags: [ 'record.deleteHandlers.record' ]
+    App\Module\Campaigns\Service\Email\Targets\Validation\EmailTargetValidatorInterface:
+      tags: [ 'email.target.validator' ]
+    App\Emails\Service\EmailParserHandler\EmailParserInterface:
+      tags: [ 'email.parser' ]
+    App\Module\Campaigns\Service\Email\Parser\CampaignEmailParserInterface:
+      tags: [ 'campaign.email.parser' ]
+    App\Module\Service\Fields\Attachments\AttachmentTypeHandlers\AttachmentTypeHandlerInterface:
+      tags: [ 'attachment.type.handler' ]
+    App\MediaObjects\Validator\UploadValidator\UploadValidatorInterface:
+      tags: [ 'media-object.upload.validator.registry' ]
+    App\AsyncTask\Service\TaskHandler\AsyncTaskHandlerInterface:
+      tags: [ 'app.async-task.handler' ]
+    App\AsyncTask\Service\Runner\AsyncTaskRunnerInterface:
+      tags: [ 'app.async-task.runner' ]
+    App\AsyncTask\Service\TaskCompletedHandler\AsyncTaskCompletedHandlerInterface:
+      tags: [ 'app.async-task.completed.handler' ]
+    App\AsyncTask\Service\TaskProgressedHandler\AsyncTaskProgressedHandlerInterface:
+      tags: [ 'app.async-task.progressed.handler' ]
+    App\AsyncTask\Service\TaskFailureHandler\AsyncTaskFailureHandlerInterface:
+      tags: [ 'app.async-task.failure.handler' ]
 
   # makes classes in src/ available to be used as services
   # this creates a service per class whose id is the fully-qualified class name
@@ -113,13 +195,13 @@ services:
 
   App\Module\:
     resource: '../core/modules/*'
-    exclude: '../core/modules/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+    exclude: '../core/modules/{language,Language,DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
   # makes classes in extensions/ available to be used as services
   # this creates a service per class whose id is the fully-qualified class name
   App\Extension\:
     resource: '../extensions/*'
-    exclude: '../extensions/**/{config,DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+    exclude: '../extensions/**/{config,language,Language,DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
   # controllers are imported separately to make sure services can be injected
   # as action arguments even if you don't extend any base controller class
@@ -146,6 +228,10 @@ services:
     arguments:
       - !tagged { tag: 'app.process.handler' }
 
+  App\Schedulers\Service\SchedulerRegistry:
+    arguments:
+      - !tagged { tag: 'app.scheduler' }
+
   App\Engine\Service\Extensions\ExtensionAssetCopyCacheWarmer:
     arguments:
       - '@App\Engine\Service\Extensions\ExtensionAssetCopyInterface'
@@ -164,6 +250,20 @@ services:
       - '@?property_accessor'
 
   security.listener.json_login_ldap.main: '@App\Security\Ldap\AppCheckLdapCredentialsListener'
+
+  App\Data\EventSubscriber\RecordInitDoctrineEventListener:
+    arguments:
+      - '@App\Authentication\LegacyHandler\UserHandler'
+    tags:
+      - { name: doctrine.event_listener, event: prePersist }
+
+  App\Security\TwoFactor\EventListener\TotpEncryptionListener:
+    arguments:
+      - '@App\Security\TwoFactor\LegacyHandler\BlowfishCodeHandler'
+    tags:
+      - { name: doctrine.event_listener, event: prePersist, entity: App\Module\Users\Entity\User }
+      - { name: doctrine.event_listener, event: preUpdate, entity: App\Module\Users\Entity\User }
+      - { name: doctrine.event_listener, event: postLoad, entity: App\Module\Users\Entity\User }
 
   App\Security\Ldap\AppCheckLdapCredentialsListener:
     class: App\Security\Ldap\AppCheckLdapCredentialsListener
@@ -214,7 +314,7 @@ services:
     tags: [ { name: kernel.event_listener, event: kernel.response, method: onKernelResponse } ]
     arguments:
       $routes:
-        - path: '(/login$|/$|/auth$|/logout$|/logged-out$|/session-status|/auth/logout|/auth/login|/auth/session-status)'
+        - path: '(/login$|/2fa/enable|/2fa/enable-finalize|/2fa|/$|/auth$|/logout$|/logged-out$|/session-status|/auth/logout|/auth/login|/auth/session-status)'
       $cookieName: 'XSRF-TOKEN'
       $cookieExpire: 0
       $cookiePath: /
@@ -246,10 +346,27 @@ services:
     arguments:
       - !tagged { tag: 'field.definition.mapper' }
 
+  App\FieldDefinitions\Service\VardefConfigMapperRegistry:
+    # inject all services tagged with field.definition.mapper as first argument
+    lazy: true
+    arguments:
+      - !tagged { tag: 'vardef.mapper' }
+
   App\ViewDefinitions\LegacyHandler\ViewDefinitionMappers:
     # inject all services tagged with view.definition.mapper as first argument
     arguments:
       - !tagged { tag: 'view.definition.mapper' }
+      -
+
+  App\ViewDefinitions\LegacyHandler\ViewConfigMappers:
+    # inject all services tagged with view.config.mapper as first argument
+    arguments:
+      - !tagged { tag: 'view.config.mapper' }
+
+  App\ViewDefinitions\LegacyHandler\Widgets\WidgetDefinitionParsers:
+    # inject all services tagged with widget.parser as first argument
+    arguments:
+      - !tagged { tag: 'widget.parser' }
 
   App\Data\LegacyHandler\PresetListDataHandlers:
     # inject all services tagged with app.data.preset.handler as first argument
@@ -306,9 +423,135 @@ services:
     arguments:
       - !tagged { tag: 'massupdate.definition.mapper' }
 
+  api.record.mapper.registry:
+    class: 'App\Data\Service\Record\Mappers\BaseRecordMapperRegistry'
+    factory: 'App\Data\Service\Record\Mappers\BaseRecordMapperRegistryFactory::create'
+    arguments:
+      - !tagged { tag: 'mappers.api.record.record' }
+
+  api.field.mapper.registry:
+    class: 'App\Data\Service\Record\Mappers\BaseFieldMapperRegistry'
+    factory: 'App\Data\Service\Record\Mappers\BaseFieldMapperRegistryFactory::create'
+    arguments:
+      - !tagged { tag: 'mappers.api.record.field' }
+
+  api.fieldType.mapper.registry:
+    class: 'App\Data\Service\Record\Mappers\BaseFieldTypeMapperRegistry'
+    factory: 'App\Data\Service\Record\Mappers\BaseFieldTypeMapperRegistryFactory::create'
+    arguments:
+      - !tagged { tag: 'mappers.api.record.fieldType' }
+
+  api.record.mapper.runner:
+    class: 'App\Data\Service\Record\Mappers\ApiRecordMapperRunner'
+    arguments:
+      - '@api.field.mapper.registry'
+      - '@api.fieldType.mapper.registry'
+      - '@api.record.mapper.registry'
+      - '@App\FieldDefinitions\Service\FieldDefinitionsProviderInterface'
+
+  entity.record.mapper.registry:
+    class: 'App\Data\Service\Record\Mappers\BaseRecordMapperRegistry'
+    factory: 'App\Data\Service\Record\Mappers\BaseRecordMapperRegistryFactory::create'
+    arguments:
+      - !tagged { tag: 'mappers.entity.record.record' }
+
+  entity.field.mapper.registry:
+    class: 'App\Data\Service\Record\Mappers\BaseFieldMapperRegistry'
+    factory: 'App\Data\Service\Record\Mappers\BaseFieldMapperRegistryFactory::create'
+    arguments:
+      - !tagged { tag: 'mappers.entity.record.field' }
+
+  entity.fieldType.mapper.registry:
+    class: 'App\Data\Service\Record\Mappers\BaseFieldTypeMapperRegistry'
+    factory: 'App\Data\Service\Record\Mappers\BaseFieldTypeMapperRegistryFactory::create'
+    arguments:
+      - !tagged { tag: 'mappers.entity.record.fieldType' }
+
+  entity.record.mapper.runner:
+    class: 'App\Data\Service\Record\Mappers\EntityRecordMapperRunner'
+    arguments:
+      - '@entity.field.mapper.registry'
+      - '@entity.fieldType.mapper.registry'
+      - '@entity.record.mapper.registry'
+      - '@App\FieldDefinitions\Service\FieldDefinitionsProviderInterface'
+
+  App\Data\Service\Record\Duplicate\DuplicateFieldMapperRegistry:
+    arguments:
+      - !tagged { tag: 'record.duplicate.field.mapper' }
+
+  App\Data\Service\Record\RecordSaveHandlers\RecordFieldSaveHandlerRegistry:
+    arguments:
+      - !tagged { tag: 'record.saveHandlers.field' }
+
+  App\Data\Service\Record\RecordSaveHandlers\RecordFieldTypeSaveHandlerRegistry:
+    arguments:
+      - !tagged { tag: 'record.saveHandlers.fieldType' }
+
+  App\Data\Service\Record\RecordSaveHandlers\RecordSaveHandlerRegistry:
+    lazy: true
+    arguments:
+      - !tagged { tag: 'record.saveHandlers.record' }
+
+  App\Data\Service\Record\RecordDeleteHandlers\RecordFieldDeleteHandlerRegistry:
+    arguments:
+      - !tagged { tag: 'record.deleteHandlers.field' }
+
+  App\Data\Service\Record\RecordDeleteHandlers\RecordFieldTypeDeleteHandlerRegistry:
+    arguments:
+      - !tagged { tag: 'record.deleteHandlers.fieldType' }
+
+  App\Data\Service\Record\RecordDeleteHandlers\RecordDeleteHandlerRegistry:
+    lazy: true
+    arguments:
+      - !tagged { tag: 'record.deleteHandlers.record' }
+
+  App\Emails\Service\EmailParserHandler\EmailParserRegistry:
+    arguments:
+      - !tagged { tag: 'email.parser' }
+
+  App\Module\Campaigns\Service\Email\Parser\CampaignEmailParserRegistry:
+    arguments:
+      - !tagged { tag: 'campaign.email.parser' }
+
+  App\Module\Campaigns\Service\Email\Targets\Validation\EmailTargetValidatorRegistry:
+    arguments:
+      - !tagged { tag: 'email.target.validator' }
+
+  App\Module\Service\Fields\Attachments\AttachmentTypeHandlers\AttachmentTypeHandlers:
+    arguments:
+      - !tagged { tag: 'attachment.type.handler' }
+
+  App\AsyncTask\Service\TaskHandler\AsyncTaskHandlerRegistry:
+    arguments:
+      - !tagged { tag: 'app.async-task.handler' }
+  App\AsyncTask\Service\Runner\AsyncTaskRunnerRegistry:
+    arguments:
+      - !tagged { tag: 'app.async-task.runner' }
+  App\AsyncTask\Service\TaskCompletedHandler\AsyncTaskCompletedHandlerRegistry:
+    arguments:
+      - !tagged { tag: 'app.async-task.completed.handler' }
+  App\AsyncTask\Service\TaskProgressedHandler\AsyncTaskProgressedHandlerRegistry:
+    arguments:
+      - !tagged { tag: 'app.async-task.progressed.handler' }
+  App\AsyncTask\Service\TaskFailureHandler\AsyncTaskFailureHandlerRegistry:
+    arguments:
+      - !tagged { tag: 'app.async-task.failure.handler' }
+
   App\Security\Ldap\AppLdapUserProviderProxy:
     $ldapUserProvider: '@security.user.provider.concrete.ldap_users'
     $entityUserProvider: '@security.user.provider.concrete.app_user_provider'
+
+  App\MediaObjects\Services\UuidMediaObjectFileNamer:
+    lazy: true
+    public: true
+
+  App\MediaObjects\Validator\UploadValidator\UploadValidatorRegistry:
+    arguments:
+      - !tagged { tag: 'media-object.upload.validator.registry' }
+
+  media_object_file_namer:
+    alias: App\MediaObjects\Services\UuidMediaObjectFileNamer
+    public: true
 
   saml_user_factory:
     alias: App\Security\Saml\AppSamlUserFactory
@@ -316,6 +559,10 @@ services:
 
   legacy.route.handler:
     alias: App\Routes\Service\LegacyRouteHandler
+    public: true
+
+  app.cron.handler:
+    alias: App\Schedulers\LegacyHandler\CronHandler
     public: true
 
   graphql.introspection_manager:
@@ -330,6 +577,22 @@ services:
     alias: App\Security\AppSecretGenerator
     public: true
 
+  api_success_handler:
+    alias: App\Security\TwoFactor\AuthenticationSuccessHandler
+    public: true
+
+  2fa_required:
+    alias: App\Security\TwoFactor\TwoFactorAuthenticationRequiredHandler
+    public: true
+
+  2fa_success:
+    alias: App\Security\TwoFactor\TwoFactorAuthenticationSuccessHandler
+    public: true
+
+  2fa_failed:
+    alias: App\Security\TwoFactor\TwoFactorAuthenticationFailureHandler
+    public: true
+
   App\Process\Service\ActionNameMapperInterface: '@App\Engine\LegacyHandler\ActionNameMapperHandler'
   App\Process\Service\BaseActionDefinitionProviderInterface: '@App\Process\Service\BaseActionDefinitionProvider'
   App\Process\Service\BulkActionDefinitionProviderInterface: '@App\Process\Service\BulkActionDefinitionProvider'
@@ -342,6 +605,7 @@ services:
   App\Routes\Service\NavigationProviderInterface: '@App\Navbar\LegacyHandler\NavbarHandler'
   App\Process\Service\ProcessHandlerInterface: '@App\Process\LegacyHandler\ResetPasswordHandler'
   App\Data\Service\RecordActionDefinitionProviderInterface: '@App\Data\Service\RecordActionDefinitionProvider'
+  App\Data\Service\RecordModalActionDefinitionProviderInterface: '@App\Data\Service\RecordModalActionDefinitionProvider'
   App\Data\Service\RecordDeletionServiceInterface: '@App\Data\LegacyHandler\RecordDeletionHandler'
   App\Data\Service\RecordListProviderInterface: '@App\Data\LegacyHandler\RecordListHandler'
   App\Data\Service\RecordProviderInterface: '@App\Data\LegacyHandler\RecordHandler'
@@ -351,10 +615,6 @@ services:
   App\SystemConfig\Service\SystemConfigProviderInterface: '@App\SystemConfig\LegacyHandler\SystemConfigHandler'
   app.system-configs:
     alias: App\SystemConfig\Service\SystemConfigProviderInterface
-    public: true
-
-  app.version.provider:
-    alias: 'shivas_versioning.provider.version'
     public: true
 
   Symfony\Component\Security\Http\Logout\LogoutUrlGenerator: '@security.logout_url_generator'

@@ -1,6 +1,7 @@
 parameters:
   legacy.api_paths:
     Api/access_token: Api/index.php/access_token
+    Api/authorize: index.php?module=OAuth2AuthCodes&action=authorize
     Api/V8: Api/index.php/V8
     Api: Api/index.php
     service/v4_1: service/v4_1
@@ -9,6 +10,8 @@ parameters:
     Api/access_token:
       file: index.php
       dir: Api
+    Api/authorize:
+      redirect: true
     Api/V8:
       file: index.php
       dir: Api

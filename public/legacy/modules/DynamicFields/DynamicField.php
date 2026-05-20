@@ -89,7 +89,7 @@ class DynamicField
     /**
      *
      */
-    public function deleteCache()
+    public static function deleteCache()
     {
     }
 
@@ -182,12 +182,21 @@ class DynamicField
             if (empty($vardef ['source'])) {
                 $vardef ['source'] = 'custom_fields';
             }
+
+            if (!empty($row['metadata']) && is_string($row['metadata'])) {
+                $vardef['metadata'] = json_decode($row['metadata'], true) ?? [];
+            } elseif (!empty($row['metadata']) && is_array($row['metadata'])) {
+                $vardef['metadata'] = $row['metadata'];
+            }
+
+
             if (empty($results [$row ['custom_module']])) {
                 $results [$row ['custom_module']] = array();
             }
             $results [$row ['custom_module']] [$row ['name']] = $vardef;
         }
-        if (empty($module)) {
+
+          if (empty($module)) {
             foreach ($results as $module => $result) {
                 $this->saveToVardef($module, $result, $saveCache);
             }
@@ -612,6 +621,7 @@ class DynamicField
         $fmd->custom_module = $object_name;
         $fmd->name = $db_name;
         $fmd->vname = $label;
+        $fmd->dbType = $field->dbType ?? null;
         $fmd->type = $field->type;
         $fmd->help = $field->help;
         if (!empty($field->len)) {
@@ -630,10 +640,17 @@ class DynamicField
         $fmd->audited = $field->audited;
         $fmd->inline_edit = $field->inline_edit;
         $fmd->reportable = ($field->reportable ? 1 : 0);
+        $metadata = [];
+        foreach ($field->metadataMap as $metaKey => $vardefKey) {
+            $metadata[$metaKey] = $field->$vardefKey;
+        }
+
+        $fmd->metadata = json_encode($metadata);
+
         if (!$is_update) {
             $fmd->new_with_id = true;
         }
-        if ($field) {
+        if ($field && $field->get_field_def()['source'] !== 'non-db') {
             if (!$is_update) {
                 //Do two SQL calls here in this case
                 //The first is to create the column in the custom table without the default value
@@ -671,6 +688,14 @@ class DynamicField
             TemplateHandler::clearCache($this->module);
         }
 
+        if ($field->get_field_def()['source'] === 'non-db') {
+            $fmd->save();
+            $this->buildCache($this->module);
+            $this->saveExtendedAttributes($field, array_keys($fmd->field_defs));
+            include_once('include/TemplateHandler/TemplateHandler.php');
+            TemplateHandler::clearCache($this->module);
+        }
+
         return true;
     }
 
@@ -698,6 +723,11 @@ class DynamicField
             $to_save[$property] =
                 is_string($field->$property) ? htmlspecialchars_decode($field->$property, ENT_QUOTES) : $field->$property;
         }
+
+        if ($field->get_field_def()['source'] === 'non-db') {
+            $to_save['source'] = 'non-db';
+        }
+
         $bean_name = $beanList[$this->module];
 
         $this->writeVardefExtension($bean_name, $field, $to_save);

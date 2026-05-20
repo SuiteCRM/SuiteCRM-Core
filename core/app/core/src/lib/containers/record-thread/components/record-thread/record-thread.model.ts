@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,11 +24,15 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Action, AttributeMap, FieldDefinitionMap, SearchCriteria} from 'common';
+import {Action} from '../../../../common/actions/action.model';
+import {AttributeMap} from '../../../../common/record/record.model';
+import {FieldDefinitionMap} from '../../../../common/record/field.model';
+import {SearchCriteria} from '../../../../common/views/list/search-criteria.model';
 import {RecordThreadItemConfig} from '../record-thread-item/record-thread-item.model';
 import {Observable} from 'rxjs';
 import {RecordThreadStore} from '../../store/record-thread/record-thread.store';
 import {FieldFlexbox} from '../../../../components/record-flexbox/record-flexbox.model';
+import {RecordThreadItemClickActionConfig} from '../../actions/click-actions/record-thread-item-click-action.model';
 
 export interface RecordThreadConfig {
 
@@ -66,6 +70,7 @@ export interface ThreadItemMetadataConfig {
     header?: FieldFlexbox;
     body?: FieldFlexbox;
     actions?: Action[];
+    clickActions?: RecordThreadItemClickActionConfig[];
     fields?: FieldDefinitionMap;
     collapseActions?: boolean;
 }

@@ -47,6 +47,7 @@ require_once __DIR__ . '/../../include/EmailInterface.php';
 require_once __DIR__ . '/../Emails/EmailUI.php';
 
 // User is used to store customer information.
+#[\AllowDynamicProperties]
 class User extends Person implements EmailInterface
 {
 
@@ -116,6 +117,11 @@ class User extends Person implements EmailInterface
     public $sugar_login;
     public $external_auth_only;
     public $show_on_employees;
+    public $email_opt_out;
+    public $link_guid;
+    public $invalid_email;
+
+    public $default_team;
 
     /**
      * @var bool
@@ -126,6 +132,10 @@ class User extends Person implements EmailInterface
      * @var string
      */
     public $factor_auth_interface;
+
+    public $totp_secret;
+
+    public $is_totp_enabled;
 
     /**
      * Normally a bean returns ID from save() method if it was
@@ -620,6 +630,8 @@ class User extends Person implements EmailInterface
 
         $isUpdate = $this->isUpdate();
 
+        $this->restrictAdminOnlyFields();
+
         //No SMTP server is set up Error.
         $admin = BeanFactory::newBean('Administration');
         $smtp_error = $admin->checkSmtpError();
@@ -685,9 +697,15 @@ class User extends Person implements EmailInterface
 
         if (!$this->verify_data()) {
             SugarApplication::appendErrorMessage($this->error_string);
-            return SugarApplication::redirect('Location: index.php?action=Error&module=Users');
+            return SugarApplication::redirect('index.php?action=Error&module=Users');
         }
 
+        if (
+            $this->status === 'Inactive' &&
+            (!empty($this->fetched_row['status']) && $this->fetched_row['status'] !== 'Inactive')
+        ) {
+            $this->beforeDisable($this->id);
+        }
 
         $retId = parent::save($check_notify);
         if (!$retId) {
@@ -707,17 +725,21 @@ class User extends Person implements EmailInterface
 
         $this->savePreferencesToDB();
 
-        if ((isset($_POST['old_password']) || $this->portal_only) &&
-            (isset($_POST['new_password']) && !empty($_POST['new_password'])) &&
+        global $RAW_REQUEST;
+        $oldPassword = $RAW_REQUEST['old_password'] ?? $_POST['old_password'] ?? null;
+        $newPassword = $RAW_REQUEST['new_password'] ?? $_POST['new_password'] ?? null;
+
+        if ((isset($oldPassword) || $this->portal_only) &&
+            (isset($newPassword) && !empty($newPassword)) &&
             (isset($_POST['password_change']) && $_POST['password_change'] === 'true')) {
-            if (!$this->change_password($_POST['old_password'], $_POST['new_password'])) {
+            if (!$this->change_password($oldPassword, $newPassword)) {
                 if (isset($_POST['page']) && $_POST['page'] === 'EditView') {
                     SugarApplication::appendErrorMessage($this->error_string);
-                    SugarApplication::redirect("Location: index.php?action=EditView&module=Users&record=" . $_POST['record']);
+                    SugarApplication::redirect("index.php?action=EditView&module=Users&record=" . $_POST['record']);
                 }
                 if (isset($_POST['page']) && $_POST['page'] === 'Change') {
                     SugarApplication::appendErrorMessage($this->error_string);
-                    SugarApplication::redirect("Location: index.php?action=ChangePassword&module=Users&record=" . $_POST['record']);
+                    SugarApplication::redirect("index.php?action=ChangePassword&module=Users&record=" . $_POST['record']);
                 }
             }
         }
@@ -731,6 +753,15 @@ class User extends Person implements EmailInterface
         }
 
         return $this->id;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function mark_deleted($id)
+    {
+        $this->beforeDisable($id);
+        parent::mark_deleted($id);
     }
 
     public function saveFormPreferences()
@@ -762,72 +793,96 @@ class User extends Person implements EmailInterface
             }
 
             if (isset($_POST['mailmerge_on']) && !empty($_POST['mailmerge_on'])) {
-                $this->setPreference('mailmerge_on', 'on', 0, 'global');
+                $this->setPreference('mailmerge_on', isTrue($_POST['mailmerge_on']) ? 'on' : 'off', 0, 'global');
             } else {
-                $this->setPreference('mailmerge_on', 'off', 0, 'global');
+                $mailMerge = $this->getCurrentPreference('mailmerge_on');
+                $this->setPreference('mailmerge_on', $mailMerge ?? 'off', 0, 'global');
             }
 
             if (isset($_POST['subpanel_pagination_type'])) {
                 $this->setPreference('subpanel_pagination_type', $_POST['subpanel_pagination_type'], 0, 'global');
+            } else {
+                $subpanelPagination = $this->getCurrentPreference('subpanel_pagination_type');
+                $this->setPreference('subpanel_pagination_type', $subpanelPagination ?? $sugar_config['subpanel_pagination_type'], 0, 'global');
             }
 
             if (isset($_POST['listview_pagination_type'])) {
                 $this->setPreference('listview_pagination_type', $_POST['listview_pagination_type'], 0, 'global');
+            } else {
+                $listViewPagination = $this->getCurrentPreference('listview_pagination_type');
+                $this->setPreference('listview_pagination_type', $listViewPagination ?? $sugar_config['listview_pagination_type'], 0, 'global');
             }
 
             if (isset($_POST['record_modal_pagination_type'])) {
                 $this->setPreference('record_modal_pagination_type', $_POST['record_modal_pagination_type'], 0, 'global');
+            } else {
+                $recordModalPagination = $this->getCurrentPreference('record_modal_pagination_type');
+                $this->setPreference('record_modal_pagination_type', $recordModalPagination ?? $sugar_config['record_modal_pagination_type'], 0, 'global');
             }
 
             if (isset($_POST['snooze_alert_timer'])) {
                 $this->setPreference('snooze_alert_timer', $_POST['snooze_alert_timer'], 0, 'global');
+            } else {
+                $snoozeAlertTimer = $this->getCurrentPreference('snooze_alert_timer');
+                $this->setPreference('snooze_alert_timer', $snoozeAlertTimer ?? $sugar_config['snooze_alert_timer'], 0, 'global');
             }
 
             if (isset($_POST['user_swap_last_viewed'])) {
                 $this->setPreference('swap_last_viewed', $_POST['user_swap_last_viewed'], 0, 'global');
             } else {
-                $this->setPreference('swap_last_viewed', '', 0, 'global');
+                $lastViewedSwap = $this->getCurrentPreference('swap_last_viewed');
+                $this->setPreference('swap_last_viewed', $lastViewedSwap ?? '', 0, 'global');
             }
 
             if (isset($_POST['user_swap_shortcuts'])) {
                 $this->setPreference('swap_shortcuts', $_POST['user_swap_shortcuts'], 0, 'global');
             } else {
-                $this->setPreference('swap_shortcuts', '', 0, 'global');
+                $swapShortcuts = $this->getCurrentPreference('swap_shortcuts');
+                $this->setPreference('swap_shortcuts', $swapShortcuts ?? '', 0, 'global');
             }
 
             if (isset($_POST['use_group_tabs'])) {
                 $this->setPreference('navigation_paradigm', $_POST['use_group_tabs'], 0, 'global');
             } else {
-                $this->setPreference('navigation_paradigm', $GLOBALS['sugar_config']['default_navigation_paradigm'], 0, 'global');
+                $groupTabs = $this->getCurrentPreference('navigation_paradigm');
+                $this->setPreference('navigation_paradigm', $groupTabs ?? $GLOBALS['sugar_config']['default_navigation_paradigm'], 0, 'global');
             }
 
             if (isset($_POST['sort_modules_by_name'])) {
                 $this->setPreference('sort_modules_by_name', $_POST['sort_modules_by_name'], 0, 'global');
             } else {
-                $this->setPreference('sort_modules_by_name', '', 0, 'global');
+                $modulesByName = $this->getCurrentPreference('sort_modules_by_name');
+                $this->setPreference('sort_modules_by_name', $modulesByName ?? '', 0, 'global');
             }
 
             if (isset($_POST['user_subpanel_tabs'])) {
                 $this->setPreference('subpanel_tabs', $_POST['user_subpanel_tabs'], 0, 'global');
             } else {
-                $this->setPreference('subpanel_tabs', '', 0, 'global');
+                $subpanelTabs = $this->getCurrentPreference('subpanel_tabs');
+                $this->setPreference('subpanel_tabs', $subpanelTabs ?? '', 0, 'global');
             }
 
             if (isset($_POST['user_count_collapsed_subpanels'])) {
                 $this->setPreference('count_collapsed_subpanels', $_POST['user_count_collapsed_subpanels'], 0, 'global');
             } else {
-                $this->setPreference('count_collapsed_subpanels', '', 0, 'global');
+                $countCollapsedSubpanel = $this->getCurrentPreference('count_collapsed_subpanels');
+                $this->setPreference('count_collapsed_subpanels', $countCollapsedSubpanel ?? '', 0, 'global');
             }
 
             if (isset($_POST['user_theme'])) {
                 $this->setPreference('user_theme', $_POST['user_theme'], 0, 'global');
                 $_SESSION['authenticated_user_theme'] = $_POST['user_theme'];
+            } else {
+                $userTheme = $this->getCurrentPreference('user_theme');
+                $this->setPreference('user_theme', $userTheme ?? $sugar_config['default_theme'], 0, 'global');
+                $_SESSION['authenticated_user_theme'] = $userTheme ?? $sugar_config['default_theme'];
             }
 
             if (isset($_POST['user_module_favicon'])) {
                 $this->setPreference('module_favicon', $_POST['user_module_favicon'], 0, 'global');
             } else {
-                $this->setPreference('module_favicon', '', 0, 'global');
+                $moduleFavicon = $this->getCurrentPreference('module_favicon');
+                $this->setPreference('module_favicon', $moduleFavicon ?? '', 0, 'global');
             }
 
             $tabs = new TabController();
@@ -850,56 +905,94 @@ class User extends Person implements EmailInterface
             if (isset($_POST['no_opps'])) {
                 $this->setPreference('no_opps', $_POST['no_opps'], 0, 'global');
             } else {
-                $this->setPreference('no_opps', 'off', 0, 'global');
+                $noOpps = $this->getCurrentPreference('no_opps');
+                $this->setPreference('no_opps', $noOpps ?? 'off', 0, 'global');
             }
 
             if (isset($_POST['reminder_time'])) {
                 $this->setPreference('reminder_time', $_POST['reminder_time'], 0, 'global');
+            } else {
+                $reminderTime = $this->getCurrentPreference('reminder_time');
+                $this->setPreference('reminder_time', $reminderTime ?? '60', 0, 'global');
             }
             if (isset($_POST['email_reminder_time'])) {
                 $this->setPreference('email_reminder_time', $_POST['email_reminder_time'], 0, 'global');
+            } else {
+                $emailReminderTime = $this->getCurrentPreference('email_reminder_time');
+                $this->setPreference('email_reminder_time', $emailReminderTime ?? '60', 0, 'global');
             }
             if (isset($_POST['reminder_checked'])) {
                 $this->setPreference('reminder_checked', $_POST['reminder_checked'], 0, 'global');
+            } else {
+                $reminderChecked = $this->getCurrentPreference('reminder_checked');
+                $this->setPreference('reminder_checked', $reminderChecked ?? '0', 0, 'global');
             }
             if (isset($_POST['email_reminder_checked'])) {
                 $this->setPreference('email_reminder_checked', $_POST['email_reminder_checked'], 0, 'global');
+            } else {
+                $emailReminderChecked = $this->getCurrentPreference('email_reminder_checked');
+                $this->setPreference('email_reminder_checked', $emailReminderChecked ?? '0', 0, 'global');
             }
 
             if (isset($_POST['timezone'])) {
                 $this->setPreference('timezone', $_POST['timezone'], 0, 'global');
             } else {
-                $this->setPreference('timezone', 'UTC', 0, 'global');
+                $timezone = $this->getCurrentPreference('timezone');
+                $this->setPreference('timezone', $timezone, 0, 'global');
             }
-            if (isset($_POST['ut'])) {
-                $this->setPreference('ut', '0', 0, 'global');
+
+            $ut = $_POST['ut'] ?? '0';
+
+            if (isset($ut)) {
+                $value = $_POST['ut'] === 'on' ? '0' : '1';
+                $this->setPreference('ut', $value, 0, 'global');
             } else {
-                $this->setPreference('ut', '1', 0, 'global');
+                $ut = $this->getCurrentPreference('ut');
+                $this->setPreference('ut', $ut ?? '1', 0, 'global');
             }
             if (isset($_POST['currency'])) {
                 $this->setPreference('currency', $_POST['currency'], 0, 'global');
+            } else {
+                $currency = $this->getCurrentPreference('currency');
+                $this->setPreference('currency', $currency, 0, 'global');
             }
             if (isset($_POST['default_currency_significant_digits'])) {
                 $this->setPreference('default_currency_significant_digits', $_POST['default_currency_significant_digits'], 0, 'global');
+            } else {
+                $currencySignificantDigits = $this->getCurrentPreference('default_currency_significant_digits');
+                $this->setPreference('default_currency_significant_digits', $currencySignificantDigits ?? $sugar_config['default_currency_significant_digits'], 0, 'global');
             }
             if (isset($_POST['num_grp_sep'])) {
                 $this->setPreference('num_grp_sep', $_POST['num_grp_sep'], 0, 'global');
+            } else {
+                $numGrpSep = $this->getCurrentPreference('num_grp_sep');
+                $this->setPreference('num_grp_sep', $numGrpSep, 0, 'global');
             }
             if (isset($_POST['dec_sep'])) {
                 $this->setPreference('dec_sep', $_POST['dec_sep'], 0, 'global');
+            } else {
+                $decSep = $this->getCurrentPreference('dec_sep');
+                $this->setPreference('dec_sep', $decSep ?? $sugar_config['default_decimal_seperator'], 0, 'global');
             }
             if (isset($_POST['fdow'])) {
                 $this->setPreference('fdow', $_POST['fdow'], 0, 'global');
+            } else {
+                $fdow = $this->getCurrentPreference('fdow');
+                $this->setPreference('fdow', $fdow, 0, 'global');
             }
             if (isset($_POST['dateformat'])) {
                 $this->setPreference('datef', $_POST['dateformat'], 0, 'global');
+            } else {
+                $datef = $this->getCurrentPreference('datef');
+                $this->setPreference('datef', $datef ?? $sugar_config['datef'], 0, 'global');
             }
             if (isset($_POST['timeformat'])) {
                 $this->setPreference('timef', $_POST['timeformat'], 0, 'global');
+            } else {
+                $timef = $this->getCurrentPreference('timef');
+                $this->setPreference('timef', $timef ?? $sugar_config['timef'], 0, 'global');
             }
-            if (isset($_POST['timezone'])) {
-                $this->setPreference('timezone', $_POST['timezone'], 0, 'global');
-            }
+
             if (isset($_POST['language'])) {
                 if ($_SESSION['authenticated_user_id'] === $this->id){
                     $_SESSION['authenticated_user_language'] = $_POST['language'];
@@ -932,31 +1025,43 @@ class User extends Person implements EmailInterface
             }
             if (isset($_POST['default_locale_name_format'])) {
                 $this->setPreference('default_locale_name_format', $_POST['default_locale_name_format'], 0, 'global');
+            } else {
+                $nameFormat = $this->getCurrentPreference('default_locale_name_format');
+                $this->setPreference('default_locale_name_format', $nameFormat ?? $sugar_config['default_locale_name_format'], 0, 'global');
             }
             if (isset($_POST['export_delimiter'])) {
                 $this->setPreference('export_delimiter', $_POST['export_delimiter'], 0, 'global');
+            } else {
+                $exportDelimiter = $this->getCurrentPreference('export_delimiter');
+                $this->setPreference('export_delimiter', $exportDelimiter ?? $sugar_config['export_delimiter'], 0, 'global');
             }
             if (isset($_POST['default_export_charset'])) {
                 $this->setPreference('default_export_charset', $_POST['default_export_charset'], 0, 'global');
+            } else {
+                $exportCharset = $this->getCurrentPreference('default_export_charset');
+                $this->setPreference('default_export_charset', $exportCharset ?? $sugar_config['default_export_charset'], 0, 'global');
             }
             if (isset($_POST['use_real_names'])) {
-                $this->setPreference('use_real_names', 'on', 0, 'global');
+                $this->setPreference('use_real_names', isTrue($_POST['use_real_names']) ? 'on' : 'off', 0, 'global');
             } elseif (!isset($_POST['use_real_names']) && !isset($_POST['from_dcmenu'])) {
                 // Make sure we're on the full form and not the QuickCreate.
-                $this->setPreference('use_real_names', 'off', 0, 'global');
+                $useRealNames = $this->getCurrentPreference('use_real_names');
+                $this->setPreference('use_real_names', $useRealNames ?? 'off', 0, 'global');
             }
 
             if (isset($_POST['mail_smtpauth_req'])) {
                 $this->setPreference('mail_smtpauth_req', $_POST['mail_smtpauth_req'], 0, 'global');
             } else {
-                $this->setPreference('mail_smtpauth_req', '', 0, 'global');
+                $smtpAuthRequired = $this->getCurrentPreference('mail_smtpauth_req');
+                $this->setPreference('mail_smtpauth_req', $smtpAuthRequired ?? '', 0, 'global');
             }
 
             // SSL-enabled SMTP connection
             if (isset($_POST['mail_smtpssl'])) {
                 $this->setPreference('mail_smtpssl', 1, 0, 'global');
             } else {
-                $this->setPreference('mail_smtpssl', 0, 0, 'global');
+                $smtpSsl = $this->getCurrentPreference('mail_smtpssl');
+                $this->setPreference('mail_smtpssl', $smtpSsl ?? 0, 0, 'global');
             }
             ///////////////////////////////////////////////////////////////////////////
             ////    PDF SETTINGS
@@ -971,10 +1076,16 @@ class User extends Person implements EmailInterface
             ////	SIGNATURES
             if (isset($_POST['signature_id'])) {
                 $this->setPreference('signature_default', $_POST['signature_id'], 0, 'global');
+            } else {
+                $signatureDefault = $this->getCurrentPreference('signature_default');
+                $this->setPreference('signature_default', $signatureDefault ?? '', 0, 'global');
             }
 
             if (isset($_POST['signature_prepend'])) {
                 $this->setPreference('signature_prepend', $_POST['signature_prepend'], 0, 'global');
+            } else {
+                $signaturePrepend = $this->getCurrentPreference('signature_prepend');
+                $this->setPreference('signature_prepend', $signaturePrepend ?? '', 0, 'global');
             }
             ////	END SIGNATURES
             ///////////////////////////////////////////////////////////////////////////
@@ -982,9 +1093,15 @@ class User extends Person implements EmailInterface
 
             if (isset($_POST['email_link_type'])) {
                 $this->setPreference('email_link_type', $_REQUEST['email_link_type']);
+            } else {
+                $emailLinkType = $this->getCurrentPreference('email_link_type');
+                $this->setPreference('email_link_type', $emailLinkType ?? 'sugar', 0, 'global');
             }
             if (isset($_POST['editor_type'])) {
                 $this->setPreference('editor_type', $_REQUEST['editor_type']);
+            } else {
+                $editorType = $this->getCurrentPreference('editor_type');
+                $this->setPreference('editor_type', $editorType ?? 'tinymce', 0, 'global');
             }
             if (isset($_REQUEST['email_show_counts'])) {
                 $this->setPreference('email_show_counts', $_REQUEST['email_show_counts'], 0, 'global');
@@ -993,9 +1110,15 @@ class User extends Person implements EmailInterface
             }
             if (isset($_REQUEST['email_editor_option'])) {
                 $this->setPreference('email_editor_option', $_REQUEST['email_editor_option'], 0, 'global');
+            } else {
+                $emailEditorOption = $this->getCurrentPreference('email_editor_option');
+                $this->setPreference('email_editor_option', $emailEditorOption ?? 'tinymce', 0, 'global');
             }
             if (isset($_REQUEST['default_email_charset'])) {
                 $this->setPreference('default_email_charset', $_REQUEST['default_email_charset'], 0, 'global');
+            } else {
+                $defaultEmailCharset = $this->getCurrentPreference('default_email_charset');
+                $this->setPreference('default_email_charset', $defaultEmailCharset ?? 'UTF-8', 0, 'global');
             }
 
             $isValidator = new \SuiteCRM\Utility\SuiteValidator();
@@ -1008,12 +1131,11 @@ class User extends Person implements EmailInterface
 
             if (isset($_POST['subtheme'])) {
                 $this->setPreference('subtheme', $_POST['subtheme'], 0, 'global');
-            }
-            if (isset($_POST['gsync_cal'])) {
-                $this->setPreference('syncGCal', 1, 0, 'GoogleSync');
             } else {
-                $this->setPreference('syncGCal', 0, 0, 'GoogleSync');
+                $subtheme = $this->getCurrentPreference('subtheme');
+                $this->setPreference('subtheme', $subtheme ?? '', 0, 'global');
             }
+
             if ($this->user_hash === null) {
                 $newUser = true;
                 clear_register_value('user_array', $this->object_name);
@@ -1316,7 +1438,7 @@ EOQ;
         $result = $db->limitQuery($query, 0, 1, false);
         if (!empty($result)) {
             $row = $db->fetchByAssoc($result);
-            if (!$checkPasswordMD5 || self::checkPasswordMD5($password, $row['user_hash'])) {
+            if ($row !== false && (!$checkPasswordMD5 || self::checkPasswordMD5($password, $row['user_hash']))) {
                 return $row;
             }
         }
@@ -1861,7 +1983,7 @@ EOQ;
             } else {
                 $r = $user->db->query("SELECT value FROM config WHERE name = 'fromaddress'");
                 $a = $user->db->fetchByAssoc($r);
-                $fromddr = $a['value'];
+                $fromaddr = $a['value'];
             }
         }
 
@@ -2474,9 +2596,13 @@ EOQ;
 
     public function getEditorType()
     {
+        global $app_list_strings;
+
+        $validEditorTypes = array_keys($app_list_strings['dom_editor_type'] ?? []);
+
         $editorType = $this->getPreference('editor_type');
-        if (!$editorType) {
-            $editorType = 'mozaik';
+        if (!$editorType || !in_array($editorType, $validEditorTypes, true)) {
+            $editorType = 'tinymce';
             $this->setPreference('editor_type', $editorType);
         }
 
@@ -2504,7 +2630,7 @@ EOQ;
      * Check if current user can save the current user record
      * @return bool
      */
-    protected function hasSaveAccess(): bool
+    public function hasSaveAccess(): bool
     {
         global $current_user;
 
@@ -2545,11 +2671,131 @@ EOQ;
 
     }
 
+    protected function getCurrentPreference(string $key) {
+        global $current_user;
+        if ($this->user_name === $current_user->user_name && isset($_SESSION[$this->user_name.'_PREFERENCES']['global'][$key])) {
+            return $_SESSION[$this->user_name.'_PREFERENCES']['global'][$key];
+        }
+
+        return $this->getPreference($key);
+    }
+
     /**
      * @return bool
      */
     protected function isUpdate(): bool
     {
         return !empty($this->id) && !$this->new_with_id;
+    }
+
+    protected function restrictAdminOnlyFields(): void
+    {
+        global $current_user;
+
+        if (is_admin($current_user)){
+            return;
+        }
+
+        if (empty($this->id)) {
+            return;
+        }
+
+        $savedBean = BeanFactory::getBean('Users', $this->id);
+
+        if (empty($savedBean->id)) {
+            return;
+        }
+
+        $adminOnlyFields = [
+            'UserType',
+            'status',
+            'employee_status',
+        ];
+
+        foreach ($adminOnlyFields as $field) {
+            if (isset($this->$field) && $this->$field !== $savedBean->$field) {
+                $this->$field = $savedBean->$field;
+            }
+        }
+    }
+
+    public function hasActionAccess(string $module, string $action): bool
+    {
+        if (is_admin($this) || !$this->bean_implements('ACL')) {
+            return true;
+        }
+
+        return ACLController::checkAccess($module, $action);
+    }
+
+    protected function beforeDisable(string $id): void
+    {
+        /** @var User $user */
+        $user = BeanFactory::getBean('Users', $id);
+        $user->deleteOAuthTokens();
+        $user->deletePersonalOAuthConnections();
+    }
+
+    protected function deleteOAuthTokens(): void
+    {
+        $bean = BeanFactory::newBean('OAuth2Tokens');
+        $userId = $bean->db->quote($this->id);
+        $tableName = $bean->db->quote($bean->getTableName());
+
+        $query = "SELECT id FROM $tableName where assigned_user_id = '$userId' AND deleted = 0";
+        $result = $this->db->query($query);
+
+        $row = $this->db->fetchByAssoc($result);
+        while (!empty($row)) {
+            $bean = $bean->retrieve($row['id']);
+            if (empty($bean)) {
+                continue;
+            }
+
+            $bean->mark_deleted($bean->id);
+            $row = $this->db->fetchByAssoc($result);
+        }
+    }
+
+    public function deleteOAuthCodes(): void
+    {
+        $bean = BeanFactory::newBean('OAuth2AuthCodes');
+        $userId = $bean->db->quote($this->id);
+        $tableName = $bean->db->quote($bean->getTableName());
+
+        $query = "SELECT id FROM $tableName where assigned_user_id = '$userId' AND deleted = 0";
+        $result = $this->db->query($query);
+
+        $row = $this->db->fetchByAssoc($result);
+        while (!empty($row)) {
+            $bean = $bean->retrieve($row['id']);
+            if (empty($bean)) {
+                continue;
+            }
+
+            $bean->mark_deleted($bean->id);
+            $row = $this->db->fetchByAssoc($result);
+        }
+    }
+
+    public function deletePersonalOAuthConnections(): void
+    {
+        $bean = BeanFactory::newBean('ExternalOAuthConnection');
+        $userId = $bean->db->quote($this->id);
+        $tableName = $bean->db->quote($bean->getTableName());
+
+        $query = "SELECT id FROM $tableName where created_by = '$userId' AND deleted = 0";
+        $result = $this->db->query($query);
+
+        $row = $this->db->fetchByAssoc($result);
+        while (!empty($row)) {
+            $bean = $bean->retrieve($row['id']);
+            if (empty($bean)) {
+                continue;
+            }
+
+            $bean->mark_deleted($bean->id);
+            $row = $this->db->fetchByAssoc($result);
+        }
     }
 }

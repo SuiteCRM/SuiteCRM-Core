@@ -1,0 +1,220 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2025 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+import {Component, signal, WritableSignal} from '@angular/core';
+import {BaseFieldComponent} from "./base-field.component";
+import {Attachment} from "../../components/uploaded-file/uploaded-file.model";
+import {DataTypeFormatter} from "../../services/formatters/data-type.formatter.service";
+import {FieldLogicManager} from "../field-logic/field-logic.manager";
+import {FieldLogicDisplayManager} from "../field-logic-display/field-logic-display.manager";
+import {MediaObjectsService, UploadSuccessCallback} from "../../services/media-objects/media-objects.service";
+import {Record} from "../../common/record/record.model";
+import {FieldValue} from "../../common/record/field.model";
+import {
+    LegacyEntrypointLinkBuilder
+} from "../../services/navigation/legacy-entrypoint-link-builder/legacy-entrypoint-link-builder.service";
+
+
+@Component({template: ''})
+export class BaseFileComponent extends BaseFieldComponent {
+
+    filenameLink: string = '';
+
+    isLegacy: boolean = true;
+    isRecordLink: boolean = false;
+    compact: boolean = false;
+    uploadedFile: WritableSignal<Attachment> = signal(null);
+    attachments: WritableSignal<Attachment[]> = signal([]);
+    isValidStorageType: boolean = false;
+    textMaxWidth: WritableSignal<string> = signal('200px');
+
+    validStorageTypes: string[] = [
+        'archived-documents',
+        'private-documents',
+        'private-images',
+        'public-documents',
+        'public-images',
+    ];
+
+    constructor(
+        protected typeFormatter: DataTypeFormatter,
+        protected logic: FieldLogicManager,
+        protected logicDisplay: FieldLogicDisplayManager,
+        protected mediaObjects: MediaObjectsService,
+        protected legacyEntrypointLinkBuilder: LegacyEntrypointLinkBuilder
+    ) {
+        super(typeFormatter, logic, logicDisplay);
+    }
+
+    protected uploadFile(storageType: string, file: File, onUpload: UploadSuccessCallback): Attachment {
+
+        const uploadedFile = this.mediaObjects.uploadFile(
+            storageType,
+            file,
+            this?.record?.module ?? '',
+            this?.field?.name ?? '',
+            (progress: number) => {
+            },
+            (uploadFile: Attachment) => {
+                onUpload(uploadFile);
+            },
+            (error) => {
+            }
+        );
+
+        return uploadedFile;
+    }
+
+    protected subscribeValueChanges(): void {
+    }
+
+    protected mapToRecord(uploadFile: Attachment): Record {
+        return {
+            id: uploadFile?.id ?? uploadFile?.name ?? '',
+            module: 'media-objects',
+            attributes: {
+                id: uploadFile?.id ?? uploadFile?.name ?? '',
+                name: uploadFile?.name ?? '',
+                size: uploadFile?.size ?? '',
+                attachmentType: uploadFile?.attachmentType ?? 'file',
+                type: uploadFile?.type ?? '',
+                thumbnailUrl: uploadFile?.thumbnailUrl ?? '',
+                contentUrl: uploadFile?.contentUrl ?? '',
+                original_name: uploadFile?.name ?? '',
+            }
+        } as Record;
+    }
+
+    protected initUploadedFile(): void {
+        const id = this.record.id;
+        const type = this.record.module;
+
+        if (this.field.valueObject && this.field.valueObject.id) {
+            this.isLegacy = false;
+            this.initFileFromValueObject(this.field.valueObject);
+
+            this.subs.push(this.field.valueChanges$.subscribe((fieldValue: FieldValue) => {
+                this.initFileFromValueObject(this.field.valueObject);
+            }));
+        }
+
+
+        this.filenameLink = this.legacyEntrypointLinkBuilder.getDownloadEntrypointLink(id, type);
+    }
+
+    protected initFileFromValueObject(valueObject: any): void {
+
+        if (!valueObject) {
+            this.uploadedFile.set(null);
+            return;
+        }
+
+        let contentUrl = valueObject?.attributes?.contentUrl ?? '';
+
+        contentUrl = this.checkUrl(contentUrl);
+
+        let thumbnailUrl = valueObject?.attributes?.thumbnailUrl ?? '';
+
+        thumbnailUrl = this.checkUrl(thumbnailUrl);
+
+        this.uploadedFile.set({
+            id: valueObject?.id ?? '',
+            name: valueObject?.attributes?.original_name ?? '',
+            size: valueObject?.attributes?.size ?? 0,
+            type: valueObject?.attributes?.type ?? '',
+            thumbnailUrl: thumbnailUrl || '',
+            attachmentType: valueObject?.attributes?.attachmentType ?? 'file',
+            contentUrl: contentUrl || '',
+            status: signal('saved'),
+            progress: signal(100),
+            dateCreated: valueObject?.attributes?.date_entered || ''
+        } as Attachment);
+    }
+
+    protected checkUrl(url: string): string {
+        if (url && (!url.startsWith('https://') && !url.startsWith('http://')) && !url.startsWith('.')) {
+            url = '.' + url ?? '';
+        }
+
+        return url;
+    }
+
+    protected calculateDynamicMaxWidth(startElement: HTMLElement, defaultSelector?: string): void {
+
+        const ancestorSelector = this?.field?.metadata?.dynamicWidthAncestor ?? defaultSelector ?? '';
+        const dynamicWidthAdjustment = 30;
+        let containerWidth = '';
+
+        if (ancestorSelector) {
+            const ancestor = this.findAncestor(startElement, ancestorSelector);
+            if (ancestor) {
+                let offSetWidth = ancestor?.offsetWidth ?? 0;
+
+                if (offSetWidth && dynamicWidthAdjustment) {
+                    offSetWidth = offSetWidth - dynamicWidthAdjustment;
+                }
+                containerWidth = (offSetWidth).toString();
+            }
+        }
+
+        if (containerWidth && containerWidth !== '0') {
+            containerWidth = containerWidth + 'px';
+        } else {
+            containerWidth = this?.field?.metadata?.width ?? '200px';
+        }
+
+        this.textMaxWidth.set(containerWidth);
+    }
+
+    protected findAncestor(el: HTMLElement, selector: string): HTMLElement {
+        let found = false;
+        let iterations = 0;
+
+        if (el.matches(selector)) {
+            found = true;
+            return el;
+        }
+
+        while (!found || iterations > 50) {
+            el = el?.parentElement ?? null;
+            if (!el) {
+                found = true;
+                break;
+            }
+
+            if (el.matches(selector)) {
+                found = true;
+            }
+            iterations++;
+        }
+
+        if (!found) {
+            el = null;
+        }
+
+        return el;
+    }
+}

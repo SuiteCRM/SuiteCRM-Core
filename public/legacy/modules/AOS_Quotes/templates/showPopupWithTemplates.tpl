@@ -54,7 +54,7 @@
                     <tr height="20">
                         <td width="17" valign="center"><a href="#" onclick="{$on_click_js}">
                             <a href="#" onclick="{$on_click_js}">
-                                {sugar_image name="PDF_Templates" width="20" height="20"}                                                                
+                                {sugar_image name="PDF_Templates" width="20" height="20"}
                             </a>
                         </td>
                         <td style="padding-top: 0.2em;">
@@ -74,40 +74,107 @@
     </tr>
     <tr>
         <td colspan="2">
-            <button style=" display: block;margin-left: auto;margin-right: auto" onclick="document.getElementById('popupDivBack_ara').style.display='none';document.getElementById('popupDiv_ara').style.display='none';return false;">
+            <button style=" display: block;margin-left: auto;margin-right: auto"
+                    onclick="document.getElementById('popupDivBack_ara').style.display='none';document.getElementById('popupDiv_ara').style.display='none';return false;">
                 Cancel
             </button>
         </td>
     </tr>
     </table>
 </div>
-<div id="popupDivBack_ara" onclick="this.style.display='none';document.getElementById('popupDiv_ara').style.display='none';" style="top:0px;left:0px;position:fixed;height:100%;width:100%;background-color:#E9E9E9;opacity:0.7;display:none;vertical-align:middle;text-align:center;z-index:9998;">
+<div id="popupDivBack_ara"
+     onclick="this.style.display='none';document.getElementById('popupDiv_ara').style.display='none';"
+     style="top:0px;left:0px;position:fixed;height:100%;width:100%;background-color:#E9E9E9;opacity:0.7;display:none;vertical-align:middle;text-align:center;z-index:9998;">
 </div>
 <script>
-  {literal}
-  /**
-   *
-   * @param task
-   * @return {boolean}
-   * @see generatePdf (entrypoint)
-   */
-  {/literal}
-  function showPopup(task) {ldelim}
-    var form = document.getElementById('popupForm');
-    var ppd = document.getElementById('popupDivBack_ara');
-    var ppd2 = document.getElementById('popupDiv_ara');
-    var totalTemplates = {$TOTAL_TEMPLATES}
-    if (totalTemplates === 1) {ldelim}
-      form.task.value = task;
-      form.templateID.value = '{$template}';
-      form.submit();
-    {rdelim} else if (form !== null && ppd !== null && ppd2 !== null) {ldelim}
-      ppd.style.display ='block';
-      ppd2.style.display ='block';
-      form.task.value = task;
-    {rdelim} else {ldelim}
-      alert('Error!');
-    {rdelim}
-    return false;
-  {rdelim}
+    {if $PRINT_AS_PDF_ACTION}
+    const printAsPdfConfig = {$PRINT_AS_PDF_ACTION};
+    {/if}
+    {literal}
+    function openEmailComposeModal(id, module) {
+        const options = {
+            type: 'run-global-async-action',
+            params: {
+                action: {
+                    key: 'quote-build-pdf-email',
+                    asyncProcess: true,
+                    params: {
+                        id: id,
+                        module: module,
+                        selectModal: {
+                            module: 'AOS_PDF_Templates',
+                        }
+                    }
+                }
+            }
+        };
+
+        window.parent.postMessage(JSON.stringify(options));
+
+        window.event.preventDefault();
+        window.event.stopImmediatePropagation();
+    }
+
+    function printAsPdf(id, module) {
+        const config = typeof printAsPdfConfig !== 'undefined' ? printAsPdfConfig : {
+            key: 'record-print-as-pdf',
+            asyncProcess: true,
+            params: {
+                selectModal: {
+                    module: 'AOS_PDF_Templates',
+                }
+            }
+        };
+        const options = {
+            type: 'run-global-async-action',
+            params: {
+                action: {
+                    key: config.key,
+                    asyncProcess: config.asyncProcess,
+                    params: Object.assign({}, config.params, { id: id, module: module })
+                }
+            }
+        };
+
+        window.parent.postMessage(JSON.stringify(options));
+
+        window.event.preventDefault();
+        window.event.stopImmediatePropagation();
+    }
+
+    /**
+     *
+     * @param task
+     * @return {boolean}
+     * @see generatePdf (entrypoint)
+     */
+    {/literal}
+    function showPopup(task) {ldelim}
+        var form = document.getElementById('popupForm');
+        var ppd = document.getElementById('popupDivBack_ara');
+        var ppd2 = document.getElementById('popupDiv_ara');
+        const module = '{$FOCUS->module_name}';
+        const id = '{$FOCUS->id}';
+        if (task ==='emailpdf') {ldelim}
+            openEmailComposeModal(id, module);
+            return false;
+        {rdelim}
+        if (task ==='pdf') {ldelim}
+            printAsPdf(id, module);
+            return false;
+            {rdelim}
+        var totalTemplates = {$TOTAL_TEMPLATES}
+        if (totalTemplates === 1) {ldelim}
+            form.task.value = task;
+            form.templateID.value = '{$template}';
+            form.submit();
+            {rdelim} else if (form !== null && ppd !== null && ppd2 !== null) {ldelim}
+            ppd.style.display = 'block';
+            ppd2.style.display = 'block';
+            form.task.value = task;
+            {rdelim} else {ldelim}
+            alert('Error!');
+            {rdelim}
+        return false;
+        {rdelim}
 </script>

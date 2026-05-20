@@ -7,12 +7,7 @@
       "jasmine"
     ],
     "paths": {
-      "common": [
-        "dist/common/common",
-        "dist/common"
-      ],
       "core": [
-        "dist/core/core",
         "dist/core"
       ]
     }

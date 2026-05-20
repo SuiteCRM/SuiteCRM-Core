@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2022 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2022 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,6 +28,7 @@
 namespace App\Security;
 
 use App\Authentication\LegacyHandler\Authentication;
+use App\SystemConfig\LegacyHandler\SystemConfigHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
@@ -39,10 +40,12 @@ class LoginSuccessEventListener implements EventSubscriberInterface
      * @var Authentication
      */
     private $authentication;
+    protected SystemConfigHandler $config;
 
-    public function __construct(Authentication $authentication)
+    public function __construct(Authentication $authentication, SystemConfigHandler $config)
     {
         $this->authentication = $authentication;
+        $this->config = $config;
     }
 
     public static function getSubscribedEvents(): array
@@ -60,10 +63,16 @@ class LoginSuccessEventListener implements EventSubscriberInterface
 
         $user = $event->getUser();
 
-        $result = $this->authentication->initLegacyUserSession($user->getUsername());
+        $authType = $this->config->getSystemConfig('auth_type')->getValue();
 
-        if ($result === false) {
-            throw new CustomUserMessageAuthenticationException('Authentication: Invalid login credentials');
+        if (!$user->isTotpAuthenticationEnabled() ||  $authType === 'saml') {
+            $result = $this->authentication->initLegacyUserSession($user->getUsername());
+
+            if ($result === false) {
+                throw new CustomUserMessageAuthenticationException('Authentication: Invalid login credentials');
+            }
         }
+
+
     }
 }

@@ -70,7 +70,7 @@ function deleteAttachmentCallBack(text)
                     ),
 
                     array(
-                        'filename',
+                        'file',
 
                     ),
                     array(

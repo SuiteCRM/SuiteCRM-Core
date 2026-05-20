@@ -118,6 +118,9 @@ $vardefs = array(
             'len' => 255,
             'dbType' => 'varchar',
             'width' => '160',
+            'metadata' => [
+                'storage_type' => 'private-images',
+            ],
             'height' => '160',
             'studio' => array('listview' => true),
         ),

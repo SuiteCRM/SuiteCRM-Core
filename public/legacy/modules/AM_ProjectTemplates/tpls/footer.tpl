@@ -117,15 +117,3 @@ YAHOO.util.Event.onContentReady("{/literal}{{$form_name}}{literal}",function() {
 {/literal}
 </script>
 </form>
-<div class="buttons">
-{{if !empty($form) && !empty($form.buttons_footer)}}
-   {{foreach from=$form.buttons_footer key=val item=button}}
-      {{sugar_button module="$module" id=$button location="FOOTER" view="$view"}}
-   {{/foreach}}
-{{else}}
-	{{sugar_button module="$module" id="SAVE" view="$view"}}
-	{{sugar_button module="$module" id="CANCEL" view="$view"}}
-{{/if}}
-
-{{sugar_button module="$module" id="Audit" view="$view"}}
-</div>

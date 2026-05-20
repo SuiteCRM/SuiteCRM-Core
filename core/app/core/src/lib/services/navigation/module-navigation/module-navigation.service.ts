@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,9 +26,10 @@
 
 import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
-import {ModuleAction, NavbarModule, Navigation} from '../../../store/navigation/navigation.store';
+import {ModuleAction, NavbarModule, Navigation, NavigationStore} from '../../../store/navigation/navigation.store';
 import {LanguageListStringMap, LanguageStrings} from '../../../store/language/language.store';
-import {MenuItem, Record} from 'common';
+import {MenuItem} from '../../../common/menu/menu.model';
+import {Record} from '../../../common/record/record.model';
 import {ModuleNameMapper} from '../module-name-mapper/module-name-mapper.service';
 import {ActionNameMapper} from '../action-name-mapper/action-name-mapper.service';
 
@@ -37,6 +38,7 @@ export interface NavigationRoute {
     url: string;
     params: { [key: string]: string };
     process?: string;
+    processParams?: { [key: string]: string };
 }
 
 const ROUTE_PREFIX = './#';
@@ -47,7 +49,8 @@ export class ModuleNavigation {
     constructor(
         protected router: Router,
         protected moduleNameMapper: ModuleNameMapper,
-        protected actionNameMapper: ActionNameMapper
+        protected actionNameMapper: ActionNameMapper,
+        protected navigation: NavigationStore
     ) {
     }
 
@@ -154,6 +157,7 @@ export class ModuleNavigation {
         let route = null;
         let params = {};
         let process = action?.process
+        let processParams = action?.processParams ?? {};
 
         if (url.startsWith(ROUTE_PREFIX)) {
             route = url.replace(ROUTE_PREFIX, '');
@@ -177,7 +181,7 @@ export class ModuleNavigation {
             }
         }
 
-        return {route, url, params, process};
+        return {route, url, params, process, processParams};
     }
 
     /**
@@ -310,5 +314,13 @@ export class ModuleNavigation {
         }
 
         return returnModule;
+    }
+
+    /**
+     * Check if the user has access to a module
+     * @param module
+     */
+    public hasAccessToModule(module: string): boolean {
+       return this.navigation.hasAccessToModule(module);
     }
 }

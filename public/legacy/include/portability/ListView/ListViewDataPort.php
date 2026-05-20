@@ -323,6 +323,14 @@ class ListViewDataPort extends ListViewData
      */
     public function getOrderBy($orderBy = '', $direction = ''): array
     {
+        if (empty($orderBy)){
+            $orderBy = 'date_entered';
+        }
+
+        if (empty($direction)) {
+            $direction = 'DESC';
+        }
+
         return ['orderBy' => $orderBy, 'sortOrder' => $direction];
     }
 
@@ -398,9 +406,9 @@ class ListViewDataPort extends ListViewData
         $query .= $ret_array['inner_join'] ?? '';
         $query .= $ret_array['where'] ?? '';
         $query .= $params['custom_where'] ?? '';
+        $query .= $ret_array['group_by'] ?? '';
         $query .= $ret_array['order_by'] ?? '';
         $query .= $params['custom_order_by'] ?? '';
-        $query .= $ret_array['group_by'] ?? '';
 
         return $query;
     }

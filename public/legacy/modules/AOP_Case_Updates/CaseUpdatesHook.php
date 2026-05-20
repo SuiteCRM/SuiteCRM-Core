@@ -638,7 +638,7 @@ class CaseUpdatesHook
         $aop_config = $sugar_config['aop'];
         if ($caseUpdate->assigned_user_id) {
             if ($aop_config['contact_email_template_id']) {
-                $email_template = $email_template->retrieve($aop_config['contact_email_template_id']);
+                $email_template = $email_template->retrieve($aop_config['contact_email_template_id']) ?? $email_template;
                 $signature = $current_user->getDefaultSignature();
             }
 
@@ -660,7 +660,7 @@ class CaseUpdatesHook
         } else {
             $emails = $caseUpdate->getEmailForUser();
             if ($aop_config['user_email_template_id']) {
-                $email_template = $email_template->retrieve($aop_config['user_email_template_id']);
+                $email_template = $email_template->retrieve($aop_config['user_email_template_id']) ?? $email_template;
             }
             $addDelimiter = false;
 

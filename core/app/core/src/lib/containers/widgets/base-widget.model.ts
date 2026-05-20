@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,12 +25,28 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {WidgetMetadata, ViewContext} from 'common';
+import {ViewContext} from '../../common/views/view.model';
+import {WidgetMetadata} from '../../common/metadata/widget.metadata';
 import {Observable} from 'rxjs';
+import {PanelCollapseMode} from "../../components/panel/panel.component";
 
 @Component({template: ''})
 export class BaseWidgetComponent {
+    @Input('key') key: string;
     @Input('config') config: WidgetMetadata;
     @Input('context') context: ViewContext;
     @Input('context$') context$: Observable<ViewContext>;
+    mode: PanelCollapseMode;
+
+    ngOnInit(): void {
+        this.mode = 'none';
+
+        if (this?.config?.allowCollapse){
+            this.mode = 'collapsible';
+        }
+
+        if (!this.key && this?.config?.key) {
+            this.key = this?.config?.key;
+        }
+    }
 }

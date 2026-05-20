@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -42,6 +42,9 @@ import {AuthService} from '../../../services/auth/auth.service';
 import {RecentlyViewedService} from '../../../services/navigation/recently-viewed/recently-viewed.service';
 import {forkJoin} from 'rxjs';
 import {MetadataStore} from '../../../store/metadata/metadata.store.service';
+import {RecordModalService} from "../../../services/modals/record-modal.service";
+import {RecordThreadModalService} from "../../../store/record-thread-modal/record-thread-modal.service";
+import {GlobalActionsAdapter} from "../../../services/global-actions/adapters/actions.adapter";
 
 @Injectable({providedIn: 'root'})
 export class ClassicViewResolver extends BaseMetadataResolver {
@@ -59,6 +62,9 @@ export class ClassicViewResolver extends BaseMetadataResolver {
         protected appMetadata: AppMetadataStore,
         protected auth: AuthService,
         protected recentlyViewed: RecentlyViewedService,
+        protected recordModalService: RecordModalService,
+        protected recordThreadModalService: RecordThreadModalService,
+        protected globalAsyncActionAdapter: GlobalActionsAdapter,
         protected metadataStore: MetadataStore,
     ) {
         super(
@@ -71,6 +77,9 @@ export class ClassicViewResolver extends BaseMetadataResolver {
             moduleNameMapper,
             messageService,
             appMetadata,
+            recordModalService,
+            recordThreadModalService,
+            globalAsyncActionAdapter,
             auth
         );
     }
@@ -95,7 +104,10 @@ export class ClassicViewResolver extends BaseMetadataResolver {
                     const action = info.action ?? 'index';
                     this.appStateStore.setView(action);
 
-                    this.recentlyViewed.onNavigationAdd(this.appStateStore.getModule(), route);
+                    setTimeout(() => {
+                        this.recentlyViewed.onNavigationAdd(this.appStateStore.getModule(), route);
+                    }, 800);
+
                 },
                 () => {
                     this.addMetadataLoadErrorMessage();

@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,7 +28,9 @@ import {NavbarModel} from './navbar-model';
 import {LogoAbstract} from '../logo/logo-abstract';
 import {CurrentUserModel} from './current-user-model';
 import {ActionLinkModel} from './action-link-model';
-import {MenuItem, ready, User} from 'common';
+import {ready} from '../../common/utils/object-utils';
+import {MenuItem} from '../../common/menu/menu.model';
+import {User} from '../../common/types/user';
 import {LanguageStore} from '../../store/language/language.store';
 import {
     GroupedTab,
@@ -455,7 +457,8 @@ export class NavbarAbstract implements NavbarModel {
                 url: moduleActionRoute.url,
                 route: moduleActionRoute.route,
                 params: moduleActionRoute.params,
-                process: moduleActionRoute.process
+                process: moduleActionRoute.process,
+                processParams: moduleActionRoute.processParams
             },
             icon: subMenu.icon || '',
             submenu: sublinks.map((item) => this.buildSubMenuItem(module, item, [])),

@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -33,6 +33,7 @@ use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;
 use App\Engine\Service\ActionAvailabilityChecker\ActionAvailabilityChecker;
 use App\Engine\Service\DefinitionEntryHandlingTrait;
+use App\ViewDefinitions\LegacyHandler\Widgets\WidgetDefinitionParsers;
 use App\ViewDefinitions\Service\WidgetDefinitionProviderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -47,11 +48,6 @@ class WidgetDefinitionProvider extends LegacyHandler implements WidgetDefinition
     public const HANDLER_KEY = 'widget-definition-provider';
 
     /**
-     * @var ActionAvailabilityChecker
-     */
-    protected $actionChecker;
-
-    /**
      * SidebarWidgetDefinitionProvider constructor.
      * @param string $projectDir
      * @param string $legacyDir
@@ -60,6 +56,7 @@ class WidgetDefinitionProvider extends LegacyHandler implements WidgetDefinition
      * @param LegacyScopeState $legacyScopeState
      * @param RequestStack $session
      * @param ActionAvailabilityChecker $actionChecker
+     * @param WidgetDefinitionParsers $widgetDefinitionParsers
      */
     public function __construct(
         string $projectDir,
@@ -68,7 +65,8 @@ class WidgetDefinitionProvider extends LegacyHandler implements WidgetDefinition
         string $defaultSessionName,
         LegacyScopeState $legacyScopeState,
         RequestStack $session,
-        ActionAvailabilityChecker $actionChecker
+        protected ActionAvailabilityChecker $actionChecker,
+        protected WidgetDefinitionParsers $widgetDefinitionParsers
     ) {
         parent::__construct(
             $projectDir,
@@ -78,7 +76,6 @@ class WidgetDefinitionProvider extends LegacyHandler implements WidgetDefinition
             $legacyScopeState,
             $session
         );
-        $this->actionChecker = $actionChecker;
     }
 
     /**
@@ -123,6 +120,14 @@ class WidgetDefinitionProvider extends LegacyHandler implements WidgetDefinition
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function getHeaderWidgets(array $config, string $module, array $moduleDefaults = []): array
+    {
+        return $this->parseEntries($config, $module, $moduleDefaults);
+    }
+
+    /**
      * @param array $config
      * @param string $module
      * @param array $moduleDefaults
@@ -145,7 +150,15 @@ class WidgetDefinitionProvider extends LegacyHandler implements WidgetDefinition
 
         $widgets = $this->filterDefinitionEntries($module, 'widgets', $config, $this->actionChecker);
 
+        foreach ($widgets as $index => $widget) {
+            if (!is_numeric($index)) {
+                $widgets[$index]['key'] = $widget['key'] ?? $index;
+            }
+        }
+
         $displayedWidgets = $this->filterAccessibleWidgets($widgets);
+
+        $displayedWidgets = $this->parseWidgetTypeMetadata($module, $displayedWidgets);
 
         return array_values($displayedWidgets);
     }
@@ -206,5 +219,37 @@ class WidgetDefinitionProvider extends LegacyHandler implements WidgetDefinition
         $this->close();
 
         return $access;
+    }
+
+    /**
+     * @param string $module
+     * @param array $displayedWidgets
+     * @return array
+     */
+    protected function parseWidgetTypeMetadata(string $module, array $displayedWidgets): array
+    {
+        if (empty($displayedWidgets)) {
+            return [];
+        }
+
+        foreach ($displayedWidgets as $index => $widget) {
+            if (empty($widget['type'])) {
+                continue;
+            }
+
+            $type = $widget['type'];
+
+            $parsers = $this->widgetDefinitionParsers->get($module ?? 'default', $type);
+            if (empty($parsers)) {
+                continue;
+            }
+
+            foreach ($parsers as $parser) {
+                $parsedWidget = $parser->parse($widget);
+                $displayedWidgets[$index] = $parsedWidget;
+            }
+        }
+
+        return $displayedWidgets;
     }
 }

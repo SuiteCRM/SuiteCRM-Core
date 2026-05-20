@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,7 +24,17 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    HostListener,
+    OnDestroy,
+    OnInit,
+    signal,
+    ViewChild,
+    WritableSignal
+} from '@angular/core';
 import {combineLatestWith, Observable, Subscription} from 'rxjs';
 import {filter, map, take} from 'rxjs/operators';
 import {NavbarModel} from '../navbar-model';
@@ -45,7 +55,9 @@ import {ModuleNavigation} from '../../../services/navigation/module-navigation/m
 import {ModuleNameMapper} from '../../../services/navigation/module-name-mapper/module-name-mapper.service';
 import {AppState, AppStateStore} from '../../../store/app-state/app-state.store';
 import {AuthService} from '../../../services/auth/auth.service';
-import {MenuItem, ready, RecentlyViewed} from 'common';
+import {ready} from '../../../common/utils/object-utils';
+import {MenuItem} from '../../../common/menu/menu.model';
+import {RecentlyViewed} from '../../../common/record/recently-viewed.model';
 import {AsyncActionInput, AsyncActionService} from '../../../services/process/processes/async-action/async-action';
 import {NotificationStore} from "../../../store/notification/notification.store";
 import {GlobalRecentlyViewedStore} from "../../../store/global-recently-viewed/global-recently-viewed.store";
@@ -89,7 +101,7 @@ export class BaseNavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     navbar: NavbarModel;
     maxTabs = 8;
     screen: ScreenSize = ScreenSize.Medium;
-    notificationsEnabled: boolean = false;
+    notificationsEnabled: WritableSignal<boolean> = signal<boolean>(false);
     subs: Subscription[] = []
     navigation: Navigation;
     mobileNavbar = false;
@@ -204,7 +216,12 @@ export class BaseNavbarComponent implements OnInit, OnDestroy, AfterViewInit {
         this.recentlyViewedCount = this.systemConfigStore.getUi('global_recently_viewed');
 
         this.subs.push(this.notificationStore.notificationsEnabled$.subscribe(notificationsEnabled => {
-            this.notificationsEnabled = notificationsEnabled;
+
+            if (!Object.keys(this?.navigation?.modules ?? []).includes('Notifications') && !Object.keys(this?.navigation?.modules ?? []).includes('alerts')){
+                notificationsEnabled = false;
+            }
+
+            this.notificationsEnabled.set(notificationsEnabled);
         }));
 
         this.subs.push(this.breakpointObserver.observe([
@@ -348,6 +365,7 @@ export class BaseNavbarComponent implements OnInit, OnDestroy, AfterViewInit {
         const options = {
             action: processType,
             module: action.module,
+            params: action.processParams ?? []
         } as AsyncActionInput;
 
         this.asyncActionService.run(processType, options).pipe(take(1)).subscribe();

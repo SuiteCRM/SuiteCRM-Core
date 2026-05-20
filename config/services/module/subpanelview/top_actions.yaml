@@ -11,6 +11,26 @@ parameters:
             - list
           acl:
             - edit
+        modal-create:
+          key: modal-create
+          labelKey: LBL_QUICK_CREATE
+          action: modal-create
+          params:
+            modalOptions:
+              size: xl
+              scrollable: true
+          modes:
+            - list
+          acl:
+            - edit
+        select:
+          key: select
+          labelKey: LBL_LINK
+          action: select
+          params:
+          modes:
+            - list
+          acl:
         link:
           key: select
           labelKey: LBL_LINK
@@ -48,3 +68,16 @@ parameters:
           modes:
             - list
           acl:
+    modules:
+      document-revisions:
+        actions:
+          create:
+            key: create
+            labelKey: LBL_QUICK_CREATE
+            action: create
+            aclModule: 'Documents'
+            params:
+            modes:
+              - list
+            acl:
+              - edit

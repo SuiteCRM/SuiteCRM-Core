@@ -84,6 +84,100 @@ class SavedSearch extends SugarBean
         }
     }
 
+    public function save($check_notify = false)
+    {
+        $this->sanitizeContents();
+
+        return parent::save($check_notify);
+    }
+
+    /**
+     * Preserve contents across parent cleanBean().
+     * SugarBean::cleanBean() runs purify_html on text fields,
+     * which would mangle the JSON format. sanitizeContents() already
+     * validates and normalizes the contents field.
+     */
+    public function cleanBean()
+    {
+        $contents = $this->contents;
+        parent::cleanBean();
+        $this->contents = $contents;
+    }
+
+    /**
+     * Validate contents field. Only allow values that are valid JSON
+     * (or safely decodable legacy base64+serialize arrays).
+     * Reject anything that cannot round-trip through JSON — this blocks
+     * serialized PHP objects (gadget chains) injected via the REST API.
+     * Converts legacy base64+serialize to JSON on save.
+     */
+    protected function sanitizeContents(): void
+    {
+        if (empty($this->contents)) {
+            return;
+        }
+
+        // Try JSON first
+        try {
+            $decoded = json_decode($this->contents, true, 512, JSON_THROW_ON_ERROR);
+        } catch (Throwable $e) {
+            $decoded = null;
+        }
+
+        // Fallback to legacy base64+serialize
+        if ($decoded === null) {
+            try {
+                $decoded = @unserialize(base64_decode($this->contents), ['allowed_classes' => false]);
+            } catch (Throwable $e) {
+                $decoded = null;
+            }
+        }
+
+        if (!is_array($decoded)) {
+            $this->contents = '';
+
+            return;
+        }
+
+        // Re-encode as JSON (blocks serialized objects, normalizes format)
+        try {
+            $this->contents = json_encode($decoded, JSON_THROW_ON_ERROR);
+        } catch (Throwable $e) {
+            $this->contents = '';
+        }
+    }
+
+    /**
+     * Decode contents from JSON (new format) or base64+serialize (legacy).
+     *
+     * @param string|null $raw
+     * @return array|null
+     */
+    protected function decodeContents($raw): ?array
+    {
+        if (empty($raw)) {
+            return null;
+        }
+
+        try {
+            $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+        } catch (Throwable $e) {
+            $decoded = null;
+        }
+
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+
+        try {
+            $decoded = @unserialize(base64_decode($raw), ['allowed_classes' => false]);
+        } catch (Throwable $e) {
+            return null;
+        }
+
+        return is_array($decoded) ? $decoded : null;
+    }
+
     // Saved Search Form
     public function getForm($module, $inline = true, $orderBySelectOnly = false)
     {
@@ -296,13 +390,13 @@ class SavedSearch extends SugarBean
 
         SugarApplication::headerRedirect(
             $header .
-                '&saved_search_select=' . $saved_search_id .
-                '&saved_search_select_name=' . $saved_search_name .
-                '&orderBy=' . $orderBy .
-                '&sortOrder=' . $thisContentsSortOrder .
-                '&query=' . $query .
-                '&searchFormTab=' . $search_form_tab .
-                '&showSSDIV=' . $showDiv
+            '&saved_search_select=' . $saved_search_id .
+            '&saved_search_select_name=' . $saved_search_name .
+            '&orderBy=' . $orderBy .
+            '&sortOrder=' . $thisContentsSortOrder .
+            '&query=' . $query .
+            '&searchFormTab=' . $search_form_tab .
+            '&showSSDIV=' . $showDiv
         );
     }
 
@@ -325,7 +419,7 @@ class SavedSearch extends SugarBean
                 $_SESSION['LastSavedView'] = array();
             }
             $_SESSION['LastSavedView'][$row['search_module']] = $row['id'];
-            $contents = unserialize(base64_decode($row['contents']));
+            $contents = $this->decodeContents($row['contents']);
             $saved_search_id = $row['id'];
             $saved_search_name = $row['name'];
         }
@@ -420,7 +514,7 @@ class SavedSearch extends SugarBean
 
         $contents['advanced'] = true;
 
-        $focus->contents = base64_encode(serialize($contents));
+        $focus->contents = json_encode($contents);
 
         $focus->assigned_user_id = $current_user->id;
         $focus->new_schema = true;
@@ -494,7 +588,7 @@ class SavedSearch extends SugarBean
     public function retrieveSavedSearch($id)
     {
         parent::retrieve($id);
-        $this->contents = unserialize(base64_decode($this->contents));
+        $this->contents = $this->decodeContents($this->contents);
     }
 
     public function populateRequest()

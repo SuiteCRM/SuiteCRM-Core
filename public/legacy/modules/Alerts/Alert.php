@@ -88,6 +88,11 @@ class Alert extends Basic
     /**
      * @var string
      */
+    public $status;
+
+    /**
+     * @var string
+     */
     public $date_start;
 
     public function __construct()

@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -78,10 +78,10 @@ final class Version20231103101649 extends BaseMigration implements ContainerAwar
         try {
 
             $output = new ConsoleOutput();
-            $angularMessage = "SuiteCRM is now using angular 16.";
+            $angularMessage = "SuiteCRM is now using angular 18.";
             $this->log($angularMessage);
             $output->writeln("<comment>Warning! $angularMessage</comment>");
-            $extensionsNeedToBeRebuiltMessage = "'defaultExt' and any extension that contains frontend changes will need to be rebuilt. For defaultExt you can build using `yarn run build:defaultExt`";
+            $extensionsNeedToBeRebuiltMessage = "'defaultExt' and any extension that contains frontend changes will need to be rebuilt. For defaultExt you can build using `yarn run build:extension defaultExt`";
             $this->log($extensionsNeedToBeRebuiltMessage);
             $output->writeln("<comment>Warning! $extensionsNeedToBeRebuiltMessage</comment>");
 

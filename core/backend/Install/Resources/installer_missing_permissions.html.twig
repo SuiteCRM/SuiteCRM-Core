@@ -1,0 +1,85 @@
+<!--
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2025 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="icon" type="image/png" href="dist/themes/suite8/images/favicon.ico">
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'/>
+    <link rel="stylesheet" href="dist/{{ cssFile }}">
+</head>
+<body>
+<app-root>
+    <div class="top-panel fixed-top">
+        <nav class="navbar ml-0 pl-0">
+            <div class="navbar-collapse">
+                <ul class="navbar-nav">
+                    <li class="pl-1">
+                        <img alt=""
+                             src="legacy/themes/default/images/company_logo.png"
+                             title=""
+                             class="">
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <div class="install-view full-height-view">
+        <div class="install-view-header container-fluid">
+            <center>
+                <div class="row mr-0">
+                    <div class="install-header-title-col col">
+                        <div class="install-view-title record-view-name justify-content-center d-flex">
+                            <scrm-label>{{ mod_strings.ERR_CHECKSYS_NOT_WRITABLE }}</scrm-label>
+                        </div>
+                        <pre class="bg-transparent text-body pt-3">'{{ path }}'</pre>
+                        <div>
+                            <scrm-label>{{ mod_strings.LBL_DISABLED_DESCRIPTION_3 }}</scrm-label>
+                        </div>
+                        <div class="pb-3">
+                            {{ mod_strings.LBL_DISABLED_HELP_1 }}
+                            <a href="{{ mod_strings.LBL_DISABLED_HELP_LNK }}"
+                               target="_blank">{{ mod_strings.LBL_DISABLED_HELP_2 }}</a>
+                        </div>
+                    </div>
+                </div>
+            </center>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="copyright-links"><a data-toggle="modal" data-target=".copyright-suitecrm" class="footer-link"> ©
+                Supercharged by SuiteCRM </a><a data-toggle="modal" data-target=".copyright-sugarcrm"
+                                                class="footer-link"> © Powered By SugarCRM </a></div>
+    </div>
+    <div class="copyright"></div>
+</app-root>
+</body>
+</html>

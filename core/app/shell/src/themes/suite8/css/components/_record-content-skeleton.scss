@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2022 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2022 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,22 +25,54 @@
  */
 
 .record-content-skeleton .nav-tabs.nav {
-  height: 34px;
+  height: 30px;
   opacity: 0.6;
 }
 
 .record-content-skeleton .tab-content .col-form-label-sm {
   background-color: $midnight-blue;
   opacity: 0.4;
+  height: 1.2rem !important;
 }
 
 .record-content-skeleton .tab-content .skeleton-field-content {
   background-color: $geyser-blue;
   opacity: 0.6;
+  height: 1.2rem;
 }
 
 .dynamic-field .skeleton-field-content {
   height: 34px;
   background-color: $geyser-blue;
   opacity: 0.6;
+}
+
+.skeleton-field-content {
+  color: transparent;
+  background-color: $geyser-blue;
+  opacity: 0.6;
+}
+
+.skeleton-field-content.small-size-text-skeleton {
+  height: 0.5em;
+}
+
+.skeleton-field-content.medium-size-text-skeleton {
+  height: 1em;
+}
+
+.skeleton-field-content.large-size-text-skeleton {
+  height: 1.5em;
+}
+
+.skeleton-field-content.small-length-text-skeleton {
+  width: 4.5em;
+}
+
+.skeleton-field-content.medium-length-text-skeleton {
+  width: 6em;
+}
+
+.skeleton-field-content.large-length-text-skeleton {
+  width: 12em;
 }

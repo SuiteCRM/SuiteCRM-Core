@@ -10,11 +10,14 @@ parameters:
   default_session_name: 'SCRMSESSID'
   auth_type: '%env(AUTH_TYPE)%'
   log.dir: '%kernel.logs_dir%'
+  base.log.dir: '%kernel.project_dir%/logs'
   log.main.default: '%kernel.environment%.log'
   log.security.default: '%kernel.environment%.security.log'
   log.deprecation.default: '%kernel.environment%.deprecation.log'
+  log.messenger.default: '%kernel.environment%.messenger.log'
   site.url: '%env(SITE_URL)%'
   saml.autocreate.attributes_map: '%env(json:SAML_AUTOCREATE_ATTRIBUTES_MAP)%'
+  temporary_file.base_dir: '%env(TEMPORARY_FILE_BASE_DIR)%'
 
 services:
   Symfony\Component\Ldap\Ldap:
@@ -44,6 +47,10 @@ imports:
   - { resource: ../extensions/*/config/modules/*.php }
   - { resource: ../extensions/*/config/modules/**/*.yaml }
   - { resource: ../extensions/*/config/modules/**/*.php }
+  - { resource: ../extensions/*/modules/*/config/*.php }
+  - { resource: ../extensions/*/modules/*/config/*.yaml }
+  - { resource: ../extensions/*/modules/*/config/**/*.php }
+  - { resource: ../extensions/*/modules/*/config/**/*.yaml }
   - { resource: core_services.yaml }
   - { resource: ../extensions/*/config/*.yaml }
   - { resource: ../extensions/*/config/*.php }

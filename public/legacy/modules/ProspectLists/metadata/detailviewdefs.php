@@ -41,7 +41,7 @@
 $viewdefs['ProspectLists']['DetailView'] = array(
 'templateMeta' => array('form' => array('closeFormBeforeCustomButtons' => true,'buttons'=>array('EDIT', 'DUPLICATE', 'DELETE',
 array('customCode'=> '<input title="{$APP.LBL_EXPORT}"  class="button" type="button" name="opp_to_quote_button" id="export_button" value="{$APP.LBL_EXPORT}" onclick="document.location.href = \'index.php?entryPoint=export&module=ProspectLists&uid={$fields.id.value}&members=1\'">'),)),
-                
+
                         'maxColumns' => '2',
                         'widths' => array(
                                         array('label' => '10', 'field' => '30'),
@@ -60,6 +60,7 @@ array('customCode'=> '<input title="{$APP.LBL_EXPORT}"  class="button" type="but
       ),
       array(
           'description',
+          ''
       ),
     ),
     'LBL_PANEL_ASSIGNMENT' => array(
@@ -76,6 +77,7 @@ array('customCode'=> '<input title="{$APP.LBL_EXPORT}"  class="button" type="but
               'name' => 'date_entered',
               'customCode' => '{$fields.date_entered.value} {$APP.LBL_BY} {$fields.created_by_name.value}',
             ),
+            ''
         ),
     )
 )

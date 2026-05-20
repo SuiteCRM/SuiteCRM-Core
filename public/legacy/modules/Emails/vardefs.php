@@ -83,21 +83,21 @@ $dictionary['Email'] = array(
         'to_addrs_names' => array(
             'name' => 'to_addrs_names',
             'type' => 'varchar',
-            'vname' => 'to_addrs_names',
+            'vname' => 'LBL_TO',
             'source' => 'non-db',
             'inline_edit' => false,
         ),
         'cc_addrs_names' => array(
             'name' => 'cc_addrs_names',
             'type' => 'varchar',
-            'vname' => 'cc_addrs_names',
+            'vname' => 'LBL_CC',
             'source' => 'non-db',
             'inline_edit' => false,
         ),
         'bcc_addrs_names' => array(
             'name' => 'bcc_addrs_names',
             'type' => 'varchar',
-            'vname' => 'bcc_addrs_names',
+            'vname' => 'LBL_BCC',
             'source' => 'non-db',
             'inline_edit' => false,
         ),
@@ -116,6 +116,26 @@ $dictionary['Email'] = array(
             'source' => 'non-db',
             'inline_edit' => false,
         ),
+        'email_attachments' => array(
+            'name' => 'email_attachments',
+            'type' => 'attachment',
+            'source' => 'non-db',
+            'vname' => 'LBL_ATTACHMENTS',
+            'metadata' => [
+                'breakpoint' => 2,
+                'maxPerRow' => 2,
+                'popoverMaxTextLength' => '200px',
+                'popoverMinWidth' => '315px',
+                'compact' => true,
+                'maxTextWidth' => '75px',
+                'minWidth' => '185px',
+                'labelDisplay' => 'none',
+                'popoverLinkPosition' => 'side',
+                'storage_type' => 'private-documents',
+                'upload_maxsize' => 10000000,
+            ],
+            'inline_edit' => false,
+        ),
         'description_html' => array(
             'name' => 'description_html',
             'type' => 'emailbody',
@@ -129,9 +149,6 @@ $dictionary['Email'] = array(
             'vname' => 'description',
             'source' => 'non-db',
             'inline_edit' => false,
-            'rows' => 6,
-            'cols' => 80,
-
         ),
         'date_sent_received' => array(
             'name' => 'date_sent_received',
@@ -158,7 +175,15 @@ $dictionary['Email'] = array(
             'len' => '255',
             'comment' => 'The subject of the email',
             'inline_edit' => false,
-
+            'linkActions' => [
+                [
+                    'key' => 'open-draft-compose',
+                    'asyncProcess' => true,
+                    'activeOnFields' => [
+                        'status' => ['draft'],
+                    ],
+                ],
+            ],
         ),
         'type' => array(
             'name' => 'type',
@@ -257,29 +282,44 @@ $dictionary['Email'] = array(
         ),
 
         'parent_name' => array(
-            'name'=> 'parent_name',
-            'parent_type'=>'record_type_display' ,
-            'type_name'=>'parent_type',
-            'id_name'=>'parent_id',
-            'vname'=>'LBL_EMAIL_RELATE',
-            'type'=>'parent',
-            'source'=>'non-db',
-            'options'=> 'record_type_display',
+            'name' => 'parent_name',
+            'parent_type' => 'record_type_display',
+            'type_name' => 'parent_type',
+            'id_name' => 'parent_id',
+            'vname' => 'LBL_EMAIL_RELATE',
+            'group' => 'parent_name',
+            'type' => 'parent',
+            'source' => 'non-db',
+            'options' => 'record_type_display',
             'inline_edit' => false,
         ),
         'parent_type' => array(
             'name' => 'parent_type',
             'vname' => 'LBL_PARENT_TYPE',
-            'type' => 'varchar',
+            'type' => 'parent_type',
+            'dbType' => 'varchar',
+            'group' => 'parent_name',
+            'options' => 'parent_type_display',
             'reportable' => false,
             'len' => 100,
             'comment' => 'Identifier of Sugar module to which this email is associated (deprecated as of 4.2)',
             'inline_edit' => false,
 
         ),
+        'addrs_metadata' => array(
+            'name' => 'addrs_metadata',
+            'type' => 'text',
+        ),
+        'to_icon_type' => [
+            'name' => 'to_icon_type',
+            'type' => 'varchar',
+            'source' => 'non-db',
+            'inline_edit' => false,
+        ],
         'parent_id' => array(
             'name' => 'parent_id',
             'vname' => 'LBL_PARENT_ID',
+            'group' => 'parent_name',
             'type' => 'id',
             'len' => '36',
             'reportable' => false,
@@ -302,7 +342,7 @@ $dictionary['Email'] = array(
                 'name' => 'displayIndicatorField',
                 'returns' => 'html',
                 'include' => 'modules/Emails/include/displayIndicatorField.php',
-                'onListView' =>  true
+                'onListView' => true
             ),
         ),
 
@@ -320,25 +360,7 @@ $dictionary['Email'] = array(
                 'name' => 'displaySubjectField',
                 'returns' => 'html',
                 'include' => 'modules/Emails/include/displaySubjectField.php',
-                'onListView' =>  true
-            ),
-        ),
-
-        'attachment' => array(
-            'name' => 'attachment',
-            'vname' => 'LBL_ATTACHMENTS',
-            'type' => 'function',
-            'source' => 'non-db',
-            'massupdate' => 0,
-            'importable' => 'false',
-            'duplicate_merge' => 'disabled',
-            'studio' => 'visible',
-            'inline_edit' => false,
-            'function' => array(
-                'name' => 'displayAttachmentField',
-                'returns' => 'html',
-                'include' => 'modules/Emails/include/displayAttachmentField.php',
-                'onListView' =>  true
+                'onListView' => true
             ),
         ),
 
@@ -417,7 +439,7 @@ $dictionary['Email'] = array(
                 'name' => 'displayHasAttachmentField',
                 'returns' => 'html',
                 'include' => 'modules/Emails/include/displayHasAttachmentField.php',
-                'onListView' =>  true
+                'onListView' => true
             ),
         ),
 
@@ -617,9 +639,70 @@ $dictionary['Email'] = array(
                 'name' => 'displayEmailAddressOptInField',
                 'returns' => 'html',
                 'include' => 'modules/Emails/include/displayEmailAddressOptInField.php',
-                'onListView' =>  true
+                'onListView' => true
             ),
         ),
+        'outbound_email_id' => [
+            'name' => 'outbound_email_id',
+            'vname' => 'LBL_OUTBOUND_EMAIL_ACOUNT_ID',
+            'type' => 'id',
+            'isnull' => true,
+            'required' => false,
+        ],
+        'outbound_email_name' => [
+            'name' => 'outbound_email_name',
+            'rname' => 'from_addr',
+            'id_name' => 'outbound_email_id',
+            'db_concat_fields' => [0 => 'smtp_from_name', 1 => 'smtp_from_addr'],
+            'vname' => 'LBL_FROM',
+            'join_name' => 'outbound_email',
+            'type' => 'relate',
+            'showFilter' => false,
+            'filter' => [
+                'preset' => [
+                    'type' => 'outbound-email',
+                    'params' => [
+                        'module' => 'OutboundEmailAccounts'
+                    ]
+                ]
+            ],
+            'initDefaultProcess' => 'outbound-email-default',
+            'defaultValueModes' => [
+                'create',
+            ],
+            'filterOnEmpty' => true,
+            'link' => 'outbound_email',
+            'table' => 'outbound_email',
+            'isnull' => 'true',
+            'module' => 'OutboundEmailAccounts',
+            'dbType' => 'varchar',
+            'len' => '255',
+            'source' => 'non-db',
+            'reportable' => false,
+            'required' => true,
+            'massupdate' => false,
+            'inline_edit' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false,
+        ],
+        'outbound_email' => [
+            'name' => 'outbound_email',
+            'type' => 'link',
+            'relationship' => 'email_outbound_email_accounts',
+            'link_type' => 'one',
+            'source' => 'non-db',
+            'vname' => 'LBL_OUTBOUND_EMAIL_ACCOUNT',
+            'duplicate_merge' => 'disabled',
+            'reportable' => false,
+            'massupdate' => false,
+            'inline_edit' => false,
+            'importable' => false,
+            'exportable' => false,
+            'unified_search' => false,
+        ],
+
+
     ), /* end fields() array */
     'relationships' => array(
         'emails_assigned_user' => array(
@@ -729,6 +812,15 @@ $dictionary['Email'] = array(
             'relationship_role_column' => 'bean_module',
             'relationship_role_column_value' => 'Meetings',
         ),
+        'email_outbound_email_accounts' => [
+            'lhs_module' => 'OutboundEmailAccounts',
+            'lhs_table' => 'outbound_email',
+            'lhs_key' => 'id',
+            'rhs_module' => 'Emails',
+            'rhs_table' => 'emails',
+            'rhs_key' => 'outbound_email_id',
+            'relationship_type' => 'one-to-many'
+        ],
     ), // end relationships
     'indices' => array(
         array(
@@ -765,6 +857,6 @@ $dictionary['Email'] = array(
 );
 
 VardefManager::createVardef('Emails', 'Email', array('default',
-        'basic',
-        'assignable','security_groups',
+    'basic',
+    'assignable', 'security_groups',
 ));

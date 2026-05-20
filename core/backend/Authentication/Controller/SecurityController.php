@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,17 +28,30 @@
 
 namespace App\Authentication\Controller;
 
+use App\Authentication\LegacyHandler\UserHandler;
+use App\Data\LegacyHandler\PreparedStatementHandler;
+use App\Engine\LegacyHandler\CacheManagerHandler;
+use Doctrine\DBAL\Exception;
+use Doctrine\ORM\EntityManagerInterface;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
 use App\Authentication\LegacyHandler\Authentication;
 use App\Module\Users\Entity\User;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\SvgWriter;
 use RuntimeException;
+use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Totp\TotpAuthenticatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 /**
@@ -58,14 +71,35 @@ class SecurityController extends AbstractController
     private $requestStack;
 
     /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+    private PreparedStatementHandler $preparedStatementHandler;
+
+
+    private UserHandler $userHandler;
+
+    private CacheManagerHandler $cacheManagerHandler;
+    /**
      * SecurityController constructor.
      * @param Authentication $authentication
      * @param RequestStack $requestStack
      */
-    public function __construct(Authentication $authentication, RequestStack $requestStack)
+    public function __construct(
+        Authentication           $authentication,
+        RequestStack             $requestStack,
+        EntityManagerInterface   $entityManager,
+        PreparedStatementHandler $preparedStatementHandler,
+        UserHandler $userHandler,
+        CacheManagerHandler $cacheManagerHandler
+    )
     {
         $this->authentication = $authentication;
         $this->requestStack = $requestStack;
+        $this->entityManager = $entityManager;
+        $this->preparedStatementHandler = $preparedStatementHandler;
+        $this->userHandler = $userHandler;
+        $this->cacheManagerHandler = $cacheManagerHandler;
     }
 
     #[Route('/login', name: 'app_login', methods: ["GET", "POST"])]
@@ -103,6 +137,84 @@ class SecurityController extends AbstractController
         $data['user'] = $user->getUserIdentifier();
 
         return $this->json($data, Response::HTTP_OK);
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    #[Route('/2fa/enable', name: 'app_2fa_enable', methods: ["GET", "POST"])]
+    #[isGranted('IS_AUTHENTICATED_FULLY')]
+    public function enable2fa(#[CurrentUser] ?User $user, TotpAuthenticatorInterface $totpAuthenticator): Response
+    {
+        $secret = $totpAuthenticator->generateSecret();
+
+        $user->setTotpSecret($secret);
+
+        $qrCodeUrl = $totpAuthenticator->getQRContent($user);
+
+        $this->preparedStatementHandler->update(
+            'UPDATE users SET totp_secret = :totp_secret WHERE id = :id',
+            ['totp_secret' => $secret, 'id' => $user->getId()],
+            [['param' => 'totp_secret', 'type' => 'string'], ['param' => 'id', 'type' => 'string']]
+        );
+
+        $this->entityManager->flush();
+
+        $response = [
+            'url' => $qrCodeUrl,
+            'svg' => $this->displayQRCode($qrCodeUrl),
+            'secret' => $secret,
+        ];
+
+        return new Response(json_encode($response), Response::HTTP_OK);
+    }
+
+    #[Route('/2fa/disable', name: 'app_2fa_disable', methods: ["GET"])]
+    public function disable2fa(#[CurrentUser] ?User $user, TotpAuthenticatorInterface $totpAuthenticator): Response
+    {
+        $id = $user->getId();
+
+        $this->userHandler->setUserPreference('is_two_factor_enabled', false);
+        $user->setTotpSecret(null);
+        $user->setBackupCodes(null);
+
+        $this->preparedStatementHandler->update(
+            'UPDATE users SET totp_secret = NULL, is_totp_enabled = 0, backup_codes = NULL WHERE id = :id',
+            ['id' => $id],
+            [['param' => 'id', 'type' => 'string']]
+        );
+
+        $this->cacheManagerHandler->markAsNeedsUpdate('app-metadata-user-preferences-' . $user->getId());
+
+        $response = [
+            'two_factor_disabled' => true
+        ];
+
+        return new Response(json_encode($response), Response::HTTP_OK);
+    }
+
+    #[Route('/2fa/enable-finalize', name: 'app_2fa_enable_finalize', methods: ["GET", "POST"])]
+    public function enableFinalize2fa(#[CurrentUser] ?User $user, Security $security, Request $request, TotpAuthenticatorInterface $totpAuthenticator): Response
+    {
+        $auth_code = $request->getPayload()->get('auth_code') ?? '';
+
+        $correctCode = $totpAuthenticator->checkCode($user, $auth_code);
+
+        if ($correctCode) {
+            $this->userHandler->setUserPreference('is_two_factor_enabled', true);
+            $this->preparedStatementHandler->update(
+                'UPDATE users SET is_totp_enabled = true WHERE id = :id',
+                ['id' => $user->getId()],
+                [['param' => 'id', 'type' => 'string']]
+            );
+        }
+
+        $this->cacheManagerHandler->markAsNeedsUpdate('app-metadata-user-preferences-' . $user->getId());
+
+        $response = ['two_factor_setup_complete' => $correctCode];
+
+        return new Response(json_encode($response), Response::HTTP_OK);
     }
 
     #[Route('/logout', name: 'app_logout', methods: ["GET", "POST"])]
@@ -159,6 +271,14 @@ class SecurityController extends AbstractController
             return $response;
         }
 
+        $isLoginWizardCompleteStatus = $this->authentication->getLoginWizardCompletedStatus();
+
+        if ($isLoginWizardCompleteStatus) {
+            $appStatus['loginWizardCompleted'] = true;
+        } else {
+            $appStatus['loginWizardCompleted'] = false;
+        }
+
         $data = $this->getResponseData($user, $appStatus);
 
         if (!isset($data['redirect'])){
@@ -189,6 +309,12 @@ class SecurityController extends AbstractController
         return $this->sessionStatus($security);
     }
 
+    #[Route('/auth/2fa_check', name: 'native_auth_2fa_check', methods: ["GET", "POST"])]
+    public function nativeCheckTwoFactorCode(Request $request): Response
+    {
+        return $this->redirectToRoute('app_2fa_check', $request->query->all());
+    }
+
     /**
      * @param UserInterface $user
      * @param array $appStatus
@@ -201,6 +327,18 @@ class SecurityController extends AbstractController
         $lastName = $user->getLastName();
         $userName = $user->getUsername();
 
+        if ($user->isTotpAuthenticationEnabled()) {
+            return [
+                'appStatus' => $appStatus,
+                'active' => true,
+                'id' => $id,
+                'firstName' => $firstName,
+                'lastName' => $lastName,
+                'userName' => $userName,
+                'two_factor_complete' => 'false'
+            ];
+        }
+
         return [
             'appStatus' => $appStatus,
             'active' => true,
@@ -209,5 +347,22 @@ class SecurityController extends AbstractController
             'lastName' => $lastName,
             'userName' => $userName
         ];
+    }
+
+    private function displayQrCode(string $qrCodeContent): string
+    {
+        // ErrorCorrectionLevelHigh
+        $result = Builder::create()
+            ->writer(new SvgWriter())
+            ->writerOptions(['exclude_xml_declaration' => true])
+            ->data($qrCodeContent)
+            ->encoding(new Encoding('UTF-8'))
+            ->errorCorrectionLevel(ErrorCorrectionLevel::High)
+            ->size(200)
+            ->margin(0)
+            ->roundBlockSizeMode(RoundBlockSizeMode::Margin)
+            ->build();
+
+        return $result->getString();
     }
 }

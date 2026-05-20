@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,22 +24,138 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-.field-layout .label-container,
-.field-layout .label-container label {
-  color: $midnight-blue;
+
+.field-layout.edit,
+.field-layout.create {
+
+  .form-row > .col, .form-row > [class*=col-] {
+    padding-bottom: 0.65rem !important;
+  }
+
+  .field-separation {
+    display: none;
+  }
+
+  .field-layout-field-group-wrapper {
+    margin-bottom: 5px;
+  }
+}
+
+.field-layout-field-group-wrapper {
+  min-height: 2em;
+}
+.create.field-layout .field-separation {
+  border-top: 1px solid #ddd;
+  margin-top: 0.25rem !important;
+  padding-top: 5px !important;
+}
+.field-layout .field-separation {
+  border-top: 1px solid #ddd;
+  margin-top: 0px !important;
+  padding-top: 5px !important;
+}
+
+.field-group-label {
+  span.required {
+    color: $amaranth;
+    float: inline-start;
+    position: initial;
+  }
+}
+
+span.required {
+  color: $amaranth;
+  position: absolute;
+  left: 7px;
+}
+
+.tabs-layout .nav-tabs .tab-link {
+  background-color: #d7dde1;
+  color: #333;
+  font-size: .8rem;
+  border: none;
+  padding: .35rem 1rem;
+}
+
+.tab-content {
+  box-shadow: 0 .125rem .25rem #00000013 !important;
+  border: 1px solid #dee2e6 !important;
+}
+
+.tabs-layout .nav-tabs .tab {
+  display: flex;
+  align-items: end;
+}
+
+.form-row > .col, .form-row > [class*=col-] {
+  /* padding-right: 5px !important; */
+  padding-left: 5px;
+  padding-bottom: 5px !important;
+}
+
+.field-layout {
+  > .form-row > .form-group > .form-group.row {
+    margin-bottom: 0;
+
+    .email_addresses {
+      padding-top: .5rem;
+    }
+  }
+
+  .full-row {
+    @media (min-width: 992px) {
+      .col-lg-3 {
+        flex: 0 0 12.4861%;
+        max-width: 12.4861%;
+      }
+
+      .col-lg-9 {
+        flex: 0 0 87.39%;
+        max-width: 87.39%;
+      }
+    }
+  }
+
+
+  .col-form-label {
+    padding-top: 0;
+    padding-bottom: 0;
+    word-break: break-word;
+
+    .col-form-label-sm {
+      padding-top: 0;
+      padding-bottom: 0;
+      font-size: .76rem;
+    }
+  }
 }
 
 .field-layout .field-column-bordered {
-  border-right: $nepal-grey solid 0.0625rem;
+  //border-right: $nepal-grey solid 0.0625rem;
+  /*
+  .form-group::after {
+    content: " ";
+    position: absolute;
+    right: 0;
+    top: 25%;
+    transform: translate(50%, 50%);
+    width: 3px;
+    height: 3px;
+    background-color: grey;
+    border-radius: 50%;
+    margin-bottom: auto;
+  }*/
 }
 
 .field-separation {
+  /*
   height: 0.1em;
   color: darkgrey;
   background-image: linear-gradient(to right, grey 10%, rgba(255, 255, 255, 0) 0%);
   background-position: top;
   background-size: 0.5em 0.1em;
   background-repeat: repeat-x;
+  */
 }
 
 .field-layout.detail textarea.form-control:disabled,

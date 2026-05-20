@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -27,7 +27,9 @@
 import {Injectable} from '@angular/core';
 import {Params, Router} from '@angular/router';
 import {ModuleNameMapper,} from '../../../../services/navigation/module-name-mapper/module-name-mapper.service';
-import {AttributeMap, isVoid, ViewMode} from 'common';
+import {ViewMode} from '../../../../common/views/view.model';
+import {AttributeMap} from '../../../../common/record/record.model';
+import {isVoid} from '../../../../common/utils/value-utils';
 import get from 'lodash-es/get';
 import {SubpanelActionData, SubpanelActionHandler} from '../subpanel.action';
 
@@ -56,16 +58,25 @@ export class SubpanelCreateAction extends SubpanelActionHandler {
 
         const route = `/${moduleName}/${moduleAction}`;
 
+        let returnModule = parentModule;
+        let returnId = parentId;
+
+        if ((data.action?.params?.redirect ?? true) === false) {
+            returnModule = moduleName;
+            returnId = '';
+        }
+
         const queryParams = {
             // eslint-disable-next-line camelcase,@typescript-eslint/camelcase
-            return_module: this.moduleNameMapper.toLegacy(parentModule),
+            return_module: this.moduleNameMapper.toLegacy(returnModule),
             // eslint-disable-next-line camelcase,@typescript-eslint/camelcase
             return_action: 'DetailView',
             // eslint-disable-next-line camelcase,@typescript-eslint/camelcase
-            return_id: parentId,
+            return_id: returnId,
             relate_to: parentModule,
             relate_id: parentId,
         } as Params;
+
         this.addAdditionalFields(data, queryParams);
         this.addParams(data, queryParams);
 

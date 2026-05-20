@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,7 +25,8 @@
  */
 
 import {Injectable} from '@angular/core';
-import {ModalButtonInterface, ViewMode} from 'common';
+import {ModalButtonInterface} from '../../../../common/components/modal/modal.model';
+import {ViewMode} from '../../../../common/views/view.model';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Router} from '@angular/router';
 import {ModuleNameMapper} from '../../../../services/navigation/module-name-mapper/module-name-mapper.service';
@@ -69,10 +70,15 @@ export class CancelCreateAction extends RecordActionHandler {
 
         let returnAction = store.params.return_action || '';
         let returnId = store.params.return_id || '';
-        let returnModule = store.getModuleName();
+        let returnModule = store.params.returnModule ?? store.getModuleName();
 
         if (store.params.return_module) {
             returnModule = this.moduleNameMapper.toFrontend(store.params.return_module);
+        }
+
+        if (store.params.parent_id) {
+            returnModule = this.moduleNameMapper.toFrontend(store.params.parent_type);
+            returnId = store.params.parent_id;
         }
 
         if (store.params.isConvert) {

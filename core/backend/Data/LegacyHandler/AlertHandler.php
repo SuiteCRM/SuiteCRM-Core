@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,6 +28,8 @@
 namespace App\Data\LegacyHandler;
 
 use App\Data\Service\AlertProviderInterface;
+use App\Data\Service\Record\EntityRecordMappers\EntityRecordMapperRunner;
+use App\Data\Service\Record\RecordSaveHandlers\RecordSaveHandlerRunnerInterface;
 use App\Data\Service\RecordDeletionServiceInterface;
 use App\Engine\LegacyHandler\LegacyScopeState;
 use App\Engine\Service\AclManagerInterface;
@@ -60,6 +62,8 @@ class AlertHandler extends RecordHandler implements AlertProviderInterface
      * @param AclManagerInterface $aclHandler
      * @param FavoriteProviderInterface $favorites
      * @param RecordDeletionServiceInterface $recordDeletionProvider
+     * @param EntityRecordMapperRunner $entityRecordMapperRunner
+     * @param RecordSaveHandlerRunnerInterface $saveHandlerRunner
      */
     public function __construct(
         string $projectDir,
@@ -71,7 +75,9 @@ class AlertHandler extends RecordHandler implements AlertProviderInterface
         RequestStack $session,
         AclManagerInterface $aclHandler,
         FavoriteProviderInterface $favorites,
-        RecordDeletionServiceInterface $recordDeletionProvider
+        RecordDeletionServiceInterface $recordDeletionProvider,
+        EntityRecordMapperRunner $entityRecordMapperRunner,
+        RecordSaveHandlerRunnerInterface $saveHandlerRunner
     ) {
         parent::__construct(
             $projectDir,
@@ -82,7 +88,9 @@ class AlertHandler extends RecordHandler implements AlertProviderInterface
             $moduleNameMapper,
             $session,
             $aclHandler,
-            $favorites
+            $favorites,
+            $entityRecordMapperRunner,
+            $saveHandlerRunner
         );
         $this->recordDeletionProvider = $recordDeletionProvider;
     }
@@ -158,7 +166,7 @@ class AlertHandler extends RecordHandler implements AlertProviderInterface
         /** @var \Reminder $bean */
         $reminder = BeanFactory::getBean('Reminders', $reminderId, ['encode' => false]);
 
-        if (empty($reminder)){
+        if (empty($reminder)) {
             return;
         }
         $reminder->popup_viewed = 1;

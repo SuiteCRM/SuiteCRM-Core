@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,17 +25,16 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import {isTrue} from '../../../../common/utils/value-utils';
+import {ButtonInterface} from '../../../../common/components/button/button.model';
+import {ButtonGroupInterface} from '../../../../common/components/button/button-group.model';
 import {
-    ButtonGroupInterface,
-    ButtonInterface,
     DropdownButtonInterface,
     DropdownButtonSection,
     DropdownButtonSectionMap,
-    GroupedButtonInterface,
-    isTrue,
-    SearchCriteria,
-    SearchCriteriaFilter
-} from 'common';
+    GroupedButtonInterface
+} from '../../../../common/components/button/dropdown-button.model';
+import {SearchCriteria, SearchCriteriaFilter} from '../../../../common/views/list/search-criteria.model';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {BehaviorSubject, combineLatestWith, Subscription} from 'rxjs';
 import {ListViewStore} from '../../store/list-view/list-view.store';

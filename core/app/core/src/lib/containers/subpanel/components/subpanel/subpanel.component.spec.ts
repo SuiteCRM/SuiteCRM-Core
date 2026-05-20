@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,7 +25,7 @@
  */
 
 import {CommonModule} from '@angular/common';
-import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {Component} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {RouterModule} from '@angular/router';
@@ -42,6 +42,7 @@ import {PanelModule} from '../../../../components/panel/panel.module';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {metadataStoreMock} from '../../../../store/metadata/metadata.store.spec.mock';
 import {ImageModule} from '../../../../components/image/image.module';
+import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 const store = recordviewStoreMock.getSubpanels().contacts;
 
@@ -59,24 +60,23 @@ describe('SubpanelComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                CommonModule,
-                NgbModule,
-                ImageModule,
-                PanelModule,
-                RouterModule,
-                ButtonGroupModule,
-                ApolloTestingModule,
-                HttpClientTestingModule,
-                RouterTestingModule
-            ],
-            declarations: [SubpanelComponent, SubpanelComponentTestHostComponent],
-            providers: [
-                {provide: LanguageStore, useValue: languageStoreMock},
-                {provide: RecordViewStore, useValue: recordviewStoreMock},
-                {provide: MetadataStore, useValue: metadataStoreMock},
-            ],
-        })
+    declarations: [SubpanelComponent, SubpanelComponentTestHostComponent],
+    imports: [CommonModule,
+        NgbModule,
+        ImageModule,
+        PanelModule,
+        RouterModule,
+        ButtonGroupModule,
+        ApolloTestingModule,
+        RouterTestingModule],
+    providers: [
+        { provide: LanguageStore, useValue: languageStoreMock },
+        { provide: RecordViewStore, useValue: recordviewStoreMock },
+        { provide: MetadataStore, useValue: metadataStoreMock },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+})
             .compileComponents();
     });
 

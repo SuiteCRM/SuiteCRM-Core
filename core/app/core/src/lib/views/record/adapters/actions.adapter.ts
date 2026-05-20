@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,62 +24,42 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import { combineLatestWith, Observable } from 'rxjs';
+import {combineLatestWith, Observable} from 'rxjs';
+import {map, take} from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {Action, ActionContext, ActionHandler, ModeActions} from '../../../common/actions/action.model';
+import {LogicDefinitions} from '../../../common/metadata/metadata.model';
+import {Record} from '../../../common/record/record.model';
+import {ViewMode} from '../../../common/views/view.model';
 import {
-    map,
-    take,
-} from 'rxjs/operators';
-import { Injectable } from '@angular/core';
-import {
-    Action,
-    ActionContext,
-    ActionHandler,
-    LogicDefinitions,
-    ModeActions,
-    Record,
-    ViewMode,
-    Panel
-} from 'common';
-import { MetadataStore, RecordViewMetadata } from '../../../store/metadata/metadata.store.service';
-import { RecordViewStore } from '../store/record-view/record-view.store';
-import { RecordActionManager } from '../actions/record-action-manager.service';
-import {
-    AsyncActionInput,
-    AsyncActionService,
-} from '../../../services/process/processes/async-action/async-action';
-import { RecordActionData } from '../actions/record.action';
-import { LanguageStore, LanguageStrings } from '../../../store/language/language.store';
-import { MessageService } from '../../../services/message/message.service';
-import { Process } from '../../../services/process/process.service';
-import { ConfirmationModalService } from '../../../services/modals/confirmation-modal.service';
-import { BaseRecordActionsAdapter } from '../../../services/actions/base-record-action.adapter';
-import { SelectModalService } from '../../../services/modals/select-modal.service';
-import { RecordActionDisplayTypeLogic } from '../action-logic/display-type/display-type.logic';
+    MetadataStore,
+    RecordViewMetadata,
+    RecordViewSectionMetadata
+} from '../../../store/metadata/metadata.store.service';
+import {RecordViewStore} from '../store/record-view/record-view.store';
+import {RecordActionManager} from '../actions/record-action-manager.service';
+import {AsyncActionInput, AsyncActionService,} from '../../../services/process/processes/async-action/async-action';
+import {RecordActionData} from '../actions/record.action';
+import {LanguageStore, LanguageStrings} from '../../../store/language/language.store';
+import {MessageService} from '../../../services/message/message.service';
+import {Process} from '../../../services/process/process.service';
+import {ConfirmationModalService} from '../../../services/modals/confirmation-modal.service';
+import {BaseRecordActionsAdapter} from '../../../services/actions/base-record-action.adapter';
+import {SelectModalService} from '../../../services/modals/select-modal.service';
+import {RecordActionDisplayTypeLogic} from '../action-logic/display-type/display-type.logic';
 import {AppMetadataStore} from "../../../store/app-metadata/app-metadata.store.service";
+import {FieldModalService} from "../../../services/modals/field-modal.service";
+import {RecordMapperRegistry} from "../../../common/record/record-mappers/record-mapper.registry";
+import {FieldLogicManager} from "../../../fields/field-logic/field-logic.manager";
+import {RecordManager} from "../../../services/record/record.manager";
 
 @Injectable()
 export class RecordActionsAdapter extends BaseRecordActionsAdapter<RecordActionData> {
 
     defaultActions: ModeActions = {
         detail: [
-            {
-                key: 'toggle-widgets',
-                labelKey: 'LBL_INSIGHTS',
-                params: {
-                    expanded: true
-                },
-                acl: []
-            },
         ],
         edit: [
-            {
-                key: 'toggle-widgets',
-                labelKey: 'LBL_INSIGHTS',
-                params: {
-                    expanded: true
-                },
-                acl: []
-            }
         ],
     };
 
@@ -92,8 +72,12 @@ export class RecordActionsAdapter extends BaseRecordActionsAdapter<RecordActionD
         protected message: MessageService,
         protected confirmation: ConfirmationModalService,
         protected selectModalService: SelectModalService,
+        protected fieldModalService: FieldModalService,
         protected displayTypeLogic: RecordActionDisplayTypeLogic,
-        protected appMetadataStore: AppMetadataStore
+        protected appMetadataStore: AppMetadataStore,
+        protected recordMappers: RecordMapperRegistry,
+        protected logic: FieldLogicManager,
+        protected recordManager: RecordManager
     ) {
         super(
             actionManager,
@@ -102,15 +86,19 @@ export class RecordActionsAdapter extends BaseRecordActionsAdapter<RecordActionD
             confirmation,
             language,
             selectModalService,
+            fieldModalService,
             metadata,
-            appMetadataStore
+            appMetadataStore,
+            recordMappers,
+            logic,
+            recordManager
         );
     }
 
     getActions(context?: ActionContext): Observable<Action[]> {
         return this.metadata.recordViewMetadata$.pipe(
-            combineLatestWith(this.store.mode$, this.store.record$, this.store.language$, this.store.widgets$, this.store.panels$),
-            map(([meta, mode]: [RecordViewMetadata, ViewMode, Record, LanguageStrings, boolean, Panel[]]) => {
+            combineLatestWith(this.store.mode$, this.store.record$, this.store.language$, this.store.widgets$, this.store.sectionMetadata$),
+            map(([meta, mode]: [RecordViewMetadata, ViewMode, Record, LanguageStrings, boolean, RecordViewSectionMetadata]) => {
                 if (!mode || !meta) {
                     return [];
                 }
@@ -159,6 +147,7 @@ export class RecordActionsAdapter extends BaseRecordActionsAdapter<RecordActionD
 
     protected reload(action: Action, process: Process, context?: ActionContext): void {
         this.store.load(false).pipe(take(1)).subscribe();
+        this.store.reloadSubpanels();
     }
 
     protected shouldDisplay(actionHandler: ActionHandler<RecordActionData>, data: RecordActionData): boolean {

@@ -47,6 +47,7 @@ include("metadata/accounts_casesMetaData.php");
 include("metadata/accounts_contactsMetaData.php");
 include("metadata/accounts_opportunitiesMetaData.php");
 include("metadata/calls_contactsMetaData.php");
+include("metadata/calendar_accounts_meetingsMetaData.php");
 include("metadata/calls_usersMetaData.php");
 include("metadata/calls_leadsMetaData.php");
 include("metadata/cases_bugsMetaData.php");
@@ -130,8 +131,10 @@ include('metadata/securitygroups_defaultsMetaData.php');
 include('metadata/securitygroups_recordsMetaData.php');
 include('metadata/securitygroups_usersMetaData.php');
 include("metadata/cache_rebuildMetaData.php");
+include("metadata/attachments_referencesMetaData.php");
 
 include 'metadata/surveyquestionoptions_surveyquestionresponsesMetaData.php';
+include 'metadata/messenger_messagesMetaData.php';
 
 if (file_exists('custom/application/Ext/TableDictionary/tabledictionary.ext.php')) {
     include('custom/application/Ext/TableDictionary/tabledictionary.ext.php');

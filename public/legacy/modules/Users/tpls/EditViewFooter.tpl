@@ -246,72 +246,71 @@
                     <div class="bottom-dotted-border"></div>
                 </div>
             </div>
-        <!--First row ends here-->
-        <!--Second row-->
-        <div class="row-container">
-            <div class="left-col d-flex flex-column">
-                <div class="row-label"><slot>{$MOD.LBL_EXPORT_CHARSET}:</slot>&nbsp;{sugar_help text=$MOD.LBL_EXPORT_CHARSET_DESC }</div>
-                <div class="row-bottom flex-grow-1"><slot><select tabindex='12' name="default_export_charset">{$EXPORT_CHARSET}</select></slot></div>
-                <div class="bottom-dotted-border"></div>
+            <div class="row-container">
+                <div class="left-col d-flex flex-column">
+                    <div class="row-label"><slot>{$MOD.LBL_EXPORT_CHARSET}:</slot>&nbsp;{sugar_help text=$MOD.LBL_EXPORT_CHARSET_DESC }</div>
+                    <div class="row-bottom flex-grow-1"><slot><select tabindex='12' name="default_export_charset">{$EXPORT_CHARSET}</select></slot></div>
+                    <div class="bottom-dotted-border"></div>
+                </div>
+                <div class="right-col d-flex flex-column">
+                    <div class="row-label"><slot>{$MOD.LBL_REMINDER}:</slot>&nbsp;{sugar_help text=$MOD.LBL_REMINDER_TEXT }</div>
+                    <div class="row-bottom"><slot>{include file="modules/Reminders/tpls/remindersDefaults.tpl"}</slot></div>
+                    <div class="bottom-dotted-border"></div>
+                </div>
             </div>
-            <div class="right-col d-flex flex-column">
-                <div class="row-label"><slot>{$MOD.LBL_REMINDER}:</slot>&nbsp;{sugar_help text=$MOD.LBL_REMINDER_TEXT }</div>
-                <div class="row-bottom"><slot>{include file="modules/Reminders/tpls/remindersDefaults.tpl"}</slot></div>
-                <div class="bottom-dotted-border"></div>
-
+            <div class="row-container" >
+                <div class="left-col d-flex flex-column">
+                    <div class="row-label"><slot>{$MOD.LBL_DESKTOP_NOTIFICATIONS}:</slot></div>
+                    <div class="row-bottom flex-grow-1">
+                        <slot>
+                            <button type="button" class="btn btn-primary btn-sm" onClick="Alerts.prototype.enable()">
+                            {$MOD.LBL_ENABLE_NOTIFICATIONS}
+                            </button>
+                        </slot>
+                    </div>
+                    <div class="bottom-dotted-border"></div>
+                </div>
+                <div class="right-col d-flex flex-column" >
+                    <div class="row-label"><slot>{$MOD.LBL_SNOOZE_TIMER}:</slot></div>
+                    <div class="row-bottom flex-grow-1"><select tabindex='12' name="snooze_alert_timer">{$SNOOZE_ALERT_TIMER}</select></div>
+                    <div class="bottom-dotted-border"></div>
+                </div>
             </div>
-        </div>
-        <div class="row-container" >
-            <div class="left-col d-flex flex-column">
-                <div class="row-label"><slot>{$MOD.LBL_DESKTOP_NOTIFICATIONS}:</slot></div>
-                 <div class="row-bottom flex-grow-1">
-                    <slot>
-                        <button type="button" class="btn btn-primary btn-sm" onClick="Alerts.prototype.enable()">
-                        {$MOD.LBL_ENABLE_NOTIFICATIONS}
-                        </button>
+            <div class="row-container">
+                <div class="left-col d-flex flex-column">
+                    <div class="row-label"><slot>{$MOD.LBL_USE_REAL_NAMES}:</slot>&nbsp;{sugar_help text=$MOD.LBL_USE_REAL_NAMES_DESC }</div>
+                    <div class="row-bottom flex-grow-1"><slot style="line-height: 2.3">
+                        <input type="hidden" name="use_real_names" value="false">
+                        <input style="margin-top: -1em;" tabindex='12' type="checkbox" name="use_real_names" {$USE_REAL_NAMES}>
+                    </slot></div>
+                    <div class="bottom-dotted-border"></div>
+                </div>
+                <div class="right-col d-flex flex-column">
+                    <div class="row-label"><slot>{$MOD.LBL_MAILMERGE}:</slot>&nbsp;{sugar_help text=$MOD.LBL_MAILMERGE_TEXT }</div>
+                    <div class="row-bottom flex-grow-1">
+                    <slot style="line-height: 1">
+                        <input type="hidden" name="mailmerge_on" value="false">
+                        <input style="margin-top: -1em;" tabindex='12' name="mailmerge_on" class="checkbox" type="checkbox" {$MAILMERGE_ON}>
                     </slot>
+                    </div>
+                    <div class="bottom-dotted-border"></div>
                 </div>
-                <div class="bottom-dotted-border"></div>
             </div>
-            <div class="right-col d-flex flex-column" >
-                <div class="row-label"><slot>{$MOD.LBL_SNOOZE_TIMER}:</slot></div>
-                <div class="row-bottom flex-grow-1"><select tabindex='12' name="snooze_alert_timer">{$SNOOZE_ALERT_TIMER}</select></div>
-                <div class="bottom-dotted-border"></div>
-            </div>
-        </div>
-        <!--Second row ends here-->
-
-        <div class="row-container">
-            <div class="left-col d-flex flex-column">
-                <div class="row-label"><slot>{$MOD.LBL_USE_REAL_NAMES}:</slot>&nbsp;{sugar_help text=$MOD.LBL_USE_REAL_NAMES_DESC }</div>
-                <div class="row-bottom flex-grow-1"><slot style="line-height: 2.3"><input style="margin-top: -1em;" tabindex='12' type="checkbox" name="use_real_names" {$USE_REAL_NAMES}></slot></div>
-                <div class="bottom-dotted-border"></div>
-            </div>
-            <div class="right-col d-flex flex-column">
-                <div class="row-label"><slot>{$MOD.LBL_MAILMERGE}:</slot>&nbsp;{sugar_help text=$MOD.LBL_MAILMERGE_TEXT }</div>
-                <div class="row-bottom flex-grow-1">
-                <slot style="line-height: 1"><input style="margin-top: -1em;" tabindex='12' name='mailmerge_on' class="checkbox" type="checkbox" {$MAILMERGE_ON}>
-                </slot>
-                </div>
-                <div class="bottom-dotted-border"></div>
-            </div>
-        </div>
-        <!--{if !empty($EXTERNAL_AUTH_CLASS) && !empty($IS_ADMIN)}-->
-        <div class="row-container">
-            <div>{capture name=SMARTY_LBL_EXTERNAL_AUTH_ONLY}&nbsp;{$MOD.LBL_EXTERNAL_AUTH_ONLY} {$EXTERNAL_AUTH_CLASS_1}{/capture}</div>
-            <div class="left-col d-flex flex-column">
-                <div class="row-label"><slot>{$EXTERNAL_AUTH_CLASS} {$MOD.LBL_ONLY}:
-                    </slot>&nbsp;{sugar_help text=$smarty.capture.SMARTY_LBL_EXTERNAL_AUTH_ONLY}</div>
-                <div class="row-bottom"> <input type='hidden' value='0' name='external_auth_only'><input type='checkbox' value='1'
+            <!--{if !empty($EXTERNAL_AUTH_CLASS) && !empty($IS_ADMIN)}-->
+            <div class="row-container">
+                <div>{capture name=SMARTY_LBL_EXTERNAL_AUTH_ONLY}&nbsp;{$MOD.LBL_EXTERNAL_AUTH_ONLY} {$EXTERNAL_AUTH_CLASS_1}{/capture}</div>
+                <div class="left-col d-flex flex-column">
+                    <div class="row-label"><slot>{$EXTERNAL_AUTH_CLASS} {$MOD.LBL_ONLY}:
+                        </slot>&nbsp;{sugar_help text=$smarty.capture.SMARTY_LBL_EXTERNAL_AUTH_ONLY}</div>
+                    <div class="row-bottom"> <input type='hidden' value='0' name='external_auth_only'><input type='checkbox' value='1'
                                                                                     name='external_auth_only' {$EXTERNAL_AUTH_ONLY_CHECKED}></div>
-                <div class="bottom-dotted-border"></div>
+                    <div class="bottom-dotted-border"></div>
+                </div>
             </div>
-        </div>
-        <!--{/if}-->
+            <!--{/if}-->
         </div><!--row user-->
     </div>
     <!-- User Settings Ends here -->
-
     <div id="locale" style="display:{$HIDE_FOR_GROUP_AND_PORTAL}">
         <div>
             <h4>
@@ -395,173 +394,141 @@
                         <slot>{$MOD.LBL_PROMPT_TIMEZONE}:</slot>&nbsp;{sugar_help text=$MOD.LBL_PROMPT_TIMEZONE_TEXT }
                     </div>
                     <div class="row-bottom">
-                        <slot><input type="checkbox" tabindex='14' class="checkbox" name="ut" value="0" {$PROMPTTZ}>
+                        <slot><input type="checkbox" tabindex='14' class="checkbox" name="ut" {$PROMPTTZ}>
                     </div>
                     {else}
                     <div>
                         <slot></slot>
                     </div>
+                    {/if}
+                    <div class="bottom-dotted-border"></div>
                 </div>
-                <slot></slot>
+                <div class="right-col">
+                    <div class="row-label">
+                        <slot>{$MOD.LBL_NUMBER_GROUPING_SEP}:
+                        </slot>&nbsp;{sugar_help text=$MOD.LBL_NUMBER_GROUPING_SEP_TEXT }</div>
+                        <div class="row-bottom">
+                            <slot>
+                                <input tabindex='14' name='num_grp_sep' id='default_number_grouping_seperator'
+                                    type='text' maxlength='1' size='1' value='{$NUM_GRP_SEP}'
+                                    onkeydown='setSigDigits();' onkeyup='setSigDigits();'>
+                            </slot>
+                        </div>
+                        <div class="bottom-dotted-border"></div>
+                    </div>
             </div>
-            {/if}
-            <div class="bottom-dotted-border"></div>
-        </div>
-        <div class="right-col">
-            <div class="row-label">
-                <slot>{$MOD.LBL_NUMBER_GROUPING_SEP}:
-                </slot>&nbsp;{sugar_help text=$MOD.LBL_NUMBER_GROUPING_SEP_TEXT }</div>
-            <div class="row-bottom">
-                <slot>
-                    <input tabindex='14' name='num_grp_sep' id='default_number_grouping_seperator'
-                           type='text' maxlength='1' size='1' value='{$NUM_GRP_SEP}'
-                           onkeydown='setSigDigits();' onkeyup='setSigDigits();'>
-                </slot>
+            {capture name=SMARTY_LOCALE_NAME_FORMAT_DESC}&nbsp;{$MOD.LBL_LOCALE_NAME_FORMAT_DESC}{/capture}
+            <div class="row-container">
+                <div class="left-col">
+                    <div class="row-label"> {$MOD.LBL_LOCALE_DEFAULT_NAME_FORMAT}
+                        :&nbsp;{sugar_help text=$smarty.capture.SMARTY_LOCALE_NAME_FORMAT_DESC }</div>
+                    <div class="row-bottom">
+                        <slot><select tabindex='14' id="default_locale_name_format" name="default_locale_name_format"
+                        selected="{$default_locale_name_format}">{$NAMEOPTIONS}</select></slot>
+                    </div>
+                    <div class="bottom-dotted-border"></div>
+                </div>
+                <div class="right-col">
+                    <div class="row-label">
+                        <slot>{$MOD.LBL_DECIMAL_SEP}:</slot>&nbsp;{sugar_help text=$MOD.LBL_DECIMAL_SEP_TEXT }
+                    </div>
+                    <div class="row-bottom">
+                        <slot>
+                            <input tabindex='14' name='dec_sep' id='default_decimal_seperator'
+                            type='text' maxlength='1' size='1' value='{$DEC_SEP}'
+                            onkeydown='setSigDigits();' onkeyup='setSigDigits();'>
+                        </slot>
+                    </div>
+                    <div class="bottom-dotted-border"></div>
+                </div>
             </div>
-            <div class="bottom-dotted-border"></div>
-        </div>
-    </div>
-    {capture name=SMARTY_LOCALE_NAME_FORMAT_DESC}&nbsp;{$MOD.LBL_LOCALE_NAME_FORMAT_DESC}{/capture}
-    <div class="row-container">
-        <div class="left-col">
-            <div class="row-label"> {$MOD.LBL_LOCALE_DEFAULT_NAME_FORMAT}
-                :&nbsp;{sugar_help text=$smarty.capture.SMARTY_LOCALE_NAME_FORMAT_DESC }</div>
-            <div class="row-bottom">
-                <slot><select tabindex='14' id="default_locale_name_format" name="default_locale_name_format"
-                              selected="{$default_locale_name_format}">{$NAMEOPTIONS}</select></slot>
-            </div>
-            <div class="bottom-dotted-border"></div>
-        </div>
-        <div class="right-col">
-            <div class="row-label">
-                <slot>{$MOD.LBL_DECIMAL_SEP}:</slot>&nbsp;{sugar_help text=$MOD.LBL_DECIMAL_SEP_TEXT }
-            </div>
-            <div class="row-bottom">
-                <slot>
-                    <input tabindex='14' name='dec_sep' id='default_decimal_seperator'
-                           type='text' maxlength='1' size='1' value='{$DEC_SEP}'
-                           onkeydown='setSigDigits();' onkeyup='setSigDigits();'>
-                </slot>
-            </div>
-            <div class="bottom-dotted-border"></div>
-        </div>
-    </div>
-    <div class="row-container">
-       <div class="right-col">
-          <div class="row-label">
-              <slot>{$MOD.LBL_USER_LANGUAGE}:</slot>
-          </div>
+            <div class="row-container">
+                <div class="right-col">
+                    <div class="row-label">
+                        <slot>{$MOD.LBL_USER_LANGUAGE}:</slot>
+                    </div>
 
-          <div class="row-bottom">
-              <slot>
-                  <select tabindex='15' id="language" name="language">{$LanguageOptions}</select>
-              </slot>
-          </div>
-       </div>
+                    <div class="row-bottom">
+                        <slot>
+                        <select tabindex='15' id="language" name="language">{$LanguageOptions}</select>
+                        </slot>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-</div>
-<div id="calendar_options" style="display:{$HIDE_FOR_GROUP_AND_PORTAL}">
-    <div>
-        <h4>
-            <slot>{$MOD.LBL_CALENDAR_OPTIONS}</slot>
-        </h4>
-    </div>
-    <div class="row-user">
-        <div class="row-container">
-            <div style="width:100%;" class="row-left">
-                <div class="row-label">
-                    <slot>{$MOD.LBL_PUBLISH_KEY}:</slot>&nbsp;{sugar_help text=$MOD.LBL_CHOOSE_A_KEY}</div>
-                <div class="row-bottom">
-                    <slot><input id='calendar_publish_key' name='calendar_publish_key' tabindex='17' size='25'
+    <div id="calendar_options" style="display:{$HIDE_FOR_GROUP_AND_PORTAL}">
+        <div>
+            <h4>
+                <slot>{$MOD.LBL_CALENDAR_OPTIONS}</slot>
+            </h4>
+        </div>
+        <div class="row-user">
+            <div class="row-container">
+                <div style="width:100%;" class="row-left">
+                    <div class="row-label">
+                        <slot>{$MOD.LBL_PUBLISH_KEY}:</slot>&nbsp;{sugar_help text=$MOD.LBL_CHOOSE_A_KEY}</div>
+                    <div class="row-bottom">
+                        <slot><input id='calendar_publish_key' name='calendar_publish_key' tabindex='17' size='25'
                                  maxlength='36' type="text" value="{$CALENDAR_PUBLISH_KEY}"></slot>
+                    </div>
+                    <div class="bottom-dotted-border"></div>
                 </div>
-                <div class="bottom-dotted-border"></div>
             </div>
-        </div>
-        <div class="row-container">
-            <div style="width:100%;" class="row-left">
-                <div class="row-label">
-                    <slot>
-                        <nobr>{$MOD.LBL_YOUR_PUBLISH_URL|strip_semicolon}:</nobr>
-                    </slot>
+            <div class="row-container">
+                <div style="width:100%;" class="row-left">
+                    <div class="row-label">
+                        <slot>
+                            <nobr>{$MOD.LBL_YOUR_PUBLISH_URL|strip_semicolon}:</nobr>
+                        </slot>
+                    </div>
+                    <div class="row-bottom">
+                        <span class="calendar_publish_ok">{$CALENDAR_PUBLISH_URL}</span>
+                        <span class="calendar_publish_none" style="display: none">{$MOD.LBL_NO_KEY}</span>
+                    </div>
+                    <div class="bottom-dotted-border"></div>
                 </div>
-                <div class="row-bottom">
-                    <span class="calendar_publish_ok">{$CALENDAR_PUBLISH_URL}</span>
-                    <span class="calendar_publish_none" style="display: none">{$MOD.LBL_NO_KEY}</span>
-                </div>
-                <div class="bottom-dotted-border"></div>
             </div>
-        </div>
-        <div class="row-container">
-            <div style="width:100%;" class="row-left">
-                <div class="row-label">
-                    <slot>{$MOD.LBL_SEARCH_URL|strip_semicolon}:</slot>
+            <div class="row-container">
+                <div style="width:100%;" class="row-left">
+                    <div class="row-label">
+                        <slot>{$MOD.LBL_SEARCH_URL|strip_semicolon}:</slot>
+                    </div>
+                    <div class="row-bottom">
+                        <span class="calendar_publish_ok">{$CALENDAR_SEARCH_URL}</span>
+                        <span class="calendar_publish_none" style="display: none">{$MOD.LBL_NO_KEY}</span>
+                    </div>
+                    <div class="bottom-dotted-border"></div>
                 </div>
-                <div class="row-bottom">
-                    <span class="calendar_publish_ok">{$CALENDAR_SEARCH_URL}</span>
-                    <span class="calendar_publish_none" style="display: none">{$MOD.LBL_NO_KEY}</span>
-                </div>
-                <div class="bottom-dotted-border"></div>
             </div>
-        </div>
-        <div class="row-container">
-            <div style="width:100%;" class="row-left">
-                <div class="row-label">
-                    <slot>{$MOD.LBL_ICAL_PUB_URL|strip_semicolon}: {sugar_help text=$MOD.LBL_ICAL_PUB_URL_HELP}</slot>
+            <div class="row-container">
+                <div style="width:100%;" class="row-left">
+                    <div class="row-label">
+                        <slot>{$MOD.LBL_ICAL_PUB_URL|strip_semicolon}: {sugar_help text=$MOD.LBL_ICAL_PUB_URL_HELP}</slot>
+                    </div>
+                    <div class="row-bottom">
+                        <span class="calendar_publish_ok">{$CALENDAR_ICAL_URL}</span>
+                        <span class="calendar_publish_none" style="display: none">{$MOD.LBL_NO_KEY}</span>
+                    </div>
+                    <div class="bottom-dotted-border"></div>
                 </div>
-                <div class="row-bottom">
-                    <span class="calendar_publish_ok">{$CALENDAR_ICAL_URL}</span>
-                    <span class="calendar_publish_none" style="display: none">{$MOD.LBL_NO_KEY}</span>
-                </div>
-                <div class="bottom-dotted-border"></div>
             </div>
-        </div>
-        <div class="row-container">
-            <div style="width:100%;" class="row-left">
-                <div class="row-label">
-                    <slot>{$MOD.LBL_FDOW}:</slot>&nbsp;{sugar_help text=$MOD.LBL_FDOW_TEXT}
-                </div>
-                <div class="row-bottom">
-                    <slot>
-                        <select tabindex='14'
+            <div class="row-container">
+                <div style="width:100%;" class="row-left">
+                    <div class="row-label">
+                        <slot>{$MOD.LBL_FDOW}:</slot>&nbsp;{sugar_help text=$MOD.LBL_FDOW_TEXT}
+                    </div>
+                    <div class="row-bottom">
+                        <slot>
+                            <select tabindex='14'
                                 name='fdow'>{html_options options=$FDOWOPTIONS selected=$FDOWCURRENT}</select>
-                    </slot>
+                        </slot>
+                    </div>
+                    <div class="bottom-dotted-border" style="margin-bottom: 1em;"></div>
                 </div>
-                <div class="bottom-dotted-border" style="margin-bottom: 1em;"></div>
             </div>
         </div>
     </div>
-</div>
-<div id="google_options" style="display:{$HIDE_IF_GAUTH_UNCONFIGURED}">
-    <table width="100%" border="0" cellspacing="1" cellpadding="0" class="edit view">
-        <tr>
-            <th align="left" scope="row" colspan="4"><h4>{$MOD.LBL_GOOGLE_API_SETTINGS}</h4></th>
-        </tr>
-        <tr>
-            <td width="17%" scope="row">
-                <slot>{$MOD.LBL_GOOGLE_API_TOKEN}:</slot>&nbsp;{sugar_help text=$MOD.LBL_GOOGLE_API_TOKEN_HELP}
-            </td>
-            <td width="20%">
-                <slot>Current API Token is: <span style="color:{$GOOGLE_API_TOKEN_COLOR}">{$GOOGLE_API_TOKEN}</span>
-                    &nbsp;&nbsp;<input style="display:{$GOOGLE_API_TOKEN_ENABLE_NEW}" class="btn btn-primary btn-sm"
-                                       id="google_gettoken" type="button" value="{$GOOGLE_API_TOKEN_BTN}"
-                                       onclick="window.open('{$GOOGLE_API_TOKEN_NEW_URL}', '_blank')"/></slot>
-            </td>
-            <td width="63%">
-                <slot>&nbsp;</slot>
-            </td>
-        </tr>
-        <tr>
-            <td width="17%" scope="row">
-                <slot>{$MOD.LBL_GSYNC_CAL}:</slot>
-            </td>
-            <td>
-                <slot><input tabindex='12' name='gsync_cal' class="checkbox" type="checkbox" {$GSYNC_CAL}></slot>
-            </td>
-        </tr>
-    </table>
-</div>
 </div>
 {if $ID}
 <div id="eapm_area" style='display:{$HIDE_FOR_GROUP_AND_PORTAL};' class="user-tab-content">
@@ -657,7 +624,30 @@
         </div>
     </div>
 </div>
-
+<div class="user-tab-content">
+    <div id="two-factor-auth">
+        <div class="row-user layout">
+            <div class="row-container">
+                <div class="full-row">
+                    <div class="row-label">{$MOD.LBL_STATUS}: <span id="auth_status">{$STATUS}</span></div>
+                    <div class="bottom-dotted-border"></div>
+                </div>
+            </div>
+        </div>
+    {if $CURRENT_USER}
+    <div class="row-user layout">
+        <div class="row-container">
+            <div class="full-row">
+                <div class="row-label">{$MOD.LBL_FACTOR_AUTH}:</div>
+                    <div class="row-bottom"> <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href = './#/users/2fa-config'">{$MOD.LBL_2FA_CONFIG}</button></div>
+                    <div class="bottom-dotted-border"></div>
+                </div>
+            </div>
+        </div>
+    {/if}
+    </div>
+</div>
+</div>
 </div>
 
 <script type="text/javascript">
@@ -666,6 +656,8 @@
     var mail_smtpssl = '{$MAIL_SMTPSSL}';
     {literal}
     EmailMan = {};
+
+    document.getElementById('auth_status').style.color = '{/literal}{$STATUS_COLOR}{literal}';
 
     function Admin_check() {
         if (('{/literal}{$IS_FOCUS_ADMIN}{literal}') && document.getElementById('is_admin').value == '0') {

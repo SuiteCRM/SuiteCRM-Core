@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,21 +26,22 @@
 
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {deepClone} from 'common';
-import {
-    SingleValueStatistic,
-    SingleValueStatisticsData,
-    Statistic,
-    StatisticsQuery
-} from 'common';
+import {deepClone} from '../../common/utils/object-utils';
 import {StatisticsFetchGQL} from '../statistics/graphql/api.statistics.get';
 import {StatisticsStore} from '../statistics/statistics.store';
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {FieldManager} from '../../services/record/field/field.manager';
 import {
+    SingleValueStatistic,
+    SingleValueStatisticsData,
+    Statistic,
+    StatisticsQuery
+} from '../../common/statistics/statistics.model';
+import {
     SingleValueStatisticsState,
     SingleValueStatisticsStoreInterface
-} from 'common';
+} from '../../common/statistics/statistics-store.model';
+import {LanguageStore} from "../language/language.store";
 
 const initialState = {
     module: '',
@@ -64,7 +65,8 @@ export class SingleValueStatisticsStore extends StatisticsStore implements Singl
 
     constructor(
         protected fetchGQL: StatisticsFetchGQL,
-        protected fieldManager: FieldManager
+        protected fieldManager: FieldManager,
+        protected language: LanguageStore,
     ) {
         super(fetchGQL);
         this.state$ = this.store.asObservable();
@@ -78,16 +80,51 @@ export class SingleValueStatisticsStore extends StatisticsStore implements Singl
             return;
         }
 
-        const field = this.fieldManager.buildShallowField(statistic.metadata.dataType, statistic.data.value);
+        if (Object.keys((statistic?.data?.fields ?? [])).length === 0){
+            const field = this.fieldManager.buildShallowField(statistic.metadata.dataType, statistic.data.value);
 
-        field.metadata = {
-            digits: 0
-        };
+            field.metadata = {
+                digits: 0
+            };
+
+            if (statistic.data.linkTextLabelKey) {
+                field.metadata.linkText = this.language.getFieldLabel(statistic.data.linkTextLabelKey, this.internalState?.module);
+            } else if (statistic.data.linkText) {
+                field.metadata.linkText = statistic.data.linkText;
+            }
+
+            this.updateState({
+                ...this.internalState,
+                statistic,
+                field,
+                loading: false
+            });
+            return;
+        }
+
+        const fields = [];
+
+        Object.keys(statistic.data.fields).forEach((key) => {
+            const label = statistic.data.fields[key].labelKey;
+            let value = statistic.data.fields[key].value;
+
+            if (statistic?.data?.fields[key]?.useLabelAsValue ?? false) {
+                value = this.language.getFieldLabel(label, this.internalState?.module);
+            }
+
+            const builtField = this.fieldManager.buildShallowField(statistic.metadata.dataType, value, label);
+
+            builtField.metadata = {
+                digits: 0
+            }
+
+            fields[key] = builtField;
+        })
 
         this.updateState({
             ...this.internalState,
             statistic,
-            field,
+            fields,
             loading: false
         });
     }

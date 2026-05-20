@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -43,6 +43,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Throwable;
 
 /**
  * Class InstallHandler
@@ -135,7 +136,6 @@ class InstallHandler extends LegacyHandler
      */
     public function installLegacy(): Feedback
     {
-        $this->switchSession($this->legacySessionName);
         chdir($this->legacyDir);
 
         $errorLevelStored = error_reporting();
@@ -152,21 +152,51 @@ class InstallHandler extends LegacyHandler
         $_REQUEST['goto'] = 'SilentInstall';
         $_REQUEST['cli'] = 'true';
 
-        ob_start();
-        ob_start();
-        /* @noinspection PhpIncludeInspection */
-        include_once 'install.php';
-        ob_end_clean();
-        ob_end_clean();
+        $installResult = [];
 
-        if (is_file('config.php')) {
-            $feedback->setSuccess(true)->setMessages(['SuiteCRM Installation Completed']);
-        } else {
-            $feedback->setSuccess(false)->setMessages(['SuiteCRM Installation Failed']);
+        if (!is_readable('include/portability/Install/AppInstallService.php')) {
+            $this->logger->error('An error occurred while installing SuiteCRM - not able to access portability/Install/AppInstallService.php');
+            $feedback->setSuccess(false)->setMessages(['An error occurred while installing SuiteCRM - not able to access portability/Install/AppInstallService.php']);
+            chdir($this->projectDir);
+
+            error_reporting($errorLevelStored);
+
+            return $feedback;
         }
 
+        try {
+            ob_start();
+            ob_start();
+            /* @noinspection PhpIncludeInspection */
+            require_once 'include/portability/Install/AppInstallService.php';
+            $appInstallService = new \AppInstallService();
+            $installResult = $appInstallService->runInstall();
+            ob_end_clean();
+            ob_end_clean();
+        } catch (Throwable $t) {
+            $this->logger->error('An error occurred while installing SuiteCRM : ' . $t->getMessage());
+
+            $installResult = $installResult ?? [];
+            $installResult['success'] = false;
+            $installResult['messages'] = $installResult['messages'] ?? [];
+            $installResult['debug'] = $installResult['debug'] ?? [];
+            $installResult['debug'] = array_merge($installResult['debug'], ['Exception: ' . $t->getMessage()]);
+        }
+
+        $success = ($installResult['success'] ?? false) && is_file('config.php');
+        $installMessages = $installResult['messages'] ?? [];
+
+        $messages = ['SuiteCRM Installation Completed'];
+        if (!$success) {
+            $messages = ["An error occurred while installing SuiteCRM. Please check the '/logs/install.log'."];
+        }
+        $messages = array_merge($messages, $installMessages);
+
+        $debug = $installResult['debug'] ?? [];
+
+        $feedback->setSuccess($success)->setMessages($messages)->setDebug($debug);
+
         chdir($this->projectDir);
-        $this->switchSession($this->defaultSessionName);
 
         error_reporting($errorLevelStored);
 

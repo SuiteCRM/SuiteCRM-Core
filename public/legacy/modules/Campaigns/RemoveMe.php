@@ -56,26 +56,43 @@ if (!empty($_REQUEST['from'])) {
 if (!empty($_REQUEST['identifier'])) {
     global $beanFiles, $beanList, $current_user;
 
+    $db = DBManagerFactory::getInstance();
+    $identifierQuoted = $db->quote($_REQUEST['identifier']);
+    $query = "select * from campaign_log where target_tracker_key='$identifierQuoted' and activity_type='viewed'";
+    $viewedQuery = $db->query($query);
+    $row = $db->fetchByAssoc($viewedQuery);
+
+    if (empty($row)) {
+        log_campaign_activity($_REQUEST['identifier'], 'viewed');
+    }
+
     //user is most likely not defined, retrieve admin user so that team queries are bypassed
     if (empty($current_user) || empty($current_user->id)) {
         $current_user = BeanFactory::newBean('Users');
         $current_user->retrieve('1');
     }
-    
+
     $keys=log_campaign_activity($_REQUEST['identifier'], 'removed');
     global $current_language;
     $mod_strings = return_module_language($current_language, 'Campaigns');
 
-    
+
     if (!empty($keys) && $keys['target_type'] == 'Users') {
         //Users cannot opt out of receiving emails, print out warning message.
         echo $mod_strings['LBL_USERS_CANNOT_OPTOUT'];
-    } elseif (!empty($keys) && isset($keys['campaign_id']) && !empty($keys['campaign_id'])) {
+        return;
+    }
+
+    if (!empty($keys) && isset($keys['campaign_id']) && !empty($keys['campaign_id'])) {
         //we need to unsubscribe the user from this particular campaign
         $beantype = $beanList[$keys['target_type']];
         require_once($beanFiles[$beantype]);
         $focus = new $beantype();
         $focus->retrieve($keys['target_id']);
+        if (isTrue($keys['is_test_entry'] ?? false)) {
+            echo $mod_strings['LBL_ELECTED_TO_OPTOUT'];
+            return;
+        }
         unsubscribe($keys['campaign_id'], $focus);
     } elseif (!empty($keys)) {
         $id = $keys['target_id'];

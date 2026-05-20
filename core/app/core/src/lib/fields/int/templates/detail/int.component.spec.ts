@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,7 +28,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {IntDetailFieldComponent} from './int.component';
 import {Component} from '@angular/core';
 import {BehaviorSubject, of} from 'rxjs';
-import {Field} from 'common';
+import {Field} from '../../../../common/record/field.model';
 import {UserPreferenceMockStore} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';

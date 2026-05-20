@@ -67,7 +67,7 @@ class DefaultFilterMapper implements FilterMapperInterface
             return $legacyValue;
         }
 
-        if (count($values) === 1) {
+        if (count($values) === 1 && ($criteriaItem['valueType'] ?? '') !== 'array') {
             $legacyValue = $values[0];
         }
 

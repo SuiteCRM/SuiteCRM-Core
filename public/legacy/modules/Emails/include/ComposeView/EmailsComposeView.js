@@ -60,6 +60,12 @@
     self.prependSignature = false;
 
     /**
+     * Determines if a Signature has already been added to the message
+     * @type {boolean}
+     */
+    self.signatureAdded = false;
+
+    /**
      * Defines the buttons that are displayed when the user focuses in on a to, cc and bcc field.
      *
      * @param data-open-popup-module - The module to popup
@@ -348,6 +354,18 @@
       return false;
     };
 
+    /**
+     * Remove any existing signature element class in the email thread
+     * @type {self.removeExistingSignatureClass}
+     */
+
+    $.fn.EmailsComposeView.removeExistingSignatureClass = self.removeExistingSignatureClass = function() {
+      let body = tinymce.activeEditor.getContent();
+      let $body = $('<div>').append($(body));
+      let $signatureElement = $body.find('div.email-signature-element');
+      $signatureElement.removeClass('email-signature-element');
+      tinymce.activeEditor.setContent($body.html(), {format: 'html'})
+    }
 
     $.fn.EmailsComposeView.updateSignature = self.updateSignature = function ($selected) {
       if(!$selected) {
@@ -362,9 +380,13 @@
 
       var body = tinymce.activeEditor.getContent();
       if (body !== '' && $(body).hasClass('email-signature-element')) {
-        var $body = $(body);
-        var $existingSignature = $body.find('.email-signature-element');
-        $existingSignature.remove();
+        var $body = $('<div>').append($(body));
+        var $existingSignature = $body.find('div.email-signature-element');
+        if(self.prependSignature) {
+          $existingSignature.outerText = '';
+        } else {
+          $existingSignature.remove();
+        }
         tinymce.activeEditor.setContent($body.html(), {format: 'html'});
       }
 
@@ -404,7 +426,7 @@
         $(htmlSignature).appendTo(signatureElement);
       }
 
-      if (tinymce.editors.length < 1) {
+      if (tinymce.get().length < 1) {
         console.warn('unable to find tinymce editor');
         return false;
       }
@@ -1301,11 +1323,16 @@
             $(self).trigger('emailComposeViewGetFromFields');
 
 
-            if (tinymce.initialized === true) {
+            if (tinymce.initialized === true && !self.signatureAdded) {
+              self.removeExistingSignatureClass();
               self.updateSignature();
-            } else if(tinymce.EditorManager && tinymce.EditorManager.activeEditor) {
+              self.signatureAdded = true;
+            } else if(tinymce.EditorManager && tinymce.EditorManager.activeEditor && !self.signatureAdded) {
               tinymce.EditorManager.activeEditor.on('init', function(e) {
+                self.removeExistingSignatureClass();
                 self.updateSignature();
+                self.signatureAdded = true;
+
               });
             }
           }
@@ -1345,7 +1372,7 @@
         .appendTo($(self));
 
       if (typeof tinymce === "undefined") {
-        console.error('EmailsComposeView - Missing Dependency: Cannot find tinyMCE.');
+        console.error('EmailsComposeView - Missing Dependency: Cannot find tinymce.');
 
         // copy plain to html
         $(self).find('#description_html').closest('.edit-view-row-item').addClass('hidden');
@@ -1357,11 +1384,13 @@
 
         var intervalCheckTinymce = window.setInterval(function () {
           var isFromPopulated = $('#from_addr_name').prop("tagName").toLowerCase() === 'select';
-          if (tinymce.editors.length > 0 && isFromPopulated === true) {
+          if (tinymce.get().length > 0 && isFromPopulated === true && !self.signatureAdded) {
+            self.removeExistingSignatureClass();
             self.updateSignature();
+            self.signatureAdded = true;
             clearInterval(intervalCheckTinymce);
           }
-        }, 300);
+        }, 750);
 
         tinymce.init(opts.tinyMceOptions);
 
@@ -1413,9 +1442,9 @@
       // TODO: Find a better way only display one tiny mce
       // Remove the hanging tinyMCE div
       $('.mce-panel').remove();
-      var length = tinyMCE.editors.length;
+      var length = tinymce.get().length;
       for (var i = length; i > 0; i--) {
-        tinyMCE.editors[i - 1].remove();
+        tinymce.get()[i - 1].remove();
       }
       $('.emails-qtip').remove();
       return true;
@@ -1607,18 +1636,6 @@
   };
 
   $.fn.EmailsComposeView.defaults = {
-    "tinyMceOptions": {
-      menubar: false,
-      plugins: ['link'],
-      toolbar: ['fontselect | fontsizeselect | bold italic underline | forecolor backcolor | styleselect | outdent indent | link'],
-      formats: {
-        bold: {inline: 'b'},
-        italic: {inline: 'i'},
-        underline: {inline: 'u'}
-      },
-      convert_urls: false,
-      relative_urls: false,
-      remove_script_host: false,
-    }
+    "tinyMceOptions": window.emailTinyMCEConfig
   };
 }(jQuery));

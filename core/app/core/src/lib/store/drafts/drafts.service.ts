@@ -1,0 +1,175 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+import {AppStateStore} from "../app-state/app-state.store";
+import {RecordThreadModalService} from "../record-thread-modal/record-thread-modal.service";
+import {DraftsStore} from "./drafts.store";
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {Injectable, signal, WritableSignal} from "@angular/core";
+import {isTrue} from "../../common/utils/value-utils";
+import {toObservable} from "@angular/core/rxjs-interop";
+import {Subscription} from "rxjs";
+
+@Injectable({
+    providedIn: 'root',
+})
+export class DraftsService {
+
+    initialized = false;
+    modal: NgbModalRef;
+    openedDrafts: string[] = [];
+    draftsCount: WritableSignal<number> = signal(0);
+    draftsCount$ = toObservable(this.draftsCount);
+    modalConfig: any = {};
+    showDrafts: WritableSignal<boolean> = signal(false);
+
+    protected subs: Subscription[] = [];
+
+    constructor(
+        protected appState: AppStateStore,
+        protected recordThreadModalService: RecordThreadModalService,
+        protected draftsStore: DraftsStore,
+    ) {
+    }
+
+    init(): void {
+        this.initialized = true;
+        this.modalConfig = this.recordThreadModalService.getOptions('drafts')?.modalConfig || {};
+
+        this.appState.draftOpenedEventEmitter.subscribe(() => {
+            this.getOpenedDrafts();
+            this.updateCriteria();
+        })
+        this.appState.refreshDraftsEventEmitter.subscribe(() => {
+            if (isTrue(this.showDrafts())) {
+                this.getOpenedDrafts();
+                this.updateCriteria();
+                return;
+            }
+            this.initModal();
+        });
+
+        this.appState.recordModalOpenEventEmitter.subscribe(() => {
+            if (this?.modal?.componentInstance) {
+                this.closeModal();
+            }
+        });
+
+
+        this.draftsStore.getRecordThreadStore()?.getRecordList()?.pagination$.subscribe((pagination) => {
+            const currentCount = pagination.total ?? 0;
+
+            if (this.draftsCount() === 1 && currentCount === 0) {
+                this.closeModal();
+            }
+
+            setTimeout(() => {
+                this.draftsCount.set(currentCount);
+            }, 250);
+        });
+
+        this.getOpenedDrafts();
+        this.updateCriteria();
+    }
+
+    showModal(): void {
+
+        if (this?.modal?.componentInstance) {
+            return;
+        }
+
+        const modalOptions = this.recordThreadModalService?.getOptions('drafts')?.modalConfig || {};
+        const options = {
+            ...modalOptions,
+            modalStore: this.draftsStore,
+        };
+        this.modal = this.recordThreadModalService.showModal(options, {
+            addToAppState: false,
+        });
+
+        this.getOpenedDrafts();
+        this.updateCriteria();
+    }
+
+    closeModal(): void {
+        if (this?.modal?.componentInstance) {
+            this.modal.close();
+            this.subs.forEach(sub => sub?.unsubscribe());
+        }
+    }
+
+    protected initModal(): void {
+        this.draftsStore.getRecordThreadStore()?.reload();
+        this.showDrafts.set(true);
+
+        const options = {
+            ...this.modalConfig,
+            modalStore: this.draftsStore,
+        }
+        this.modal = this.recordThreadModalService.showModal(options, {
+            addToAppState: false,
+        });
+
+        this.modal.close();
+    }
+
+    protected updateCriteria(): void {
+        const recordThreadStore = this.draftsStore.getRecordThreadStore();
+        const recordList = recordThreadStore?.getRecordList();
+        const currentCriteria = recordList.criteria || {};
+
+        const newCriteria = {
+            ...currentCriteria,
+            filters: {
+                id: {
+                    field: 'id',
+                    fieldType: 'id',
+                    operator: 'not_in',
+                    valueType: 'array',
+                    values: [...this.openedDrafts],
+                }
+            }
+        }
+
+        recordList.updateSearchCriteria(newCriteria);
+    }
+
+    protected getOpenedDrafts(): void {
+        this.openedDrafts = [];
+        this.appState.getActiveModals().forEach((modal) => {
+            const recordId = modal?.componentInstance?.recordId ?? '';
+
+            if (recordId === '') {
+                return;
+            }
+
+            if (this.openedDrafts.includes(recordId)) {
+                return;
+            }
+            this.openedDrafts.push(recordId);
+        });
+    }
+}

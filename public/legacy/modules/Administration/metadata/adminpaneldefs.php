@@ -189,6 +189,13 @@ $admin_option_defs['Administration']['aop'] = [
     './index.php?module=Administration&action=AOPAdmin',
     'admin-aop-settings'
 ];
+$admin_option_defs['Administration']['calendar_sync_settings'] = [
+    'CalendarSync',
+    'LBL_CALENDAR_SYNC_SETTINGS',
+    'LBL_CALENDAR_SYNC_SETTINGS_DESC',
+    './index.php?module=Administration&action=CalendarSyncSettings',
+    'admin-system-settings'
+];
 $admin_option_defs['Administration']['configure_group_tabs'] = [
     'ConfigureTabs',
     'LBL_CONFIGURE_GROUP_TABS',
@@ -301,6 +308,21 @@ $admin_option_defs['Administration']['repair'] = [
     './index.php?module=Administration&action=Upgrade',
     'admin-repair'
 ];
+$admin_option_defs['Administration']['migrations'] = [
+    'Migrations',
+    'LBL_MANAGE_MANUAL_MIGRATION_TASKS',
+    'LBL_MANAGE_MANUAL_MIGRATION_TASKS_DESC',
+    'index.php?module=ManualMigrationTasks&action=index',
+    'admin-migrations'
+];
+// Processes admin entry hidden until properly tested
+// $admin_option_defs['Administration']['processes'] = [
+//     'Processes',
+//     'LBL_MANAGE_PROCESSES',
+//     'LBL_MANAGE_PROCESSES_DESC',
+//     'index.php?module=Processes&action=index',
+//     'admin-processes'
+// ];
 if (!isset($GLOBALS['sugar_config']['hide_admin_backup']) || !$GLOBALS['sugar_config']['hide_admin_backup']) {
     $admin_option_defs['Administration']['backup_management'] = [
         'Backups',
@@ -388,13 +410,6 @@ $admin_group_header[] = ['LBL_STUDIO_TITLE', '', false, $admin_option_defs, 'LBL
 //Google Settings
 $admin_option_defs = [];
 
-$admin_option_defs['Administration']['google_calendar_settings'] = [
-    'Google Calendar Settings',
-    'LBL_GOOGLE_CALENDAR_SETTINGS_TITLE',
-    'LBL_GOOGLE_CALENDAR_SETTINGS_DESC',
-    './index.php?module=Administration&action=GoogleCalendarSettings',
-    'admin-system-settings'
-];
 $admin_option_defs['jjwg_Maps']['config'] = [
     'Administration',
     'LBL_JJWG_MAPS_ADMIN_CONFIG_TITLE',

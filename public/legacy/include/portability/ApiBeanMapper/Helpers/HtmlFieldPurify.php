@@ -50,6 +50,6 @@ trait HtmlFieldPurify
             $extra = [];
         }
 
-        return purify_html(securexss($value), $extra);
+        return html_entity_decode(purify_html(securexss($value), $extra), ENT_QUOTES);
     }
 }

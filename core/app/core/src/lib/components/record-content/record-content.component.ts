@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,11 +26,15 @@
 
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Observable, of, Subscription} from 'rxjs';
-import {FieldMap, Panel, Record, isTrue} from 'common';
+import {FieldMap} from '../../common/record/field.model';
+import {Panel} from '../../common/metadata/metadata.model';
+import {Record} from '../../common/record/record.model';
+import {isTrue} from '../../common/utils/value-utils';
 import {map, shareReplay} from 'rxjs/operators';
 import {RecordContentConfig, RecordContentDataSource} from './record-content.model';
 import {FieldLayoutConfig, FieldLayoutDataSource} from '../field-layout/field-layout.model';
 import {LanguageStore} from '../../store/language/language.store';
+import {emptyObject} from "../../common/utils/object-utils";
 
 @Component({
     selector: 'scrm-record-content',
@@ -85,6 +89,10 @@ export class RecordContentComponent implements OnInit, OnDestroy {
 
         const tabDefs = this.mapTabDefs();
 
+        if (emptyObject(tabDefs)){
+            return;
+        }
+
         Object.keys(tabDefs).forEach(tabDefKey => {
             const tabDef = tabDefs[tabDefKey];
 
@@ -138,7 +146,7 @@ export class RecordContentComponent implements OnInit, OnDestroy {
             let isCollapsed = false;
             panel.label = panel?.label?.toUpperCase() ?? '';
             const panelKey = panel?.key?.toUpperCase() ?? '';
-            if (panel.meta.panelDefault === 'collapsed') {
+            if (panel.meta?.panelDefault === 'collapsed') {
                 isCollapsed = true;
             }
             panel.isCollapsed = isCollapsed;
@@ -164,6 +172,7 @@ export class RecordContentComponent implements OnInit, OnDestroy {
             getConfig: (): Observable<FieldLayoutConfig> => this.dataSource.getDisplayConfig().pipe(map(config => ({
                 mode: config.mode,
                 maxColumns: config.maxColumns,
+                colClasses: config?.colClasses ?? [],
             }))),
             getLayout: (): Observable<Panel> => of(panel).pipe(shareReplay(1)),
             getFields: (): Observable<FieldMap> => this.dataSource.getRecord().pipe(map(record => (record.fields))),

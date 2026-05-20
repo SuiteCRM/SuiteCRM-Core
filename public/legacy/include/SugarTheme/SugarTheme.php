@@ -57,7 +57,7 @@ if (!defined('JSMIN_AS_LIB')) {
 
 require_once("include/SugarTheme/cssmin.php");
 require_once("jssource/SugarMin.php");
-require_once('include/utils/sugar_file_utils.php');
+require_once('include/utils/suite_file_utils.php');
 
 /**
  * Class that provides tools for working with a theme.
@@ -341,7 +341,7 @@ class SugarTheme
         }
         if (!inDeveloperMode()) {
             if (is_file($cachedfile = sugar_cached($this->getFilePath().'/pathCache.php'))) {
-                $caches = unserialize(file_get_contents($cachedfile));
+                $caches = unserialize(file_get_contents($cachedfile), ['allowed_classes' => false]);
                 if (isset($caches['jsCache'])) {
                     $this->_jsCache       = $caches['jsCache'];
                 }
@@ -357,7 +357,7 @@ class SugarTheme
             }
             $cachedfile = sugar_cached($this->getFilePath().'/spriteCache.php');
             if (!empty($GLOBALS['sugar_config']['use_sprites']) && is_file($cachedfile)) {
-                $this->_spriteCache = unserialize(sugar_file_get_contents($cachedfile));
+                $this->_spriteCache = suite_file_get_unserialized_contents($cachedfile);
             }
         }
         $this->_initialCacheSize = array(
@@ -432,9 +432,9 @@ class SugarTheme
                     );
             }
             if (count($this->_spriteCache) != $this->_initialCacheSize['spriteCache']) {
-                sugar_file_put_contents(
-                    "$cachedir/spriteCache.php",
-                    serialize($this->_spriteCache)
+                suite_file_put_serialized_contents(
+                    filename: "$cachedir/spriteCache.php",
+                    value: $this->_spriteCache
                 );
             }
         }

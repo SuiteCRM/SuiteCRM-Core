@@ -98,19 +98,6 @@ $dictionary['CampaignLog'] = array('audited'=>false,
             'type' => 'datetime',
             'comment' => 'The date the activity occurred'
             ),
-        'related_id' => array(
-            'name' => 'related_id',
-            'vname' => 'LBL_RELATED_ID',
-            'type' => 'varchar',
-            'len' => '36',
-            'reportable' => false,
-            ),
-        'related_type' => array(
-            'name' => 'related_type',
-            'vname' => 'LBL_RELATED_TYPE',
-            'type' => 'varchar',
-            'len' => 100,
-            ),
         'archived' => array(
             'name' => 'archived',
             'vname' => 'LBL_ARCHIVED',
@@ -148,15 +135,37 @@ $dictionary['CampaignLog'] = array('audited'=>false,
             'len' => '255',
             'source'=>'non-db',
         ),
+        'tracker_url' => array(
+            'name' => 'tracker_url',
+            'type' => 'varchar',
+            'len' => '255',
+            'source'=>'non-db',
+        ),
         'recipient_email' => array(
             'name' => 'recipient_email',
             'type' => 'varchar',
             'len' => '255',
             'source'=>'non-db',
         ),
+        'is_test_entry' => [
+            'name' => 'is_test_entry',
+            'type' => 'bool',
+            'reportable'=>false,
+            'massupdate' => false,
+            'default'=>'0',
+            'comment' => 'Indicates if item has been archived'
+        ],
         'marketing_name' => array(
             'name' => 'marketing_name',
-            'type' => 'varchar',
+            'rname' => 'name',
+            'id_name' => 'marketing_id',
+            'vname' => 'LBL_MARKETING_NAME',
+            'type' => 'relate',
+            'table' => 'email_marketing',
+            'isnull' => 'true',
+            'module' => 'EmailMarketing',
+            'dbType' => 'varchar',
+            'link'=>'marketing',
             'len' => '255',
             'source'=>'non-db',
         ),
@@ -199,17 +208,45 @@ $dictionary['CampaignLog'] = array('audited'=>false,
             'source'=>'non-db',
             'vname'=> 'LBL_CAMPAIGNS',
         ),
-        'related_name'=>array(
-            'source'=>'function',
-            'function_name'=>'get_related_name',
-            'function_class'=>'CampaignLog',
-            'function_params'=> array('related_id', 'related_type'),
-            'function_params_source'=>'this',  //valid values are 'parent' or 'this' default is parent.
-            'type'=>'function',
-            'vname'=>'LBL_RELATED_NAME',
-            'name'=>'related_name',
-            'reportable'=>false,
+        'marketing'=> array(
+            'name' => 'marketing',
+            'type' => 'link',
+            'relationship' => 'email_marketing_campaignlog',
+            'source'=>'non-db',
         ),
+        'related_type' =>
+            array(
+                'name' => 'related_type',
+                'vname' => 'LBL_RELATED_TYPE',
+                'type' => 'parent_type',
+                'dbType' => 'varchar',
+                'group' => 'parent_name',
+                'options' => 'parent_type_display',
+                'required' => false,
+                'len' => '255',
+            ),
+
+        'related_name' =>
+            array(
+                'name' => 'related_name',
+                'parent_type' => 'record_type_display',
+                'type_name' => 'target_type',
+                'id_name' => 'target_id',
+                'vname' => 'LBL_LIST_RELATED_TO',
+                'type' => 'parent',
+                'group' => 'parent_name',
+                'source' => 'non-db',
+                'options' => 'parent_type_display',
+            ),
+
+        'related_id' =>
+            array(
+                'name' => 'related_id',
+                'type' => 'id',
+                'group' => 'parent_name',
+                'reportable' => false,
+                'vname' => 'LBL_RELATED_ID',
+            ),
         'date_modified' => array(
             'name' => 'date_modified',
             'vname' => 'LBL_DATE_MODIFIED',
@@ -296,6 +333,11 @@ $dictionary['CampaignLog'] = array('audited'=>false,
 
             'type' =>'index',
             'fields'=>array('target_id')
+        ),
+        array(
+            'name' =>'idx_related',
+            'type' =>'index',
+            'fields'=> array('related_id', 'related_type', 'marketing_id', 'deleted')
         ),
         array(
             'name' =>'idx_target_id_deleted',

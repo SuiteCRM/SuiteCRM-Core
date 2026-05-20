@@ -27,7 +27,7 @@ parameters:
     notes:
       index: true
       list: true
-      record: false
+      record: true
     leads:
       index: true
       list: true
@@ -48,10 +48,14 @@ parameters:
       index: true
       list: true
       record: false
+    email-marketing:
+      index: true
+      list: true
+      record: true
     campaigns:
       index: true
       list: true
-      record: false
+      record: true
     prospects:
       index: true
       list: true
@@ -63,7 +67,11 @@ parameters:
     documents:
       index: true
       list: true
-      record: false
+      record: true
+    document-revisions:
+      index: true
+      list: true
+      record: true
     cases:
       index: true
       list: true
@@ -221,8 +229,8 @@ parameters:
       list: true
       record: false
     schedulers:
-      index: false
-      list: false
+      index: true
+      list: true
       record: false
     oauth-keys:
       index: false
@@ -251,4 +259,20 @@ parameters:
     calendar:
       index: false
       list: false
+      record: false
+    emailman:
+      index: true
+      list: true
+      record: true
+    manual-migration-tasks:
+      index: true
+      list: true
+      record: true
+    processes:
+      index: true
+      list: true
+      record: true
+    calendar-account:
+      index: true
+      list: true
       record: false

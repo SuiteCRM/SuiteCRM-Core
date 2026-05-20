@@ -44,6 +44,7 @@ if (!defined('sugarEntry') || !sugarEntry) {
 
 $module_name = 'Emails';
 $searchFields[$module_name] = array(
+    'range_id' => array('query_type' => 'default', 'enable_range_search' => true, 'is_id_field' => true),
     'name' => array('query_type' => 'default'),
     'current_user_only' => array(
         'query_type' => 'default',

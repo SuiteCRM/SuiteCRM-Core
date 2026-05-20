@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,9 +24,12 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
-import {BulkActionsMap, DropdownButtonInterface, SelectionDataSource, SelectionStatus} from 'common';
+import {BulkActionsMap} from '../../common/actions/bulk-action.model';
+import {DropdownButtonInterface} from '../../common/components/button/dropdown-button.model';
+import {SelectionStatus} from '../../common/views/list/record-selection.model';
+import {SelectionDataSource} from '../../common/views/list/selection.model';
 import {LanguageStore} from '../../store/language/language.store';
 
 export interface BulkActionDataSource {
@@ -54,7 +57,8 @@ export class BulkActionMenuComponent implements OnInit, OnDestroy {
     dropdownSmallConfig: DropdownButtonInterface;
     subs: Subscription[] = [];
     status: SelectionStatus = SelectionStatus.NONE;
-    count: number = 0;
+    count: WritableSignal<number> = signal(0);
+
 
     constructor(protected languageStore: LanguageStore) {
     }
@@ -62,7 +66,7 @@ export class BulkActionMenuComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.subs.forEach(sub => sub.unsubscribe());
         this.subs = [];
-        this.count = 0;
+        this.count = signal(0);
         this.status = SelectionStatus.NONE;
     }
 
@@ -70,7 +74,7 @@ export class BulkActionMenuComponent implements OnInit, OnDestroy {
         this.subs = [];
 
         this.subs.push(this.selectionSource.getSelectionStatus().subscribe(status => this.status = status));
-        this.subs.push(this.selectionSource.getSelectedCount().subscribe(count => this.count = count));
+        this.subs.push(this.selectionSource.getSelectedCount().subscribe(count => this.count.set(count)));
 
         this.subs.push(this.actionSource.getBulkActions().subscribe(actions => {
             const dropdownConfig = {

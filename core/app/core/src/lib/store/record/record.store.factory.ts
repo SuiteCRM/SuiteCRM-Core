@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,7 +25,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {RecordMapperRegistry, ViewFieldDefinition, ObjectMap} from 'common';
 import {RecordStore} from './record.store';
 import {Observable} from 'rxjs';
 import {RecordFetchGQL} from './graphql/api.record.get';
@@ -33,6 +32,9 @@ import {RecordSaveGQL} from './graphql/api.record.save';
 import {MessageService} from '../../services/message/message.service';
 import {RecordManager} from '../../services/record/record.manager';
 import {BaseSaveRecordMapper} from './record-mappers/base-save.record-mapper';
+import {RecordMapperRegistry} from '../../common/record/record-mappers/record-mapper.registry';
+import {ViewFieldDefinition} from '../../common/metadata/metadata.model';
+import {ObjectMap} from "../../common/types/object-map";
 
 @Injectable({
     providedIn: 'root',
@@ -50,7 +52,7 @@ export class RecordStoreFactory {
         recordMappers.register('default', baseMapper.getKey(), baseMapper);
     }
 
-    create(definitions$: Observable<ViewFieldDefinition[]>, metadata$?: Observable<ObjectMap>): RecordStore {
+    create(definitions$: Observable<ViewFieldDefinition[]>, metadata$?: Observable<ObjectMap>, options: ObjectMap = null): RecordStore {
         return new RecordStore(
             definitions$,
             metadata$,
@@ -58,7 +60,8 @@ export class RecordStoreFactory {
             this.recordFetchGQL,
             this.message,
             this.recordManager,
-            this.recordMappers
+            this.recordMappers,
+            options
         );
     }
 }

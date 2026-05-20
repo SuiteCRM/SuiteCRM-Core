@@ -25,10 +25,6 @@ array(
           ),
           6 =>
           array(
-            'customCode' => '<input type="button" class="button" onClick="showPopup(\'email\');return false;" value="{$MOD.LBL_EMAIL_QUOTE}">',
-          ),
-          7 =>
-          array(
             'customCode' => '<input type="submit" class="button" onClick="this.form.action.value=\'createOpportunity\';" value="{$MOD.LBL_CREATE_OPPORTUNITY}">',
             'sugar_html' =>
             array(
@@ -44,7 +40,7 @@ array(
               ),
             ),
           ),
-          8 =>
+          7 =>
           array(
             'customCode' => '<input type="submit" class="button" onClick="this.form.action.value=\'createContract\';" value="{$MOD.LBL_CREATE_CONTRACT}">',
             'sugar_html' =>
@@ -61,7 +57,7 @@ array(
               ),
             ),
           ),
-          9 =>
+          8 =>
           array(
             'customCode' => '<input type="submit" class="button" onClick="this.form.action.value=\'converToInvoice\';" value="{$MOD.LBL_CONVERT_TO_INVOICE}">',
             'sugar_html' =>
@@ -119,6 +115,23 @@ array(
           ),
       ),
     ),
+    'recordActions' => [
+          'actions' => [
+              'print-as-pdf' => [
+                  'key' => 'print-as-pdf',
+                  'labelKey' => 'LBL_PRINT_AS_PDF',
+                  'asyncProcess' => true,
+                  'modes' => ['detail'],
+                  'acl' => ['view'],
+                  'aclModule' => 'AOS_PDF_Templates',
+                  'params' => [
+                      'selectModal' => [
+                          'module' => 'AOS_PDF_Templates'
+                      ]
+                  ]
+              ]
+          ],
+      ],
     'panels' =>
     array(
       'LBL_PANEL_OVERVIEW' =>

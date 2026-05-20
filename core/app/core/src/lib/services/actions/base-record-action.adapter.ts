@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,7 +25,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {Action, ActionContext, ActionManager} from 'common';
+import {Action, ActionContext, ActionManager, RecordBasedActionData} from '../../common/actions/action.model';
 import {AsyncActionInput, AsyncActionService} from '../process/processes/async-action/async-action';
 import {MessageService} from '../message/message.service';
 import {ConfirmationModalService} from '../modals/confirmation-modal.service';
@@ -34,10 +34,15 @@ import {LanguageStore} from '../../store/language/language.store';
 import {SelectModalService} from '../modals/select-modal.service';
 import {MetadataStore} from '../../store/metadata/metadata.store.service';
 import {AppMetadataStore} from "../../store/app-metadata/app-metadata.store.service";
+import {FieldModalService} from "../modals/field-modal.service";
+import {take} from "rxjs/operators";
+import {FieldLogicManager} from "../../fields/field-logic/field-logic.manager";
+import {RecordManager} from "../record/record.manager";
+import {RecordMapperRegistry} from "../../common/record/record-mappers/record-mapper.registry";
+import {isString} from "lodash-es";
 
 @Injectable()
-export abstract class BaseRecordActionsAdapter<D> extends BaseActionsAdapter<D> {
-
+export abstract class BaseRecordActionsAdapter<D extends RecordBasedActionData> extends BaseActionsAdapter<D> {
 
     protected constructor(
         protected actionManager: ActionManager<D>,
@@ -46,8 +51,12 @@ export abstract class BaseRecordActionsAdapter<D> extends BaseActionsAdapter<D> 
         protected confirmation: ConfirmationModalService,
         protected language: LanguageStore,
         protected selectModalService: SelectModalService,
+        protected fieldModalService: FieldModalService,
         protected metadata: MetadataStore,
-        protected appMetadataStore: AppMetadataStore
+        protected appMetadataStore: AppMetadataStore,
+        protected recordMappers: RecordMapperRegistry,
+        protected logic: FieldLogicManager,
+        protected recordManager: RecordManager
     ) {
         super(
             actionManager,
@@ -56,17 +65,61 @@ export abstract class BaseRecordActionsAdapter<D> extends BaseActionsAdapter<D> 
             confirmation,
             language,
             selectModalService,
+            fieldModalService,
             metadata,
-            appMetadataStore
-        )
+            appMetadataStore,
+            logic
+        );
+    }
+
+    runAction(action: Action, context: ActionContext = null): void {
+        const validate = action?.params?.validate ?? false;
+        const actionData: D = this.buildActionData(action, context);
+        const recordStore = actionData?.store?.recordStore ?? null;
+
+        if (validate && recordStore) {
+            const isFieldLoading = Object.keys(recordStore.getStaging().fields).some(fieldKey => {
+                const field = recordStore.getStaging().fields[fieldKey];
+                return field.loading() ?? false;
+            });
+
+            if (isFieldLoading) {
+                this.message.addWarningMessageByKey('LBL_LOADING_IN_PROGRESS');
+                return;
+            }
+
+            recordStore.validate().pipe(take(1)).subscribe(valid => {
+                if (valid) {
+                    super.runAction(action, context);
+                    return;
+                }
+                this.message.addWarningMessageByKey('LBL_VALIDATION_ERRORS');
+            });
+
+            return;
+        }
+
+        super.runAction(action, context);
     }
 
     /**
      * Get action name
      * @param action
+     * @param context
      */
-    protected getActionName(action: Action) {
-        return `record-${action.key}`;
+    protected getActionName(action: Action, context: ActionContext = null) {
+
+        const prefix = action?.params?.asyncProcessKeyPrefix ?? 'record';
+
+        const keyFieldName = action?.params?.asyncProcessKeyField ?? '';
+        const record = context?.record ?? null;
+        const keyField = record?.fields?.[keyFieldName ?? ''] ?? null;
+        const keyFieldValue = keyField?.value ?? null;
+        if (keyFieldValue && isString(keyFieldValue)) {
+            return `${prefix}-${keyFieldValue}`;
+        }
+
+        return `${prefix}-${action.key}`;
     }
 
     /**
@@ -76,13 +129,22 @@ export abstract class BaseRecordActionsAdapter<D> extends BaseActionsAdapter<D> 
      * @param actionName
      * @param moduleName
      * @param context
+     * @param actionData
      */
-    protected buildActionInput(action: Action, actionName: string, moduleName: string, context: ActionContext = null): AsyncActionInput {
+    protected buildActionInput(action: Action, actionName: string, moduleName: string, context: ActionContext = null, actionData?: D): AsyncActionInput {
+        const record = (actionData && actionData?.store?.recordStore?.getStaging()) || null;
+        let baseRecord = null;
+        if (record) {
+            baseRecord = this.recordManager.getBaseRecord(record);
+        }
+
         return {
             action: actionName,
             module: moduleName,
-            id: (context && context.record && context.record.id) || '',
+            id: baseRecord?.id ?? (context && context.record && context.record.id) ?? '',
             params: (action && action.params) || [],
+            record: baseRecord ?? null
         } as AsyncActionInput;
     }
+
 }

@@ -1,0 +1,152 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2024 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="d-flex align-items-center">
+    <ng-container *ngIf="initModule">
+        <div class="flex-grow-1 w-100 mr-1">
+            <p-multiSelect
+                #tag
+                [options]="currentOptions()"
+                [(ngModel)]="selectedValues"
+                [optionLabel]="getRelateFieldName()"
+                (onChange)="onAdd()"
+                (onLazyLoad)="onFilter()"
+                (onRemove)="onRemove()"
+                (onPanelShow)="onPanelShow()"
+                (onPanelHide)="resetFunction()"
+                [placeholder]="placeholderLabel"
+                [selectedItemsLabel]="'{0} ' + selectedItemsLabel"
+                [emptyFilterMessage]="emptyFilterLabel()"
+                [emptyMessage]="emptyFilterLabel()"
+                [maxSelectedLabels]="maxSelectedLabels"
+                [styleClass]="'w-100 ' + getInvalidClass()"
+                [showToggleAll]="true"
+                [selectAll]="selectAll"
+                [loading]="loading()"
+                [autoOptionFocus]="false"
+                [autofocusFilter]="false"
+                [focusOnHover]="true"
+                [showClear]="true"
+                (onClear)="onClear()"
+                [filter]="true"
+                [lazy]="true"
+                [dataKey]="'id'"
+                [filterBy]="getRelateFieldName()"
+            >
+                <ng-template let-value pTemplate="selectedItems">
+                    <div class="d-flex">
+                        <ng-container *ngIf="value && value.length > 0 && value.length <= 2">
+                            <ng-container *ngFor="let option of value; let i = index;">
+                                <div *ngIf="i > 0" class="pr-1">,</div>
+                                <div class="d-flex multi-relate-selected-entry align-items-center" >
+                                    <ng-container *ngIf="showIcon()">
+                                    <scrm-image [image]="option.module_name" class="multi-relate-selected-entry-icon"></scrm-image>
+                                    </ng-container>
+                                    <div class="multi-relate-selected-entry-value">
+                                        {{ option[headerFields[option.module_name] ?? 'name'] ?? '' }}
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="value && value.length > 2">
+                            <div class="d-flex multi-relate-selected-entry align-items-center" >
+                                <ng-container *ngIf="showIcon()">
+                                <scrm-image [image]="value[0].module_name" class="multi-relate-selected-entry-icon"></scrm-image>
+                                </ng-container>
+                                <div class="multi-relate-selected-entry-value">{{ value[0][headerFields[value[0].module_name] ?? 'name'] ?? '' }}</div>
+                            </div>
+                            <div class="pr-1">,</div>
+                            <div class="d-flex multi-relate-selected-entry align-items-center" >
+                                <ng-container *ngIf="showIcon()">
+                                <scrm-image [image]="value[1].module_name" class="multi-relate-selected-entry-icon"></scrm-image>
+                                </ng-container>
+                                <div class="multi-relate-selected-entry-value">{{ value[1][headerFields[value[1].module_name] ?? 'name'] ?? '' }}</div>
+                            </div>
+                            <div class="pr-1">, +{{value.length - 2}} </div>
+                        </ng-container>
+
+                        <div *ngIf="!value || value.length === 0"><scrm-label [labelKey]="'LBL_SELECT_ITEM'"></scrm-label></div>
+                    </div>
+
+                </ng-template>
+                <ng-template let-item pTemplate="item">
+                    <div class="d-flex flex-column mutli-relate-relate-item">
+                        <div class="multi-relate-item-header-field">
+                            {{ item.label ?? '' }}
+                        </div>
+                        <div *ngIf="item.subLabel ?? ''"
+                             class="multi-relate-item-subheader-field">
+                            {{ item.subLabel ?? '' }}
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="dropdownicon">
+                    <scrm-image image="down_carret"></scrm-image>
+                </ng-template>
+                <ng-template pTemplate="checkicon">
+                    <scrm-image image="checkbox_cross"></scrm-image>
+                </ng-template>
+
+                <ng-template pTemplate="filter" let-options="options">
+
+                    <div class="p-checkbox p-component" (click)="$event.stopPropagation()">
+                        <div class="p-hidden-accessible" data-p-hidden-accessible="true">
+                            <input type="checkbox" checked="false" aria-label="All items unselected">
+                        </div>
+                        <div role="checkbox" class="p-checkbox-box" aria-checked="false" (click)="onSelectAll()">
+                            <scrm-image image="checkbox_cross" *ngIf="selectAll"></scrm-image>
+                        </div>
+                    </div>
+                    <div class="p-multiselect-filter-container" (click)="$event.stopPropagation()">
+                        <input #dropdownFilterInput
+                               type="text"
+                               pInputText
+                               autocomplete="off"
+                               class="p-multiselect-filter p-inputtext p-component"
+                               [(ngModel)]="filterValue"
+                               (keyup)="onFilterInput($event);"
+                               tabindex="0">
+                        <span class="p-multiselect-filter-icon">
+                            <scrm-image image="search" class="p-element p-dropdown-filter-search-icon"></scrm-image>
+                        </span>
+                    </div>
+
+                </ng-template>
+
+
+
+            </p-multiSelect>
+        </div>
+        <div>
+            <scrm-button [config]="selectButton">
+            </scrm-button>
+        </div>
+    </ng-container>
+</div>
+
+
+

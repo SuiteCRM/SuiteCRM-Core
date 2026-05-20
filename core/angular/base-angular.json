@@ -1,0 +1,205 @@
+{
+  "$schema": "node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "core/app",
+  "projects": {
+    "shell": {
+      "root": "core/app/shell",
+      "sourceRoot": "core/app/shell/src",
+      "projectType": "application",
+      "prefix": "scrm",
+      "architect": {
+        "build": {
+          "builder": "ngx-build-plus:browser",
+          "options": {
+            "namedChunks": true,
+            "commonChunk": false,
+            "sourceMap": true,
+            "aot": true,
+            "outputPath": "public/dist/",
+            "index": "core/app/shell/src/index.html",
+            "main": "core/app/shell/src/main.ts",
+            "polyfills": "core/app/shell/src/polyfills.ts",
+            "tsConfig": "core/app/shell/tsconfig.app.json",
+            "scripts": [
+              "node_modules/tinymce/tinymce.min.js",
+              "node_modules/dompurify/dist/purify.min.js"
+            ],
+            "styles": [
+              "node_modules/bootstrap-css-only/css/bootstrap.min.css",
+              "core/app/shell/src/themes/suite8/css/style.scss",
+              "node_modules/primeng/resources/themes/bootstrap4-light-blue/theme.css",
+              "node_modules/primeng/resources/primeng.min.css"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "core/app/shell/src/themes/*/css"
+              ]
+            },
+            "deployUrl": "dist/",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "core/app/shell/src/themes",
+                "ignore": [
+                  "**/*.scss"
+                ],
+                "output": "/themes/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/tinymce",
+                "output": "/tinymce/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/monaco-editor/min/",
+                "output": "/mona/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/squire-rte/dist/",
+                "output": "/squire/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/dompurify/dist/",
+                "output": "/dompurify/"
+              },
+              "core/app/shell/src/squire-document.html"
+            ],
+            "allowedCommonJsDependencies": [
+              "graphql-tag",
+              "zen-observable",
+              "seedrandom",
+              "rfdc",
+              "typed-function",
+              "javascript-natural-sort",
+              "complex.js",
+              "escape-latex"
+            ],
+            "extraWebpackConfig": "core/app/shell/webpack.config.js"
+          },
+          "configurations": {
+            "serve": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
+              "assets": [
+                {
+                  "glob": "**/*",
+                  "input": "core/app/shell/src/themes",
+                  "output": "public/dist/themes"
+                }
+              ]
+            },
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "core/app/shell/src/environments/environment.ts",
+                  "with": "core/app/shell/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "9mb",
+                  "maximumError": "12mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ],
+              "extraWebpackConfig": "core/app/shell/webpack.prod.config.js"
+            }
+          }
+        },
+        "test": {
+          "builder": "ngx-build-plus:karma",
+          "options": {
+            "main": "core/app/shell/src/test.ts",
+            "polyfills": "core/app/shell/src/polyfills.ts",
+            "tsConfig": "core/app/shell/tsconfig.spec.json",
+            "karmaConfig": "core/app/shell/karma.conf.js",
+            "styles": [
+              "node_modules/bootstrap-css-only/css/bootstrap.min.css",
+              "core/app/shell/src/themes/suite8/css/style.scss"
+            ],
+            "scripts": [],
+            "assets": [
+              "core/app/shell/src/themes"
+            ],
+            "extraWebpackConfig": "core/app/shell/webpack.config.spec.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "eslintConfig": "./.eslintrc.js",
+            "tsConfig": "core/app/shell/tsconfig.app.json",
+            "fix": true
+          }
+        }
+      }
+    },
+    "core": {
+      "projectType": "library",
+      "root": "core/app/core",
+      "sourceRoot": "core/app/core/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "core/app/core/tsconfig.lib.json",
+            "project": "core/app/core/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "core/app/core/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "ngx-build-plus:karma",
+          "options": {
+            "main": "core/app/core/src/test.ts",
+            "tsConfig": "core/app/core/tsconfig.spec.json",
+            "karmaConfig": "core/app/core/karma.conf.js",
+            "styles": [
+              "node_modules/bootstrap-css-only/css/bootstrap.min.css"
+            ],
+            "scripts": [],
+            "assets": [],
+            "extraWebpackConfig": "core/app/core/webpack.config.spec.js"
+          }
+        }
+      }
+    }
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "prefix": "app",
+      "style": "scss"
+    },
+    "@schematics/angular:directive": {
+      "prefix": "app"
+    }
+  },
+  "cli": {
+    "packageManager": "yarn",
+    "analytics": false
+  }
+}

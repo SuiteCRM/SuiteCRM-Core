@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,10 +24,10 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, signal, WritableSignal} from '@angular/core';
 import {Router} from '@angular/router';
-import {combineLatestWith, Observable, of} from 'rxjs';
-import {catchError, map, tap} from 'rxjs/operators';
+import {combineLatestWith, Observable} from 'rxjs';
+import {map, tap} from 'rxjs/operators';
 import {transition, trigger, useAnimation} from '@angular/animations';
 import {fadeIn} from 'ng-animate';
 import {RecoverPasswordService} from '../../../../services/process/processes/recover-password/recover-password';
@@ -36,7 +36,7 @@ import {AuthService} from '../../../../services/auth/auth.service';
 import {LanguageStore, LanguageStringMap} from '../../../../store/language/language.store';
 import {MessageService} from '../../../../services/message/message.service';
 import {Process} from '../../../../services/process/process.service';
-import {StringMap} from 'common';
+import {StringMap} from '../../../../common/types/string-map';
 import {HttpErrorResponse} from '@angular/common/http';
 import {AppStateStore} from "../../../../store/app-state/app-state.store";
 
@@ -61,7 +61,7 @@ export class LoginUiComponent implements OnInit {
     passw = '';
     email = '';
 
-    cardState = 'front';
+    cardState: WritableSignal<string> = signal('front');
 
     systemConfigs$: Observable<SystemConfigMap> = this.configs.configs$;
     appStrings$: Observable<LanguageStringMap> = this.languageStore.appStrings$;
@@ -150,16 +150,23 @@ export class LoginUiComponent implements OnInit {
     }
 
     flipCard(): void {
-        if (this.cardState === 'front') {
-            this.cardState = 'back';
+        if (this.cardState() === 'front') {
+            this.cardState.set('back');
         } else {
-            this.cardState = 'front';
+            this.cardState.set('front');
         }
+    }
+
+    returnToLogin(): void {
+        this.cardState.set('front');
+        this.auth.isUserLoggedIn.next(false);
+        this.auth.handleInvalidSession('LBL_2FA_LOGIN_CANCEL');
+        return;
     }
 
     doLogin(): void {
         this.loading = true;
-        this.auth.doLogin(this.uname, this.passw, this.onLoginSuccess.bind(this), this.onLoginError.bind(this));
+        this.auth.doLogin(this.uname, this.passw, this.onLoginSuccess.bind(this), this.onLoginError.bind(this), this.onTwoFactor.bind(this));
     }
 
     recoverPassword(): void {
@@ -192,32 +199,7 @@ export class LoginUiComponent implements OnInit {
         this.message.log('Login success');
         this.message.removeMessages();
 
-        this.languageStore.setSessionLanguage()
-            .pipe(catchError(() => of({})))
-            .subscribe(() => {
-                if (result && result.redirect && result.redirect.route) {
-                    this.router.navigate(
-                        [result.redirect.route],
-                        {
-                         queryParams: result.redirect.queryParams ?? {}
-                        }).then();
-                    return;
-                }
-
-                if (this.appState.getPreLoginUrl()) {
-                    this.router.navigateByUrl(this.appState.getPreLoginUrl()).then(() => {
-                        this.appState.setPreLoginUrl('');
-                    });
-                    return;
-                }
-
-                const defaultModule = this.configs.getHomePage();
-                this.router.navigate(['/' + defaultModule]).then();
-            });
-
-        if (this.configs.getConfigValue('login_language')) {
-            this.languageStore.setUserLanguage().subscribe();
-        }
+        this.auth.setLanguage(result);
         return;
     }
 
@@ -239,6 +221,10 @@ export class LoginUiComponent implements OnInit {
             message = defaultMessage
         }
         this.message.addDangerMessage(message);
+    }
+
+    onTwoFactor(result: any): void {
+        this.cardState.set('2fa');
     }
 
     protected getTooManyFailedMessage(defaultTooManyFailedMessage: string): string {

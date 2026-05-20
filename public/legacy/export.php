@@ -49,6 +49,7 @@ require_once('include/export_utils.php');
 global $sugar_config;
 global $current_user;
 global $app_list_strings;
+global $db;
 global $beanList;
 global $log;
 
@@ -74,12 +75,12 @@ $bean = $beanList[$_REQUEST['module']];
 //check to see if this is a request for a sample or for a regular export
 if (!empty($_REQUEST['sample'])) {
     //call special method that will create dummy data for bean as well as insert standard help message.
-    $content = exportSample(clean_string($_REQUEST['module']));
+    $content = exportSample($the_module);
 } else {
     if (!empty($_REQUEST['uid'])) {
-        $content = export(clean_string($_REQUEST['module']), $_REQUEST['uid'], isset($_REQUEST['members']) ? $_REQUEST['members'] : false);
+        $content = export($the_module, $_REQUEST['uid'], isset($_REQUEST['members']) ? $_REQUEST['members'] : false);
     } else {
-        $content = export(clean_string($_REQUEST['module']));
+        $content = export($the_module);
     }
 }
 $filename = $_REQUEST['module'];

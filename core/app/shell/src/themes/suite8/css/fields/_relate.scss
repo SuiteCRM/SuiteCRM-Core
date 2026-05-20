@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2024 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2024 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -31,8 +31,32 @@
       font-size: .875rem;
     }
 
+    .p-dropdown-trigger {
+      .pi-spin {
+        border: 2px solid #495057;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        display: table-cell;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+        width: 15px;
+        height: 15px;
+
+      }
+
+      @keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    }
+
     .p-dropdown-trigger-icon {
       font-size: .875rem;
+
       svg {
         fill: $midnight-grey;
       }
@@ -55,7 +79,7 @@
     .p-dropdown.p-component.p-inputwrapper {
       justify-content: space-between;
 
-      >p-overlay {
+      > p-overlay {
         display: contents;
       }
 
@@ -81,7 +105,7 @@
 
     .p-dropdown-item {
       font-size: .875rem;
-      line-height: .875rem;
+      line-height: 1.1rem;
       display: table;
       table-layout: fixed;
       width: 100%;
@@ -92,7 +116,8 @@
         text-overflow: ellipsis;
         display: table-cell;
         vertical-align: middle;
-        width: 100%
+        width: 100%;
+        height: 16px;
       }
     }
 
@@ -109,6 +134,10 @@
     .p-dropdown-items {
       padding-inline-start: 0;
       margin-bottom: 0;
+
+      .p-dropdown-empty-message {
+        font-size: .875rem;
+      }
     }
 
     .p-dropdown-label {
@@ -121,6 +150,65 @@
 
     .p-dropdown-panel .p-dropdown-header {
       padding: 0.5rem 0.7rem;
+    }
+  }
+
+  .relate-item {
+    display: table;
+
+    .selected-item-label {
+      display: table-cell;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .related-item-label {
+      display: table-cell;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .relate-item-header-field {
+
+      display: table-cell;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+
+      span {
+        overflow: hidden;
+        display: inline;
+        max-width: 0;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .relate-item-subheader-field {
+      padding-left: 0.2rem;
+      font-size: 85%;
+      color: $shell-grey;
+      display: table-cell;
+      max-width: 0;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
+
+
+      span {
+        overflow: hidden;
+        display: inline;
+        max-width: 0;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+
     }
   }
 }

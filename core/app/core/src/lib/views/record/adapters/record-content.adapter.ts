@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -27,8 +27,11 @@
 import {combineLatestWith, Observable, Subscription} from 'rxjs';
 import {inject, Injectable} from '@angular/core';
 import {map} from 'rxjs/operators';
-import {Action, Panel, Record, ViewMode} from 'common';
-import {MetadataStore, RecordViewMetadata} from '../../../store/metadata/metadata.store.service';
+import {Action} from '../../../common/actions/action.model';
+import {ViewMode} from '../../../common/views/view.model';
+import {Record} from '../../../common/record/record.model';
+import {Panel} from '../../../common/metadata/metadata.model';
+import {MetadataStore, RecordViewSectionMetadata} from '../../../store/metadata/metadata.store.service';
 import {RecordContentConfig, RecordContentDataSource} from '../../../components/record-content/record-content.model';
 import {RecordActionManager} from '../actions/record-action-manager.service';
 import {RecordActionData} from '../actions/record.action';
@@ -49,7 +52,8 @@ export class RecordContentAdapter implements RecordContentDataSource {
         protected metadata: MetadataStore,
         protected language: LanguageStore,
         protected actions: RecordActionManager,
-        protected logicManager: PanelLogicManager
+        protected logicManager: PanelLogicManager,
+        protected panels$: Observable<Panel[]>
     ) {
         this.recordValidationHandler = inject(RecordValidationHandler);
     }
@@ -68,25 +72,27 @@ export class RecordContentAdapter implements RecordContentDataSource {
 
     getDisplayConfig(): Observable<RecordContentConfig> {
 
-        return this.metadata.recordViewMetadata$.pipe(
+        return this.store.sectionMetadata$.pipe(
             combineLatestWith(this.store.mode$),
-            map(([meta, mode]: [RecordViewMetadata, ViewMode]) => {
-                const layout = this.getLayout(meta);
+            map(([meta, mode]: [RecordViewSectionMetadata, ViewMode]) => {
+                const layout = this.getPanelDisplayType(meta);
                 const maxColumns = meta.templateMeta.maxColumns || 2;
+                const colClasses = meta?.templateMeta?.colClasses ?? [];
                 const tabDefs = meta.templateMeta.tabDefs;
 
                 return {
                     layout,
                     mode,
                     maxColumns,
-                    tabDefs
+                    tabDefs,
+                    colClasses
                 } as RecordContentConfig;
             })
         );
     }
 
     getPanels(): Observable<Panel[]> {
-        return this.store.panels$;
+        return this.panels$;
     }
 
     getRecord(): Observable<Record> {
@@ -107,13 +113,13 @@ export class RecordContentAdapter implements RecordContentDataSource {
         );
     }
 
-    protected getLayout(recordMeta: RecordViewMetadata): string {
-        let layout = 'panels';
-        if (recordMeta.templateMeta.useTabs) {
-            layout = 'tabs';
+    protected getPanelDisplayType(sectionMetadata: RecordViewSectionMetadata): string {
+        let panelDisplayType = 'panels';
+        if (sectionMetadata?.templateMeta?.useTabs) {
+            panelDisplayType = 'tabs';
         }
 
-        return layout;
+        return panelDisplayType;
     }
 
     clean(): void {

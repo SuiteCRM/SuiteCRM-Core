@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,8 +26,8 @@
 
 import {Component, OnDestroy, OnInit,} from '@angular/core';
 import {NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct, NgbInputDatepicker} from '@ng-bootstrap/ng-bootstrap';
-import {ButtonInterface, isEmptyString, isVoid} from 'common';
-import {BaseDateTimeComponent} from '../../../base/datetime/base-datetime.component';
+import {isVoid, isEmptyString} from '../../../../common/utils/value-utils';
+import {ButtonInterface} from '../../../../common/components/button/button.model';
 import {DataTypeFormatter} from '../../../../services/formatters/data-type.formatter.service';
 import {DateParserFormatter} from '../../../base/datetime/date/date-parser-formatter.service';
 import {DateFormatter} from '../../../../services/formatters/datetime/date-formatter.service';
@@ -76,6 +76,10 @@ export class DateEditFieldComponent extends BaseDateComponent implements OnInit,
         const parserFormatter = this.dateParserFormatter as DateParserFormatter;
         parserFormatter.setUserFormat(this.getDateFormat());
         this.dateModel = this.formatter.dateFormatToStruct(this.field.value, this.formatter.getInternalFormat());
+
+        this.initMinDate();
+        this.initMaxDate();
+
         this.subscribeValueChanges();
     }
 

@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -27,7 +27,10 @@
 import {Injectable} from '@angular/core';
 import {RecordThreadStore} from '../../containers/record-thread/store/record-thread/record-thread.store';
 import {SystemConfigStore} from '../system-config/system-config.store';
-import {deepClone, Field, Record, SearchCriteria} from 'common';
+import {deepClone} from '../../common/utils/object-utils';
+import {Record} from '../../common/record/record.model';
+import {Field} from '../../common/record/field.model';
+import {SearchCriteria} from '../../common/views/list/search-criteria.model';
 import {RecordThreadItemMetadata} from '../../containers/record-thread/store/record-thread/record-thread-item.store.model';
 import {
     RecordThreadConfig,
@@ -127,6 +130,10 @@ export class NotificationsService {
 
         if (options?.item && options?.item?.fields) {
             metadata.fields = deepClone(options.item.fields);
+        }
+
+        if (options?.item && options?.item?.clickActions) {
+            metadata.clickActions = deepClone(options?.item?.clickActions);
         }
 
         if ((options?.item?.collapseActions ?? null) !== null) {

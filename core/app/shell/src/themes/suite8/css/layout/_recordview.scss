@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,12 +28,33 @@
   padding-top: 3em;
   width: 100%;
   margin: 0;
+
+  .record-view-container {
+    .record-content {
+      .field-layout {
+        .field-layout-row {
+          .field-layout-col {
+            .field-layout-field-group-wrapper {
+              .field-layout-field-label-wrapper.label-container {
+                .dynamic-label {
+                  text-transform: uppercase;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+
 }
 
 .record-view-position-sticky {
   position: sticky;
   top: 3em;
-  z-index: 11;
+  z-index: 500;
+  min-height: 44px
 }
 
 .record-view-header {
@@ -58,10 +79,14 @@
   padding-right: 1.6em;
 }
 
+.record-widget-container {
+  padding-top: 0.2em;
+}
+
 @media all and (min-width: $breakpoint-large) {
   .record-view-hr-container {
     font-size: 0.85em;
-    padding: 0.4em 1.6em;
+    padding: 0.2em 1.6em 0.3em;
   }
 }
 
@@ -69,16 +94,15 @@
 
   .record-view-name-header,
   .record-view-back-button-container,
-  .record-view-action-header
-  {
+  .record-view-action-header {
     justify-content: center;
   }
 
   .record-view-name,
   .record-view-name-scrolled {
-    justify-content:center;
+    justify-content: center;
     position: relative;
-    margin-right:10%;
+    margin-right: 10%;
   }
 
 }

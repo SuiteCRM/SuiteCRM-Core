@@ -1,0 +1,12 @@
+parameters:
+  module.recordview.section_tab_limits:
+    type: 'dynamicBreakpoint'
+    dynamicBreakpoint:
+      buttonMax: 115
+      dropdownMax: 80
+    fixedLimits:
+      XSmall: 3
+      Small: 5
+      Medium: 5
+      Large: 4
+      XLarge: 5

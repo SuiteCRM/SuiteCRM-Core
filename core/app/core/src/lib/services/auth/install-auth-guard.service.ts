@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -71,7 +71,7 @@ export class InstallAuthGuard  {
                 map((user: SessionStatus) => {
 
                     if (user && user.appStatus.locked === true && user.appStatus.installed === true) {
-                        this.message.addDangerMessageByKey('LBL_DISABLED_TITLE_2');
+                        window.location.href = './install.php'
 
                         if (user && user.active === false) {
                             return homePageUrlTree;
@@ -82,7 +82,6 @@ export class InstallAuthGuard  {
 
                     if (user && user.active === true) {
                         this.authService.logout('', false);
-                        this.authService.isUserLoggedIn.next(false);
                     }
 
                     return true;

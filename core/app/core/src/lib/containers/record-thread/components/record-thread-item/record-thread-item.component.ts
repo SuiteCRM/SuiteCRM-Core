@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -29,9 +29,14 @@ import {RecordThreadItemConfig} from './record-thread-item.model';
 import {of, Subscription} from 'rxjs';
 import {FieldFlexbox, RecordFlexboxConfig} from '../../../../components/record-flexbox/record-flexbox.model';
 import {debounceTime, shareReplay} from 'rxjs/operators';
-import {ButtonInterface, Record, StringMap} from 'common';
+import {StringMap} from '../../../../common/types/string-map';
+import {ButtonInterface} from '../../../../common/components/button/button.model';
+import {Record} from '../../../../common/record/record.model';
 import {RecordThreadItemActionsAdapter} from '../../adapters/record-thread-item-actions.adapter';
 import {RecordThreadItemActionsAdapterFactory} from '../../adapters/record-thread-item-actions.adapter.factory';
+import {RecordThreadItemClickActionAdapter} from '../../adapters/record-thread-item-click-action.adapter';
+import {RecordThreadItemClickActionAdapterFactory} from '../../adapters/record-thread-item-click-action.adapter.factory';
+import {ResolvedClickAction} from '../../actions/click-actions/record-thread-item-click-action-resolver.service';
 
 @Component({
     selector: 'scrm-record-thread-item',
@@ -46,18 +51,24 @@ export class RecordThreadItemComponent implements OnInit, OnDestroy, AfterViewIn
     collapsible = false;
     collapseLimit = 300;
     dynamicClass = '';
+    hasClickAction = false;
     protected subs: Subscription[] = [];
     protected actionAdapter: RecordThreadItemActionsAdapter;
+    protected clickActionAdapter: RecordThreadItemClickActionAdapter;
+    protected resolvedClickAction: ResolvedClickAction | null = null;
     protected dynamicClassesMap: StringMap = {};
     protected dynamicClassFieldSubs: Subscription[] = [];
 
     constructor(
-        protected actionAdapterFactory: RecordThreadItemActionsAdapterFactory
+        protected actionAdapterFactory: RecordThreadItemActionsAdapterFactory,
+        protected clickActionAdapterFactory: RecordThreadItemClickActionAdapterFactory,
+        protected elementRef: ElementRef
     ) {
     }
 
     ngOnInit(): void {
         this.actionAdapter = this.actionAdapterFactory.create(this.config.store, this.config.threadStore, this.config);
+        this.initClickAction();
         this.initDynamicClass();
     }
 
@@ -122,6 +133,59 @@ export class RecordThreadItemComponent implements OnInit, OnDestroy, AfterViewIn
                 }
             }
         } as ButtonInterface;
+    }
+
+    onItemClick(event: MouseEvent): void {
+        if (!this.resolvedClickAction) {
+            return;
+        }
+
+        if (this.isInteractiveElement(event.target as HTMLElement)) {
+            return;
+        }
+
+        this.clickActionAdapter.runClickAction(this.resolvedClickAction);
+    }
+
+    protected initClickAction(): void {
+        const clickActionConfigs = this.config?.metadata?.clickActions;
+        if (!clickActionConfigs || !clickActionConfigs.length) {
+            return;
+        }
+
+        this.clickActionAdapter = this.clickActionAdapterFactory.create(
+            this.config.store,
+            this.config.threadStore,
+            clickActionConfigs
+        );
+
+        this.subs.push(this.clickActionAdapter.resolvedClickAction$.subscribe(resolved => {
+            this.resolvedClickAction = resolved;
+            this.hasClickAction = resolved !== null;
+        }));
+    }
+
+    protected isInteractiveElement(element: HTMLElement): boolean {
+        const interactiveTags = ['BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA'];
+        let current = element;
+
+        while (current && current !== this.elementRef?.nativeElement) {
+            if (interactiveTags.includes(current.tagName)) {
+                return true;
+            }
+
+            if (current.classList.contains('record-thread-item-actions-area')) {
+                return true;
+            }
+
+            if (current.getAttribute('role') === 'button') {
+                return true;
+            }
+
+            current = current.parentElement;
+        }
+
+        return false;
     }
 
     protected initDynamicClass(): void {

@@ -1,5 +1,7 @@
-/.angular/cache
 ## SuiteCRM 8 ##
+
+/.angular/cache
+/angular.json
 
 ###> symfony/framework-bundle ###
 /.env.local
@@ -33,12 +35,19 @@
 # Symfony Cache
 /cache/
 
+# Nx Cache
+/.nx/
+
 # Dependencies
 node_modules
 
 # Compiled Output
 /public/
 /dist/
+
+# Tmp
+/tmp/
+!/tmp/.gitkeep
 
 # Custom
 /extensions/

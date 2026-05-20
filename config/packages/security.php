@@ -87,14 +87,19 @@ return static function (ContainerConfigurator $containerConfig) {
 
     //Note: Only the *first* access control that matches will be used
     $baseAccessControl = [
+        ['path' => '^/logged-out', 'roles' => 'PUBLIC_ACCESS'],
+        ['path' => '^/logout$', 'roles' => 'PUBLIC_ACCESS'],
         ['path' => '^/login$', 'roles' => 'PUBLIC_ACCESS'],
         ['path' => '^/session-status$', 'roles' => 'PUBLIC_ACCESS'],
-        ['path' => '^/logout$', 'roles' => 'PUBLIC_ACCESS'],
-        ['path' => '^/logged-out', 'roles' => 'PUBLIC_ACCESS'],
+        ['path' => '^/2fa/enable-finalize', 'roles' => 'ROLE_USER'],
+        ['path' => '^/2fa/check', 'roles' => 'IS_AUTHENTICATED_2FA_IN_PROGRESS'],
+        ['path' => '^/2fa/enable', 'roles' => 'ROLE_USER'],
+        ['path' => '^/2fa/disable', 'roles' => 'ROLE_USER'],
         ['path' => '^/$', 'roles' => 'PUBLIC_ACCESS'],
         ['path' => '^/api', 'roles' => 'PUBLIC_ACCESS'],
         ['path' => '^/api/graphql', 'roles' => 'PUBLIC_ACCESS'],
         ['path' => '^/api/graphql/graphiql*', 'roles' => 'PUBLIC_ACCESS'],
+        ['path' => '^/ep', 'roles' => 'PUBLIC_ACCESS'],
         ['path' => '^/', 'roles' => 'PUBLIC_ACCESS']
     ];
 
@@ -116,8 +121,10 @@ return static function (ContainerConfigurator $containerConfig) {
         $containerConfig->extension('security', [
             'firewalls' => array_merge_recursive($baseFirewall, [
                 'main' => [
+                    'stateless' => false,
                     'json_login' => [
                         'check_path' => 'app_login',
+                        'success_handler' => 'api_success_handler'
                     ],
                     'login_throttling' => [
                         'limiter' => 'app.login_rate_limiter'
@@ -125,6 +132,17 @@ return static function (ContainerConfigurator $containerConfig) {
                     'logout' => [
                         'path' => 'app_logout',
                     ],
+                    'two_factor' => [
+                        'check_path' => 'app_2fa_check',
+                        'prepare_on_login' => true,
+                        'prepare_on_access_denied' => true,
+                        'auth_code_parameter_name' => '_auth_code',
+                        'default_target_path' => '/',
+                        'provider' => 'app_user_provider',
+                        'authentication_required_handler' => '2fa_required',
+                        'success_handler' => '2fa_success',
+                        'failure_handler' => '2fa_failed'
+                    ]
                 ],
             ]),
             'access_control' => $baseAccessControl
@@ -210,6 +228,17 @@ return static function (ContainerConfigurator $containerConfig) {
                     ],
                     'logout' => [
                         'path' => 'app_logout'
+                    ],
+                    'two_factor' => [
+                        'check_path' => 'app_2fa_check',
+                        'prepare_on_login' => true,
+                        'prepare_on_access_denied' => true,
+                        'auth_code_parameter_name' => '_auth_code',
+                        'default_target_path' => '/',
+                        'provider' => 'app_user_provider',
+                        'authentication_required_handler' => '2fa_required',
+                        'success_handler' => '2fa_success',
+                        'failure_handler' => '2fa_failed'
                     ]
                 ],
             ]),
@@ -253,6 +282,7 @@ return static function (ContainerConfigurator $containerConfig) {
             ['path' => '^/login$', 'roles' => 'PUBLIC_ACCESS'],
             ['path' => '^/session-status$', 'roles' => 'PUBLIC_ACCESS'],
             ['path' => '^/logout$', 'roles' => 'PUBLIC_ACCESS'],
+            ['path' => '^/auth/2fa_check', 'roles' => 'IS_AUTHENTICATED_2FA_IN_PROGRESS'],
             ['path' => '^/saml/login', 'roles' => 'PUBLIC_ACCESS'],
             ['path' => '^/saml/metadata', 'roles' => 'PUBLIC_ACCESS'],
             ['path' => '^/saml/acs', 'roles' => 'PUBLIC_ACCESS'],
@@ -263,6 +293,7 @@ return static function (ContainerConfigurator $containerConfig) {
             ['path' => '^/auth/session-status', 'roles' => 'PUBLIC_ACCESS'],
             ['path' => '^/auth/logout', 'roles' => 'PUBLIC_ACCESS'],
             ['path' => '^/$', 'roles' => 'ROLE_USER'],
+            ['path' => '^/private/media', 'roles' => 'ROLE_USER'],
             ['path' => '^/api', 'roles' => 'PUBLIC_ACCESS'],
             ['path' => '^/api/graphql', 'roles' => 'PUBLIC_ACCESS'],
             ['path' => '^/api/graphql/graphiql*', 'roles' => 'PUBLIC_ACCESS'],
@@ -303,6 +334,17 @@ return static function (ContainerConfigurator $containerConfig) {
                     ],
                     'logout' => [
                         'path' => 'logged-out'
+                    ],
+                    'two_factor' => [
+                        'check_path' => 'native_auth_2fa_check',
+                        'prepare_on_login' => true,
+                        'prepare_on_access_denied' => true,
+                        'auth_code_parameter_name' => '_auth_code',
+                        'default_target_path' => '/',
+                        'provider' => 'app_user_provider',
+                        'authentication_required_handler' => '2fa_required',
+                        'success_handler' => '2fa_success',
+                        'failure_handler' => '2fa_failed'
                     ]
                 ],
                 'logged-out' => [

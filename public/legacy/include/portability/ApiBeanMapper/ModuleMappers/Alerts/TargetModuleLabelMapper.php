@@ -52,7 +52,7 @@ class TargetModuleLabelMapper implements FieldMapperInterface
      */
     public function toApi(SugarBean $bean, array &$container, string $alternativeName = ''): void
     {
-        global $app_list_strings, $beanList;
+        global $app_list_strings, $app_strings, $beanList;
         $name = self::FIELD_NAME;
 
 
@@ -67,25 +67,32 @@ class TargetModuleLabelMapper implements FieldMapperInterface
             return;
         }
 
-        if (empty($beanList) || empty($beanList[$targetModule]) || empty($app_list_strings)) {
-            $container[$name] = $targetModule;
+        $label = $this->resolveModuleLabel($targetModule, $beanList, $app_list_strings);
 
-            return;
+        $status = $bean->status ?? '';
+        $statusLabelKey = 'LBL_ALERT_STATUS_' . strtoupper($status);
+        if (!empty($status) && !empty($app_strings[$statusLabelKey])) {
+            $label .= ' - ' . $app_strings[$statusLabelKey];
+        }
+
+        $container[$name] = $label;
+    }
+
+    protected function resolveModuleLabel(string $targetModule, array $beanList, array $app_list_strings): string
+    {
+        if (empty($beanList) || empty($beanList[$targetModule]) || empty($app_list_strings)) {
+            return $targetModule;
         }
 
         if (!empty($app_list_strings['moduleListSingular'][$targetModule])) {
-            $container[$name] = $app_list_strings['moduleListSingular'][$targetModule];
-
-            return;
+            return $app_list_strings['moduleListSingular'][$targetModule];
         }
 
         if (!empty($app_list_strings['moduleList'][$targetModule])) {
-            $container[$name] = $app_list_strings['moduleList'][$targetModule];
-
-            return;
+            return $app_list_strings['moduleList'][$targetModule];
         }
 
-        $container[$name] = $targetModule;
+        return $targetModule;
     }
 
     /**

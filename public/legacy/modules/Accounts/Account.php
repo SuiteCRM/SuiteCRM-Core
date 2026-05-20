@@ -374,6 +374,11 @@ class Account extends Company implements EmailInterface
         }
         return false;
     }
+
+    public function getUpcomingEmails() {
+        return getUpcomingEmails($this);
+    }
+
     public function get_unlinked_email_query($type=array())
     {
         return get_unlinked_email_query($type, $this);

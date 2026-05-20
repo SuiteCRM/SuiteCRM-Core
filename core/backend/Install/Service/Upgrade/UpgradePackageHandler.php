@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -95,6 +95,7 @@ class UpgradePackageHandler extends PackageHandler
         $this->compare->setToKeep($upgradeConfig['toKeep']);
         $this->compare->setToKeepIgnore($upgradeConfig['toKeepIgnore']);
         $this->compare->setPathsToExpand($upgradeConfig['toExpand']);
+        $this->compare->setToReAdd($upgradeConfig['toReAdd']);
         $this->upgradeLogger = $upgradeLogger;
     }
 
@@ -138,6 +139,21 @@ class UpgradePackageHandler extends PackageHandler
             $feedback = new Feedback();
             $feedback->setSuccess(false)->setMessages(['Error while trying to extract package to: ' . $extractPath]);
         }
+
+        return $feedback;
+    }
+
+    /**
+     * Run compare and check files to delete
+     * @param string $version
+     * @return Feedback
+     */
+    public function checkFilesToDelete(string $version): Feedback
+    {
+        $feedback = new Feedback();
+        $feedback->setSuccess(true);
+        $messages = ['Files to delete checked'];
+        $feedback->setMessages($messages);
 
         return $feedback;
     }
@@ -215,11 +231,77 @@ class UpgradePackageHandler extends PackageHandler
             'sync manifest generated: ' . json_encode($manifest, JSON_THROW_ON_ERROR)
         ]);
 
+        $tmpFolder = $this->projectDir . '/tmp/toReAdd';
+        $toReAddItems = $this->compare->getToReAdd();
+
+        $this->copyFilesToReAddToTmpFolder($tmpFolder, $toReAddItems);
+
         $this->sync->run($extractPath, $this->projectDir, $manifest);
+
+        $this->restoreFilesFromTmpFolder($tmpFolder, $toReAddItems);
 
         $feedback->setSuccess(true)->setMessages(['Successfully installed package']);
 
         return $feedback;
+    }
+
+    /**
+     * Copy files to be re-added to a temporary folder
+     *
+     * @param string $tmpFolder
+     * @param array $toReAddItems
+     * @return void
+     */
+    protected function copyFilesToReAddToTmpFolder(string $tmpFolder, array $toReAddItems): void
+    {
+        $filesystem = new Filesystem();
+
+        if (!$filesystem->exists($tmpFolder)) {
+            $filesystem->mkdir($tmpFolder);
+        }
+
+        foreach ($toReAddItems as $item) {
+            $sourcePath = $this->projectDir . '/' . $item;
+            $destinationPath = $tmpFolder . '/' . $item;
+
+            if (is_dir($sourcePath)) {
+                $this->copyToReAddFolderContents($sourcePath, $destinationPath, $filesystem);
+                continue;
+            }
+
+            if (file_exists($sourcePath)) {
+                $filesystem->mirror($sourcePath, $destinationPath);
+            }
+        }
+    }
+
+    /**
+     * Restore files from the temporary folder to their original location
+     *
+     * @param string $tmpFolder
+     * @param array $toReAddItems
+     * @return void
+     */
+    protected function restoreFilesFromTmpFolder(string $tmpFolder, array $toReAddItems): void
+    {
+        $filesystem = new Filesystem();
+
+        foreach ($toReAddItems as $item) {
+            $tmpPath = $tmpFolder . '/' . $item;
+            $finalDestinationPath = $this->projectDir . '/' . $item;
+
+            if (file_exists($tmpPath)) {
+                if (is_dir($tmpPath)) {
+                    $this->restoreToReAddTmpFolderContents($tmpPath, $finalDestinationPath, $filesystem);
+                } else {
+                    if (basename($item) !== 'en_us.lang.php' || !file_exists($finalDestinationPath)) {
+                        $filesystem->copy($tmpPath, $finalDestinationPath);
+                    }
+                }
+            }
+        }
+
+        $filesystem->remove($tmpFolder);
     }
 
     /**
@@ -287,5 +369,70 @@ class UpgradePackageHandler extends PackageHandler
     public function getBackupPath(string $version): string
     {
         return $this->upgradePackageDir . '/' . $version . '-backup';
+    }
+
+    /**
+     * @param string $sourcePath
+     * @param string $destinationPath
+     * @param Filesystem $filesystem
+     * @return void
+     */
+    public function copyToReAddFolderContents(string $sourcePath, string $destinationPath, Filesystem $filesystem): void
+    {
+        $dirContents = scandir($sourcePath);
+
+        foreach ($dirContents as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            if ($file !== 'en_us.lang.php') {
+                $fileSourcePath = $sourcePath . '/' . $file;
+                $fileDestinationPath = $destinationPath . '/' . $file;
+
+                if (file_exists($fileSourcePath)) {
+                    if (!is_dir($destinationPath)) {
+                        mkdir($destinationPath, 0755, true);
+                    }
+
+                    if (is_dir($fileSourcePath)) {
+                        $this->copyToReAddFolderContents($fileSourcePath, $fileDestinationPath, $filesystem);
+                        continue;
+                    }
+
+                    $filesystem->copy($fileSourcePath, $fileDestinationPath);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $tmpPath
+     * @param string $finalDestinationPath
+     * @param Filesystem $filesystem
+     * @return void
+     */
+    public function restoreToReAddTmpFolderContents(string $tmpPath, string $finalDestinationPath, Filesystem $filesystem): void
+    {
+        $dirContents = scandir($tmpPath);
+
+        foreach ($dirContents as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            $fileTmpPath = $tmpPath . '/' . $file;
+            $fileFinalPath = $finalDestinationPath . '/' . $file;
+
+            if ($file === 'en_us.lang.php' && file_exists($fileFinalPath)) {
+                continue;
+            }
+
+            if (is_dir($fileTmpPath)) {
+                $this->restoreToReAddTmpFolderContents($fileTmpPath, $fileFinalPath, $filesystem);
+            } else {
+                $filesystem->copy($fileTmpPath, $fileFinalPath);
+            }
+        }
     }
 }

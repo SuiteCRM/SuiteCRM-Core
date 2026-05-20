@@ -115,7 +115,7 @@ class SugarWidgetSubPanelDetailViewLink extends SugarWidgetField
         $action = 'DetailView';
         if($module === "Emails"){
             $email = BeanFactory::getBean($module, $record);
-            if($email->status === "draft"){
+            if($email !== false && $email->status === "draft"){
                 $action = 'DetailDraftView';
             }
         }
@@ -125,10 +125,11 @@ class SugarWidgetSubPanelDetailViewLink extends SugarWidgetField
         $detailView = $layout_def['DetailView'] ?? '';
         $ownerId = $layout_def['owner_id'] ?? '';
         $ownerModule = $layout_def['owner_module'] ?? '';
+        $groupAccessView = SecurityGroup::groupHasAccess($module,$record,'view');
         if (!empty($record) &&
             ($detailView && !$layout_def['owner_module']
-            ||  $detailView && !ACLController::moduleSupportsACL($layout_def['owner_module'])
-            || ACLController::checkAccess($ownerModule, 'view', $ownerId == $current_user->id))) {
+            || $detailView && !ACLController::moduleSupportsACL($layout_def['owner_module'])
+            || ACLController::checkAccess($ownerModule, 'view', $ownerId == $current_user->id, 'module',  $groupAccessView))) {
             $link = ajaxLink("index.php?module=$module&action=$action&record={$record}{$parent}");
             if ($module == 'EAPM') {
                 $link = "index.php?module=$module&action=$action&record={$record}{$parent}";

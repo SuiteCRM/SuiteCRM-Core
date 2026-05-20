@@ -106,7 +106,17 @@ $dictionary['Alert'] = [
             'name' => 'date_start',
             'vname' => 'LBL_DATE',
             'type' => 'datetime',
-        ]
+        ],
+        'status' => [
+            'name' => 'status',
+            'vname' => 'LBL_STATUS',
+            'type' => 'varchar',
+            'len' => 50,
+            'required' => false,
+            'massupdate' => false,
+            'studio' => 'false',
+            'comment' => 'Notification status label key (e.g. completed, failed)',
+        ],
     ],
     'relationships' => [],
     'optimistic_locking' => true,

@@ -55,26 +55,26 @@ class ViewCampaignconfig extends SugarView
     protected function _getModuleTitleParams($browserTitle = false)
     {
         global $mod_strings;
-        
+
         return array(
            "<a href='index.php?module=Administration&action=index'>".translate('LBL_MODULE_NAME', 'Administration')."</a>",
            translate('LBL_CAMPAIGN_CONFIG_TITLE', 'Administration'),
            );
     }
-    
+
     /**
      * @see SugarView::preDisplay()
      */
     public function preDisplay()
     {
         global $current_user;
-        
+
         if (!is_admin($current_user)
                 && !is_admin_for_module($GLOBALS['current_user'], 'Campaigns')) {
             sugar_die("Unauthorized access to administration.");
         }
     }
-    
+
     /**
      * @see SugarView::display()
      */
@@ -87,26 +87,54 @@ class ViewCampaignconfig extends SugarView
         echo '<div class="campaign-email">';
         echo $this->getModuleTitle(false);
         global $currentModule, $sugar_config;
-        
+
         $focus = BeanFactory::newBean('Administration');
         $focus->retrieveSettings(); //retrieve all admin settings.
         $GLOBALS['log']->info("Mass Emailer(EmailMan) ConfigureSettings view");
-        
+
         $this->ss->assign("MOD", $mod_strings);
         $this->ss->assign("APP", $app_strings);
         $this->ss->assign("THEME", (string)SugarThemeRegistry::current());
         $this->ss->assign("RETURN_MODULE", "Administration");
         $this->ss->assign("RETURN_ACTION", "index");
-        
+
         $this->ss->assign("MODULE", $currentModule);
         $this->ss->assign("PRINT_URL", "index.php?".$GLOBALS['request_string']);
-        
+
         if (isset($focus->settings['massemailer_campaign_emails_per_run']) && !empty($focus->settings['massemailer_campaign_emails_per_run'])) {
             $this->ss->assign("EMAILS_PER_RUN", $focus->settings['massemailer_campaign_emails_per_run']);
         } else {
-            $this->ss->assign("EMAILS_PER_RUN", 500);
+            $this->ss->assign("EMAILS_PER_RUN", $sugar_config['campaign_emails_per_run_default'] ?? 50);
         }
-        
+
+        if (isset($focus->settings['massemailer_trackers_enabled'])) {
+            if (isTrue($focus->settings['massemailer_trackers_enabled'])) {
+                $this->ss->assign("TRACKERS_ENABLED", 'true');
+            } else {
+                $this->ss->assign("TRACKERS_ENABLED", 'false');
+            }
+        } else {
+            $this->ss->assign("TRACKERS_ENABLED", isTrue($sugar_config['trackers_enabled'] ?? true) ? 'true' : 'false');
+        }
+
+        if (isset($focus->settings['massemailer_campaign_marketing_items_per_run']) && is_numeric($focus->settings['massemailer_campaign_marketing_items_per_run'])) {
+            $this->ss->assign("CAMPAIGN_MARKETING_RECORDS_PER_RUN", $focus->settings['massemailer_campaign_marketing_items_per_run']);
+        } else {
+            $this->ss->assign("CAMPAIGN_MARKETING_RECORDS_PER_RUN", $sugar_config['campaign_marketing_items_per_run_default'] ?? 3);
+        }
+
+        if (isset($focus->settings['massemailer_campaign_emails_max_retries']) && is_numeric($focus->settings['massemailer_campaign_emails_max_retries'])) {
+            $this->ss->assign("CAMPAIGN_MAX_RETRIES", $focus->settings['massemailer_campaign_emails_max_retries']);
+        } else {
+            $this->ss->assign("CAMPAIGN_MAX_RETRIES", $sugar_config['campaign_emails_max_retries_default'] ?? 3);
+        }
+
+        if (isset($focus->settings['massemailer_campaign_emails_threshold']) && is_numeric($focus->settings['massemailer_campaign_emails_threshold'])) {
+            $this->ss->assign("CAMPAIGN_THRESHOLD", $focus->settings['massemailer_campaign_emails_threshold']);
+        } else {
+            $this->ss->assign("CAMPAIGN_THRESHOLD", $sugar_config['campaign_emails_threshold_default'] ?? 10);
+        }
+
         if (!isset($focus->settings['massemailer_tracking_entities_location_type']) || empty($focus->settings['massemailer_tracking_entities_location_type']) || $focus->settings['massemailer_tracking_entities_location_type']=='1') {
             $this->ss->assign("default_checked", "checked");
             $this->ss->assign("TRACKING_ENTRIES_LOCATION_STATE", "disabled");
@@ -116,18 +144,18 @@ class ViewCampaignconfig extends SugarView
             $this->ss->assign("TRACKING_ENTRIES_LOCATION", $focus->settings["massemailer_tracking_entities_location"]);
         }
         $this->ss->assign("SITEURL", $sugar_config['site_url']);
-        
-        
+
+
         // Change the default campaign to not store a copy of each message.
         if (!empty($focus->settings['massemailer_email_copy']) && $focus->settings['massemailer_email_copy']=='1') {
             $this->ss->assign("yes_checked", "checked='checked'");
         } else {
             $this->ss->assign("no_checked", "checked='checked'");
         }
-        
+
         $email = BeanFactory::newBean('Emails');
         $this->ss->assign('ROLLOVER', $email->rolloverStyle);
-        
+
         $this->ss->assign("JAVASCRIPT", get_validate_record_js());
         $this->ss->display("modules/EmailMan/tpls/campaignconfig.tpl");
         echo '</div>';

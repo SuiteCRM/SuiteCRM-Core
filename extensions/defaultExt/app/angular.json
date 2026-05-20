@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "projects": {
+    "defaultExt": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "name": "",
+          "project": ""
+        }
+      },
+      "root": "extensions/defaultExt",
+      "sourceRoot": "extensions/defaultExt/app/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "ngx-build-plus:browser",
+          "options": {
+            "namedChunks": true,
+            "commonChunk": false,
+            "sourceMap": true,
+            "aot": true,
+            "outputPath": "extensions/defaultExt/public",
+            "index": "extensions/defaultExt/app/src/index.html",
+            "main": "extensions/defaultExt/app/src/main.ts",
+            "polyfills": "extensions/defaultExt/app/src/polyfills.ts",
+            "tsConfig": "extensions/defaultExt/app/tsconfig.app.json",
+            "assets": [
+              "extensions/defaultExt/app/src/favicon.ico",
+              "extensions/defaultExt/app/src/assets"
+            ],
+            "styles": [
+              "extensions/defaultExt/app/src/styles.scss"
+            ],
+            "scripts": [],
+            "extraWebpackConfig": "extensions/defaultExt/app/webpack.config.js"
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "extensions/defaultExt/app/src/environments/environment.ts",
+                  "with": "extensions/defaultExt/app/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ],
+              "extraWebpackConfig": "extensions/defaultExt/app/webpack.prod.config.js"
+            },
+            "dev": {
+              "outputPath": "public/extensions/defaultExt"
+            }
+          }
+        },
+        "serve": {
+          "builder": "ngx-build-plus:dev-server",
+          "options": {
+            "browserTarget": "services:build",
+            "extraWebpackConfig": "extensions/defaultExt/app/webpack.config.js",
+            "port": 3000
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "services:build:production",
+              "extraWebpackConfig": "extensions/defaultExt/app/webpack.prod.config.js"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "buildTarget": "services:build"
+          }
+        },
+        "test": {
+          "builder": "ngx-build-plus:karma",
+          "options": {
+            "main": "extensions/defaultExt/app/src/test.ts",
+            "polyfills": "extensions/defaultExt/app/src/polyfills.ts",
+            "tsConfig": "extensions/defaultExt/app/tsconfig.spec.json",
+            "karmaConfig": "extensions/defaultExt/app/karma.conf.js",
+            "assets": [
+              "extensions/defaultExt/app/src/favicon.ico",
+              "extensions/defaultExt/app/src/assets"
+            ],
+            "styles": [
+              "extensions/defaultExt/app/src/styles.scss"
+            ],
+            "scripts": [],
+            "extraWebpackConfig": "extensions/defaultExt/app/webpack.config.js"
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "extensions/defaultExt/app/e2e/protractor.conf.js",
+            "devServerTarget": "services:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "services:serve:production",
+              "protractorConfig": ""
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,9 +24,19 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, OnDestroy, OnInit, ViewChild,} from '@angular/core';
+import {
+    Component,
+    ElementRef,
+    HostListener,
+    OnDestroy,
+    OnInit,
+    signal,
+    ViewChild,
+    WritableSignal,
+} from '@angular/core';
 import {NgbCalendar, NgbDateStruct, NgbPopover, NgbPopoverConfig, NgbTimeStruct} from '@ng-bootstrap/ng-bootstrap';
-import {ButtonInterface, isEmptyString, isVoid} from 'common';
+import {isEmptyString, isVoid} from '../../../../common/utils/value-utils';
+import {ButtonInterface} from '../../../../common/components/button/button.model';
 import {BaseDateTimeComponent} from '../../../base/datetime/base-datetime.component';
 import {DataTypeFormatter} from '../../../../services/formatters/data-type.formatter.service';
 import {DatetimeFormatter} from "../../../../services/formatters/datetime/datetime-formatter.service";
@@ -34,6 +44,7 @@ import {DateTimeModel} from "../../datetime.model";
 import {PlacementArray} from "@ng-bootstrap/ng-bootstrap/util/positioning";
 import {FieldLogicManager} from '../../../field-logic/field-logic.manager';
 import {FieldLogicDisplayManager} from '../../../field-logic-display/field-logic-display.manager';
+import {UserPreferenceStore} from "../../../../store/user-preference/user-preference.store";
 
 @Component({
     selector: 'scrm-datetime-edit',
@@ -44,8 +55,18 @@ export class DateTimeEditFieldComponent extends BaseDateTimeComponent implements
 
     @ViewChild(NgbPopover, {static: true})
     private popover: NgbPopover;
+    @ViewChild('calendarContainer') calendarContainer: ElementRef;
+
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: Event) {
+        if (!this.calendarContainer.nativeElement.contains(event.target)) {
+            this.popover.close();
+        }
+    }
+
 
     dateTimeModel: DateTimeModel = new DateTimeModel();
+    isMeridian: WritableSignal<boolean> = signal(false);
 
     constructor(
         protected formatter: DatetimeFormatter,
@@ -53,7 +74,8 @@ export class DateTimeEditFieldComponent extends BaseDateTimeComponent implements
         protected calendar: NgbCalendar,
         protected config: NgbPopoverConfig,
         protected logic: FieldLogicManager,
-        protected logicDisplay: FieldLogicDisplayManager
+        protected logicDisplay: FieldLogicDisplayManager,
+        protected userPreferences: UserPreferenceStore,
     ) {
         super(formatter, typeFormatter, logic, logicDisplay);
         config.autoClose = "outside";
@@ -81,6 +103,13 @@ export class DateTimeEditFieldComponent extends BaseDateTimeComponent implements
         if (this.formatter.getTimeFormat().includes('ss')) {
             this.dateTimeModel.displaySeconds = true;
         }
+
+        if ((this.userPreferences.getUserPreference('time_format') ?? '').includes('a')) {
+            this.isMeridian.set(true);
+        }
+
+        this.initMinDate();
+        this.initMaxDate();
 
         this.subscribeValueChanges();
     }
@@ -122,6 +151,10 @@ export class DateTimeEditFieldComponent extends BaseDateTimeComponent implements
 
     getPlacement(): PlacementArray {
         return ['bottom-right', 'top-right', 'bottom-left', 'top-left'];
+    }
+
+    togglePopover() {
+        this.popover.isOpen() ? this.popover.close() : this.popover.open();
     }
 
 }

@@ -42,9 +42,28 @@ use App\Install\Service\InstallPreChecks;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
+// clear cookies
+$past = time() - 3600;
+foreach ( $_COOKIE as $key => $value )
+{
+    setcookie( $key, $value, $past, '/' );
+}
+
 require __DIR__ . '/../config/bootstrap.php';
 require __DIR__ . '/../vendor/autoload.php';
+if (!is_writable('../logs')) {
+    (new InstallPreChecks(''))->showMissingPermissionsPage('/logs/install.log');
+    return;
+}
 $log = new Logger('install.log');
+$sessionName = 'SCRMSESSID';
+$sessionId = $_COOKIE[$sessionName] ?? false;
+if (!empty($sessionId) && session_status() === PHP_SESSION_ACTIVE) {
+    session_destroy();
+
+}
+setcookie($sessionName, false, 1,  '/');
+
 $log->pushHandler(new StreamHandler('../logs/install.log', Logger::DEBUG));
 (new InstallPreChecks($log))->setupTwigTemplate();
 

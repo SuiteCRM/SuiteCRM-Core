@@ -39,11 +39,11 @@ parameters:
         - '{type_name}'
         - '{id_name}'
       layout:
-        - '{name}'
         - '{type_name}'
+        - '{name}'
       showLabel:
-        edit: ['*']
-        filter: ['*']
+        edit: []
+        filter: []
       replaceAttributes:
         - name
         - type_name
@@ -52,7 +52,6 @@ parameters:
         '{name}':
           type: 'relate'
           rname: 'name'
-          module: 'Accounts'
           link: 'flex'
           logic:
             parent:
@@ -62,4 +61,4 @@ parameters:
                 fieldDependencies: ['{type_name}']
         '{type_name}':
           type: 'enum'
-          modes: ['edit', 'create', 'massupdate', 'filter', 'detail']
+          modes: ['edit', 'create', 'massupdate', 'filter']

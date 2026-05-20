@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,81 +24,172 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, Input, OnInit, signal} from '@angular/core';
-import {map, take, tap} from 'rxjs/operators';
-import {Observable} from 'rxjs';
+import {Component, computed, Input, OnDestroy, OnInit, Signal, signal, WritableSignal} from '@angular/core';
+import {take} from 'rxjs/operators';
+import {Observable, Subscription} from 'rxjs';
 import {SubpanelContainerConfig} from './subpanel-container.model';
-import {LanguageStore, LanguageStrings} from '../../../../store/language/language.store';
+import {LanguageStore} from '../../../../store/language/language.store';
 import {SubpanelStore, SubpanelStoreMap} from '../../store/subpanel/subpanel.store';
 import {MaxColumnsCalculator} from '../../../../services/ui/max-columns-calculator/max-columns-calculator.service';
-import {isTrue, ViewContext, WidgetMetadata} from 'common';
+import {ViewContext} from '../../../../common/views/view.model';
+import {WidgetMetadata} from '../../../../common/metadata/widget.metadata';
+import {isTrue} from '../../../../common/utils/value-utils';
 import {GridWidgetConfig, StatisticsQueryArgs} from '../../../../components/grid-widget/grid-widget.component';
 import {LocalStorageService} from "../../../../services/local-storage/local-storage.service";
 import {FilterConfig} from "../../../list-filter/components/list-filter/list-filter.model";
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
+import {SystemConfigStore} from "../../../../store/system-config/system-config.store";
+import {
+    ScreenSize,
+    ScreenSizeObserverService
+} from "../../../../services/ui/screen-size-observer/screen-size-observer.service";
 
 @Component({
     selector: 'scrm-subpanel-container',
     templateUrl: 'subpanel-container.component.html',
     providers: [MaxColumnsCalculator]
 })
-export class SubpanelContainerComponent implements OnInit {
+export class SubpanelContainerComponent implements OnInit, OnDestroy {
 
     @Input() config: SubpanelContainerConfig;
 
-    isCollapsed = signal(false);
+    isCollapsed = signal(true);
     toggleIcon = signal('arrow_down_filled');
     maxColumns$: Observable<number>;
 
-    languages$: Observable<LanguageStrings> = this.languageStore.vm$;
-
-    vm$: Observable<{ subpanels: SubpanelStoreMap }>;
-    openSubpanels: string[] = [];
+    subpanels: SubpanelStoreMap;
+    orderedSubpanels: WritableSignal<string[]> = signal([]);
+    headerSubpanels: Signal<string[]> = signal([]);
+    bodySubpanels: Signal<string[]> = signal([]);
+    openSubpanels: WritableSignal<string[]> = signal([]);
+    activeHiddenButtonsCount: Signal<number> = signal(0);
 
     filterConfig: FilterConfig;
+    subs: Subscription[] = [];
+    protected subpanelButtonLimits: any = {
+        XSmall: 2,
+        Small: 3,
+        Medium: 3,
+        Large: 5,
+        XLarge: 5
+    };
+    protected subpanelButtonBreakpoint: WritableSignal<number> = signal(3);
+
 
     constructor(
         protected languageStore: LanguageStore,
         protected maxColumnCalculator: MaxColumnsCalculator,
         protected localStorage: LocalStorageService,
-        protected preferences: UserPreferenceStore
+        protected preferences: UserPreferenceStore,
+        protected systemConfigs: SystemConfigStore,
+        protected screenSize: ScreenSizeObserverService,
     ) {
     }
 
     ngOnInit(): void {
         const module = this?.config?.parentModule ?? 'default';
-        this.setCollapsed(isTrue(this.preferences.getUi(module, 'subpanel-container-collapse') ?? false));
+        this.setCollapsed(isTrue(this.preferences.getUi(module, 'subpanel-container-collapse') ?? true));
 
-        this.openSubpanels = this.preferences.getUi(module, 'subpanel-container-open-subpanels') ?? [];
+        const subpanelButtonLimits = this.systemConfigs.getConfigValue('recordview_subpanel_button_limits') ?? {};
+        if (subpanelButtonLimits && Object.keys(subpanelButtonLimits).length) {
+            this.subpanelButtonLimits = subpanelButtonLimits;
+        }
 
-        this.vm$ = this.config.subpanels$.pipe(
-            map((subpanelsMap) => ({
-                subpanels: subpanelsMap
-            })),
-            tap((subpanelsMap) => {
-                if (!subpanelsMap || !Object.keys(subpanelsMap).length) {
-                    return;
-                }
+        this.openSubpanels.set(this.preferences.getUi(module, 'subpanel-container-open-subpanels') ?? []);
 
-                if (!this.openSubpanels || this.openSubpanels.length < 1) {
-                    return;
-                }
+        this.subs.push(this.config.subpanels$.subscribe({
+                next: (subpanelsMap) => {
+                    this.subpanels = {...subpanelsMap};
 
-                this.openSubpanels.forEach(subpanelKey => {
-                    const subpanel = subpanelsMap.subpanels[subpanelKey];
+                    const orderedSubpanels = Object.values(this.subpanels)
+                        .filter(item => item?.metadata?.order !== undefined)
+                        .sort((a, b) => (a.metadata.order ?? 0) - (b.metadata.order ?? 0))
+                        .map(item => item.metadata.name);
 
-                    if (!subpanel || subpanel.show) {
+                    if (orderedSubpanels) {
+                        this.orderedSubpanels.set(orderedSubpanels);
+                    }
+
+                    if (!this.subpanels || !Object.keys(this.subpanels).length) {
                         return;
                     }
 
-                    subpanel.show = true;
-                    subpanel.load().pipe(take(1)).subscribe();
+                    if (!this.openSubpanels() || this.openSubpanels().length < 1) {
+                        return;
+                    }
 
-                });
+                    this.openSubpanels().forEach(subpanelKey => {
+                        const subpanel = this.subpanels[subpanelKey];
 
-            }));
+                        if (!subpanel || subpanel.show) {
+                            return;
+                        }
+
+                        subpanel.show = true;
+                        subpanel.load().pipe(take(1)).subscribe();
+                    });
+                }
+            })
+        );
+
+        this.headerSubpanels = computed(() => this.orderedSubpanels().slice(0, this.subpanelButtonBreakpoint()));
+        this.bodySubpanels = computed(() => {
+            const sliced = [...this.orderedSubpanels()];
+
+            let count = 0;
+            const groups = [];
+            sliced.forEach(value => {
+                if (count === 0) {
+                    groups.push([]);
+                }
+
+                groups[groups.length - 1].push(value);
+
+                count++;
+                if (count >= this.subpanelButtonBreakpoint()) {
+                    count = 0;
+                }
+            });
+
+            if(count < this.subpanelButtonBreakpoint() && groups.length > 0) {
+                const lastGroup = groups[groups.length - 1];
+                const diff = this.subpanelButtonBreakpoint() - lastGroup.length;
+                for (let i = 0; i < diff; i++) {
+                    lastGroup.push('');
+                }
+                groups[groups.length - 1] = lastGroup;
+            }
+
+            return groups;
+        });
+
+        this.activeHiddenButtonsCount = computed(() => {
+            const openSubpanelsSet = new Set(this.openSubpanels());
+            const headerSubpanelsSet = new Set(this.headerSubpanels());
+
+            return this.bodySubpanels().flat().reduce(
+                (count, subpanelKey) => {
+                    const isOpen = openSubpanelsSet.has(subpanelKey);
+                    const inHeader = headerSubpanelsSet.has(subpanelKey);
+                    return count + ((isOpen && !inHeader) ? 1 : 0);
+                },
+                0
+            );
+        });
+
+        this.subs.push(this.screenSize.screenSize$.subscribe({
+            next: (screenSize: ScreenSize) => {
+                if (screenSize && this.subpanelButtonLimits[screenSize]) {
+                    this.subpanelButtonBreakpoint.set(this.subpanelButtonLimits[screenSize]);
+                }
+            }
+        }));
 
         this.maxColumns$ = this.getMaxColumns();
+    }
+
+    ngOnDestroy() {
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 
     getMaxColumns(): Observable<number> {
@@ -115,17 +206,21 @@ export class SubpanelContainerComponent implements OnInit {
     showSubpanel(key: string, item: SubpanelStore): void {
         item.show = !item.show;
 
+        let openSubpanels = [...this.openSubpanels()];
+
         if (item.show) {
-            if (!this.openSubpanels.includes(key)) {
-                this.openSubpanels.push(key);
+            if (!openSubpanels.includes(key)) {
+                openSubpanels.push(key);
             }
             item.load().pipe(take(1)).subscribe();
         } else {
-            this.openSubpanels = this.openSubpanels.filter(subpanelKey => subpanelKey != key);
+            openSubpanels = openSubpanels.filter(subpanelKey => subpanelKey != key);
         }
 
+        this.openSubpanels.set(openSubpanels);
+
         const module = this?.config?.parentModule ?? 'default';
-        this.preferences.setUi(module, 'subpanel-container-open-subpanels', this.openSubpanels);
+        this.preferences.setUi(module, 'subpanel-container-open-subpanels', this.openSubpanels());
     }
 
     getCloseCallBack(key: string, item: SubpanelStore): Function {
@@ -134,7 +229,7 @@ export class SubpanelContainerComponent implements OnInit {
 
     getGridConfig(vm: SubpanelStore): GridWidgetConfig {
 
-        if (!vm.metadata || !vm.metadata.insightWidget) {
+        if (!vm.metadata || !vm.metadata.subpanelWidget) {
             return {
                 layout: null,
             } as GridWidgetConfig;

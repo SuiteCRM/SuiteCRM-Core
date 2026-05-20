@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
 import {BaseWidgetComponent} from '../../../widgets/base-widget.model';
 import {SingleValueStatisticsStore} from '../../../../store/single-value-statistics/single-value-statistics.store';
 import {
@@ -33,7 +33,9 @@ import {
 import {map, take} from 'rxjs/operators';
 import {LanguageStore, LanguageStringMap} from '../../../../store/language/language.store';
 import {combineLatestWith, Observable, of, Subscription} from 'rxjs';
-import {SingleValueStatisticsState, StatisticsQuery, ViewContext} from 'common';
+import {StatisticsQuery} from '../../../../common/statistics/statistics.model';
+import {SingleValueStatisticsState} from '../../../../common/statistics/statistics-store.model';
+import {ViewContext} from '../../../../common/views/view.model';
 
 interface StatisticsTopWidgetState {
     statistics: { [key: string]: SingleValueStatisticsState };
@@ -63,7 +65,7 @@ export class StatisticsTopWidgetComponent extends BaseWidgetComponent implements
     vm$: Observable<StatisticsTopWidgetState>;
     messageLabelKey: string;
     loading$: Observable<boolean>;
-    protected loading = true;
+    protected loading: WritableSignal<boolean> = signal(true);
     protected subs: Subscription[] = [];
 
     constructor(
@@ -146,7 +148,7 @@ export class StatisticsTopWidgetComponent extends BaseWidgetComponent implements
             combineLatestWith(...loadings$),
             map((loadings) => {
                 if (!loadings || loadings.length < 1) {
-                    this.loading = false;
+                    this.loading.set(false);
                     return false;
                 }
 
@@ -156,7 +158,7 @@ export class StatisticsTopWidgetComponent extends BaseWidgetComponent implements
                     loading = loading && value;
                 });
 
-                this.loading = loading;
+                this.loading.set(loading);
 
                 return loading;
             })
@@ -184,9 +186,9 @@ export class StatisticsTopWidgetComponent extends BaseWidgetComponent implements
 
         if (this.config.reload$) {
             this.subs.push(this.config.reload$.subscribe(() => {
-                if (this.loading === false) {
+                if (this.loading() === false) {
 
-                    this.loading = true;
+                    this.loading.set(true);
                     this.config.options.statistics.forEach(statistic => {
 
                         if (!statistic.type) {
@@ -271,4 +273,6 @@ export class StatisticsTopWidgetComponent extends BaseWidgetComponent implements
 
         return this.language.getFieldLabel(key, module);
     }
+
+    protected readonly signal = signal;
 }

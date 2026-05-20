@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,7 +26,7 @@
 */
 -->
 
-<div class="input-group mr-2">
+<div class="input-group mr-2" #calendarContainer>
 
     <input
         [ngClass]="klass"
@@ -34,26 +34,29 @@
         [class.is-invalid]="validateOnlyOnSubmit ? isInvalid() : (field.formControl.invalid && field.formControl.touched)"
         [formControl]="field.formControl"
         (change)="onInputChange($event)"
-        [ngbPopover]="calendarContent"
+        [ngbPopover]="calendarTemplate"
     >
 
     <div class="input-group-append">
-        <scrm-button [config]="getOpenButton()" [ngbPopover]="calendarContent">
+        <scrm-button triggers="manual" (click)="togglePopover()" [config]="getOpenButton()" [ngbPopover]="calendarTemplate">
         </scrm-button>
     </div>
 </div>
 
-<ng-template #calendarContent>
+<ng-template #calendarTemplate>
     <div>
         <div>
             <ngb-datepicker name="datepicker"
                             [ngModel]="dateTimeModel.date"
+                            [minDate]="minDate"
+                            [maxDate]="maxDate"
                             (dateSelect)="onDateChange($event)" [startDate]="dateTimeModel.date"></ngb-datepicker>
         </div>
 
         <div class="d-flex justify-content-center mt-auto">
             <ngb-timepicker name="timepicker"
                             [ngModel]="dateTimeModel.time" (ngModelChange)="onTimeChange($event)"
+                            [meridian]="isMeridian()"
                             [seconds]="dateTimeModel.displaySeconds" [hourStep]="dateTimeModel.hourStep"
                             [minuteStep]="dateTimeModel.minuteStep"
                             [secondStep]="dateTimeModel.secondStep">

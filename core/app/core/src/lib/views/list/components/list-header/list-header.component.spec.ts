@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,9 +28,8 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {Component} from '@angular/core';
 import {take} from 'rxjs/operators';
 import {of} from 'rxjs';
-import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {ApolloTestingModule} from 'apollo-angular/testing';
-
 import {ListHeaderComponent} from './list-header.component';
 import {RouterTestingModule} from '@angular/router/testing';
 import {AngularSvgIconModule} from 'angular-svg-icon';
@@ -58,6 +57,7 @@ import {appStateStoreMock} from '../../../../store/app-state/app-state.store.spe
 import {listviewStoreMock} from '../../store/list-view/list-view.store.spec.mock';
 import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
 import {SettingsMenuModule} from '../settings-menu/settings-menu.module';
+import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 @Component({
     selector: 'list-header-test-host-component',
@@ -72,52 +72,51 @@ describe('ListHeaderComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                ModuleTitleModule,
-                ActionMenuModule,
-                ButtonModule,
-                SettingsMenuModule,
-                ApolloTestingModule,
-                HttpClientTestingModule,
-                ImageModule,
-                ListFilterModule,
-                RouterTestingModule,
-                AngularSvgIconModule.forRoot()
-            ],
-            declarations: [ListHeaderComponent, ListHeaderTestHostComponent],
-            providers: [
-                {provide: ListViewStore, useValue: listviewStoreMock},
-                {
-                    provide: ThemeImagesStore, useValue: {
-                        images$: of(themeImagesMockData).pipe(take(1))
-                    }
-                },
-                {
-                    provide: ModuleNavigation, useValue: mockModuleNavigation
-                },
-                {
-                    provide: SystemConfigStore, useValue: systemConfigStoreMock
-                },
-                {
-                    provide: UserPreferenceStore, useValue: userPreferenceStoreMock
-                },
-                {
-                    provide: NavigationStore, useValue: navigationMock
-                },
-                {
-                    provide: ModuleNavigation, useValue: mockModuleNavigation
-                },
-                {
-                    provide: LanguageStore, useValue: languageStoreMock
-                },
-                {
-                    provide: MetadataStore, useValue: metadataStoreMock
-                },
-                {
-                    provide: AppStateStore, useValue: appStateStoreMock
-                },
-            ],
-        })
+    declarations: [ListHeaderComponent, ListHeaderTestHostComponent],
+    imports: [ModuleTitleModule,
+        ActionMenuModule,
+        ButtonModule,
+        SettingsMenuModule,
+        ApolloTestingModule,
+        ImageModule,
+        ListFilterModule,
+        RouterTestingModule,
+        AngularSvgIconModule.forRoot()],
+    providers: [
+        { provide: ListViewStore, useValue: listviewStoreMock },
+        {
+            provide: ThemeImagesStore, useValue: {
+                images$: of(themeImagesMockData).pipe(take(1))
+            }
+        },
+        {
+            provide: ModuleNavigation, useValue: mockModuleNavigation
+        },
+        {
+            provide: SystemConfigStore, useValue: systemConfigStoreMock
+        },
+        {
+            provide: UserPreferenceStore, useValue: userPreferenceStoreMock
+        },
+        {
+            provide: NavigationStore, useValue: navigationMock
+        },
+        {
+            provide: ModuleNavigation, useValue: mockModuleNavigation
+        },
+        {
+            provide: LanguageStore, useValue: languageStoreMock
+        },
+        {
+            provide: MetadataStore, useValue: metadataStoreMock
+        },
+        {
+            provide: AppStateStore, useValue: appStateStoreMock
+        },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+})
             .compileComponents();
     });
 

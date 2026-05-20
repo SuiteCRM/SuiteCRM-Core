@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -23,17 +23,226 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Supercharged by SuiteCRM".
  */
+
+@media (min-width: 1200px) {
+  .col-xl-12.field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item:first-child {
+          width: 238px !important;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  .col-lg-12.field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item:first-child {
+          width: 200px !important;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 787px) and (max-width: 991px) {
+  .full-row.field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item:first-child {
+          width: 200px !important;
+        }
+      }
+    }
+  }
+
+  .field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item:first-child {
+          width: 152px !important;
+        }
+
+        .field-group-item {
+          margin-left: 0.2rem;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 768px) and (max-width: 786px) {
+  .full-row.field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item:first-child {
+          width: 200px !important;
+        }
+      }
+    }
+  }
+
+  .field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item:first-child {
+          width: 143px !important;
+        }
+
+        .field-group-item {
+          margin-left: 0.2rem;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 676px) and (max-width: 767px) {
+  .full-row.field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item:first-child {
+          width: 200px !important;
+        }
+
+        .field-group-item {
+          margin-left: 0.3rem;
+        }
+      }
+    }
+  }
+
+  .field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item:first-child {
+          width: 95px !important;
+        }
+
+        .field-group-item {
+          margin-left: 0.2rem;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 600px) and (max-width: 675px) {
+  .full-row.field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item:first-child {
+          width: 150px !important;
+        }
+
+        .field-group-item {
+          margin-left: 0.3rem;
+        }
+      }
+    }
+  }
+
+  .field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item:first-child {
+          width: 69px !important;
+        }
+
+        .field-group-item {
+          margin-left: 0rem;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 426px) and (max-width: 599px) {
+  .col-xs-12.field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item:first-child {
+          width: 150px !important;
+        }
+      }
+    }
+  }
+
+  .field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item {
+          margin-left: 0.3rem;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 375px) and (max-width: 425px) {
+  .field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item:first-child {
+          width: 100px !important;
+        }
+
+        .field-group-item {
+          margin-left: 0.3rem;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 374px) {
+  .field-layout-field-wrapper {
+    .composite.email-fields {
+      .field-group {
+        .field-group-item:first-child {
+          width: 75px !important;
+        }
+
+        .field-group-item {
+          margin-left: 0.1rem;
+        }
+      }
+    }
+  }
+}
+
+
 .composite.email-fields {
   .field-group {
+    .field-group-label.hidden {
+      display: none !important;
+    }
+
+    &.composite-field-wrapper {
+      height: auto !important;
+    }
+
     .field-group-item:first-child {
-      width: 100% !important;
+      width: 150px !important;
+      margin-left: 0;
     }
 
     .field-group-item {
-      width: 25% !important;
+      display: inline-block !important;
+      margin-left: 0.5rem;
+      width: 50px !important;
       align-self: flex-start !important;
       @media all and (max-width: $breakpoint-xxlarge) {
         line-height: 1;
+      }
+
+      .field-group-label {
+        label {
+          margin-bottom: .2rem;
+        }
       }
     }
   }
@@ -46,6 +255,7 @@
       margin-top: 0.3em;
     }
   }
+
   .checkbox-field {
     .checkmark {
       margin-left: 0.68em;
@@ -53,10 +263,11 @@
         margin-top: 0.3em;
       }
     }
+
     position: relative;
     top: 0.3em;
     @media all and (max-width: $breakpoint-xxlarge) {
-      padding-bottom: 0!important;
+      padding-bottom: 0 !important;
     }
   }
 }
@@ -70,4 +281,10 @@
 
 .line-item-entry-buttons-no-label-padding {
   padding-top: 0.7em;
+}
+
+.field-layout-field-wrapper {
+  .line-item-entry {
+    align-items: center !important;
+  }
 }

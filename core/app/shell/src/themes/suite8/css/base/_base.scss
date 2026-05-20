@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -51,6 +51,10 @@ ul li::marker {
   color: $midnight-blue;
 }
 
+.text-lighter {
+  color: $dark-midnight-grey;
+}
+
 .text-main {
   color: $main;
 }
@@ -65,6 +69,14 @@ ul li::marker {
 
 .text-danger {
   color: $btn-danger !important;
+}
+
+.text-error {
+  color: $error !important;
+}
+
+.text-bigger-0 {
+  font-size: 100%;
 }
 
 .text-bigger-1 {
@@ -83,6 +95,29 @@ ul li::marker {
   font-size: 140%;
 }
 
+.text-smaller-95 {
+  font-size: 95%
+}
+
+.text-smaller-90 {
+  font-size: 90%
+}
+
+.text-smaller-85 {
+  font-size: 85%
+}
+
+.text-smaller-80 {
+  font-size: 80%
+}
+
+.text-smaller-75 {
+  font-size: 75%
+}
+
+.text-smaller-70 {
+  font-size: 70%
+}
 
 .fill-white {
   fill: $white;
@@ -206,6 +241,39 @@ ul li::marker {
   stroke: $complementary-light;
 }
 
+
+.fill-info {
+  fill: $info;
+}
+
+.stroke-info {
+  stroke: $info;
+}
+
+.fill-hover-info:hover {
+  fill: $info;
+}
+
+.stroke-hover-info:hover {
+  stroke: $info;
+}
+
+.fill-info-light {
+  fill: $info-light;
+}
+
+.stroke-info-light {
+  stroke: $info-light;
+}
+
+.fill-hover-info-light:hover {
+  fill: $info-light;
+}
+
+.stroke-hover-info-light:hover {
+  stroke: $info-light;
+}
+
 .shadow-md {
   box-shadow: .1rem .15rem .2rem rgba(0, 0, 0, .25) !important;
 }
@@ -221,4 +289,28 @@ ul li::marker {
 
 .lh-100 {
   line-height: 100%;
+}
+
+.w-max-content {
+  width: max-content !important;
+}
+
+.w-fit-content {
+    width: fit-content !important;
+}
+
+
+@media (min-width: 992px) {
+  .border-right-lg {
+    border-right: 1px solid $extra-light-grey !important;
+  }
+}
+
+.after-no-content {
+  &:after {
+    content: none;
+  }
+  :after {
+    content: none;
+  }
 }

@@ -5,7 +5,7 @@
  * SugarCRM, Inc. Copyright (C) 2004-2013 SugarCRM Inc.
  *
  * SuiteCRM is an extension to SugarCRM Community Edition developed by SalesAgility Ltd.
- * Copyright (C) 2011 - 2018 SalesAgility Ltd.
+ * Copyright (C) 2011 - 2019 SalesAgility Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -513,6 +513,18 @@ $beanList['ExternalOAuthProvider'] = 'ExternalOAuthProvider';
 $beanFiles['ExternalOAuthProvider'] = 'modules/ExternalOAuthProvider/ExternalOAuthProvider.php';
 $modInvisList[] = 'ExternalOAuthProvider';
 
+$beanList['ManualMigrationTasks'] = 'ManualMigrationTask';
+$beanFiles['ManualMigrationTask'] = 'modules/ManualMigrationTasks/ManualMigrationTask.php';
+$modInvisList[] = 'ManualMigrationTasks';
+
+$beanList['Processes'] = 'Process';
+$beanFiles['Process'] = 'modules/Processes/Process.php';
+$modInvisList[] = 'Processes';
+
+$beanList['AsyncTaskItems'] = 'AsyncTaskItem';
+$beanFiles['AsyncTaskItem'] = 'modules/AsyncTaskItems/AsyncTaskItem.php';
+$modInvisList[] = 'AsyncTaskItems';
+
 $beanList['TemplateSectionLine'] = 'TemplateSectionLine';
 $beanFiles['TemplateSectionLine'] = 'modules/TemplateSectionLine/TemplateSectionLine.php';
 $modules_exempt_from_availability_check['TemplateSectionLine'] = 'TemplateSectionLine';
@@ -527,7 +539,9 @@ $beanList['OAuth2Clients'] = 'OAuth2Clients';
 $beanFiles['OAuth2Clients'] = 'modules/OAuth2Clients/OAuth2Clients.php';
 $modInvisList[] = 'OAuth2Clients';
 
-
+$beanList['OAuth2AuthCodes'] = 'OAuth2AuthCodes';
+$beanFiles['OAuth2AuthCodes'] = 'modules/OAuth2AuthCodes/OAuth2AuthCodes.php';
+$modInvisList[] = 'OAuth2AuthCodes';
 
 $beanList['SurveyResponses'] = 'SurveyResponses';
 $beanFiles['SurveyResponses'] = 'modules/SurveyResponses/SurveyResponses.php';
@@ -553,6 +567,22 @@ $modules_exempt_from_availability_check['SurveyQuestionOptions'] = 'SurveyQuesti
 $report_include_modules['SurveyQuestionOptions'] = 'SurveyQuestionOptions';
 $modInvisList[] = 'SurveyQuestionOptions';
 
+$beanList['CalendarAccount'] = 'CalendarAccount';
+$beanFiles['CalendarAccount'] = 'modules/CalendarAccount/CalendarAccount.php';
+$modInvisList[] = 'CalendarAccount';
+$modules_exempt_from_availability_check['CalendarAccount'] = 'CalendarAccount';
+$report_include_modules['CalendarAccount'] = 'CalendarAccount';
+
+$beanList['MediaObjects'] = 'MediaObject';
+$modInvisList[] = 'MediaObjects';
+$adminOnlyList['MediaObjects'] = ['all' => 1];
+$beanFiles['MediaObject'] = 'modules/MediaObjects/MediaObject.php';
+
+$beanFiles['ArchivedDocumentMediaObject'] = 'modules/MediaObjects/ArchivedDocumentMediaObject.php';
+$beanFiles['PrivateDocumentMediaObject'] = 'modules/MediaObjects/PrivateDocumentMediaObject.php';
+$beanFiles['PrivateImageMediaObject'] = 'modules/MediaObjects/PrivateImageMediaObject.php';
+$beanFiles['PublicDocumentMediaObject'] = 'modules/MediaObjects/PublicDocumentMediaObject.php';
+$beanFiles['PublicImageMediaObject'] = 'modules/MediaObjects/PublicImageMediaObject.php';
 
 
 if (file_exists('include/modules_override.php')) {

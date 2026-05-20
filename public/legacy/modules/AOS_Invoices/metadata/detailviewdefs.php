@@ -23,10 +23,6 @@ array(
           array(
             'customCode' => '<input type="button" class="button" onClick="showPopup(\'emailpdf\');" value="{$MOD.LBL_EMAIL_PDF}">',
           ),
-          6 =>
-          array(
-            'customCode' => '<input type="button" class="button" onClick="showPopup(\'email\');" value="{$MOD.LBL_EMAIL_INVOICE}">',
-          ),
         ),
       ),
       'maxColumns' => '2',
@@ -68,6 +64,24 @@ array(
         ),
       ),
     ),
+    'recordActions' => [
+        'actions' => [
+            'print-as-pdf' => [
+                'key' => 'print-as-pdf',
+                'labelKey' => 'LBL_PRINT_AS_PDF',
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['view'],
+                'aclModule' => 'AOS_PDF_Templates',
+                'params' => [
+                    'createNote' => true,
+                    'selectModal' => [
+                        'module' => 'AOS_PDF_Templates'
+                    ]
+                ]
+            ]
+        ],
+    ],
     'panels' =>
     array(
       'LBL_PANEL_OVERVIEW' =>

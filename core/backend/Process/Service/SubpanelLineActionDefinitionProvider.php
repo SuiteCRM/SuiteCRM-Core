@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -33,19 +33,18 @@ use App\Engine\Service\ActionAvailabilityChecker\ActionAvailabilityChecker;
 class SubpanelLineActionDefinitionProvider extends ActionDefinitionProvider implements SubpanelLineActionDefinitionProviderInterface
 {
     /**
-     * @var array
-     */
-    private $subpanelLineActions;
-
-    /**
      * SubpanelLineActionDefinitionProvider constructor.
      * @param array $subpanelLineActions
      * @param ActionAvailabilityChecker $actionChecker
+     * @param $actionAclModuleOverride
      */
-    public function __construct(array $subpanelLineActions, ActionAvailabilityChecker $actionChecker)
+    public function __construct(
+        protected array $subpanelLineActions,
+        ActionAvailabilityChecker $actionChecker,
+        protected $actionAclModuleOverride
+    )
     {
-        parent::__construct($actionChecker);
-        $this->subpanelLineActions = $subpanelLineActions;
+        parent::__construct($actionChecker, $this->actionAclModuleOverride);
     }
 
     /**
@@ -61,13 +60,19 @@ class SubpanelLineActionDefinitionProvider extends ActionDefinitionProvider impl
      * @param string $action
      * @return bool
      */
-    public function isActionDefined(string $action): bool
+    public function isActionDefined(string $module, string $action): bool
     {
         $config = $this->subpanelLineActions;
         $defaults = $config['default'] ?? [];
         $defaultActions = $defaults['actions'] ?? [];
 
-        return array_key_exists($action, $defaultActions);
+        $modules = $config['modules'] ?? [];
+        $actions = $modules[$module] ?? [];
+        $moduleActions = $actions['actions'] ?? [];
+
+        $merged = array_merge($defaultActions, $moduleActions);
+
+        return array_key_exists($action, $merged);
     }
 
     /**
@@ -91,7 +96,7 @@ class SubpanelLineActionDefinitionProvider extends ActionDefinitionProvider impl
      */
     public function isActionAccessible(string $module, string $actionKey): bool
     {
-        return $this->isActionDefined($actionKey)
+        return $this->isActionDefined($module, $actionKey)
             && $this->isActionAvailable($module, $actionKey);
     }
 

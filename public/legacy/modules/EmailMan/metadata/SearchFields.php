@@ -41,58 +41,111 @@ if (!defined('sugarEntry') || !sugarEntry) {
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
-$searchFields['EmailMan'] =
-    array(
-        'campaign_name' => array( 'query_type'=>'default','db_field'=>array('campaigns.name')),
-        'to_name'=> array('query_type'=>'default','db_field'=>array('contacts.first_name','contacts.last_name','leads.first_name','leads.last_name','prospects.first_name','prospects.last_name')),
-        'to_email'=> array('query_type'=>'default','db_field'=>array('contacts.email1','leads.email1','prospects.email1')),
-        'current_user_only'=> array('query_type'=>'default','db_field'=>array('assigned_user_id'),'my_items'=>true, 'vname' => 'LBL_CURRENT_USER_FILTER', 'type' => 'bool'),
-        'message_name' => array( 'query_type'=>'default','db_field'=>array('email_marketing.name')),
-        'send_attempts' => array( 'query_type'=>'default','db_field'=>array('emailman.send_attempts')),
-        'in_queue' => array( 'query_type'=>'default','db_field'=>array('emailman.in_queue')),
-        'range_send_date_time' => array(
-            'query_type' => 'default',
-            'enable_range_search' => true,
-            'is_date_field' => true,
-        ),
-        'start_range_send_date_time' => array(
-            'query_type' => 'default',
-            'enable_range_search' => true,
-            'is_date_field' => true,
-        ),
-        'end_range_send_date_time' => array(
-            'query_type' => 'default',
-            'enable_range_search' => true,
-            'is_date_field' => true,
-        ),   
-        'range_date_entered' => array(
-            'query_type' => 'default',
-            'enable_range_search' => true,
-            'is_date_field' => true,
-        ),
-        'start_range_date_entered' => array(
-            'query_type' => 'default',
-            'enable_range_search' => true,
-            'is_date_field' => true,
-        ),
-        'end_range_date_entered' => array(
-            'query_type' => 'default',
-            'enable_range_search' => true,
-            'is_date_field' => true,
-        ),   
-        'range_date_modified' => array(
-            'query_type' => 'default',
-            'enable_range_search' => true,
-            'is_date_field' => true,
-        ),
-        'start_range_date_modified' => array(
-            'query_type' => 'default',
-            'enable_range_search' => true,
-            'is_date_field' => true,
-        ),
-        'end_range_date_modified' => array(
-            'query_type' => 'default',
-            'enable_range_search' => true,
-            'is_date_field' => true,
-        ),             
-    );
+$searchFields['EmailMan'] = [
+    'campaign_name' => [
+        'query_type' => 'default',
+        'db_field' => [
+            'campaigns.name'
+        ]
+    ],
+    'recipient_name' => [
+        'query_type' => 'default',
+        'db_field' => [
+            'accounts.name',
+            'contacts.first_name',
+            'contacts.last_name',
+            'leads.first_name',
+            'leads.last_name',
+            'prospects.first_name',
+            'prospects.last_name'
+        ]
+    ],
+    'recipient_email' => [
+        'query_type' => 'default',
+        'operator' => 'subquery',
+        'subquery' => 'SELECT eabr.bean_id FROM email_addr_bean_rel eabr JOIN email_addresses ea ON (ea.id = eabr.email_address_id) WHERE eabr.deleted=0 AND ea.email_address LIKE',
+        'db_field' =>
+            array(
+                0 => 'related_id',
+            ),
+    ],
+    'current_user_only' => [
+        'query_type' => 'default',
+        'db_field' => ['user_id'],
+        'my_items' => true,
+        'vname' => 'LBL_CURRENT_USER_FILTER',
+        'type' => 'bool'
+    ],
+    'message_name' => [
+        'query_type' => 'default',
+        'db_field' => ['email_marketing.name']
+    ],
+    'send_attempts' => [
+        'query_type' => 'default',
+        'db_field' => ['emailman.send_attempts']
+    ],
+    'in_queue' => [
+        'query_type' => 'default',
+        'db_field' => ['emailman.in_queue']
+    ],
+    'range_send_date_time' => [
+        'query_type' => 'default',
+        'enable_range_search' => true,
+        'is_date_field' => true,
+    ],
+    'start_range_send_date_time' => [
+        'query_type' => 'default',
+        'enable_range_search' => true,
+        'is_date_field' => true,
+    ],
+    'end_range_send_date_time' => [
+        'query_type' => 'default',
+        'enable_range_search' => true,
+        'is_date_field' => true,
+    ],
+    'range_date_entered' => [
+        'query_type' => 'default',
+        'enable_range_search' => true,
+        'is_date_field' => true,
+    ],
+    'start_range_date_entered' => [
+        'query_type' => 'default',
+        'enable_range_search' => true,
+        'is_date_field' => true,
+    ],
+    'end_range_date_entered' => [
+        'query_type' => 'default',
+        'enable_range_search' => true,
+        'is_date_field' => true,
+    ],
+    'range_date_modified' => [
+        'query_type' => 'default',
+        'enable_range_search' => true,
+        'is_date_field' => true,
+    ],
+    'start_range_date_modified' => [
+        'query_type' => 'default',
+        'enable_range_search' => true,
+        'is_date_field' => true,
+    ],
+    'end_range_date_modified' => [
+        'query_type' => 'default',
+        'enable_range_search' => true,
+        'is_date_field' => true,
+    ],
+    'range_date_created' => [
+        'query_type' => 'default',
+        'enable_range_search' => true,
+        'is_date_field' => true,
+    ],
+    'start_range_date_created' => [
+        'query_type' => 'default',
+        'enable_range_search' => true,
+        'is_date_field' => true,
+    ],
+    'end_range_date_created' => [
+        'query_type' => 'default',
+        'enable_range_search' => true,
+        'is_date_field' => true,
+    ],
+];

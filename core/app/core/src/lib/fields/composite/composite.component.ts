@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -31,6 +31,8 @@ import {RecordManager} from '../../services/record/record.manager';
 import {BaseComposite} from '../base/base-composite.component';
 import {FieldLogicManager} from '../field-logic/field-logic.manager';
 import {FieldLogicDisplayManager} from '../field-logic-display/field-logic-display.manager';
+import {CompositeAttributeTypeOverrideRegistry} from "./composite-attribute-type-override.registry";
+import {SystemConfigStore} from "../../store/system-config/system-config.store";
 
 @Component({
     selector: 'scrm-composite-field',
@@ -44,9 +46,11 @@ export class CompositeComponent extends BaseComposite {
         protected registry: StandardFieldRegistry,
         protected recordManager: RecordManager,
         protected logic: FieldLogicManager,
-        protected logicDisplay: FieldLogicDisplayManager
+        protected logicDisplay: FieldLogicDisplayManager,
+        protected attributeTypeOverrideRegistry: CompositeAttributeTypeOverrideRegistry,
+        protected config: SystemConfigStore
     ) {
-        super(typeFormatter, registry, recordManager, logic, logicDisplay);
+        super(typeFormatter, registry, recordManager, logic, logicDisplay, attributeTypeOverrideRegistry, config);
     }
 
 }

@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -29,7 +29,7 @@ import {of} from 'rxjs';
 import {take} from 'rxjs/operators';
 import {Component} from '@angular/core';
 import {RouterTestingModule} from '@angular/router/testing';
-import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {AngularSvgIconModule} from 'angular-svg-icon';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
@@ -40,6 +40,7 @@ import {languageMockData} from '../../../store/language/language.store.spec.mock
 import {themeImagesMockData} from '../../../store/theme-images/theme-images.store.spec.mock';
 import {ImageModule} from '../../image/image.module';
 import {ThemeImagesStore} from '../../../store/theme-images/theme-images.store';
+import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 const recentRecords = [
     {
@@ -70,26 +71,25 @@ describe('MenuRecentlyViewedComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            declarations: [
-                MenuItemLinkComponent,
-                MenuRecentlyViewedComponent,
-                MenuRecentlyViewedTestHostComponent
-            ],
-            imports: [
-                AngularSvgIconModule.forRoot(),
-                RouterTestingModule,
-                HttpClientTestingModule,
-                ImageModule,
-                NgbModule,
-            ],
-            providers: [
-                {
-                    provide: ThemeImagesStore, useValue: {
-                        images$: of(themeImagesMockData).pipe(take(1))
-                    }
-                },
-            ],
-        }).compileComponents();
+    declarations: [
+        MenuItemLinkComponent,
+        MenuRecentlyViewedComponent,
+        MenuRecentlyViewedTestHostComponent
+    ],
+    imports: [AngularSvgIconModule.forRoot(),
+        RouterTestingModule,
+        ImageModule,
+        NgbModule],
+    providers: [
+        {
+            provide: ThemeImagesStore, useValue: {
+                images$: of(themeImagesMockData).pipe(take(1))
+            }
+        },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+}).compileComponents();
     }));
 
     beforeEach(() => {

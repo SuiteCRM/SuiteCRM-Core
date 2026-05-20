@@ -88,6 +88,12 @@ array(
                       'endLabelKey' => 'LBL_STAT_DAYS',
                       'hideValueIfEmpty' => true
                   ],
+                  [
+                      'labelKey' => 'LBL_TOTAL_CASES_FOR_THIS_ACCOUNT',
+                      'type' => 'cases-per-account',
+                      'endLabelKey' => 'LBL_SINCE',
+                      'hideValueIfEmpty' => true
+                  ],
               ],
           ]
       ],
@@ -247,53 +253,6 @@ array(
                   'Cases' => ['view', 'list']
               ]
           ],
-          [
-              'type' => 'statistics',
-              'labelKey' => 'LBL_NUMBER_OF_CASES_PER_ACCOUNT',
-              'options' => [
-                  'sidebarStatistic' => [
-                      'rows' => [
-                          [
-                              'align' => 'start',
-                              'cols' => [
-                                  [
-                                      'labelKey' => 'LBL_TOTAL_CASES_FOR_THIS_ACCOUNT',
-                                      'size' => 'medium',
-                                  ],
-                              ]
-                          ],
-                          [
-                              'align' => 'start',
-                              'cols' => [
-                                  [
-                                      'statistic' => 'cases-per-account',
-                                      'size' => 'xx-large',
-                                      'bold' => true,
-                                      'color' => 'green'
-                                  ]
-                              ]
-                          ],
-                          [
-                              'align' => 'start',
-                              'cols' => [
-                                  [
-                                      'labelKey' => 'LBL_SINCE',
-                                      'size' => 'regular',
-                                  ],
-                                  [
-                                      'statistic' => 'get-account-date-entered',
-                                      'size' => 'regular',
-                                  ],
-                              ]
-                          ],
-                      ]
-                  ]
-              ],
-              'acls' => [
-                  'Cases' => ['view', 'list'],
-                  'Accounts' => ['view', 'list']
-              ]
-          ],
       ],
     'panels' =>
     array(
@@ -346,6 +305,7 @@ array(
             'name' => 'assigned_user_name',
             'label' => 'LBL_ASSIGNED_TO',
           ),
+          1 => ''
         ),
         7 =>
         array(

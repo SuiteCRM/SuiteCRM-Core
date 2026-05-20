@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -33,26 +33,18 @@ use App\Engine\Service\ActionAvailabilityChecker\ActionAvailabilityChecker;
 class SubpanelTopActionDefinitionProvider extends ActionDefinitionProvider implements SubpanelTopActionDefinitionProviderInterface
 {
     /**
-     * @var array
-     */
-    private $subpanelTopActions;
-
-    /**
-     * @var array
-     */
-    private $subpanelTopButtons;
-
-    /**
      * SubpanelTopActionDefinitionProvider constructor.
      * @param array $subpanelTopActions
      * @param array $subpanelTopButtons
      * @param ActionAvailabilityChecker $actionChecker
      */
-    public function __construct(array $subpanelTopActions, array $subpanelTopButtons, ActionAvailabilityChecker $actionChecker)
+    public function __construct(
+        protected array $subpanelTopActions,
+        protected array $subpanelTopButtons, ActionAvailabilityChecker $actionChecker,
+        protected $actionAclModuleOverride
+    )
     {
-        parent::__construct($actionChecker);
-        $this->subpanelTopActions = $subpanelTopActions;
-        $this->subpanelTopButtons = $subpanelTopButtons;
+        parent::__construct($actionChecker, $this->actionAclModuleOverride);
     }
 
     /**
@@ -96,7 +88,7 @@ class SubpanelTopActionDefinitionProvider extends ActionDefinitionProvider imple
      * @param string $actionKey
      * @return bool
      */
-    public function isActionAccessible(string $module, string $actionKey): bool
+    protected function isActionAccessible(string $module, string $actionKey): bool
     {
         return $this->isActionDefined($actionKey)
             && $this->isActionAvailable($module, $actionKey);
@@ -137,12 +129,11 @@ class SubpanelTopActionDefinitionProvider extends ActionDefinitionProvider imple
         }
 
         $mappedModule = $mappedButton['module'] ?? $module;
-        $mappedAcls = $mappedButton['acl'] ?? [];
 
-        foreach ($mappedAcls as $aclKey) {
-            if (!$this->isActionAccessible($mappedModule, $aclKey)) {
-                return [];
-            }
+        $actions = $this->getActions($mappedModule);
+
+        if (empty($actions[$mappedButton['action'] ?? ''])) {
+            return [];
         }
 
         $mappedButton['additionalFields'] = $topButton['additionalFields'] ?? [];

@@ -47,6 +47,7 @@ require_once('modules/Import/ImportCacheFiles.php');
 require_once('modules/Import/sources/ImportFile.php');
 require_once('modules/Import/views/ImportListView.php');
 require_once('include/ListView/ListViewFacade.php');
+require_once('include/portability/RouteConverter.php');
 
 #[\AllowDynamicProperties]
 class ImportViewLast extends ImportView
@@ -79,12 +80,12 @@ class ImportViewLast extends ImportView
         $dupeCount    = 0;
         $createdCount = 0;
         $updatedCount = 0;
-        $fp = sugar_fopen(ImportCacheFiles::getStatusFileName(), 'r');
-        
+        $fp = sugar_fopen(ImportCacheFiles::getStatusFileName(), 'rb');
+
         // Read the data if we successfully opened file
         if ($fp !== false) {
             // Read rows 1 by 1 and add the info
-            while ($row = fgetcsv($fp, 8192)) {
+            while ($row = fgetcsv($fp, 8192, ',', '"', '\\')) {
                 $count         += (int) $row[0];
                 $errorCount    += (int) $row[1];
                 $dupeCount     += (int) $row[2];
@@ -93,7 +94,7 @@ class ImportViewLast extends ImportView
             }
             fclose($fp);
         }
-        
+
         $this->ss->assign("showUndoButton", false);
         if ($createdCount > 0) {
             $this->ss->assign("showUndoButton", true);
@@ -109,8 +110,6 @@ class ImportViewLast extends ImportView
             }
         }
 
-        $this->ss->assign("JAVASCRIPT", $this->_getJS($activeTab));
-
         $this->ss->assign("errorCount", $errorCount);
         $this->ss->assign("dupeCount", $dupeCount);
         $this->ss->assign("createdCount", $createdCount);
@@ -118,6 +117,13 @@ class ImportViewLast extends ImportView
         $this->ss->assign("errorFile", ImportCacheFiles::convertFileNameToUrl(ImportCacheFiles::getErrorFileName()));
         $this->ss->assign("errorrecordsFile", ImportCacheFiles::convertFileNameToUrl(ImportCacheFiles::getErrorRecordsWithoutErrorFileName()));
         $this->ss->assign("dupeFile", ImportCacheFiles::convertFileNameToUrl(ImportCacheFiles::getDuplicateFileName()));
+
+        $routeConverter = new RouteConverter();
+        $exitRoute = $routeConverter->generateUiLink(
+            'index.php?module=' . urlencode($_REQUEST['import_module']) . '&action=index'
+        );
+
+        $this->ss->assign("JAVASCRIPT", $this->_getJS($activeTab, $exitRoute));
 
         if ($this->bean->object_name == "Prospect") {
             $this->ss->assign("PROSPECTLISTBUTTON", $this->_addToProspectListButton());
@@ -184,6 +190,7 @@ class ImportViewLast extends ImportView
     {
         $has_header = $_REQUEST['has_header'] == 'on' ? true : false;
         $if = new ImportFile($fileName, ",", '"', false, false);
+        $if->setSanitize(false);
         $if->setHeaderRow($has_header);
         $lv = new ImportListView($if, array('offset'=> 0), $tableName);
         return $lv->display(true);
@@ -192,7 +199,7 @@ class ImportViewLast extends ImportView
     /**
      * Returns JS used in this view
      */
-    private function _getJS($activeTab)
+    private function _getJS($activeTab, $exitRoute = '')
     {
         return <<<EOJAVASCRIPT
 
@@ -202,11 +209,13 @@ document.getElementById('importmore').onclick = function(){
 }
 
 document.getElementById('finished').onclick = function(){
-    var importModule  = document.getElementById('importlast').import_module.value;
-    document.getElementById('importlast').action.value = 'index';
-    window.location.href='index.php?module=' + importModule + '&action=index';
-
-	return true;
+    var exitRoute = '$exitRoute';
+    if (window.parent && window.parent !== window) {
+        window.parent.location.href = exitRoute;
+    } else {
+        window.location.href = exitRoute;
+    }
+    return false;
 }
 
 if ( typeof(SUGAR) == 'undefined' )

@@ -642,7 +642,7 @@ if ($_SESSION['demoData'] != 'no') {
     global $current_user;
     $current_user = BeanFactory::newBean('Users');
     $current_user->retrieve(1);
-    include("install/populateSeedData.php");
+    include("install/seed_data/populateSeedData.php");
     installerHook('post_installDemoData');
 }
 

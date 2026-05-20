@@ -77,7 +77,7 @@ $dictionary['prospect_lists_prospects'] = array(
             'default' => '0'
         ),
     ),
-    
+
     'indices' => array(
         array(
             'name' => 'prospect_lists_prospectspk',
@@ -98,10 +98,19 @@ $dictionary['prospect_lists_prospects'] = array(
             'fields' => array(	'related_id',
                                 'related_type',
                                 'prospect_list_id'
-                        )
+                        ),
+        ),
+        array(
+            'name' => 'idx_related',
+            'type' => 'index',
+            'fields' => array(
+                'related_id',
+                'related_type',
+                'deleted'
+            )
         ),
     ),
-    
+
     'relationships' => array(
         'prospect_list_contacts' => array(	'lhs_module'=> 'ProspectLists',
                                             'lhs_table'=> 'prospect_lists',
@@ -173,5 +182,5 @@ $dictionary['prospect_lists_prospects'] = array(
                                             'relationship_role_column_value'=>'Accounts',
                                 )
     )
-    
+
 );

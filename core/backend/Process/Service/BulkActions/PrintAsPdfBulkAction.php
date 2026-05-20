@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -31,7 +31,11 @@ namespace App\Process\Service\BulkActions;
 use ApiPlatform\Exception\InvalidArgumentException;
 use App\Module\Service\ModuleNameMapperInterface;
 use App\Process\Entity\Process;
+use App\Process\LegacyHandler\Pdf\BasePDFManager;
 use App\Process\Service\ProcessHandlerInterface;
+use App\SystemConfig\Service\SystemConfigProviderInterface;
+use Psr\Log\LoggerInterface;
+use SuiteCRM\Exception\Exception;
 
 class PrintAsPdfBulkAction implements ProcessHandlerInterface
 {
@@ -39,17 +43,16 @@ class PrintAsPdfBulkAction implements ProcessHandlerInterface
     protected const PROCESS_TYPE = 'bulk-print-as-pdf';
 
     /**
-     * @var ModuleNameMapperInterface
-     */
-    private $moduleNameMapper;
-
-    /**
      * PrintAsPdfBulkAction constructor.
      * @param ModuleNameMapperInterface $moduleNameMapper
      */
-    public function __construct(ModuleNameMapperInterface $moduleNameMapper)
+    public function __construct(
+        protected ModuleNameMapperInterface $moduleNameMapper,
+        protected BasePDFManager $pdfManager,
+        protected LoggerInterface $logger,
+        protected SystemConfigProviderInterface $systemConfigProvider
+    )
     {
-        $this->moduleNameMapper = $moduleNameMapper;
     }
 
     /**
@@ -132,11 +135,18 @@ class PrintAsPdfBulkAction implements ProcessHandlerInterface
     /**
      * @inheritDoc
      */
-    public function run(Process $process)
+    public function run(Process $process): void
     {
         $options = $process->getOptions();
 
         $responseData = $this->getDownloadData($options);
+
+        if (isset($responseData['error'])) {
+            $process->setStatus('error');
+            $process->setMessages([$responseData['error']]);
+            $process->setData([]);
+            return;
+        }
 
         $process->setStatus('success');
         $process->setMessages([]);
@@ -155,44 +165,49 @@ class PrintAsPdfBulkAction implements ProcessHandlerInterface
             'id' => $modalId
         ] = $modalRecord;
 
-        $responseData = [
+        $ids = $options['ids'] ?? [];
+        $baseModule = $options['module'] ?? '';
+
+        try {
+            $record = $this->pdfManager->generateBulkPdf($baseModule, $ids, $modalId);
+        } catch (Exception $e) {
+            $this->logger->error('Error generating PDF: ' . $e->getMessage());
+            return $this->getError();
+        }
+
+        if ($record === null) {
+            return $this->getError();
+        }
+
+        $url = '';
+        $siteUrl = $this->systemConfigProvider->getSystemConfig('site_url')->getValue();
+
+        if (isset($record->getAttributes()['contentUrl'])) {
+            $url = $siteUrl . $record->getAttributes()['contentUrl'];
+        }
+
+        if (empty($url)) {
+            return $this->getError();
+        }
+
+        return [
             'handler' => 'export',
             'params' => [
-                'url' => 'legacy/index.php?templateID='.$modalId.'&entryPoint=formLetter',
+                'url' => $url,
+                'method' => 'GET',
                 'formData' => []
             ]
         ];
-
-        if (!empty($options['ids'])) {
-            $responseData = $this->getIdBasedRequestData($options, $responseData);
-
-            return $responseData;
-        }
-
-        return $responseData;
     }
 
     /**
-     * Get request data based on a list of ids
-     * @param array|null $options
-     * @param array $responseData
-     * @return array
+     * @return array[]
      */
-    protected function getIdBasedRequestData(?array $options, array $responseData): array
+    public function getError(): array
     {
-
-        [
-            'module' => $baseModule,
-            'ids' => $baseIds
-        ] = $options;
-
-        $responseData['params']['formData'] = [
-            'uid' => implode(',', $baseIds),
-            'module' => $this->moduleNameMapper->toLegacy($baseModule),
-            'action' => 'index'
+        return [
+            'error' => ['LBL_PDF_GENERATION_FAILED'],
         ];
-
-        return $responseData;
     }
 
 }

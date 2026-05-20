@@ -1,0 +1,173 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2024 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+
+<ng-container>
+    <div class='m-0 pt-5' id='two-factor'>
+        <div class='list-view-header pb-3'>
+            <div class='row mr-0'>
+                <div class='col-md-12 d-flex'>
+                    <scrm-module-title [title]="getTitle()" class='list-view-title title-font'></scrm-module-title>
+                </div>
+            </div>
+
+            <div class='list-view-hr-container'>
+                <hr class='list-view-hr'>
+            </div>
+        </div>
+
+        <div class='container'>
+            <div class='row mb-3'>
+                <div class='col'>
+                    <scrm-widget-panel [title]="appMethodHeaderLabel">
+                        <span widget-header-icon-area>
+                            <scrm-image image='mobile-phone'></scrm-image>
+                        </span>
+                        <span widget-header-status-area>
+                            <span *ngIf="isAppMethodEnabled()" class='badge badge-pill badge-success'>
+                                <scrm-label labelKey='LBL_ENABLED'></scrm-label>
+                            </span>
+                        </span>
+                        <span widget-header-button>
+                            <scrm-button *ngIf="!isAppMethodEnabled() && !isQrCodeGenerated()"
+                                         [config]="enableAppMethodButtonConfig"></scrm-button>
+                            <scrm-button *ngIf="!isAppMethodEnabled() && isQrCodeGenerated()"
+                                         [config]="cancelAppMethodButtonConfig"></scrm-button>
+                            <scrm-button *ngIf="isAppMethodEnabled() && !isQrCodeGenerated()"
+                                         [config]="disableAppMethodButtonConfig"></scrm-button>
+                        </span>
+                        <div widget-body>
+                            <div class='d-flex col-md-12 pl-4 pr-4 pt-2 pb-2'>
+                                <scrm-label labelKey='LBL_OTP_SETUP' class='small'></scrm-label>
+                            </div>
+                            <div *ngIf="isQrCodeGenerated()" class="row-container">
+                                <div class="qr-code-container">
+                                    <div class="col">
+                                        <div *ngIf="qrCodeSvg" class='qr-code-col'>
+                                            <div class='qr-code'>
+                                                <div [innerHTML]="qrCodeSvg | trustHtml">
+                                                </div>
+                                                <div *ngIf="!showSecret()" class="secret-container">
+                                                    <a class="small show-secret-link pl-1"
+                                                       (click)="setShowSecret(true)">
+                                                        <scrm-label labelKey='LBL_USE_SECRET'>
+                                                        </scrm-label>
+                                                    </a>
+                                                </div>
+                                                <div *ngIf="showSecret()" class="secret-container">
+                                                    <a class="small show-secret-link pl-1"
+                                                       (click)="setShowSecret(false)">
+                                                        <scrm-label labelKey='LBL_HIDE_SECRET'>
+                                                        </scrm-label>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div *ngIf="showSecret()" class='qr-code-secret'>
+                                            <scrm-label class="pb-3" labelKey='LBL_USE_SECRET_DESC'>
+                                            </scrm-label>
+
+                                            <span class="font-weight-bold pb-2 secret">{{ secret }}</span>
+
+                                            <scrm-button class="pb-2"
+                                                         [config]="copySecretButtonConfig"></scrm-button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div>
+                                            <scrm-label labelKey='LBL_QR_CODE_HELP'
+                                                        class='pl-3 d-inline-block qr-code-label'>
+                                            </scrm-label>
+                                            <div class='d-flex flex-column pt-4 align-items-center'>
+                                                <input [(ngModel)]="authCode"
+                                                       id='auth_code'
+                                                       type='text'
+                                                       name='auth_code'
+                                                       autocomplete='one-time-code'
+                                                       class='mb-3 auth-input'/>
+
+                                                <scrm-button id='submit-2fa-code'
+                                                             [config]="verifyCodeButtonConfig">
+                                                </scrm-button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </scrm-widget-panel>
+                </div>
+
+            </div>
+            <div *ngIf="isAppMethodEnabled()" class='row pt-3'>
+                <div class='col mb-4'>
+                    <scrm-widget-panel [title]="recoveryCodesHeaderLabel">
+                        <span widget-header-icon-area>
+                            <scrm-image image='key'></scrm-image>
+                        </span>
+                        <span widget-header-status-area>
+                            <span *ngIf="areRecoveryCodesGenerated()" class='badge badge-pill badge-success'>
+                                <scrm-label labelKey='LBL_GENERATED'></scrm-label>
+                            </span>
+                        </span>
+                        <span widget-header-button>
+                            <scrm-button *ngIf="isAppMethodEnabled()"
+                                         [config]="regenerateBackupCodesButtonConfig"></scrm-button>
+                        </span>
+                        <div widget-body>
+                            <div class='d-flex col-md-12 pl-4 pr-4 pt-2 pb-2'>
+                                <scrm-label class='small' labelKey='LBL_BACKUP_CODES_INFO'></scrm-label>
+                            </div>
+
+                            <ng-container *ngIf="areRecoveryCodesGenerated() && backupCodes">
+                                <div class='d-flex flex-column'>
+                                    <scrm-button [config]="copyBackupButtonConfig"></scrm-button>
+                                </div>
+                                <div class='d-flex col-md-12 pl-4 pr-4 pt-2 pb-3'>
+                                    <div>
+                                        <div class='backup-codes-container'>
+                                            <ng-container *ngFor="let codes of backupCodes;">
+                                                <div class='backup-codes'>{{ codes }}</div>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </ng-container>
+
+                        </div>
+                    </scrm-widget-panel>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</ng-container>

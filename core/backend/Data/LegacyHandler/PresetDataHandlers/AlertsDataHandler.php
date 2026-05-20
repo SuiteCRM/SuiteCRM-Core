@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -113,13 +113,6 @@ class AlertsDataHandler extends ListDataHandler implements PresetListDataHandler
 
         $criteria = $this->getAlertCriteria($criteria);
 
-        $criteria['filters']['is_read'] = [
-            'field' => 'is_read',
-            'fieldType' => 'bool',
-            'operator' => '=',
-            'values' => ["0", ""]
-        ];
-
         $bean = $this->getBean($module);
 
         $legacyCriteria = $this->mapCriteria($criteria, [], $type);
@@ -129,7 +122,7 @@ class AlertsDataHandler extends ListDataHandler implements PresetListDataHandler
         global $timedate;
         $now = $timedate->nowDb();
 
-        $where .= " AND (alerts.snooze <= '$now' OR alerts.snooze IS NULL )";
+        $where .= " AND (alerts.snooze <= '$now' OR alerts.snooze IS NULL ) AND (alerts.is_read = 0 OR alerts.is_read IS NULL)";
 
         $queryParts = $this->getListDataPort()->getQueryParts($bean, $where, $filter_fields, $params);
         $queryParts['select'] = 'SELECT count(*) as unread';

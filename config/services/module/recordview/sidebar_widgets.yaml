@@ -7,4 +7,8 @@ parameters:
     default:
       widgets: []
     modules:
+  module.recordview.header_widgets:
+    default:
+      widgets: []
+    modules:
 

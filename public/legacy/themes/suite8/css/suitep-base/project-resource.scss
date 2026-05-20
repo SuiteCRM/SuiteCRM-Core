@@ -1,5 +1,5 @@
 table#header_table_chart {
-    margin-top: 0.5em;  
+    margin-top: 0.5em;
     background: $white;
     display: flex;
     align-items: center;
@@ -10,7 +10,7 @@ table#header_table_chart {
     td[scope="row_label"] {
         text-transform: uppercase;
         padding: 5px 30px 5px 0px !important;
-    }  
+    }
     input[type=text],input[type=password],input[type=email] {
         background-color:$transparent-color;
         border: 1px solid $form-border-color;
@@ -20,8 +20,8 @@ table#header_table_chart {
         background: url($select-edit-background-url) no-repeat right;
         background-size: 25px 11px;
         border-color: $bright-grey;
-    }    
-    .utilsLink {        
+    }
+    .utilsLink {
         background-color: $nepal-grey;
         text-transform: capitalize;
         font-size: 13px;
@@ -43,7 +43,7 @@ hr.spacer {
 }
 
 .view-action-view_GanttChart {
-    #exportToPDFSpan {       
+    #exportToPDFSpan {
         .ui-icon, .ui-widget-content .ui-icon {
             background: url('../../../../../themes/suite8/images/close.png') no-repeat;
             background-size: 70%;
@@ -59,20 +59,20 @@ hr.spacer {
   }
 /* Projects Resource Panel Edit View */
 
-.view-module-Project {  
+.view-module-Project {
     @media (max-width: 750px) {
         #EditView_tabs {
             clear: both;
         }
-    } 
+    }
     #EditView {
         .buttons {
             position: absolute;
             top: -0.8em;
         }
-    }   
+    }
     #scheduler .schedulerDiv {
-        padding-top: 0; 
+        padding-top: 0;
         margin-top: 1em;
         h2 {
             font-size: 16px;
@@ -98,7 +98,7 @@ hr.spacer {
     }
     input[type=text],input[type=password],input[type=email],input[type=number]{
         background-color: $transparent-color;
-        border: 1px solid $form-border-color;        
+        border: 1px solid $form-border-color;
     }
     #scheduler .edit input[type=submit]#invitees_search {
         margin: 0.2em;
@@ -106,7 +106,7 @@ hr.spacer {
         height: 2.2em;
         line-height: 1.1em;
         background-color: rgb(147, 164, 179);
-        text-transform: capitalize; 
+        text-transform: capitalize;
         border-radius: 0.2em;
         padding: 0.3em 1em;
         letter-spacing: 0.05em;
@@ -121,7 +121,7 @@ hr.spacer {
             height: 2.2em;
             line-height: 1.1em;
             background-color: rgb(147, 164, 179);
-            text-transform: capitalize; 
+            text-transform: capitalize;
             border-radius: 0.2em;
             padding: 0.3em 1em;
             letter-spacing: 0.05em;
@@ -133,20 +133,12 @@ hr.spacer {
             background: #a59f9f;
             opacity: 0.5;
         }
-    } 
+    }
     div.buttons {
         #SAVE_HEADER,#CANCEL_HEADER {
             display: none;
         }
-    }    
+    }
 }
 
 /* Projects Resource Panel Edit View Ends here */
-
-.view-module-AM_ProjectTemplates {
-    #EditView {
-      .buttons {
-          top: -0.8em;
-      }
-    }   
-  }

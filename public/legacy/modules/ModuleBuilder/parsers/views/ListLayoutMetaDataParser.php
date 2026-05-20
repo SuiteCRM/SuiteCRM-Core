@@ -268,7 +268,7 @@ class ListLayoutMetaDataParser extends AbstractMetaDataParser implements MetaDat
 
         if (isset($def['type'])) {
             if ($def['type'] == 'html' || ($def['type'] == 'parent' && !$this->allowParent)
-                || $def['type'] == "id" || $def['type'] == "link" || $def['type'] == 'image'
+                || $def['type'] == "id" || $def['type'] == "link"
             ) {
                 return false;
             }

@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -27,6 +27,8 @@
 
 namespace App\Data\LegacyHandler;
 
+use App\Data\Entity\Record;
+use App\Data\Service\Record\RecordDeleteHandlers\RecordDeleteHandlerRunnerInterface;
 use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;
 use App\Module\Service\ModuleNameMapperInterface;
@@ -62,6 +64,8 @@ class RecordDeletionHandler extends LegacyHandler implements RecordDeletionServi
      * @param LegacyScopeState $legacyScopeState
      * @param ModuleNameMapperInterface $moduleNameMapper
      * @param RecordListProviderInterface $listViewProvider
+     * @param RequestStack $session
+     * @param RecordDeleteHandlerRunnerInterface $deleteHandlerRunner
      */
     public function __construct(
         string $projectDir,
@@ -71,7 +75,8 @@ class RecordDeletionHandler extends LegacyHandler implements RecordDeletionServi
         LegacyScopeState $legacyScopeState,
         ModuleNameMapperInterface $moduleNameMapper,
         RecordListProviderInterface $listViewProvider,
-        RequestStack $session
+        RequestStack $session,
+        protected RecordDeleteHandlerRunnerInterface $deleteHandlerRunner
     )
     {
         parent::__construct($projectDir, $legacyDir, $legacySessionName, $defaultSessionName, $legacyScopeState, $session);
@@ -90,42 +95,64 @@ class RecordDeletionHandler extends LegacyHandler implements RecordDeletionServi
     /**
      * Delete record
      *
+     * @param Record $record
+     * @return bool
+     */
+    public function delete(Record $record): bool
+    {
+        $moduleName = $this->moduleNameMapper->toLegacy($record->getModule() ?? '');
+        return $this->deleteRecord($moduleName, $record->getId() ?? '');
+    }
+
+    /**
+     * Delete record
+     *
      * @param string $moduleName
      * @param string $id
      * @return bool
      */
     public function deleteRecord(string $moduleName, string $id): bool
     {
-        $this->init();
-        $this->startLegacyApp();
-
         $success = true;
-        if (!$this->delete($moduleName, $id)) {
+        if (!$this->internalDelete($moduleName, $id)) {
             $success = false;
         }
-
-        $this->close();
 
         return $success;
     }
 
     /**
-     * @param string $moduleName
+     * @param string $legacyModuleName
      * @param string $id
      * @return bool
      */
-    protected function delete(string $moduleName, string $id): bool
+    protected function internalDelete(string $legacyModuleName, string $id): bool
     {
+        $moduleName = $this->moduleNameMapper->toFrontEnd($legacyModuleName);
+
+        $this->init();
+        $this->startLegacyApp();
+
         // NOTE: Do not use BeanFactory::getBean($moduleName, $id) with mark_deleted
         // may cause errors when there are related records.
-        $bean = BeanFactory::newBean($moduleName);
+        $bean = BeanFactory::newBean($legacyModuleName);
         $bean->retrieve($id);
         if ($bean && $bean->id && $bean->ACLAccess('Delete')) {
+
+            $this->close();
+            $this->deleteHandlerRunner->run($moduleName, $id, 'before-delete');
+            $this->init();
+
             $bean->mark_deleted($id);
+
+            $this->close();
+
+            $this->deleteHandlerRunner->run($moduleName, $id, 'after-delete');
 
             return true;
         }
 
+        $this->close();
         return false;
     }
 
@@ -138,17 +165,12 @@ class RecordDeletionHandler extends LegacyHandler implements RecordDeletionServi
      */
     public function deleteRecords(string $moduleName, array $ids = []): bool
     {
-        $this->init();
-        $this->startLegacyApp();
-
         $success = true;
         foreach ($ids as $id) {
-            if (!$this->delete($moduleName, $id)) {
+            if (!$this->internalDelete($moduleName, $id)) {
                 $success = false;
             }
         }
-
-        $this->close();
 
         return $success;
     }
@@ -164,8 +186,6 @@ class RecordDeletionHandler extends LegacyHandler implements RecordDeletionServi
         array $criteria,
         array $sort
     ): bool {
-        $this->init();
-        $this->startLegacyApp();
 
         $listView = $this->listViewProvider->getList(
             $this->moduleNameMapper->toFrontEnd($moduleName),
@@ -178,12 +198,10 @@ class RecordDeletionHandler extends LegacyHandler implements RecordDeletionServi
 
         $success = true;
         foreach ($listView->getRecords() as $record) {
-            if (!$this->delete($moduleName, $record['id'])) {
+            if (!$this->internalDelete($moduleName, $record['id'])) {
                 $success = false;
             }
         }
-
-        $this->close();
 
         return $success;
     }

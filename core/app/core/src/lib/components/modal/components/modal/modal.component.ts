@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,24 +24,219 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, Input, OnInit} from '@angular/core';
-import {ButtonInterface} from 'common';
+import {
+    Component, ElementRef,
+    EventEmitter,
+    HostListener,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    signal, ViewChild,
+    WritableSignal
+} from '@angular/core';
+import {ButtonInterface} from '../../../../common/components/button/button.model';
+import {MinimiseButtonStatus} from "../../../minimise-button/minimise-button.component";
+import {Observable, Subscription} from "rxjs";
+import {StringMap} from "../../../../common/types/string-map";
+import {FieldMap} from "../../../../common/record/field.model";
+import {toObservable} from "@angular/core/rxjs-interop";
+import {ActionContext} from "../../../../common/actions/action.model";
+import {MaximizeButtonStatus} from "../../../maximize-button/maximize-button.component";
 
 @Component({
     selector: 'scrm-modal',
     templateUrl: './modal.component.html',
     styleUrls: [],
 })
-export class ModalComponent{
+export class ModalComponent implements OnInit, OnDestroy {
 
     @Input() klass = '';
     @Input() headerKlass = '';
     @Input() bodyKlass = '';
     @Input() footerKlass = '';
+    @Input() titleClass = '';
+    @Input() closeOnOutsideClick = false;
     @Input() titleKey = '';
-    @Input() closable:boolean = false;
+    @Input() titleIcon = '';
+    @Input() dynamicTitleKey = '';
+    @Input() dynamicTitleContext: WritableSignal<StringMap> = signal({});
+    @Input() dynamicTitleFields: WritableSignal<FieldMap> = signal({});
+    @Input() descriptionKey = '';
+    @Input() openMinimised = false;
+    @Input() dynamicDescriptionKey = '';
+    @Input() dynamicDescriptionContext: WritableSignal<StringMap> = signal({});
+    @Input() dynamicDescriptionFields: WritableSignal<FieldMap> = signal({});
+    @Input() limit = '';
+    @Input() limitEndLabel = '';
+    @Input() limitLabel = 'LBL_LIMIT';
+    @Input() closable: boolean = false;
+    @Input() minimizable: boolean = false;
+    @Input() maximizable: boolean = false;
+    @Input() isMinimized$: Observable<boolean>;
+    @Input() isMaximized$: Observable<boolean>;
     @Input() close: ButtonInterface = {
         klass: ['btn', 'btn-outline-light', 'btn-sm']
     } as ButtonInterface;
+    @Output('onMinimizeToggle') onMinimizeToggle: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @Output('onMaximizeToggle') onMaximizeToggle: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+    @ViewChild('modal') modalDiv: ElementRef;
+    isMinimized: WritableSignal<boolean> = signal(false);
+    minimiseButton: ButtonInterface;
+    minimiseStatus: WritableSignal<MinimiseButtonStatus> = signal('maximised');
+    minimiseStatus$: Observable<MinimiseButtonStatus> = toObservable(this.minimiseStatus);
+
+    isMaximized: WritableSignal<boolean> = signal(false);
+    maximizeButton: ButtonInterface;
+    maximizeStatus: WritableSignal<MaximizeButtonStatus> = signal('inactive');
+    maximizeStatus$: Observable<MaximizeButtonStatus> = toObservable(this.maximizeStatus);
+
+
+    @HostListener('window:click', ['$event'])
+    onWindowClick(event: MouseEvent): void {
+        if (this?.closeOnOutsideClick && this.closable) {
+            const clickedInside = this.modalDiv?.nativeElement.contains(event.target);
+
+            if (clickedInside){
+                return;
+            }
+
+            if (!this?.close?.onClick) {
+                return;
+            }
+
+            this.close.onClick();
+        }
+    }
+
+    @HostListener('window:message', ['$event'])
+    onMessage(event): void {
+        if (event?.data !== 'iframe-clicked') {
+            return;
+        }
+
+        if (!this.closeOnOutsideClick || !this.closable) {
+            return;
+        }
+
+        if (!this?.close?.onClick) {
+            return;
+        }
+
+        this.close?.onClick();
+    }
+
+    protected subs: Subscription[] = [];
+
+    ngOnInit(): void {
+
+        if ((this?.openMinimised ?? false)) {
+            this.isMinimized.set(true);
+        }
+
+        if (this.isMinimized$) {
+            this.subs.push(this.isMinimized$.subscribe(minimize => {
+                this.isMinimized.set(minimize);
+                this.initMinimiseButton();
+                if (this.isMinimized()) {
+                    this.isMaximized.set(false);
+                    this.initMaximizeStatus();
+                }
+            }));
+        }
+        if (this.isMaximized$) {
+            this.subs.push(this.isMaximized$.subscribe(maximize => {
+                this.isMaximized.set(maximize);
+                this.initMaximizeButton();
+                if (this.isMaximized()) {
+                    this.isMinimized.set(false);
+                    this.initMinimiseStatus();
+                }
+            }));
+        }
+        this.initMinimiseButton();
+        this.initMaximizeButton();
+    }
+
+    ngOnDestroy(): void {
+        this.subs.forEach(sub => sub.unsubscribe());
+    }
+
+    initMinimiseButton(): void {
+        this.minimiseButton = {
+            klass: ['btn', 'btn-outline-light', 'btn-sm'],
+            onClick: () => {
+                this.toggleMinimize();
+            },
+        } as ButtonInterface;
+        this.initMinimiseStatus();
+    }
+
+    toggleMinimize() {
+        this.isMinimized.set(!this.isMinimized());
+        this.onMinimizeToggle.emit(this.isMinimized());
+        this.initMinimiseStatus();
+        if (this.isMinimized()) {
+            this.isMaximized.set(false);
+            this.initMaximizeStatus();
+        }
+    }
+
+    minimize(): void {
+        this.isMinimized.set(true);
+        this.onMinimizeToggle.emit(this.isMinimized());
+        this.initMinimiseStatus();
+        if (this.isMinimized()) {
+            this.isMaximized.set(false);
+            this.initMaximizeStatus();
+        }
+    }
+
+    initMinimiseStatus(): void {
+        if (this.isMinimized()) {
+            this.minimiseStatus.set('minimised');
+            return;
+        }
+        this.minimiseStatus.set('maximised');
+    }
+
+    initMaximizeButton(): void {
+        this.maximizeButton = {
+            klass: ['btn', 'btn-outline-light', 'btn-sm', 'border-0'],
+            onClick: () => {
+                this.toggleMaximize();
+            },
+        } as ButtonInterface;
+        this.initMaximizeStatus();
+    }
+
+    toggleMaximize(): void {
+        this.isMaximized.set(!this.isMaximized());
+        this.onMaximizeToggle.emit(this.isMaximized());
+        this.initMaximizeStatus();
+        if (this.isMaximized()) {
+            this.isMinimized.set(false);
+            this.initMinimiseStatus();
+        }
+    }
+
+    maximize(): void {
+        this.isMaximized.set(true);
+        this.onMaximizeToggle.emit(this.isMaximized());
+        this.initMaximizeStatus();
+        if (this.isMaximized()) {
+            this.isMinimized.set(false);
+            this.initMinimiseStatus();
+        }
+    }
+
+    initMaximizeStatus(): void {
+        if (this.isMaximized()) {
+            this.maximizeStatus.set('active');
+            return;
+        }
+        this.maximizeStatus.set('inactive');
+    }
 
 }

@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -29,7 +29,8 @@ import {RecordContentComponent} from './record-content.component';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Component} from '@angular/core';
 import {NgbDropdownModule, NgbModule, NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
-import {Panel, Record} from 'common';
+import {Panel, TabDefinitions} from '../../common/metadata/metadata.model';
+import {Record} from '../../common/record/record.model';
 import {DropdownButtonModule} from '../dropdown-button/dropdown-button.module';
 import {ButtonModule} from '../button/button.module';
 import {CloseButtonModule} from '../close-button/close-button.module';
@@ -37,7 +38,7 @@ import {PanelModule} from '../panel/panel.module';
 import {LanguageStore} from '../../store/language/language.store';
 import {RecordContentConfig, RecordContentDataSource} from './record-content.model';
 import {metadataStoreMock} from '../../store/metadata/metadata.store.spec.mock';
-import {MetadataStore, TabDefinitions} from '../../store/metadata/metadata.store.service';
+import {MetadataStore} from '../../store/metadata/metadata.store.service';
 import {themeImagesStoreMock} from '../../store/theme-images/theme-images.store.spec.mock';
 import {MinimiseButtonModule} from '../minimise-button/minimise-button.module';
 import {languageStoreMock} from '../../store/language/language.store.spec.mock';

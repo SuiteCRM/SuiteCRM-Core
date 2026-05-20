@@ -102,4 +102,13 @@ $mod_strings = array(
     'COLUMN_TITLE_INLINE_EDIT_TEXT' => 'Inline Edit',
     'COLUMN_TITLE_PARENT_ENUM' => 'Parent DropDown',
     'LBL_INSERT_FIELD' => 'Insert Field',
+    'LBL_UPLOAD_MAXSIZE' => 'Max Size (in Bytes)',
+    'LBL_STORAGE_TYPE' => 'Storage Type',
+    'LBL_METADATA' => 'Metadata',
+    'LBL_ALLOW_PREVIEW' => 'Allow Preview',
+    'LBL_CREATE_THUMBNAIL' => 'Create Thumbnail',
+    'LBL_SHOW_THUMBNAIL' => 'Show Thumbnail',
+    'LBL_THUMBNAIL_WIDTH' => 'Thumbnail Width',
+    'LBL_THUMBNAIL_HEIGHT' => 'Thumbnail Height',
+    'LBL_THUMBNAIL_CONFIG' => 'Thumbnail Config',
 );

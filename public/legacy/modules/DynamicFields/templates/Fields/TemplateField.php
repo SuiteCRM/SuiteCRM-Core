@@ -78,6 +78,7 @@ class TemplateField
     public $reportable = true;
     public $label_value = '';
     public $help = '';
+    public $metadata;
     public $formula = '';
     public $unified_search = 0;
     public $supports_unified_search = false;
@@ -111,6 +112,7 @@ class TemplateField
         'unified_search'=>'unified_search',
         'full_text_search'=>'full_text_search',
     );
+    public $metadataMap = array();
     // Bug #48826
     // fields to decode from post request
     public $decode_from_request_fields_map = array('formula', 'dependency');
@@ -494,14 +496,23 @@ class TemplateField
      */
     public function populateFromRow($row=array())
     {
-        $fmd_to_dyn_map = array('comments' => 'comment', 'require_option' => 'required', 'label' => 'vname',
-                                'mass_update' => 'massupdate', 'max_size' => 'len', 'default_value' => 'default', 'id_name' => 'ext3');
+        $fmd_to_dyn_map = array(
+            'comments' => 'comment',
+            'require_option' => 'required',
+            'label' => 'vname',
+            'mass_update' => 'massupdate',
+            'max_size' => 'len',
+            'default_value' => 'default',
+            'id_name' => 'ext3',
+            'metadata' => 'metadata'
+        );
         if (!is_array($row)) {
             $GLOBALS['log']->error("Error: TemplateField->populateFromRow expecting Array");
         }
         //Bug 24189: Copy fields from FMD format to Field objects and vice versa
         foreach ($fmd_to_dyn_map as $fmd_key => $dyn_key) {
             if (isset($row[$dyn_key])) {
+
                 $this->$fmd_key = $row[$dyn_key];
             }
             if (isset($row[$fmd_key])) {
@@ -539,6 +550,12 @@ class TemplateField
                 if ($vardef != $field) {
                     $this->$field = $this->$vardef;
                 }
+            }
+        }
+
+        foreach ($this->metadataMap as $vardef => $field) {
+            if (isset($_REQUEST[$vardef])) {
+                $this->$vardef = $_REQUEST[$vardef];
             }
         }
         $this->applyVardefRules();

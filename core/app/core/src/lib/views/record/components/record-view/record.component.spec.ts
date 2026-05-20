@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,7 +26,7 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {Component} from '@angular/core';
-import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {RouterTestingModule} from '@angular/router/testing';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {ApolloTestingModule} from 'apollo-angular/testing';
@@ -59,6 +59,7 @@ import {MetadataStore} from '../../../../store/metadata/metadata.store.service';
 import {mockModuleNavigation} from '../../../../services/navigation/module-navigation/module-navigation.service.spec.mock';
 import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
 import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
+import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 @Component({
     selector: 'record-test-host-component',
@@ -74,38 +75,37 @@ describe('RecordComponent', () => {
     beforeEach(waitForAsync(() => {
         /* eslint-disable camelcase, @typescript-eslint/camelcase */
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientTestingModule,
-                RouterTestingModule,
-                NoopAnimationsModule,
-                ImageModule,
-                ApolloTestingModule,
-                DynamicModule,
-                FieldModule,
-                DropdownButtonModule,
-                RecordContainerModule,
-                RecordHeaderModule,
-                StatusBarModule,
-                AngularSvgIconModule.forRoot()
-            ],
-            declarations: [RecordComponent, RecordTestHostComponent],
-            providers: [
-                {provide: RecordViewStore, useValue: recordviewStoreMock},
-                {
-                    provide: ThemeImagesStore, useValue: {
-                        images$: of(themeImagesMockData).pipe(take(1))
-                    }
-                },
-                {provide: ModuleNavigation, useValue: mockModuleNavigation},
-                {provide: SystemConfigStore, useValue: systemConfigStoreMock},
-                {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
-                {provide: NavigationStore, useValue: navigationMock},
-                {provide: ModuleNavigation, useValue: mockModuleNavigation},
-                {provide: LanguageStore, useValue: languageStoreMock},
-                {provide: MetadataStore, useValue: metadataStoreMock},
-                {provide: AppStateStore, useValue: appStateStoreMock},
-            ],
-        })
+    declarations: [RecordComponent, RecordTestHostComponent],
+    imports: [RouterTestingModule,
+        NoopAnimationsModule,
+        ImageModule,
+        ApolloTestingModule,
+        DynamicModule,
+        FieldModule,
+        DropdownButtonModule,
+        RecordContainerModule,
+        RecordHeaderModule,
+        StatusBarModule,
+        AngularSvgIconModule.forRoot()],
+    providers: [
+        { provide: RecordViewStore, useValue: recordviewStoreMock },
+        {
+            provide: ThemeImagesStore, useValue: {
+                images$: of(themeImagesMockData).pipe(take(1))
+            }
+        },
+        { provide: ModuleNavigation, useValue: mockModuleNavigation },
+        { provide: SystemConfigStore, useValue: systemConfigStoreMock },
+        { provide: UserPreferenceStore, useValue: userPreferenceStoreMock },
+        { provide: NavigationStore, useValue: navigationMock },
+        { provide: ModuleNavigation, useValue: mockModuleNavigation },
+        { provide: LanguageStore, useValue: languageStoreMock },
+        { provide: MetadataStore, useValue: metadataStoreMock },
+        { provide: AppStateStore, useValue: appStateStoreMock },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+})
             .compileComponents();
         /* eslint-enable camelcase, @typescript-eslint/camelcase */
     }));

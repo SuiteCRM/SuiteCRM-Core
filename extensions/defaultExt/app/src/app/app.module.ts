@@ -1,21 +1,13 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
-
 import {AppComponent} from './app.component';
 import {ExtensionModule} from '../extension.module';
-import {HttpClientModule} from '@angular/common/http';
+import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
-@NgModule({
-    declarations: [
+@NgModule({ declarations: [
         AppComponent
     ],
-    imports: [
-        BrowserModule,
-        HttpClientModule,
-        ExtensionModule
-    ],
-    providers: [],
-    bootstrap: [AppComponent]
-})
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        ExtensionModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule {
 }

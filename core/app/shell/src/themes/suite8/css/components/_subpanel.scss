@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -36,15 +36,6 @@
   background-color: $midnight-blue-transparent;
 }
 
-.sub-panel-banner-button-active {
-  background-color: $midnight-blue-transparent;
-}
-
-.widget-entry-icon svg {
-  fill: $salmon-pink;
-  stroke: $salmon-pink;
-  font-size: 1.6em;
-}
 
 .sub-panel .subpanel-icon svg {
   font-size: x-large;
@@ -54,6 +45,19 @@
 
 .sub-panel div.card {
   margin-top: 0.625rem;
+}
+
+
+@media (max-width: 480px) {
+  .sub-panel .panel-buttons button.btn-outline-light {
+    scrm-label {
+      display: none;
+    }
+
+    scrm-image {
+      display: flex!important;
+    }
+  }
 }
 
 .sub-panel .panel-buttons button.btn-outline-light {
@@ -66,6 +70,7 @@
   background-color: $midnight-blue;
   color: $white;
   border-color: $midnight-blue;
+  font-weight: bold;
 
   scrm-image {
     display: inline;
@@ -86,8 +91,14 @@
     display: inline;
 
     svg {
-          fill: $midnight-blue;
+      fill: $midnight-blue;
     }
+  }
+}
+
+@media all and (max-width: $breakpoint-small) {
+  .sub-panel table td {
+    max-width: 100px;
   }
 }
 
@@ -99,100 +110,288 @@ div.widget-panel .panel-card .card-header {
   padding: 0.5rem 0.6rem;
 }
 
-.insight-panel {
-  margin-left: 0;
-  margin-right: 0;
-  padding: 1em;
+.sub-panel-banner {
+  .insight-panel {
+    margin-left: 0;
+    margin-right: 0;
 
-  .border-insight {
-    margin: 4px;
-    border: 0.15em solid $very-light-grey;
-    border-radius: 4px;
-    border-top: 3px solid $midnight-blue;
+    .insight-panel-card {
+      cursor: pointer;
+      padding: 0;
+      border: none;
+      border-bottom: 1px solid $shell-grey;
+      border-radius: 0;
+      margin: 0;
+      margin-right: 0.5em;
+      color: $shell-grey;
 
-    svg {
-      font-size: 1.5em;
-      fill: $midnight-blue;
-      stroke: $midnight-blue;
+      .grid-widget {
+        min-height: 2.1em;
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+        height: 100%;
+        justify-content: flex-end;
+        flex-direction: row !important;
+        align-items: start;
+
+        .widget-entry-icon {
+          display: flex;
+          justify-content: flex-end;
+          margin-right: 0.4em;
+
+          svg {
+            font-size: 1.5em;
+            fill: $shell-grey;
+            stroke: $shell-grey;
+          }
+        }
+
+        .sub-panel-banner-value {
+          margin-left: 0.4em;
+          min-width: fit-content;
+
+          .widget-entry-value {
+            color: $shell-grey;
+            font-size: .67rem;
+          }
+
+          .skeleton-field-content {
+            height: 0.8em;
+          }
+        }
+
+        .sub-panel-banner-button-title {
+          width: 100%;
+
+          .widget-entry-label {
+            text-transform: uppercase;
+            font-size: .62rem;
+            width: 100%;
+            padding: .5em 0;
+            color: $shell-grey;
+          }
+        }
+
+      }
+
+      @media (min-width: $breakpoint-medium) {
+        &:hover{
+          border-bottom: 1px solid $highlight-grey;
+
+          .grid-widget {
+            background-color: inherit;
+
+            .widget-entry-icon {
+              svg {
+                fill: $highlight-grey;
+                stroke: $highlight-grey;
+              }
+            }
+
+            .sub-panel-banner-button-title {
+              .widget-entry-label {
+                font-size: .62rem;
+                color: $highlight-grey;
+              }
+            }
+
+            .sub-panel-banner-value {
+              .widget-entry-value {
+                color: $highlight-grey;
+              }
+            }
+          }
+        }
+      }
+
+      &.sub-panel-banner-button-active {
+        border-bottom: 1px solid $bright-purple;
+
+        .grid-widget {
+          background-color: inherit;
+
+          .widget-entry-icon {
+            svg {
+              fill: $bright-purple;
+              stroke: $bright-purple;
+            }
+          }
+
+          .sub-panel-banner-button-title {
+            .widget-entry-label {
+              font-size: .62rem;
+              color: $bright-purple;
+              font-weight: 900;
+            }
+          }
+
+          .sub-panel-banner-value {
+            .widget-entry-value {
+              color: $bright-purple;
+            }
+          }
+        }
+        @media (min-width: $breakpoint-medium) {
+          &:hover {
+            border-bottom: 1px solid $highlight-purple;
+
+            .grid-widget {
+              background-color: inherit;
+
+              .widget-entry-icon {
+                svg {
+                  fill: $highlight-purple;
+                  stroke: $highlight-purple;
+                }
+              }
+
+              .sub-panel-banner-button-title {
+                .widget-entry-label {
+                  font-size: .62rem;
+                  color: $highlight-purple;
+                  font-weight: 900;
+                }
+              }
+
+              .sub-panel-banner-value {
+                .widget-entry-value {
+                  color: $highlight-purple;
+                }
+              }
+            }
+          }
+        }
+      }
+
     }
-  }
 
-  .insight-panel-card {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    cursor: pointer;
-  }
 
-  .insight-panel-card:hover {
-    box-shadow: 0 0.25rem 0.5rem rgb(0 0 0 / 15%);
-  }
-
-  @media (min-width: 768px) {
-    .col-md-2 {
-      flex: 0 0 15.666667%;
-      max-width: 15.666667%;
-    }
-  }
-
-  .widget-entry-icon {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 0.7em;
-  }
-
-  .sub-panel-banner-value {
-    font-size: 1rem;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: -0.5em;
-    color: $burnt-red;
-  }
-
-  .sub-panel-banner-tooltip {
-    width: 100%;
-
-    .widget-entry-label {
-      border-bottom: 2px solid $very-light-grey;
-      font-size: 0.7rem;
-      line-height: 1rem;
-
-      label {
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        width: 100%;
-        margin: 0;
+    @media (min-width: 768px) {
+      .col-md-2 {
+        flex: 0 0 15.666667%;
+        max-width: 15.666667%;
       }
     }
 
-  }
 
-  .sub-panel-banner-button-title {
-    width: 100%;
-
-    .widget-entry-label {
-      text-transform: uppercase;
-      font-size: 0.62rem;
+    .sub-panel-banner-tooltip {
       width: 100%;
-      padding: 0.5em 0;
-      color: $midnight-blue;
+
+      .widget-entry-label {
+        border-bottom: 2px solid $very-light-grey;
+        font-size: 0.7rem;
+        line-height: 1rem;
+
+        label {
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          width: 100%;
+          margin: 0;
+        }
+      }
+
     }
+
+
   }
 
-  .grid-widget {
-    height: 100%;
-    justify-content: flex-end;
+  .sub-panel-banner-body {
+
+
+    .sub-panel-banner-body-table {
+      width: 95%;
+      table-layout: fixed;
+
+      .sub-panel-banner-body-table-row:first-child {
+        .sub-panel-banner-body-table-col {
+          padding-bottom: 0.5em;
+        }
+      }
+
+      .sub-panel-banner-body-table-row {
+        height: 100%;
+        .sub-panel-banner-body-table-col {
+          height: 100%;
+
+          .insight-panel-card {
+            height: 100%;
+            display: flex;
+          }
+
+          .grid-widget {
+            justify-content: flex-end;
+            flex-direction: row !important;
+            align-items: start;
+
+            .statistics-sidebar-widget-row {
+              width: 100%;
+              height: 100%;
+              min-height: 2.7em;
+            }
+
+            .sub-panel-banner-button-title {
+              .widget-entry-label {
+                text-wrap: auto;
+                word-break: normal;
+              }
+            }
+          }
+        }
+      }
+
+    }
   }
 }
 
-.accordion {
+
+.sub-panels {
+  padding: 0 1.25rem 1.25rem;
+
+  .table {
+    .skeleton-column {
+      margin-bottom: .451rem !important;
+      margin-top: .451rem !important;
+    }
+  }
+}
+
+.sub-panel-banner.accordion {
   .card {
+    border: none;
+
+    .accordion-collapse.collapsing {
+      transition: height 0.3s ease-in-out;
+      overflow: hidden;
+    }
+
     .card-header {
+      min-height: 2.1em;
       padding: .50rem 1.25rem;
       background: $white;
-      border-top: 3px solid $midnight-blue;
+
+      .sub-panel-banner-header {
+        min-height: 2.2em;
+      }
+
+      .sub-panel-header-toggle {
+        border-radius: 50%;
+
+        .hidden-subpanel-buttons-count {
+          top: -7px;
+          right: -10px;
+          background: $sky-blue;
+          color: $white;
+          border-radius: 7px;
+        }
+
+        svg {
+          font-size: 1.1em;
+        }
+
+        &:hover {
+        }
+      }
 
       a.clickable {
         color: $midnight-blue;
@@ -218,18 +417,26 @@ div.widget-panel .panel-card .card-header {
 
 
 .sub-panel {
+
+  &:first-child {
+    .card.panel-card {
+      margin-top: 0.3em;
+    }
+  }
   table {
     tr {
       td:first-child,
-      th:first-child{
+      th:first-child {
         padding-left: 1.3em;
       }
+
       td:last-child,
       th:last-child {
         padding-right: 1.3em;
       }
     }
   }
+
   .table .show-more-column {
     float: none !important;
     width: 16px;

@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -31,39 +31,58 @@
 
 <ng-container *ngIf="this.hasValidConfig">
     <div #wrapper class="d-flex {{direction()}} justify-content-start align-items-start field-group h-100 w-100">
-
         <ng-container *ngFor="let groupField of getFields()">
-
             <div *ngIf="isModeEnabled(mode, groupField)"
                  [class.flex-fill]="mode ==='edit' && direction() === 'flex-row'"
-                 class="field-group-item d-flex flex-column justify-content-end w-100"
+                 class="field-group-item d-flex justify-content-end"
+                 [class.w-100] ="groupField?.definition?.metadata?.widthFull ?? true"
+                 [class.w-auto] ="groupField?.definition?.metadata?.widthAuto ?? false"
+                 [class.flex-column] ="groupField?.definition?.metadata?.labelDisplay !== 'inline'"
+                 [class.pt-2] ="groupField?.definition?.metadata?.labelDisplay === 'inline'"
+                 [class.pb-2] ="groupField?.definition?.metadata?.labelDisplay === 'inline'"
                  [class.h-100]="direction() === 'flex-row'">
 
                 <!-- LABEL -->
                 <span *ngIf="groupField.labelKey && showLabel(groupField.definition.name)"
-                      class="field-group-label pt-2 pr-1">
-                    <label>
-                        <scrm-label [labelKey]="groupField.labelKey" [module]="getModule()"></scrm-label>
+                      class="field-group-label  font-weight-bold"
+                      [class.pt-2] = "groupField?.definition?.metadata?.labelDisplay !== 'inline'"
+                      [class.pr-1] = "groupField?.definition?.metadata?.labelDisplay !== 'inline'"
+                      [class.mr-1] = "groupField?.definition?.metadata?.labelDisplay === 'inline'"
+                      [class.d-none] ="groupField?.definition?.metadata?.labelDisplay === 'none'"
+                >
+                    <label *ngIf="groupField.labelKey && showLabel(groupField.definition.name)"
+                           [class.m-0] = "groupField?.definition?.metadata?.labelDisplay === 'inline'"
+                    >
+                        <scrm-label
+                                [labelKey]="groupField.labelKey"
+                                [module]="getModule()"
+                        ></scrm-label>
+                        <ng-container *ngIf="groupField?.required() && (['edit', 'create'].includes(mode))">
+                            <span class="required">*</span>
+                        </ng-container>
                     </label>
                 </span>
 
                 <!-- VALUE -->
-                <span *ngIf="groupField.type" class="field-group-field pr-1">
+                <span *ngIf="groupField.type"
+                      class="field-group-field pr-1"
+                      [class.flex-grow-1] ="groupField?.definition?.metadata?.labelDisplay === 'inline'"
+                >
 
-                    <scrm-dynamic-field [componentType]="getComponentType(groupField.type, groupField.definition)"
-                                        [field]="groupField"
-                                        [klass]="klass"
-                                        [mode]="mode"
-                                        [originalMode]="originalMode"
-                                        [record]="record"
-                                        [parent]="parent"
-                                        [type]="groupField.type">
-                    </scrm-dynamic-field>
+                        <scrm-dynamic-field
+                                [componentType]="getComponentType(groupField.name, groupField.type, groupField.definition)"
+                                [field]="groupField"
+                                [klass]="klass"
+                                [mode]="fieldModes[groupField.name] ?? mode"
+                                [originalMode]="originalMode"
+                                [record]="record"
+                                [parent]="parent"
+                                [type]="groupField.type">
+                        </scrm-dynamic-field>
 
-                </span>
+                    </span>
             </div>
         </ng-container>
-
     </div>
 </ng-container>
 

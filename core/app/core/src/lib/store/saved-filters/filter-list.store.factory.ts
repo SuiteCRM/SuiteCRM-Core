@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -34,6 +34,7 @@ import {UserPreferenceStore} from '../user-preference/user-preference.store';
 import {LanguageStore} from '../language/language.store';
 import {MessageService} from '../../services/message/message.service';
 import {LocalStorageService} from "../../services/local-storage/local-storage.service";
+import {RecordManager} from "../../services/record/record.manager";
 
 @Injectable({
     providedIn: 'root',
@@ -50,6 +51,7 @@ export class FilterListStoreFactory {
      * @param auth
      * @param moduleNameMapper
      * @param localStorageService
+     * @param recordManager
      */
     constructor(
         protected listGQL: FiltersListGQL,
@@ -59,7 +61,8 @@ export class FilterListStoreFactory {
         protected message: MessageService,
         protected auth: AuthService,
         protected moduleNameMapper: ModuleNameMapper,
-        protected localStorageService: LocalStorageService
+        protected localStorageService: LocalStorageService,
+        protected recordManager: RecordManager
     ) {
     }
 
@@ -76,7 +79,8 @@ export class FilterListStoreFactory {
             this.message,
             this.auth,
             this.moduleNameMapper,
-            this.localStorageService
+            this.localStorageService,
+            this.recordManager
         );
     }
 }

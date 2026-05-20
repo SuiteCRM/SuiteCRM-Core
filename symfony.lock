@@ -16,9 +16,6 @@
     "api-platform/schema-generator": {
         "version": "v2.2.2"
     },
-    "beberlei/assert": {
-        "version": "v3.3.1"
-    },
     "behat/gherkin": {
         "version": "v4.6.0"
     },
@@ -343,6 +340,19 @@
     "league/event": {
         "version": "2.2.0"
     },
+    "league/flysystem-bundle": {
+        "version": "3.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "913dc3d7a5a1af0d2b044c5ac3a16e2f851d7380"
+        },
+        "files": [
+            "config/packages/flysystem.yaml",
+            "var/storage/.gitignore"
+        ]
+    },
     "league/html-to-markdown": {
         "version": "4.9.1"
     },
@@ -390,9 +400,6 @@
     },
     "nikic/php-parser": {
         "version": "v4.3.0"
-    },
-    "nikolaposa/version": {
-        "version": "4.1.0"
     },
     "ocramius/package-versions": {
         "version": "1.4.2"
@@ -504,6 +511,19 @@
     "robrichards/xmlseclibs": {
         "version": "3.1.1"
     },
+    "scheb/2fa-bundle": {
+        "version": "6.12",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "6.0",
+            "ref": "1e6f68089146853a790b5da9946fc5974f6fcd49"
+        },
+        "files": [
+            "config/packages/scheb_2fa.yaml",
+            "config/routes/scheb_2fa.yaml"
+        ]
+    },
     "scssphp/scssphp": {
         "version": "v1.7.0"
     },
@@ -546,17 +566,11 @@
     "sebastian/recursion-context": {
         "version": "3.0.0"
     },
-    "sebastian/resource-operations": {
-        "version": "2.0.1"
-    },
     "sebastian/type": {
         "version": "1.1.3"
     },
     "sebastian/version": {
         "version": "2.0.1"
-    },
-    "shivas/versioning-bundle": {
-        "version": "4.0.0"
     },
     "slim/slim": {
         "version": "3.12.3"
@@ -790,9 +804,6 @@
     "symfony/polyfill-mbstring": {
         "version": "v1.13.1"
     },
-    "symfony/polyfill-php70": {
-        "version": "v1.13.1"
-    },
     "symfony/polyfill-php72": {
         "version": "v1.13.1"
     },
@@ -902,6 +913,18 @@
             "templates/base.html.twig"
         ]
     },
+    "symfony/uid": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "6.2",
+            "ref": "d294ad4add3e15d7eb1bae0221588ca89b38e558"
+        },
+        "files": [
+            "config/packages/uid.yaml"
+        ]
+    },
     "symfony/validator": {
         "version": "5.3",
         "recipe": {
@@ -957,6 +980,18 @@
     "twig/twig": {
         "version": "v2.12.3"
     },
+    "vich/uploader-bundle": {
+        "version": "2.7",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.13",
+            "ref": "1b3064c2f6b255c2bc2f56461aaeb76b11e07e36"
+        },
+        "files": [
+            "config/packages/vich_uploader.yaml"
+        ]
+    },
     "vlucas/phpdotenv": {
         "version": "v3.6.8"
     },
@@ -987,46 +1022,13 @@
     "zendframework/zend-eventmanager": {
         "version": "3.2.1"
     },
-    "zf1/zend-cache": {
-        "version": "1.12.20"
-    },
-    "zf1/zend-crypt": {
-        "version": "1.12.20"
-    },
-    "zf1/zend-exception": {
-        "version": "1.12.20"
-    },
     "zf1/zend-gdata": {
-        "version": "1.12.20"
-    },
-    "zf1/zend-http": {
-        "version": "1.12.20"
-    },
-    "zf1/zend-loader": {
-        "version": "1.12.20"
-    },
-    "zf1/zend-locale": {
         "version": "1.12.20"
     },
     "zf1/zend-mime": {
         "version": "1.12.20"
     },
-    "zf1/zend-oauth": {
-        "version": "1.12.20"
-    },
-    "zf1/zend-registry": {
-        "version": "1.12.20"
-    },
-    "zf1/zend-uri": {
-        "version": "1.12.20"
-    },
-    "zf1/zend-validate": {
-        "version": "1.12.20"
-    },
     "zf1/zend-version": {
-        "version": "1.12.20"
-    },
-    "zf1/zend-xml": {
         "version": "1.12.20"
     }
 }

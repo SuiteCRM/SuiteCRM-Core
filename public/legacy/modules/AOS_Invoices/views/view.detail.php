@@ -39,6 +39,19 @@ class AOS_InvoicesViewDetail extends ViewDetail
     {
         global $app_list_strings,$app_strings, $mod_strings;
         $templates = array_keys($app_list_strings['template_ddown_c_list']);
+
+        $printAsPdfConfigJson = '';
+        $recordActions = $this->dv->defs['recordActions']['actions'] ?? [];
+        $printAsPdfAction = $recordActions['print-as-pdf'] ?? [];
+        if (!empty($printAsPdfAction)) {
+            $actionPayload = [
+                'key' => 'record-' . ($printAsPdfAction['key'] ?? 'print-as-pdf'),
+                'asyncProcess' => !empty($printAsPdfAction['asyncProcess']),
+                'params' => $printAsPdfAction['params'] ?? [],
+            ];
+            $printAsPdfConfigJson = json_encode($actionPayload);
+        }
+
         if ($templates) {
             echo '	<div id="popupDiv_ara" class="pdf-templates-modal">
 				<form id="popupForm" action="index.php?entryPoint=generatePdf" method="post">
@@ -67,12 +80,75 @@ class AOS_InvoicesViewDetail extends ViewDetail
 				</div>
 				<div id="popupDivBack_ara" onclick="this.style.display=\'none\';document.getElementById(\'popupDiv_ara\').style.display=\'none\';" style="top:0px;left:0px;position:fixed;height:100%;width:100%;background-color:#E9E9E9;opacity:0.7;display:none;vertical-align:middle;text-align:center;z-index:9998;">
 				</div>
-				<script>
+				<script>' . ($printAsPdfConfigJson ? PHP_EOL . '    const printAsPdfConfig = ' . $printAsPdfConfigJson . ';' : '') . '
+				    function openEmailComposeModal(id, module) {
+                        const options = {
+                            type: "run-global-async-action",
+                            params: {
+                                action: {
+                                    key: "invoice-build-pdf-email",
+                                    asyncProcess: true,
+                                    params: {
+                                        module: module,
+                                        id: id,
+                                        selectModal: {
+                                            module: "AOS_PDF_Templates",
+                                        }
+                                    }
+                                }
+                            }
+                        };
+
+                        window.parent.postMessage(JSON.stringify(options));
+
+                        window.event.preventDefault();
+                        window.event.stopImmediatePropagation();
+                    }
+
+                    function printAsPdf(id, module) {
+                        const config = typeof printAsPdfConfig !== "undefined" ? printAsPdfConfig : {
+                            key: "record-print-as-pdf",
+                            asyncProcess: true,
+                            params: {
+                                selectModal: {
+                                    module: "AOS_PDF_Templates",
+                                }
+                            }
+                        };
+                        const options = {
+                            type: "run-global-async-action",
+                            params: {
+                                action: {
+                                    key: config.key,
+                                    asyncProcess: config.asyncProcess,
+                                    params: Object.assign({}, config.params, { id: id, module: module })
+                                }
+                            }
+                        };
+
+                        window.parent.postMessage(JSON.stringify(options));
+
+                        window.event.preventDefault();
+                        window.event.stopImmediatePropagation();
+                    }
+
 					function showPopup(task){
+
+                        const module = \'' . $this->bean->module_name . '\';
+						const id = \'' . $this->bean->id . '\';
+						if (task === \'emailpdf\') {
+                            openEmailComposeModal(id, module);
+                            return;
+                        }
+ 						if (task === \'pdf\') {
+                            printAsPdf(id, module);
+                            return;
+                        }
+
 						var form=document.getElementById(\'popupForm\');
 						var ppd=document.getElementById(\'popupDivBack_ara\');
 						var ppd2=document.getElementById(\'popupDiv_ara\');
-						if('.count($templates).' == 1){
+						if('.count($templates).' == 1) {
 							form.task.value=task;
 							form.templateID.value=\''.$template.'\';
 							form.submit();

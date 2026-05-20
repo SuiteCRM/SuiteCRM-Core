@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -78,7 +78,30 @@ class LegacyApiRedirectHandler extends LegacyRedirectHandler
 
         foreach ($this->legacyApiPaths as $path => $replace) {
             if ($this->inPath($request, $path)) {
-                return str_replace($path, $replace, $legacyPath);
+                $parsedPath = parse_url($legacyPath, PHP_URL_PATH);
+                $urlPath = is_string($parsedPath) ? $parsedPath : $legacyPath;
+                $replacePath = parse_url($replace, PHP_URL_PATH) ?? $replace;
+                $replaceQuery = parse_url($replace, PHP_URL_QUERY) ?? '';
+
+                $newPath = str_replace($path, $replacePath, $urlPath);
+                $requestQuery = $request->getQueryString() ?? '';
+
+                if (empty($replaceQuery)) {
+                    $mergedQuery = $requestQuery;
+                } elseif (empty($requestQuery)) {
+                    $mergedQuery = $replaceQuery;
+                } else {
+                    parse_str($requestQuery, $requestParams);
+                    parse_str($replaceQuery, $replaceParams);
+                    $mergedQuery = http_build_query(
+                        array_merge($requestParams, $replaceParams),
+                        '',
+                        '&',
+                        PHP_QUERY_RFC3986
+                    );
+                }
+
+                return empty($mergedQuery) ? $newPath : $newPath . '?' . $mergedQuery;
             }
         }
 
@@ -99,8 +122,23 @@ class LegacyApiRedirectHandler extends LegacyRedirectHandler
 
                 $base = $_SERVER['BASE'] ?? $_SERVER['REDIRECT_BASE'] ?? '';
 
-                $scriptName = $base . '/legacy/' . $info['dir'] . '/' . $info['file'];
-                $requestUri = str_replace($base, $base . '/legacy', $_SERVER['REQUEST_URI']);
+                if (empty($info['dir'])) {
+                    $scriptName = $base . '/legacy/' . $info['file'] ?? '';
+                } else {
+                    $scriptName = $base . '/legacy/' . $info['dir'] . '/' . $info['file'] ?? '';
+                }
+
+                $originalRequestUri = $_SERVER['REQUEST_URI'];
+
+                if (!empty($info['request-uri'])) {
+                    $originalRequestUri = $base . $info['request-uri'];
+                }
+
+                if (!empty($base)) {
+                    $requestUri = str_replace($base, $base . '/legacy', $originalRequestUri);
+                } else {
+                    $requestUri = '/legacy' . $originalRequestUri;
+                }
 
                 $info['script-name'] = $scriptName;
                 $info['request-uri'] = $requestUri;

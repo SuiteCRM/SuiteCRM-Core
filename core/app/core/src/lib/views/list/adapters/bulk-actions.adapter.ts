@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,7 +25,9 @@
  */
 
 import {Injectable} from '@angular/core';
-import {BulkActionsMap, isFalse, Record} from 'common';
+import {BulkActionsMap} from '../../../common/actions/bulk-action.model';
+import {Record} from '../../../common/record/record.model';
+import {isFalse} from '../../../common/utils/value-utils';
 import {Observable} from 'rxjs';
 import {map, take} from 'rxjs/operators';
 import {AsyncActionInput, AsyncActionService} from '../../../services/process/processes/async-action/async-action';
@@ -127,7 +129,8 @@ export class BulkActionsAdapter implements BulkActionDataSource {
         const params = (definition && definition.params) || {} as { [key: string]: any };
         const displayConfirmation = params.displayConfirmation || false;
         const confirmationLabel = params.confirmationLabel || '';
-        const selectModal = definition.params && definition.params.selectModal;
+        const confirmationMessages = params.confirmationMessages || [];
+        const selectModal = definition?.params?.selectModal ?? {};
         const selectModule = selectModal && selectModal.module;
         const recordPanel = definition.params && definition.params.recordPanel;
 
@@ -136,14 +139,15 @@ export class BulkActionsAdapter implements BulkActionDataSource {
             return;
         }
 
+        const confirmation = [confirmationLabel, ...confirmationMessages];
 
         if (displayConfirmation) {
-            this.confirmation.showModal(confirmationLabel, () => {
+            this.confirmation.showModal(confirmation, () => {
                 if (!selectModule) {
                     this.runBulkAction(actionName, data);
                     return;
                 }
-                this.showSelectModal(selectModal.module, actionName, data);
+                this.showSelectModal(selectModal.module, actionName, data, selectModal);
             });
 
             return;
@@ -153,7 +157,7 @@ export class BulkActionsAdapter implements BulkActionDataSource {
             this.runBulkAction(actionName, data);
             return;
         }
-        this.showSelectModal(selectModal.module, actionName, data);
+        this.showSelectModal(selectModal.module, actionName, data, selectModal);
 
     }
 
@@ -161,19 +165,30 @@ export class BulkActionsAdapter implements BulkActionDataSource {
      * Run async buk action
      *
      * @returns void
-     * @param {string} selectModule: module for which records are listed in Select Modal/Popup
-     * @param {string} asyncAction: bulk action name
-     * @param {AsyncActionInput} asyncData: data passed to the async process
+     * @param selectModule
+     * @param asyncAction
+     * @param asyncData
+     * @param selectModalOptions
      */
-    public showSelectModal(selectModule: string, asyncAction: string, asyncData: AsyncActionInput) {
+    public showSelectModal(selectModule: string, asyncAction: string, asyncData: AsyncActionInput, selectModalOptions: any = {}) {
 
-        this.selectModalService.showSelectModal(selectModule, (modalRecord: Record) => {
-            if (modalRecord) {
-                const {fields, formGroup, ...baseRecord} = modalRecord;
+        this.selectModalService.showSelectModal(selectModule, (result: Record | Record[]) => {
+
+            if (Array.isArray(result)) {
+
+                asyncData.modalRecords = result.map(record => {
+                    const {fields, formGroup, ...baseRecord} = record;
+                    return baseRecord;
+                });
+
+            } else if (result) {
+
+                const {fields, formGroup, ...baseRecord} = result;
                 asyncData.modalRecord = baseRecord;
             }
+
             this.runBulkAction(asyncAction, asyncData);
-        });
+        }, selectModalOptions);
     }
 
     /**

@@ -64,6 +64,9 @@ class FieldViewer
         switch ($vardef['type']) {
             case 'address':
                 return $this->ss->fetch('modules/DynamicFields/templates/Fields/Forms/address.tpl');
+            case 'file':
+                require_once('modules/DynamicFields/templates/Fields/Forms/file.php');
+                return get_body($this->ss, $vardef);
             case 'bool':
                 return $this->ss->fetch('modules/DynamicFields/templates/Fields/Forms/bool.tpl');
             case 'int':

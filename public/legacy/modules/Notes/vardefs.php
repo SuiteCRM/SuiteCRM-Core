@@ -175,17 +175,30 @@ $dictionary['Note'] = array(
                 'importable' => false,
               ],
 
-          'filename' =>
-            [
-                'name' => 'filename',
-                'vname' => 'LBL_FILENAME',
-                'type' => 'file',
-                'dbType' => 'varchar',
-                'len' => '255',
-                'reportable'=>true,
-                'comment' => 'File name associated with the note (attachment)',
-                'importable' => false,
-            ],
+          'file' => [
+              'name' => 'file',
+              'vname' => 'LBL_FILENAME',
+              'type' => 'file',
+              'len' => '255',
+              'source' => 'non-db',
+              'reportable' => true,
+              'comment' => 'File name associated with the note (attachment)',
+              'importable' => false,
+              'metadata' => [
+                  'storage_type' => 'private-documents'
+              ],
+          ],
+
+          'filename' => [
+              'name' => 'filename',
+              'vname' => 'LBL_FILENAME',
+              'type' => 'varchar',
+              'dbType' => 'varchar',
+              'len' => '255',
+              'reportable' => true,
+              'comment' => 'File name associated with the note (attachment)',
+              'importable' => false,
+          ],
 
           'parent_type'=>
             [
@@ -300,6 +313,97 @@ $dictionary['Note'] = array(
                 'isnull'=>'true',
                 'module'=>'Contacts',
                 'source'=>'non-db',
+                'logic' => [
+                    'set-contact-name-blank-on-newvalue' => [
+                        'key' => 'setEmpty',
+                        'modes' => ['edit', 'create'],
+                        'triggeringStatus' => ['onValueChange'],
+                        'params' => [
+                            'fieldDependencies' => [
+                                'parent_type',
+                            ],
+                            'activeOnFields' => [
+                                'parent_type' => [
+                                    [
+                                        'operator' => 'previous-value-equal',
+                                        'values' => [
+                                            'Contacts'
+                                        ]
+                                    ],
+                                    [
+                                        'operator' => 'not-equal',
+                                        'values' => [
+                                            'Contacts'
+                                        ]
+                                    ]
+                                ],
+                            ]
+                        ]
+                    ],
+                    'set-contact-name-blank-on-previous-value' => [
+                        'key' => 'setEmpty',
+                        'modes' => ['edit', 'create'],
+                        'triggeringStatus' => ['onValueChange'],
+                        'params' => [
+                            'fieldDependencies' => [
+                                'parent_type',
+                            ],
+                            'activeOnFields' => [
+                                'parent_type' => [
+                                    [
+                                        'operator' => 'previous-value-not-equal',
+                                        'values' => [
+                                            'Contacts'
+                                        ]
+                                    ],
+                                    [
+                                        'operator' => 'is-equal',
+                                        'values' => [
+                                            'Contacts'
+                                        ]
+                                    ]
+                                ],
+                            ]
+                        ]
+                    ],
+                    'update-value' => [
+                        'key' => 'updateValue',
+                        'modes' => ['edit', 'create'],
+                        'params' => [
+                            'fieldDependencies' => [
+                                'parent_name',
+                            ],
+                            'targetValueField' => 'parent_name',
+                            'activeOnFields' => [
+                                'parent_type' => ['Contacts'],
+                                'parent_name' => [['operator' => 'any-value']],
+                            ]
+                        ]
+                    ],
+                ],
+                'displayLogic' => [
+                    'hide-on-contact-parent' => [
+                        'key' => 'displayType',
+                        'modes' => [
+                            'detail',
+                            'edit',
+                            'create',
+                        ],
+                        'params' => [
+                            'fieldDependencies' => [
+                                'parent_type',
+                            ],
+                            'activeOnFields' => [
+                                'parent_type' => [
+                                    [
+                                        'operator' => 'is-equal',
+                                        'values' => ['Contacts']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ],
 
          'contact_phone'=>

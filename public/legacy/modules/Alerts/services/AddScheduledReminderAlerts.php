@@ -72,16 +72,17 @@ class AddScheduledReminderAlerts
                 $relatedEventModule,
                 $popupReminder->related_event_module_id
             );
+
+            if (!$relatedEvent) {
+                continue;
+            }
+
             $dateTime = DateTime::createFromFormat($timedate->get_date_time_format(), $relatedEvent->date_start);
             $relatedEventStart = $dateTime ? $dateTime->getTimestamp() : $dateTime;
 
             if ($this->shouldUpdateExecutionTime($i_runs, $popupReminder)) {
                 $this->updateReminderExecutionTime($popupReminder, $relatedEventStart);
                 $i_runs++;
-            }
-
-            if (!$relatedEvent) {
-                continue;
             }
 
             $status = $relatedEvent->status ?? '';

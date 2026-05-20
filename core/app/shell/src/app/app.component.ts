@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, ViewChild, ViewContainerRef} from '@angular/core';
+import {Component, OnInit, signal, ViewChild, ViewContainerRef, WritableSignal} from '@angular/core';
 import {
     Event,
     NavigationCancel,
@@ -34,18 +34,30 @@ import {
     Router,
     RouterEvent
 } from '@angular/router';
-import {AppState, AppStateStore, StateManager, SystemConfigStore, NotificationStore, RecentlyViewedService} from 'core';
+import {
+    AppState,
+    AppStateStore,
+    StateManager,
+    SystemConfigStore,
+    NotificationStore,
+    RecentlyViewedService,
+    DraftsService, isTrue
+} from 'core';
 import {Observable} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
     @ViewChild('mainOutlet', {read: ViewContainerRef, static: true})
     mainOutlet: ViewContainerRef | undefined;
     appState$: Observable<AppState> = this.appStateStore.vm$.pipe(debounceTime(0));
+
+    draftsButton: WritableSignal<{}> = signal({});
+    showDrafts: WritableSignal<boolean> = signal(false);
 
     constructor(
         private router: Router,
@@ -53,23 +65,32 @@ export class AppComponent {
         protected stateManager: StateManager,
         protected systemConfigs: SystemConfigStore,
         protected notificationStore: NotificationStore,
-        protected recentlyViewed: RecentlyViewedService
+        protected recentlyViewed: RecentlyViewedService,
+        protected draftsService: DraftsService
     ) {
         router.events.subscribe((routerEvent: Event | RouterEvent) => this.checkRouterEvent(routerEvent));
+    }
+
+
+    ngOnInit(): void {
+        this.initDraftsConfig();
     }
 
     protected checkRouterEvent(routerEvent: Event | RouterEvent): void {
         if (routerEvent instanceof NavigationStart) {
             this.appStateStore.updateLoading('router-navigation', true);
             this.conditionalCacheReset();
-            this.notificationStore.conditionalNotificationRefresh();
-            this.recentlyViewed.conditionalGlobalRefresh()
+            setTimeout(() => {
+                this.notificationStore.conditionalNotificationRefresh();
+                this.recentlyViewed.conditionalGlobalRefresh()
+            }, 500);
         }
 
         if (routerEvent instanceof NavigationEnd) {
             // reset scroll on navigation
             window.scrollTo(0, 0);
-            this.appStateStore.setRouteUrl(routerEvent.url)
+            this.appStateStore.setRouteUrl(routerEvent.url);
+            this.updateDraftsVisibility();
         }
 
 
@@ -102,5 +123,67 @@ export class AppComponent {
                 return true;
             }
         });
+    }
+
+    protected initDraftsButton(): {} {
+        const countValue = this.draftsService?.draftsCount();
+        const count = countValue > 10 ? '10+' : String(countValue);
+
+        return {
+            icon: 'send',
+            klass: 'btn drafts-button btn-main',
+            iconKlass: 'pr-1',
+            dynamicLabelKey: 'LBL_DRAFTS_TOTAL',
+            dynamicLabelKlass: 'dropdown-toggle',
+            dynamicLabelFields: {
+                count: {
+                    value: count,
+                    type: 'varchar',
+                }
+            },
+            onClick: () => {
+                if (this.draftsService?.modal?.componentInstance) {
+                    this.draftsService?.closeModal();
+                    return;
+                }
+                this.draftsService.showModal();
+            }
+        };
+    }
+
+    protected isDraftsPopupEnabled(): boolean {
+        const draftsPopup = this.systemConfigs.getConfigValue('drafts_popup');
+        return draftsPopup === null || isTrue(draftsPopup);
+    }
+
+    protected initDraftsConfig(): void {
+        this.setDraftsButton();
+        this.draftsService.draftsCount$.pipe().subscribe((count) => {
+            if (count < 1 || !this.isDraftsPopupEnabled()) {
+                this.draftsService?.closeModal();
+                setTimeout(() => {
+                    this.showDrafts.set(false);
+                }, 250);
+                return;
+            }
+            this.showDrafts.set(true);
+            this.setDraftsButton();
+        });
+    }
+
+    protected updateDraftsVisibility(): void {
+        if (!this.isDraftsPopupEnabled()) {
+            this.draftsService?.closeModal();
+            this.showDrafts.set(false);
+            return;
+        }
+        if (this.draftsService?.draftsCount() > 0) {
+            this.showDrafts.set(true);
+            this.setDraftsButton();
+        }
+    }
+
+    protected setDraftsButton() {
+        this.draftsButton.set(this.initDraftsButton());
     }
 }

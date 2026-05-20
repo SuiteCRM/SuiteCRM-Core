@@ -95,6 +95,19 @@ class AOS_QuotesViewDetail extends ViewDetail
         $template->assign('FOCUS', $this->bean);
         $template->assign('TEMPLATES', $templatesList);
 
+        $printAsPdfActionJson = '';
+        $recordActions = $this->dv->defs['recordActions']['actions'] ?? [];
+        $printAsPdfAction = $recordActions['print-as-pdf'] ?? [];
+        if (!empty($printAsPdfAction)) {
+            $actionPayload = [
+                'key' => 'record-' . ($printAsPdfAction['key'] ?? 'print-as-pdf'),
+                'asyncProcess' => !empty($printAsPdfAction['asyncProcess']),
+                'params' => $printAsPdfAction['params'] ?? [],
+            ];
+            $printAsPdfActionJson = json_encode($actionPayload);
+        }
+        $template->assign('PRINT_AS_PDF_ACTION', $printAsPdfActionJson);
+
         if ($templatesList) {
             $template->assign('TOTAL_TEMPLATES', count($templatesList));
             foreach ($templatesList as $t => $templatesListItem) {
@@ -105,4 +118,5 @@ class AOS_QuotesViewDetail extends ViewDetail
             echo $template->fetch('modules/AOS_Quotes/templates/showPopupWithOutTemplates.tpl');
         }
     }
+
 }

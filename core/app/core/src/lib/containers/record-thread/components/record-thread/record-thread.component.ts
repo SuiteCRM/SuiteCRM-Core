@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,7 +24,17 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    Input,
+    OnDestroy,
+    OnInit,
+    signal,
+    ViewChild,
+    WritableSignal
+} from '@angular/core';
 import {combineLatestWith, Observable, Subscription} from 'rxjs';
 import {RecordThreadStore} from '../../store/record-thread/record-thread.store';
 import {RecordThreadStoreFactory} from '../../store/record-thread/record-thread.store.factory';
@@ -32,7 +42,10 @@ import {RecordThreadConfig} from './record-thread.model';
 import {map, take, tap} from 'rxjs/operators';
 import {RecordThreadItemConfig} from '../record-thread-item/record-thread-item.model';
 import {RecordThreadItemStore} from '../../store/record-thread/record-thread-item.store';
-import {AttributeMap, ButtonInterface, isVoid, Record, ViewMode} from 'common';
+import {isVoid} from '../../../../common/utils/value-utils';
+import {Record, AttributeMap} from '../../../../common/record/record.model';
+import {ViewMode} from '../../../../common/views/view.model';
+import {ButtonInterface} from '../../../../common/components/button/button.model';
 import {RecordThreadItemStoreFactory} from '../../store/record-thread/record-thread-item.store.factory';
 import {RecordManager} from '../../../../services/record/record.manager';
 import {MessageService} from '../../../../services/message/message.service';
@@ -53,7 +66,7 @@ export class RecordThreadComponent implements OnInit, OnDestroy, AfterViewInit {
     store: RecordThreadStore;
     createStore: RecordThreadItemStore;
     records: RecordThreadItemStore[];
-    loading = false;
+    loading: WritableSignal<boolean> = signal(false);
     maxHeight = 400;
     direction: 'asc' | 'desc' = 'asc';
     loadMorePosition: 'bottom' | 'top' | string = 'top';
@@ -86,8 +99,8 @@ export class RecordThreadComponent implements OnInit, OnDestroy, AfterViewInit {
 
         if (!this.config.store) {
             this.store = this.storeFactory.create();
-            this.store.setItemMetadata(this.config.itemConfig.metadata);
-            this.store.setListMetadata({actions: this.config.listActions});
+            this.store.setItemMetadata(this?.config?.itemConfig?.metadata);
+            this.store.setListMetadata({actions: this?.config?.listActions});
             this.store.init(this.config.module, false, this?.config?.pageSize ?? null);
         } else {
             this.store = this.config.store;
@@ -154,15 +167,15 @@ export class RecordThreadComponent implements OnInit, OnDestroy, AfterViewInit {
     buildItem(item: RecordThreadItemStore, itemRef: any): RecordThreadItemConfig {
         let klass = 'record-thread-list-item';
 
-        if (this.config.itemConfig.klass) {
-            klass += ' ' + this.config.itemConfig.klass
+        if (this.config?.itemConfig?.klass) {
+            klass += ' ' + this.config?.itemConfig?.klass
         }
         return {
-            ...this.config.itemConfig,
+            ...this.config?.itemConfig,
             store: item,
             threadStore: this.store,
             klass: klass,
-            containerClass: this.config.itemConfig.containerClass,
+            containerClass: this.config?.itemConfig?.containerClass,
             flexDirection: this.config?.itemConfig?.flexDirection ?? '',
             expanded: (): void => {
                 this.scrollToItem(itemRef);
@@ -368,14 +381,14 @@ export class RecordThreadComponent implements OnInit, OnDestroy, AfterViewInit {
                 combineLatestWith(this.createStore.loading$)
             );
         } else {
-            loading$= this.store.$loading.pipe(
+            loading$ = this.store.$loading.pipe(
                 map(value => [value])
             )
         }
 
         this.subs.push(loading$.subscribe((loadings) => {
             if (!loadings || !loadings.length) {
-                this.loading = false;
+                this.loading.set(false);
                 return;
             }
 
@@ -384,7 +397,7 @@ export class RecordThreadComponent implements OnInit, OnDestroy, AfterViewInit {
             loadings.forEach(value => {
                 loading = loading || value;
             });
-            this.loading = loading;
+            this.loading.set(loading);
         }));
     }
 }

@@ -251,7 +251,7 @@ class aSubPanel
             //this will happen only in the case of sub-panels with multiple sources(activities).
             $buttons = $this->_instance_properties [ 'top_buttons' ] ;
         } else {
-            $buttons = $this->panel_definition [ 'top_buttons' ] ;
+            $buttons = $this->panel_definition [ 'top_buttons' ] ?? [] ;
         }
 
         // permissions. hide SubPanelTopComposeEmailButton from activities if email module is disabled.
@@ -868,8 +868,6 @@ class SubPanelDefinitions
      */
     public function get_hidden_subpanels()
     {
-        global $moduleList;
-
         //create variable as static to minimize queries
         static $hidden_subpanels = null;
 
@@ -884,25 +882,9 @@ class SubPanelDefinitions
                 $hidden_subpanels = $administration->settings['MySettings_hide_subpanels'];
                 $hidden_subpanels = trim($hidden_subpanels);
 
-                //make sure serialized string is not empty
                 if (!empty($hidden_subpanels)) {
-                    //decode and unserialize to retrieve the array
-                    $hidden_subpanels = base64_decode($hidden_subpanels);
-                    $hidden_subpanels = unserialize($hidden_subpanels);
-
-                    //Ensure modules saved in the preferences exist.
-                    //get user preference
-                    //unserialize and add to array if not empty
-                    $pref_hidden = array();
-                    foreach ($pref_hidden as $id => $pref_hidden_panel) {
-                        $hidden_subpanels[] = $pref_hidden_panel;
-                    }
-                } else {
-                    //no settings found, return empty
-                    return $hidden_subpanels;
+                    $hidden_subpanels = unserialize(base64_decode($hidden_subpanels), ['allowed_classes' => false]);
                 }
-            } else {	//no settings found, return empty
-                return $hidden_subpanels;
             }
         }
 

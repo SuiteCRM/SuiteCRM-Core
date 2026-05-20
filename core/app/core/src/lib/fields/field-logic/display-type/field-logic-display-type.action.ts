@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,11 +24,16 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import { isEmpty } from 'lodash-es';
+import {isEmpty} from 'lodash-es';
 import {Injectable} from '@angular/core';
 import {FieldLogicActionData, FieldLogicActionHandler} from '../field-logic.action';
-import {Action, DisplayType, Field, Record, StringArrayMap, StringArrayMatrix, ViewMode} from 'common';
+import {Action} from '../../../common/actions/action.model';
+import {DisplayType, Field} from '../../../common/record/field.model';
+import {Record} from '../../../common/record/record.model';
+import {StringArrayMap} from '../../../common/types/string-map';
+import {ViewMode} from '../../../common/views/view.model';
 import {ConditionOperatorManager} from '../../../services/condition-operators/condition-operator.manager';
+import {ObjectArrayMatrix} from "../../../common/types/object-map";
 
 /**
  * @DEPRECATED
@@ -57,7 +62,7 @@ export class FieldLogicDisplayTypeAction extends FieldLogicActionHandler {
         const activeOnFields: StringArrayMap = (action.params && action.params.activeOnFields) || {} as StringArrayMap;
         const relatedFields: string[] = Object.keys(activeOnFields);
 
-        const activeOnAttributes: StringArrayMatrix = (action.params && action.params.activeOnAttributes) || {} as StringArrayMatrix;
+        const activeOnAttributes: ObjectArrayMatrix = (action.params && action.params.activeOnAttributes) || {} as ObjectArrayMatrix;
         const relatedAttributesFields: string[] = Object.keys(activeOnAttributes);
 
         if (!relatedFields.length && !relatedAttributesFields.length) {
@@ -77,7 +82,7 @@ export class FieldLogicDisplayTypeAction extends FieldLogicActionHandler {
             display = targetDisplay;
         }
 
-        data.field.display = display as DisplayType;
+        data.field.display.set(display as DisplayType);
 
         const resetOn: string = (action.params && action.params.resetOn) || 'none';
 
@@ -106,7 +111,7 @@ export class FieldLogicDisplayTypeAction extends FieldLogicActionHandler {
         record: Record,
         activeOnFields: StringArrayMap,
         relatedAttributesFields: string[],
-        activeOnAttributes: StringArrayMatrix
+        activeOnAttributes: ObjectArrayMatrix
     ) {
         let isActive = false;
         if (!isActive && !isEmpty(activeOnFields)) {
@@ -129,7 +134,7 @@ export class FieldLogicDisplayTypeAction extends FieldLogicActionHandler {
     protected areAttributesActive(
         relatedAttributesFields: string[],
         record: Record,
-        activeOnAttributes: StringArrayMatrix
+        activeOnAttributes: ObjectArrayMatrix
     ): boolean {
         return relatedAttributesFields.some(fieldKey => {
 
@@ -176,7 +181,7 @@ export class FieldLogicDisplayTypeAction extends FieldLogicActionHandler {
      * @param {object} field
      * @param {array} activeValues
      */
-    protected isValueActive(record:Record, field: Field, activeValues: string[] | any): boolean {
+    protected isValueActive(record: Record, field: Field, activeValues: string[] | any): boolean {
         let isActive = false;
         if (field.valueList && field.valueList.length) {
             field.valueList.some(value => {
@@ -191,19 +196,19 @@ export class FieldLogicDisplayTypeAction extends FieldLogicActionHandler {
         }
 
         const fields = Object.keys(record.fields);
-        let opsArr:boolean[]= [];
+        let opsArr: boolean[] = [];
 
         if (field.value) {
             activeValues.some(activeValue => {
 
-                if(activeValue.field && !fields.includes(activeValue.field)) {
+                if (activeValue.field && !fields.includes(activeValue.field)) {
                     return;
                 }
 
                 if (activeValue === field.value && !activeValue.operator) {
                     isActive = true;
                 }
-                if(activeValue.operator) {
+                if (activeValue.operator) {
                     const operatorKey = activeValue.operator;
                     const operator = this.operatorManager.get(operatorKey);
                     opsArr.push(operator.run(record, field, activeValue))
@@ -212,8 +217,8 @@ export class FieldLogicDisplayTypeAction extends FieldLogicActionHandler {
             })
         } else {
             activeValues.some(activeValue => {
-                if(activeValue.operator) {
-                    if(activeValue.field && !fields.includes(activeValue.field)) {
+                if (activeValue.operator) {
+                    if (activeValue.field && !fields.includes(activeValue.field)) {
                         return;
                     }
                     const operatorKey = activeValue.operator;
@@ -226,7 +231,7 @@ export class FieldLogicDisplayTypeAction extends FieldLogicActionHandler {
         return isActive;
     }
 
-    getTriggeringStatus() : string[] {
-        return ['onValueChange', 'onFieldInitialize'];
+    getTriggeringStatus(): string[] {
+        return ['onAnyLogic', 'onFieldInitialize'];
     }
 }

@@ -1,0 +1,13 @@
+# See the configuration reference at https://symfony.com/bundles/SchebTwoFactorBundle/6.x/configuration.html
+scheb_two_factor:
+#    two_factor_condition: acme.custom_two_factor_condition
+    totp:
+        enabled: true
+        server_name: SuiteCRM       # Server name used in QR code
+        issuer: SuiteCRM            # Issuer name used in QR code
+        leeway: 0
+    backup_codes:
+        enabled: true
+    security_tokens:
+        - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
+        - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken

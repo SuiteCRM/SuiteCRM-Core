@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,17 +25,50 @@
  */
 
 .widget-bar {
-  background-color: $very-light-salmon-pink;
+  background-color: $white;
   color: $dark-midnight-grey;
-  font-weight: bolder;
+  box-shadow: 0 .125rem .25rem #00000013;
+  border: 1px solid $extra-light-grey;
+
+  &.placement-sidebar {
+    min-height: 60px;
+  }
+
+  .widget-bar-entry:not(:first-child):not(:last-child) {
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+  }
+
+
 }
 
 .widget-bar .widget-bar-entry-value {
-  font-weight: bolder;
+  font-weight: 700;
+  font-size: 1.3em;
+  word-break: break-word;
+  text-align: center;
+
+  .skeleton-field-content {
+    background-color: $dark-midnight-grey;
+    opacity: 0.2;
+  }
 }
+
+.widget-bar .widget-bar-entry-label,
+.widget-bar .widget-bar-entry-end-label {
+  font-weight: 400;
+  font-size: 0.8em;
+  text-align: center;
+  word-break: break-word;
+}
+
+.widget-bar .widget-bar-entry-label:first-child {
+  padding-top: 0.2rem;
+}
+
 
 .widget-bar .inline-spinner > div {
   width: 0.45em;
   height: 0.45em;
-  background-color: white;
+  background-color: $dark-midnight-grey;
 }

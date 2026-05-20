@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,7 +25,9 @@
  */
 
 import {Injectable} from '@angular/core';
-import {Action, ActionContext, Record, ViewMode} from 'common';
+import {Action, ActionContext} from '../../../common/actions/action.model';
+import {Record} from '../../../common/record/record.model';
+import {ViewMode} from '../../../common/views/view.model';
 import {combineLatestWith, Observable, of} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
 import {AsyncActionInput, AsyncActionService} from '../../../services/process/processes/async-action/async-action';
@@ -40,6 +42,9 @@ import {BaseActionsAdapter} from "../../../services/actions/base-action.adapter"
 import {TableActionData} from "../table-actions/table.action";
 import {TableActionManager} from "../table-actions/table-action-manager.service";
 import {AppMetadataStore} from "../../../store/app-metadata/app-metadata.store.service";
+import {FieldModalService} from "../../../services/modals/field-modal.service";
+import {isFalse} from "../../../common/utils/value-utils";
+import {FieldLogicManager} from "../../../fields/field-logic/field-logic.manager";
 
 
 @Injectable()
@@ -53,8 +58,10 @@ export class ListViewTableActionsAdapter extends BaseActionsAdapter<TableActionD
         protected confirmation: ConfirmationModalService,
         protected language: LanguageStore,
         protected selectModalService: SelectModalService,
+        protected fieldModalService: FieldModalService,
         protected metadata: MetadataStore,
-        protected appMetadataStore: AppMetadataStore
+        protected appMetadataStore: AppMetadataStore,
+        protected logic: FieldLogicManager,
     ) {
         super(
             actionManager,
@@ -63,8 +70,10 @@ export class ListViewTableActionsAdapter extends BaseActionsAdapter<TableActionD
             confirmation,
             language,
             selectModalService,
+            fieldModalService,
             metadata,
-            appMetadataStore
+            appMetadataStore,
+            logic
         );
     }
 
@@ -78,9 +87,42 @@ export class ListViewTableActionsAdapter extends BaseActionsAdapter<TableActionD
     /**
      * Get action name
      * @param action
+     * @param context
      */
-    protected getActionName(action: Action) {
+    protected getActionName(action: Action, context: ActionContext = null) {
         return `table-action-${action.key}`;
+    }
+
+    protected runValidations(action: Action, context: ActionContext = null) {
+        const params = action?.params ?? null;
+
+        if (params === null){
+            return true;
+        }
+
+        const selection = this.store.recordList.selection;
+
+        if (isFalse(params.allowAll) && selection.all) {
+            let message = this.store.appStrings.LBL_SELECT_ALL_NOT_ALLOWED;
+            this.message.addDangerMessage(message);
+            return false;
+        }
+
+        if (params.min && selection.count < params.min) {
+            let message = this.store.appStrings.LBL_TOO_FEW_SELECTED;
+            message = message.replace('{min}', params.min);
+            this.message.addDangerMessage(message);
+            return false;
+        }
+
+        if (params.max && selection.count > params.max) {
+            let message = this.store.appStrings.LBL_TOO_MANY_SELECTED;
+            message = message.replace('{max}', params.max);
+            this.message.addDangerMessage(message);
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -135,7 +177,14 @@ export class ListViewTableActionsAdapter extends BaseActionsAdapter<TableActionD
                 of('list' as ViewMode).pipe(shareReplay())
             ),
             map(([tableActions, mode]: [Action[], ViewMode]) => {
-                return  this.parseModeActions(tableActions, mode, context);
+                let actions = tableActions;
+                if (Object.entries(tableActions).length) {
+                    actions = [];
+                    Object.entries(tableActions).forEach(([key, entry]) => {
+                        actions.push(entry);
+                    })
+                }
+                return this.parseModeActions(actions as Action[], mode, context);
             })
         );
     }

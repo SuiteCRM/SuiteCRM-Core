@@ -142,7 +142,17 @@ class DocumentRevision extends SugarBean
     }
     public function get_summary_text()
     {
-        return (string)$this->filename;
+        if (!is_array($this->filename)) {
+            return (string)$this->filename;
+        }
+
+        $attributes = $filename['attributes'] ?? [];
+
+        if (!isset($attributes['name'])) {
+            return 'Unable to get document name'; // update later
+        }
+
+        return (string)$attributes['name'];
     }
 
     public function retrieve($id = -1, $encode=false, $deleted=true)
@@ -183,7 +193,6 @@ class DocumentRevision extends SugarBean
         $row = $this->db->fetchByAssoc($result);
         if ($row != null) {
             $this->document_name = $row['document_name'];
-            $this->document_name = '<a href="index.php?module=Documents&action=DetailView&record='.$this->document_id.'">'.$row['document_name'].'</a>';
             $this->latest_revision = $row['revision'];
             $this->latest_revision_id = $row['document_revision_id'];
 
@@ -192,6 +201,17 @@ class DocumentRevision extends SugarBean
                 $this->revision = is_numeric($latestRevision) ? $latestRevision + 1 : '';
             }
         }
+    }
+
+    public function ACLAccess($view, $is_owner = 'not_set', $in_group = 'not_set')
+    {
+        $notAllowedActions = $this->getNotAllowedActions();
+
+        if (in_array($view, $notAllowedActions)) {
+            return false;
+        }
+
+        return parent::ACLAccess($view, $is_owner, $in_group);
     }
 
     /**
@@ -332,6 +352,15 @@ class DocumentRevision extends SugarBean
             case 'FILE': return true;
         }
         return parent::bean_implements($interface);
+    }
+
+    protected function getNotAllowedActions(): array
+    {
+        return [
+            'duplicate',
+            'delete',
+            'list'
+        ];
     }
 }
 

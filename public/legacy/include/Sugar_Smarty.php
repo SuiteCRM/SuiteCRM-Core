@@ -62,6 +62,22 @@ class Sugar_Smarty extends Smarty
     {
         $plugins_dir = [];
         parent::__construct();
+
+        $this->registerPlugin("modifier", "strval", "strval");
+        $this->registerPlugin("modifier", "strstr", "strstr");
+        $this->registerPlugin("modifier", "substr", "substr");
+        $this->registerPlugin("modifier", "strpos", "strpos");
+        $this->registerPlugin("modifier", "is_string", "is_string");
+        $this->registerPlugin("modifier", "strftime", "strftime");
+        $this->registerPlugin("modifier", "mb_strtolower", "mb_strtolower");
+        $this->registerPlugin("modifier", "preg_match", "preg_match");
+        $this->registerPlugin("modifier", "json_encode", "json_encode");
+        $this->registerPlugin("modifier", "url2html", "url2html");
+        $this->registerPlugin("modifier", "intval", "intval");
+        $this->registerPlugin("modifier", "array_values", "array_values");
+        $this->registerPlugin("modifier", "max", "max");
+        $this->registerPlugin("modifier", "key", "key");
+
         if (!file_exists(SUGAR_SMARTY_DIR)) {
             mkdir_recursive(SUGAR_SMARTY_DIR, true);
         }
@@ -75,12 +91,25 @@ class Sugar_Smarty extends Smarty
             mkdir_recursive(SUGAR_SMARTY_DIR . 'cache', true);
         }
 
-        $this->template_dir = '.';
-        $this->compile_dir = SUGAR_SMARTY_DIR . 'templates_c';
-        $this->config_dir = SUGAR_SMARTY_DIR . 'configs';
-        $this->cache_dir = SUGAR_SMARTY_DIR . 'cache';
-        //$this->request_use_auto_globals = true; // to disable Smarty from using long arrays
+        $this->setTemplateDir('.');
+        $this->setCompileDir(SUGAR_SMARTY_DIR . 'templates_c');
+        $this->setCacheDir(SUGAR_SMARTY_DIR . 'cache');
+        $this->setConfigDir(SUGAR_SMARTY_DIR . 'configs');
 
+        $this->registerPHPFunctions([
+            'count',
+            'intval',
+            'is_string',
+            'key',
+            'preg_match',
+            'substr',
+            'strpos',
+            'strstr',
+            'strtoupper',
+            'strval',
+            'url2html'
+        ]);
+        
         //TODO fix literals
         $this->auto_literal = false;
 
@@ -94,7 +123,19 @@ class Sugar_Smarty extends Smarty
         $this->assign("VERSION_MARK", getVersionedPath(''));
     }
 
-
+    public function registerPHPFunctions(array $functions): void
+    {
+        foreach ($functions as $function) {
+            if ($this->registered_plugins[Smarty::PLUGIN_MODIFIER][$function] ?? false) {
+                continue;
+            }
+            try {
+                $this->registerPlugin(Smarty::PLUGIN_MODIFIER, $function, $function);
+            } catch (SmartyException $e) {
+                $GLOBALS['log']->fatal('Smarty: Failed to register PHP function' . $function . ': ' . $e->getMessage());
+            }
+        }
+    }
 
     /**
      * Override default _unlink method call to fix Bug 53010
@@ -320,7 +361,7 @@ class Sugar_Smarty extends Smarty
     {
         $current_theme = SugarThemeRegistry::current();
         $theme_directory = (string)$current_theme;
-        if (strpos($template, "themes" . DIRECTORY_SEPARATOR . $theme_directory) === false) {
+        if (strpos((string) $template, "themes" . DIRECTORY_SEPARATOR . $theme_directory) === false) {
             $test_path = SUGAR_PATH . DIRECTORY_SEPARATOR . "themes" . DIRECTORY_SEPARATOR . $theme_directory . DIRECTORY_SEPARATOR . $template;
             if (file_exists($test_path)) {
                 $template = "themes" . DIRECTORY_SEPARATOR . $theme_directory . DIRECTORY_SEPARATOR . $template;

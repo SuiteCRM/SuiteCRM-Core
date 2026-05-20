@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -98,6 +98,12 @@ class CacheManagerHandler extends LegacyHandler implements CacheManagerInterface
 
     public function checkForCacheUpdate($keys, $modules): void
     {
+        global $_ENV;
+        if (($_ENV['APP_ENV'] ?? '') === 'dev') {
+            $this->cachePool->clear();
+            return;
+        }
+
         $this->init();
 
         global $db, $current_user;
@@ -110,6 +116,8 @@ class CacheManagerHandler extends LegacyHandler implements CacheManagerInterface
             $db->query($query);
             return;
         }
+
+        $keys = $this->cleanKeys($keys);
 
         $query = "SELECT * FROM cache_rebuild WHERE cache_key IN ('" . implode("', '", $keys) . "')";
         $result = $db->query($query);
@@ -144,5 +152,20 @@ class CacheManagerHandler extends LegacyHandler implements CacheManagerInterface
         }
 
         $this->close();
+    }
+
+    /**
+     * @param $keys
+     * @return array
+     */
+    protected function cleanKeys($keys): array
+    {
+        global $db;
+
+        foreach ($keys as $index => $key) {
+            $key = $db->quote($key);
+            $keys[$index] = $key;
+        }
+        return $keys;
     }
 }

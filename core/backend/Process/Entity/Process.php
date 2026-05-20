@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -81,6 +81,17 @@ class Process
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
+            'description' => 'name',
+        ]
+    )]
+    protected ?string $name;
+
+    /**
+     * @var string|null
+     */
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'string',
             'description' => 'status',
         ]
     )]
@@ -107,6 +118,39 @@ class Process
         ]
     )]
     protected ?bool $async;
+
+    /**
+     * @var string|null
+     */
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'string',
+            'description' => 'async-handler-key',
+        ]
+    )]
+    protected ?string $asyncHandlerKey;
+
+    /**
+     * @var string|null
+     */
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'string',
+            'description' => 'async-runner-type',
+        ]
+    )]
+    protected ?string $asyncRunnerType;
+
+    /**
+     * @var string|null
+     */
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'string',
+            'description' => 'module',
+        ]
+    )]
+    protected ?string $module;
 
     /**
      * @var array|null
@@ -173,6 +217,27 @@ class Process
     }
 
     /**
+     * Get Name
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name ?? null;
+    }
+
+    /**
+     * Set Name
+     * @param string|null $name
+     * @return Process
+     */
+    public function setName(?string $name): Process
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
      * Get Status
      * @return string|null
      */
@@ -232,6 +297,66 @@ class Process
     {
         $this->async = $async;
 
+        return $this;
+    }
+
+    /**
+     * Get Async handler key
+     * @return string|null
+     */
+    public function getAsyncHandlerKey(): ?string
+    {
+        return $this->asyncHandlerKey ?? null;
+    }
+
+    /**
+     * Set Async handler key
+     * @param string|null $asyncHandlerKey
+     * @return Process
+     */
+    public function setAsyncHandlerKey(?string $asyncHandlerKey): Process
+    {
+        $this->asyncHandlerKey = $asyncHandlerKey;
+        return $this;
+    }
+
+    /**
+     * Get Async runner type
+     * @return string|null
+     */
+    public function getAsyncRunnerType(): ?string
+    {
+        return $this->asyncRunnerType ?? null;
+    }
+
+    /**
+     * Set Async runner type
+     * @param string|null $asyncRunnerType
+     * @return Process
+     */
+    public function setAsyncRunnerType(?string $asyncRunnerType): Process
+    {
+        $this->asyncRunnerType = $asyncRunnerType;
+        return $this;
+    }
+
+    /**
+     * Get parent module
+     * @return string|null
+     */
+    public function getModule(): ?string
+    {
+        return $this->module ?? null;
+    }
+
+    /**
+     * Set parent module
+     * @param string|null $module
+     * @return Process
+     */
+    public function setModule(?string $module): Process
+    {
+        $this->module = $module;
         return $this;
     }
 

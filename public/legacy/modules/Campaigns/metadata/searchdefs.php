@@ -62,11 +62,6 @@ $searchdefs['Campaigns'] = [
                 'default' => true,
                 'width' => '10%',
             ],
-            'campaign_type' => [
-                'name' => 'campaign_type',
-                'default' => true,
-                'width' => '10%',
-            ],
             'assigned_user_id' => [
                 'name' => 'assigned_user_id',
                 'type' => 'enum',

@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -106,7 +106,13 @@ class InstallActionHandler implements ProcessHandlerInterface
         if (empty($process->getOptions())) {
             throw new InvalidArgumentException(self::MSG_OPTIONS_NOT_FOUND);
         }
+    }
 
+    /**
+     * @inheritDoc
+     */
+    public function run(Process $process)
+    {
         $options = $process->getOptions();
 
         $validOptions = [
@@ -120,19 +126,19 @@ class InstallActionHandler implements ProcessHandlerInterface
             'db_name'
         ];
 
+        $missingOptions = [];
         foreach ($validOptions as $validOption) {
             if (empty($options['payload'][$validOption])) {
-                throw new InvalidArgumentException(self::MSG_OPTIONS_NOT_FOUND);
+                $missingOptions[] = $validOption;
             }
         }
-    }
 
-    /**
-     * @inheritDoc
-     */
-    public function run(Process $process)
-    {
-        $options = $process->getOptions();
+        if (!empty($missingOptions)) {
+            $process->setStatus('error');
+            $process->setMessages(['Missing required options: ' . implode(', ', $missingOptions)]);
+            $process->setData([]);
+            return;
+        }
 
         global $installing;
         $installing = true;
@@ -226,11 +232,17 @@ class InstallActionHandler implements ProcessHandlerInterface
             return ['LBL_SILENT_INSTALL_SUCCESS'];
         }
 
+        $messages = [];
+
         if (!empty($result->getMessageLabels())) {
-            return [$result->getMessageLabels()[0]];
+            $messages = $result->getMessageLabels();
         }
 
-        return $result->getMessageLabels();
+        if (!empty($result->getMessages())) {
+            $messages = array_merge($messages, $result->getMessages());
+        }
+
+        return $messages;
     }
 
 }

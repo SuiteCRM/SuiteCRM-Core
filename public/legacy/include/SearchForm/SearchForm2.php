@@ -187,7 +187,7 @@ class SearchForm
         $this->th->ss->assign('action', $this->action);
         $this->th->ss->assign('displayView', $this->displayView);
         $this->th->ss->assign('viewTab', $this->getViewTab());
-
+        $this->th->ss->assign('user_options', get_user_array(false));
 
         require_once('modules/MySettings/StoreQuery.php');
         $storeQuery = new StoreQuery();
@@ -631,7 +631,7 @@ class SearchForm
                     if (isset($data['enabled']) && $data['enabled'] == false) {
                         continue;
                     }
-                    $data['name'] = $data['name'] . '_' . $this->parsedView;
+                    $data['name'] = ($data['name'] ?? '') . '_' . $this->parsedView;
                     $this->formData[] = array('field' => $data);
                     $this->fieldDefs[$data['name']] = $data;
                 } else {
@@ -1035,7 +1035,13 @@ class SearchForm
                             }
                         }
                     } else {
-                        $operator = $operator != 'subquery' ? 'in' : $operator;
+
+                        $acceptedOperators = ['in', 'not in', 'not_in', 'subquery'];
+
+                        if (!in_array($operator, $acceptedOperators)){
+                            $operator = $operator != 'subquery' ? 'in' : $operator;
+                        }
+
                         foreach ($parms['value'] as $val) {
                             if ($val != ' ' && $val != '') {
                                 if (!empty($field_value)) {
@@ -1217,7 +1223,7 @@ class SearchForm
                             }
                         }
 
-                        if ($type == 'decimal' || $type == 'float' || $type == 'currency' || (!empty($parms['enable_range_search']) && empty($parms['is_date_field']))) {
+                        if ($type == 'decimal' || $type == 'float' || $type == 'currency' || (!empty($parms['enable_range_search']) && empty($parms['is_date_field']) && empty($parms['is_id_field']))) {
                             require_once('modules/Currencies/Currency.php');
 
                             //we need to handle formatting either a single value or 2 values in case the 'between' search option is set
@@ -1337,7 +1343,7 @@ class SearchForm
                                         // If db_fields (e.g. contacts.first_name) contain table name, need to remove it
                                         for ($i = 0; $i < count($concat_fields); $i++) {
                                             if (strpos($concat_fields[$i], $concat_table) !== false) {
-                                                $concat_fields[$i] = substr($concat_fields[$i], strlen($concat_table) + 1);
+                                                $concat_fields[$i] = substr($concat_fields[$i], strlen($concat_table ?? '') + 1);
                                             }
                                         }
 
@@ -1352,7 +1358,7 @@ class SearchForm
                                                 if (!empty($GLOBALS['app_list_strings']['salutation_dom']) && is_array($GLOBALS['app_list_strings']['salutation_dom'])) {
                                                     foreach ($GLOBALS['app_list_strings']['salutation_dom'] as $salutation) {
                                                         if (!empty($salutation) && strpos($field_value, $salutation) === 0) {
-                                                            $field_value = trim(substr($field_value, strlen($salutation)));
+                                                            $field_value = trim(substr(($field_value ?? ''), strlen($salutation)));
                                                             break;
                                                         }
                                                     }
@@ -1366,6 +1372,7 @@ class SearchForm
                                 }
                                 break;
                             case 'not in':
+                            case 'not_in':
                                 $where .= $db_field . ' not in (' . $field_value . ')';
                                 break;
                             case 'in':

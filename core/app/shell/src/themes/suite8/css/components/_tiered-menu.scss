@@ -1,0 +1,193 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2025 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+
+.tiered-menu-popup-button {
+  .popover {
+    width: 220px !important;
+    .popover-body {
+      padding: .15em !important;
+      .tiered-menu-popup-body {
+
+      }
+    }
+  }
+}
+
+
+
+.tiered-menu-container,
+.tiered-menu-popup-button .popover .tiered-menu-container {
+  max-height: 25em;
+
+  .tiered-menu-search-bar {
+    border: solid 1px lightgray;
+    border-radius: 0.35em;
+    .input-group {
+      background-color: #fff !important;
+    }
+
+    .input-group:hover {
+      background-color: #fff !important;
+    }
+  }
+
+  .tiered-menu {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    max-height: 20em;
+    display: block;
+
+    .p-tieredmenu {
+
+      width: inherit;
+      background-color: $white;
+      border: none !important;
+      padding: .15em .15em 0;
+
+      .p-tieredmenu-root-list {
+        list-style-type: none !important;
+        padding-inline-start: 0 !important;
+        margin-bottom: 0;
+
+        > .p-menuitem {
+          > .p-menuitem-content {
+            border-top: 1px solid lightgrey;
+
+            .p-menuitem-text {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+          }
+
+          &:first-child > .p-menuitem-content {
+            border-top: none;
+          }
+        }
+
+        .p-submenu-list {
+          list-style-type: none !important;
+          padding-inline-start: 0 !important;
+          background-color: $white;
+          max-height: 18em;
+          overflow: auto;
+          scrollbar-width: thin;
+          max-width: 16em !important;
+          overflow-x: clip;
+          position: fixed;
+          padding-top: 0.2em;
+          top: 41px;
+          margin-left: 4px;
+
+
+          > .p-menuitem {
+            > .p-menuitem-content {
+              border-top: 1px solid lightgrey;
+
+              > a {
+                display: flex;
+                flex-direction: column;
+                align-items: start;
+                padding-bottom: 0.25em;
+              }
+
+              .p-menuitem-text {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 95%;
+              }
+
+              .p-menuitem-badge {
+                font-size: small;
+                color: gray;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 95%;
+              }
+            }
+
+            &:first-child > .p-menuitem-content {
+              border-top: none;
+            }
+          }
+        }
+
+        .p-menuitem-link {
+          padding: .5em .35em .5em .35em;
+        }
+      }
+    }
+  }
+}
+
+
+@media (max-width: $breakpoint-large) {
+  .tiered-menu-container,
+  .tiered-menu-popup-button .popover {
+    width: 250px !important;
+    .tiered-menu-container {
+      max-height: none !important;
+      .tiered-menu-search-bar {
+        max-width: 93% !important;
+      }
+
+      .tiered-menu {
+        max-height: 36em;
+
+        .p-tieredmenu {
+          max-width: 96%!important;
+
+          .p-tieredmenu-root-list {
+            .p-menuitem-link {
+              padding: .75em .45em;
+            }
+            .p-submenu-list {
+              position: inherit !important;
+              max-width: 16em !important;
+              margin-left: 0 !important;
+              margin-top: 5px;
+              margin-bottom: 5px;
+              max-height: 15em!important;
+              box-shadow: .1rem .15rem .2rem #00000040 !important;
+            }
+          }
+
+
+        }
+      }
+
+    }
+  }
+
+  .input-group {
+    margin: .25em !important;
+    width: 96%;
+  }
+}
+

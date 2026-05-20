@@ -57,6 +57,10 @@ $mod_strings = array(
     'LBL_OOTB_REMOVE_DOCUMENTS_FROM_FS' => 'Removal of documents from filesystem',
     'LBL_OOTB_GOOGLE_CAL_SYNC' => 'Google Calendar Sync',
     'LBL_OOTB_ELASTIC_INDEX' => 'Perform Elasticsearch Index',
+    'LBL_OOTB_CAL_ACC_SYNC' => 'Calendar Accounts Sync',
+    'LBL_OOTB_SEND_EMAIL_TO_QUEUE' => 'Queue Campaign Emails',
+    'LBL_OOTB_SEND_EMAIL_FROM_QUEUE' => 'Send Campaign Emails',
+    'LBL_OOTB_CLEAN_UP_TEMP_FILES' => 'Clean Up Temporary Files',
 
 // List Labels
     'LBL_LIST_JOB_INTERVAL' => 'Interval:',
@@ -105,7 +109,7 @@ $mod_strings = array(
     'LBL_LAST_RUN' => 'Last Successful Run',
     'LBL_MODULE_NAME' => 'SuiteCRM Scheduler',
     'LBL_MODULE_TITLE' => 'Schedulers',
-    'LBL_NAME' => 'Job Name',
+    'LBL_NAME' => 'Scheduler Name',
     'LBL_NEVER' => 'Never',
     'LBL_NEW_FORM_TITLE' => 'New Schedule',
     'LBL_PERENNIAL' => 'perpetual',
@@ -124,16 +128,24 @@ $mod_strings = array(
 // Links
     'LNK_LIST_SCHEDULER' => 'Schedulers',
     'LNK_NEW_SCHEDULER' => 'Create Scheduler',
-// Messages
+// Cron
     'ERR_CRON_SYNTAX' => 'Invalid Cron syntax',
+    'LBL_CRON_SETUP' => 'Setup Schedulers',
     'NTC_LIST_ORDER' => 'Set the order this schedule will appear in the Scheduler dropdown lists',
     'LBL_CRON_INSTRUCTIONS_WINDOWS' => 'To Setup Windows Scheduler',
     'LBL_CRON_INSTRUCTIONS_LINUX' => 'To Setup Crontab',
-    'LBL_CRON_LINUX_DESC1' => 'In order to run SuiteCRM Schedulers, edit your web server user\'s crontab file with this command:',
-    'LBL_CRON_LINUX_DESC2' => '... and add the following line to the crontab file:',
-    'LBL_CRON_LINUX_DESC3' => 'You should do this only after the installation is concluded.',
-    'LBL_CRON_WINDOWS_DESC' => 'In order to run the SuiteCRM schedulers, create a batch file to run using Windows Scheduled Tasks. The batch file should include the following commands:',
-// Subpanels
+    'LBL_CRON_LINUX_DESC1' => 'In order to run SuiteCRM Schedulers',
+    'LBL_CRON_LINUX_DESC2' => '1. Edit your web server user\'s crontab file with this command',
+    'LBL_CRON_LINUX_DESC3' => '2. Then update and add the following line to the crontab file:',
+    'LBL_CRON_LINUX_DESC4' => 'You should do this only after the installation is concluded.',
+    'LBL_CRON_LINUX_DESC5' => '2(i). To define the environment variables, add the following line:',
+    'LBL_CRON_LINUX_DESC6' => 'Please update [path/to/php] and [path/to/suite/instance] to reflect your environment.',
+    'LBL_CRON_WINDOWS_DESC' => 'In order to run the SuiteCRM Schedulers',
+    'LBL_CRON_WINDOWS_DESC2' => '1. Create a batch file to run using Windows Scheduled Tasks. The batch file should include the following commands:',
+    'LBL_CRON_WINDOWS_DESC3' => 'Please update [path\to\php.exe] and [path\to\suite\instance] to reflect your environment.',
+    'LBL_SCHEDULERS_INFO' => 'Scheduler Information',
+    'LBL_SCHEDULERS_NEVER_RUN' => 'Schedulers have never been run.',
+    // Subpanels
     'LBL_JOBS_SUBPANEL_TITLE' => 'Job Log',
     'LBL_EXECUTE_TIME' => 'Execute Time',
 
@@ -156,6 +168,10 @@ $mod_strings = array(
     'LBL_PROCESSAOW_WORKFLOW' => 'Process AOW Workflow',
 
     'LBL_RUNELASTICSEARCHINDEXERSCHEDULER' => 'Elasticsearch indexer',
+    'LBL_CALENDARSYNCJOB' => 'Sync Calendar Accounts',
+    'LBL_SENDFROMQUEUE' => 'Send Emails from Email Queue',
+    'LBL_CLEANUPTEMPORARYFILES' => 'Clean Up Temporary Files',
+    'LBL_EMAILTOQUEUE' => 'Send Scheduled Emails to Email Queue',
 
     'LBL_SCHEDULER_TIMES' => 'Scheduler Times',
     'LBL_SYNCGOOGLECALENDAR' => 'Sync Google Calendars',

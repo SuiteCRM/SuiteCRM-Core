@@ -44,35 +44,73 @@
  * To change the template for this generated file go to
  * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
-  $searchdefs['EmailMan'] = array(
-                    'templateMeta' => array(
-                            'maxColumns' => '3', 'maxColumnsBasic' => '4',
-                            'widths' => array('label' => '10', 'field' => '30'),
-                           ),
-                    'layout' => array(
-                        'basic_search' => array(
-                            array('name'=>'campaign_name', 'label'=>'LBL_LIST_CAMPAIGN'),
-                            array('name'=>'to_name', 'label'=>'LBL_LIST_RECIPIENT_NAME'),
-                            array('name'=>'to_email', 'label'=>'LBL_LIST_RECIPIENT_EMAIL'),
-                            array('name'=>'message_name', 'label'=>'LBL_LIST_MESSAGE_NAME'),
-                            array('name'=>'send_date_time', 'label'=>'LBL_SEND_DATE_TIME'),                        
-                            array('name'=>'send_attempts', 'label'=>'LBL_SEND_ATTEMPTS'),
-                            array('name'=>'in_queue', 'label'=>'LBL_IN_QUEUE'),
-                        ),
-                        'advanced_search' => array(
-                            array('name'=>'campaign_name', 'label'=>'LBL_LIST_CAMPAIGN'),
-                            array('name'=>'to_name', 'label'=>'LBL_LIST_RECIPIENT_NAME'),
-                            array('name'=>'to_email', 'label'=>'LBL_LIST_RECIPIENT_EMAIL'),
-                            array('name'=>'message_name', 'label'=>'LBL_LIST_MESSAGE_NAME'),
-                            array('name'=>'send_date_time', 'label'=>'LBL_SEND_DATE_TIME'),
-                            array('name'=>'send_attempts', 'label'=>'LBL_SEND_ATTEMPTS'),
-                            array('name'=>'in_queue', 'label'=>'LBL_IN_QUEUE'),
-                            array('name'=>'current_user_only', 'label'=>'LBL_CURRENT_USER_FILTER', 'type'=>'bool'),
-
-                            array('name' => 'date_entered', 'label' => 'LBL_DATE_ENTERED' ),
-                            array('name' => 'date_modified', 'label' => 'LBL_DATE_MODIFIED' ),
-                            array('name' => 'modified_user_id', 'label' => 'LBL_MODIFIED_USER'),
-                            array('name' => 'user_id', 'label' => 'LBL_USER_ID' ),
-                        ),
-                    ),
-               );
+$searchdefs['EmailMan'] = [
+    'templateMeta' => [
+        'maxColumns' => '3', 'maxColumnsBasic' => '4',
+        'widths' => [
+            'label' => '10',
+            'field' => '30'
+        ],
+    ],
+    'layout' => [
+        'basic_search' => [
+            'campaign_name' => [
+                'name' => 'campaign_name',
+                'label' => 'LBL_LIST_CAMPAIGN'
+            ],
+            'recipient_name' => [
+                'name' => 'recipient_name',
+                'label' => 'LBL_LIST_RECIPIENT_NAME'
+            ],
+            'recipient_email' => [
+                'name' => 'recipient_email',
+                'label' => 'LBL_LIST_RECIPIENT_EMAIL'
+            ],
+            'message_name' => [
+                'name' => 'message_name',
+                'label' => 'LBL_LIST_MESSAGE_NAME'
+            ],
+            'send_date_time' => [
+                'name' => 'send_date_time',
+                'label' => 'LBL_SEND_ON'
+            ],
+            'send_attempts' => [
+                'name' => 'send_attempts',
+                'label' => 'LBL_SEND_ATTEMPTS'
+            ],
+            'in_queue' => [
+                'name' => 'in_queue',
+                'label' => 'LBL_IN_QUEUE'
+            ],
+        ],
+        'advanced_search' => [
+            'campaign_name' => [
+                'name' => 'campaign_name',
+                'type' => 'name','label' => 'LBL_LIST_CAMPAIGN'
+            ],
+            'recipient_name' => [
+                'name' => 'recipient_name',
+                'type' => 'name','label' => 'LBL_LIST_RECIPIENT_NAME'
+            ],
+            'recipient_email' => [
+                'name' => 'recipient_email',
+                'type' => 'name', 'label' => 'LBL_LIST_RECIPIENT_EMAIL'
+            ],
+            'message_name' => [
+                'name' => 'message_name',
+                'type' => 'name', 'label' => 'LBL_LIST_MESSAGE_NAME'
+            ],
+            'in_queue' => [
+                'name' => 'in_queue',
+                'label' => 'LBL_IN_QUEUE'
+            ],
+            'current_user_only' => [
+                    'name' => 'current_user_only',
+                    'label' => 'LBL_CURRENT_USER_FILTER',
+                    'type' => 'bool',
+                    'default' => true,
+                    'width' => '10%',
+            ],
+        ],
+    ],
+];

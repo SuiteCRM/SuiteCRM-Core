@@ -5,6 +5,7 @@ parameters:
     users:
       - edit
       - Wizard
+      - 2fa-config
     administration:
       - repair
       - UpgradeWizard
@@ -24,3 +25,6 @@ parameters:
       - config
     studio:
       - wizard
+    emailman:
+      - campaignconfig
+      - config

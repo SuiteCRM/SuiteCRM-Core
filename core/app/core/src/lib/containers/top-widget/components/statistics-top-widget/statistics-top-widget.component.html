@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,60 +26,106 @@
 */
 -->
 <div *ngIf="(vm$ | async) as vm"
-     class="d-sm-flex justify-content-center widget-bar rounded">
+     class="d-sm-flex justify-content-center widget-bar rounded container-fluid p-0">
     <div class="p-2 widget-bar-entry-message" *ngIf="this.messageLabelKey">
         {{vm.appStrings[this.messageLabelKey] || '' | uppercase}}
     </div>
-    <ng-container *ngFor="let item of statistics | keyvalue">
+    <ng-container *ngIf="!loading()">
+        <div class="d-flex h-100 row justify-content-center align-items-center w-100 mt-3 mb-3 mr-0 ml-0">
+            <ng-container *ngFor="let item of statistics | keyvalue; index as i; last as isLast; count as total">
+                <div class="d-flex h-100 flex-column justify-content-start align-items-center widget-bar-entry"
+                    [class.border-right]="total > 1 && i%2 === 0 && !isLast"
+                    [class.col]="total === 1"
+                    [class.col-6]="total >= 2"
+                    [class.mt-3]="total >= 2 && i>2">
 
-        <div class="d-flex justify-content-center align-items-baseline widget-bar-entry p-2">
+                    <ng-container *ngIf="!shouldHide(vm.statistics[item.key], item.value)">
 
-            <ng-container *ngIf="!shouldHide(vm.statistics[item.key], item.value)">
+                        <div *ngIf="item.value.labelKey && getLabel(item.value.labelKey)" class="pr-1 widget-bar-entry-label">
+                            <ng-container *ngIf="!isValueEmpty(vm.statistics[item.key])">
+                                {{getLabel(item.value.labelKey) | uppercase}}:
+                            </ng-container>
+                            <ng-container *ngIf="isValueEmpty(vm.statistics[item.key])">
+                                {{getLabel(item.value.labelKey) | uppercase}}
+                            </ng-container>
+                        </div>
 
-                <div *ngIf="item.value.labelKey && getLabel(item.value.labelKey)" class="pr-1 widget-bar-entry-label">
-                    <ng-container *ngIf="!isValueEmpty(vm.statistics[item.key])">
-                        {{getLabel(item.value.labelKey) | uppercase}}:
                     </ng-container>
-                    <ng-container *ngIf="isValueEmpty(vm.statistics[item.key])">
-                        {{getLabel(item.value.labelKey) | uppercase}}
-                    </ng-container>
-                </div>
 
-            </ng-container>
-
-            <ng-container
-                *ngIf="item.key && vm.statistics[item.key] && !shouldHide(vm.statistics[item.key], item.value)">
-
-                <div class="pl-1 pr-1 widget-bar-entry-value"
-                     *ngIf="!vm.statistics[item.key].loading && vm.statistics[item.key].field">
                     <ng-container
-                        *ngIf="!isValueEmpty(vm.statistics[item.key]) || item.value.hideValueIfEmpty !== true">
-                        <scrm-field [type]="vm.statistics[item.key].field.type" [field]="vm.statistics[item.key].field"
-                                    mode="list"></scrm-field>
+                            *ngIf="item.key && vm.statistics[item.key] && !shouldHide(vm.statistics[item.key], item.value)">
+
+                        <div class="pl-1 pr-1 widget-bar-entry-value"
+                             *ngIf="!vm.statistics[item.key].loading && vm.statistics[item.key].field">
+                            <ng-container
+                                    *ngIf="!isValueEmpty(vm.statistics[item.key]) || item.value.hideValueIfEmpty !== true">
+                                <scrm-field [type]="vm.statistics[item.key].field.type" [field]="vm.statistics[item.key].field"
+                                            mode="list"></scrm-field>
+
+                            </ng-container>
+                        </div>
 
                     </ng-container>
+
+                    <div class="pl-1 pr-1 widget-bar-entry-loading" *ngIf="(item.value.store.loading$ | async) as loading">
+                        <div class="pb-2">
+                            <div class="large-size-text-skeleton small-length-text-skeleton rounded box-loading skeleton-field-content">
+                                .
+                            </div>
+                        </div>
+
+                        <ng-container *ngIf="!loading && (!item.key || !vm.statistics[item.key])">
+                            -
+                        </ng-container>
+                    </div>
+
+                    <ng-container *ngIf="!shouldHide(vm.statistics[item.key], item.value)">
+
+                        <div *ngIf="item.value.endLabelKey && getLabel(item.value.endLabelKey)"
+                             class="pl-1 widget-bar-entry-end-label">
+                            {{getLabel(item.value.endLabelKey) | uppercase}}
+                        </div>
+
+                    </ng-container>
+
                 </div>
 
             </ng-container>
+        </div>
+    </ng-container>
 
-            <div class="pl-1 pr-1 widget-bar-entry-loading" *ngIf="(item.value.store.loading$ | async) as loading">
-                <scrm-inline-loading-spinner></scrm-inline-loading-spinner>
+    <ng-container *ngIf="loading()">
+        <div class="d-flex flex-column justify-content-center align-items-baseline widget-bar-entry p-2">
 
-                <ng-container *ngIf="!loading && (!item.key || !vm.statistics[item.key])">
-                    -
-                </ng-container>
+            <div class="pl-1 pr-1 widget-bar-entry-value">
+                <div class="pb-2">
+                    <div class="large-size-text-skeleton small-length-text-skeleton rounded box-loading skeleton-field-content">
+                        .
+                    </div>
+                </div>
             </div>
 
-            <ng-container *ngIf="!shouldHide(vm.statistics[item.key], item.value)">
+            <div class="pr-1 widget-bar-entry-label large-length-text-skeleton rounded box-loading skeleton-field-content">
+                .
+            </div>
 
-                <div *ngIf="item.value.endLabelKey && getLabel(item.value.endLabelKey)"
-                     class="pl-1 widget-bar-entry-end-label">
-                    {{getLabel(item.value.endLabelKey) | uppercase}}
-                </div>
-
-            </ng-container>
 
         </div>
+        <div class="d-flex flex-column justify-content-center align-items-baseline widget-bar-entry p-2">
 
+            <div class="pl-1 pr-1 widget-bar-entry-value">
+                <div class="pb-2">
+                    <div class="large-size-text-skeleton small-length-text-skeleton rounded box-loading skeleton-field-content">
+                        .
+                    </div>
+                </div>
+            </div>
+
+            <div class="pr-1 widget-bar-entry-label large-length-text-skeleton rounded box-loading skeleton-field-content">
+                .
+            </div>
+
+
+        </div>
     </ng-container>
 </div>

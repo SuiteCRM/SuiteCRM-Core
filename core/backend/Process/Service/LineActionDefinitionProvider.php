@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -105,14 +105,25 @@ class LineActionDefinitionProvider implements LineActionDefinitionProviderInterf
         $defaults = $this->listViewLineActions['default'] ?? [];
         $defaultActions = $defaults['actions'] ?? [];
 
-        $createActions = $defaultActions['create'] ?? [];
-        $filteredCreateActions = $this->filterCreateActions($module, $createActions);
+        $allProcessedActions = [];
+        foreach ($defaultActions as $actionKey => $actionDef) {
+            switch ($actionKey) {
+                case 'create':
+                    if (isset($this->listViewLineActions[$module]) && in_array($actionKey, $this->listViewLineActions[$module]['exclude'])) {
+                        break;
+                    }
+                    $allProcessedActions[] = $this->filterCreateActions($module, $actionDef);
+                    break;
+                case 'modal-create':
+                    if (isset($this->listViewLineActions[$module]) && in_array($actionKey, $this->listViewLineActions[$module]['exclude'])) {
+                        break;
+                    }
+                    $allProcessedActions[] = $this->filterModalCreateActions($module, $actionDef);
+                    break;
+            }
+        }
 
-        $filterActions = [];
-
-        $filterActions = array_merge($filterActions, $filteredCreateActions);
-
-        return $filterActions;
+        return array_reduce($allProcessedActions, 'array_merge', []);
     }
 
     /**
@@ -143,7 +154,7 @@ class LineActionDefinitionProvider implements LineActionDefinitionProviderInterf
             $action['params'] = $action['params'] ?? [];
             $action['params']['create'] = $action['params']['create'] ?? [];
 
-            $action['params']['create']['module'] = $action['module'];
+            $action['params']['create']['module'] = $action['module'] ?? '';
             $action['params']['create']['mapping'] = $action['mapping'] ?? [];
             $action['params']['create']['legacyModuleName'] =  $action['legacyModuleName'] ?? '';
             $action['params']['create']['action'] = $action['action'] ?? 'edit';
@@ -151,6 +162,45 @@ class LineActionDefinitionProvider implements LineActionDefinitionProviderInterf
         }
 
         return $createActions;
+    }
+
+    /**
+     * Filter modal create actions
+     * @param string $module
+     * @param array $actionDefinition
+     * @return array
+     */
+    protected function filterModalCreateActions(string $module, array $actionDefinition): array
+    {
+        $actions = [];
+
+        $relatedModules = $actionDefinition['related_modules'] ?? [];
+        $actionTemplate = $actionDefinition;
+        unset($actionTemplate['related_modules']);
+
+        foreach ($relatedModules as $relatedModuleDef) {
+            $relatedModuleName = $relatedModuleDef['module'];
+
+            if ($relatedModuleName !== 'emails') {
+                continue;
+            }
+
+            if ($this->checkAccess($relatedModuleName, $actionDefinition['acl'] ?? []) === false) {
+                continue;
+            }
+
+            $relatedModuleDef['mapping'] = [];
+            $relatedModuleDef['legacyModuleName'] = $this->moduleNameMapper->toLegacy($module);
+            $relatedModuleDef['action'] = $relatedModuleDef['action'] ?? $actionDefinition['key'];
+
+            // Create email modal action object
+            $action = array_merge($actionTemplate, $relatedModuleDef);
+            $action['modes'] = $action['modes'] ?? ['list'];
+
+            $actions[] = $action;
+        }
+
+        return $actions;
     }
 
     /**

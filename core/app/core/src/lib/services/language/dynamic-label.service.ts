@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,14 +26,18 @@
 
 import {Injectable} from '@angular/core';
 import {DataTypeFormatter} from '../formatters/data-type.formatter.service';
-import {Field, FieldMap, isVoid, StringMap} from 'common';
+import {StringMap} from '../../common/types/string-map';
+import {isVoid} from '../../common/utils/value-utils';
+import {Field, FieldMap} from '../../common/record/field.model';
 import {LanguageStore} from '../../store/language/language.store';
 import get from 'lodash-es/get';
 import {SystemConfigStore} from '../../store/system-config/system-config.store';
 import {UserPreferenceStore} from '../../store/user-preference/user-preference.store';
+import {AttributeMap} from "../../common/record/record.model";
+import {isBoolean, isObject, isString} from "lodash-es";
 
 
-export declare type TemplateValueFilter = (value: string, filterArguments?: string[]) => string;
+export declare type TemplateValueFilter = (value: any, filterArguments?: string[]) => string;
 export declare type TemplateFieldFilter = (value: Field) => string;
 
 export interface TemplateValueFilterMap {
@@ -72,6 +76,13 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
         this.valuePipes.datetime = (value: string): string => this.valueTypeFormat('datetime', value);
         this.valuePipes.currency = (value: string): string => this.valueTypeFormat('currency', value);
         this.valuePipes.enum = (value: string, filterArguments: string[] = []): string => this.enumFormat(value, filterArguments);
+        this.valuePipes.prefix = (value: string, filterArguments: string[] = []): string => this.applyPrefix(value, filterArguments);
+        this.valuePipes.applySuffix = (value: string, filterArguments: string[] = []): string => this.applySuffix(value, filterArguments);
+        this.valuePipes.default = (value: string, filterArguments: string[] = []): string => this.applyDefault(value, filterArguments);
+        this.valuePipes.uppercase = (value: string): string => this.toUpperCase(value);
+        this.valuePipes.lowercase = (value: string): string => this.toLowerCase(value);
+        this.valuePipes.default = (value: string, filterArguments: string[]): string => this.showDefault(value, filterArguments);
+        this.valuePipes.filter = (value: any[], filterArguments: string[] = []): string => this.filterArray(value, filterArguments);
 
         this.fieldPipes.int = (value: Field): string => this.fieldTypeFormat('int', value);
         this.fieldPipes.float = (value: Field): string => this.fieldTypeFormat('float', value);
@@ -92,7 +103,7 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
         this.fieldPipes[name] = processor;
     }
 
-    parse(template: string, context: StringMap, fields: FieldMap): string {
+    parse(template: string, context: StringMap, fields: FieldMap, attributes: AttributeMap = {}): string {
 
         if (!template) {
             return template;
@@ -134,9 +145,12 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
                 filter = pipe.trim();
 
                 if (pipe.trim().includes(':')) {
-                    let[filterType, ...filterArgs] = pipe.trim().split(':');
+                    let [filterType, ...filterArgs] = pipe.trim().split(':');
                     filter = filterType.trim();
                     filterArguments = filterArgs;
+                    if (filterArguments && filterArguments.length) {
+                        filterArguments = filterArguments.map(arg => arg.replace(/(['"])/g, ''));
+                    }
                 }
 
                 variableName = name.trim();
@@ -150,9 +164,17 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
             }
 
 
-            let sourceValues: { [key: string]: string | Field } = context;
+            let sourceValues: { [key: string]: any | Field } = context;
             if (source === 'fields') {
                 sourceValues = fields;
+            }
+
+            let attributeName = '';
+            if (source === 'fields' && ((parts[2] ?? '') === 'attributes')) {
+                source = 'field-attributes';
+                sourceValues = fields;
+                attributeName = parts[3] ?? '';
+                path = attributeName;
             }
 
             if (source === 'fields') {
@@ -171,6 +193,9 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
 
                 if (parts[2] && parts[2] === 'value' && field.type in this.fieldPipes) {
                     value = this.fieldPipes[field.type](field);
+                    if (filter && this.valuePipes[filter]) {
+                        value = this.valuePipes[filter](value, filterArguments ?? []);
+                    }
                     parsedTemplate = parsedTemplate.replace(regexMatch, value);
                     return;
                 }
@@ -182,6 +207,9 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
                 }
 
                 value = get({fields}, path, '');
+                if (filter && this.valuePipes[filter]) {
+                    value = this.valuePipes[filter](value, filterArguments ?? []);
+                }
 
                 parsedTemplate = parsedTemplate.replace(regexMatch, value);
                 return;
@@ -212,6 +240,43 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
                         return this.preferences.getUserPreference(key);
                     }
                 );
+                return;
+            }
+
+            if (source === 'attributes') {
+                sourceValues = attributes;
+                value = sourceValues[variableName] ?? '';
+                parsedTemplate = parsedTemplate.replace(regexMatch, value);
+                return;
+            }
+
+            if (source === 'field-attributes') {
+
+                const field = fields[variableName] ?? null;
+
+                if (!field) {
+                    parsedTemplate = parsedTemplate.replace(regexMatch, '');
+                    return;
+                }
+
+                const attribute = field.attributes[attributeName] ?? null;
+
+                if (!attribute) {
+                    parsedTemplate = parsedTemplate.replace(regexMatch, '');
+                    return;
+                }
+
+                if (isObject(attribute.value)) {
+                    value = get({attribute}, path, '');
+                } else if (isString(attribute.value) || isFinite(attribute.value) || isBoolean(attribute.value)) {
+                    value = attribute.value;
+                }
+
+                if (filter && this.valuePipes[filter]) {
+                    value = this.valuePipes[filter](value, filterArguments ?? []);
+                }
+
+                parsedTemplate = parsedTemplate.replace(regexMatch, value);
                 return;
             }
 
@@ -305,5 +370,92 @@ export class DynamicLabelService implements DynamicLabelServiceInterface {
         }
 
         return parsedTemplate.replace(regexMatch, value);
+    }
+
+    protected applyPrefix(value: string, filterArguments: string[] = []): string {
+
+        if (isVoid(value) || value === '') {
+            return value;
+        }
+
+        const joinedArgs = (filterArguments ?? []).join('');
+
+        return joinedArgs + value;
+    }
+
+    protected applySuffix(value: string, filterArguments: string[] = []): string {
+
+        if (isVoid(value) || value === '') {
+            return value;
+        }
+
+        const joinedArgs = (filterArguments ?? []).join('');
+
+        return value + joinedArgs;
+    }
+
+    protected applyDefault(value: string, filterArguments: string[] = []): string {
+
+        if (isVoid(value) || value === '') {
+            return (filterArguments ?? []).join('');
+        }
+
+        return value;
+    }
+
+    protected toUpperCase(value: string) {
+        return value.toUpperCase();
+    }
+
+    protected toLowerCase(value: string) {
+        return value.toLowerCase();
+    }
+
+    protected showDefault(value: string, filterArguments?: string[]) {
+        if (!isVoid(value) && value !== '') {
+            return value;
+        }
+
+        return filterArguments ? filterArguments[0] : '';
+    }
+
+    protected filterArray(value: any[], filterArguments: string[]): any {
+        if (!Array.isArray(value) || !value.length || !filterArguments?.length) {
+            return "";
+        }
+
+        let attributeKey = '';
+
+        // (primary=true becomes {primary: "true"})
+        const filters: { [key: string]: string } = {};
+        filterArguments.forEach(arg => {
+            const [key, val] = arg.split('=').map(s => s.trim());
+            if (key === 'attributeKey') {
+                attributeKey = val;
+                return;
+            }
+            if (key && val) {
+                filters[key] = val;
+            }
+        });
+
+        const filtered = value.filter(item => {
+            if (typeof item !== 'object' || item === null) {
+                return false;
+            }
+
+            return Object.entries(filters).every(([key, val]) => {
+                const itemValue = String(item[key]);
+                return itemValue === val;
+            });
+        });
+
+        if (filtered.length === 0) {
+            return value[0][attributeKey] ?? '';
+        }
+
+        const filteredRecord = filtered[0];
+
+        return filteredRecord[attributeKey] ?? '';
     }
 }

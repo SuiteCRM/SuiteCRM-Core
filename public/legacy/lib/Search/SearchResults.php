@@ -84,10 +84,10 @@ class SearchResults
     public function __construct(
         array $hits,
         $groupedByModule = true,
-        float $searchTime = null,
-        int $total = null,
-        array $scores = null,
-        array $options = null
+        ?float $searchTime = null,
+        ?int $total = null,
+        ?array $scores = null,
+        ?array $options = null
     ) {
         $this->hits = $hits;
         $this->scores = $scores;
@@ -126,7 +126,7 @@ class SearchResults
         $parsed = [];
 
         foreach ($searchHits as $module => $beans) {
-            foreach ((array)$beans as $bean) {
+            foreach ((array)$beans['results'] as $bean) {
                 $obj = BeanFactory::getBean($module, $bean);
 
                 // if a search found a bean but suitecrm does not, it could happens
@@ -143,11 +143,72 @@ class SearchResults
 
                 $obj->load_relationships();
                 $fieldDefs = $obj->getFieldDefinitions();
+                $obj = $this->formatForDisplay($obj, $fieldDefs);
                 $parsed[$module][] = $this->updateFieldDefLinks($obj, $fieldDefs);
             }
         }
 
         return $parsed;
+    }
+
+    /**
+     * Format data so it can be correctly displayed on search results
+     *
+     * @param SugarBean $obj
+     * @param array $fieldDefs
+     * @return SugarBean
+     */
+    protected function formatForDisplay(SugarBean $obj, array $fieldDefs): SugarBean
+    {
+        global $app_list_strings, $locale;
+
+        foreach ($fieldDefs as $fieldDef) {
+            $value = $obj->{$fieldDef['name']} ?? null;
+            if (isset($value)) {
+                switch ($fieldDef['type']){
+                    case 'enum':
+                    case 'dynamicenum':
+
+                        if (isset($app_list_strings[$obj->field_name_map[$fieldDef['name']]['options']][$value]) && 
+                            isset($obj->field_name_map[$fieldDef['name']]['options'])
+                        ) {
+                            $obj->{$fieldDef['name']} = $app_list_strings[$obj->field_name_map[$fieldDef['name']]['options']][$value];
+                        }
+                        break;
+
+                    case 'multienum':
+
+                        $optionsListKey = $obj->field_name_map[$fieldDef['name']]['options'] ?? '';
+                        $availableOptions = $app_list_strings[$optionsListKey] ?? [];
+                        $validOptionValues = array_filter(
+                            array: array_map(
+                                callback: static fn($key) => $availableOptions[$key] ?? null,
+                                array: unencodeMultienum($value)
+                            ),
+                            callback: static fn($value) => $value !== null && (string)$value
+                        );
+                        if (!empty($validOptionValues)) {
+                            $obj->{$fieldDef['name']} = implode(', ', $validOptionValues);
+                        }
+                        break;
+
+                    case 'currency':
+                        
+                        if (!str_ends_with($fieldDef['name'], '_usdollar')) {
+                            $params['currency_id'] = getCurrencyId($obj->module_dir, $obj->id);
+                            $params['currency_symbol'] = $locale->currencies[$params['currency_id']]['symbol'] ?? null;
+                        } else {
+                            $params['currency_id'] = $locale->getPrecedentPreference('currency');
+                            $params['currency_symbol'] = $locale->getPrecedentPreference('default_currency_symbol');
+                            $params['convert'] = true;
+                        }
+                        $obj->{$fieldDef['name']} = currency_format_number($value, $params);
+
+                        break;
+                }
+            }
+        }
+        return $obj;
     }
 
     /**
@@ -210,7 +271,12 @@ class SearchResults
     {
         $relField = $idName;
         if (isset($obj->$link)) {
-            $relId = $obj->$link->getFocus()->$relField;
+            $linkedBeans = $obj->$link->getBeans();
+            if(count($linkedBeans) === 1){
+                $relId = array_keys($linkedBeans)[0];
+            } else {
+                $relId = $obj->$link->getFocus()->$relField;
+            }
             if (is_object($relId)) {
                 if (method_exists($relId, "getFocus")) {
                     $relId = $relId->getFocus()->id;
@@ -242,9 +308,9 @@ class SearchResults
      */
     protected function getLink(string $label, string $module, string $record, string $action): string
     {
-        global $sugar_config;
-
-        return "<a href=\"{$sugar_config['site_url']}/index.php?action={$action}&module={$module}&record={$record}&offset=1\"><span>{$label}</span></a>";
+        $link = ajaxLink("index.php?action={$action}&module={$module}&record={$record}");
+        
+        return "<a href=\"{$link}\"><span>{$label}</span></a>";
     }
 
     /**
@@ -265,6 +331,11 @@ class SearchResults
     public function getTotal(): ?int
     {
         return $this->total;
+    }
+    
+    public function getModuleTotal($module) :?int
+    {
+        return $this->getHits()[$module]['totalHits'];
     }
 
     /**
@@ -301,5 +372,15 @@ class SearchResults
     public function isGroupedByModule(): bool
     {
         return $this->groupedByModule;
+    }
+    
+    public function getLargestHitsCount() 
+    {
+        $largest = 0;
+        foreach($this->getHits() as $hit) 
+        {
+            $largest = max($largest, $hit['totalHits']);
+        }
+        return $largest;
     }
 }

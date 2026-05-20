@@ -77,11 +77,11 @@ array(
       1 => 'parent_type',
     ),
   ),
-  
-  'FILENAME' =>
+
+  'FILE' =>
   array(
     'width' => '20%',
-    'label' => 'LBL_LIST_FILENAME',
+    'label' => 'LBL_LIST_FILE',
     'default' => true,
     'type' => 'file',
     'related_fields' =>

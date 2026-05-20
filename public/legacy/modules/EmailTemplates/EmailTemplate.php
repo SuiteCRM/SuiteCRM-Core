@@ -287,7 +287,7 @@ class EmailTemplate extends SugarBean
 
     public function fill_in_additional_detail_fields()
     {
-        if (empty($this->body) && !empty($this->body_html)) {
+        if (!empty($this->body_html)) {
             global $sugar_config;
 
             $bodyCleanup = $this->body_html;
@@ -299,7 +299,7 @@ class EmailTemplate extends SugarBean
             // to recognise it when parsing and replacing variables
             $bodyCleanup = preg_replace('/(\$\w+\b)([^\s\/&"\'])/', '$1 $2', $bodyCleanup);
 
-            $bodyCleanup = Html2Text\Html2Text::convert($bodyCleanup, true);
+            $bodyCleanup = Soundasleep\Html2Text::convert($bodyCleanup, true);
 
             $this->body = $bodyCleanup;
         }
@@ -476,7 +476,7 @@ class EmailTemplate extends SugarBean
                     }
                 }
 
-                if (in_array($focus->field_defs[$field_name]['type'], $decimalTypes)){
+                if (isset($focus->field_defs[$field_name]['type']) && in_array($focus->field_defs[$field_name]['type'], $decimalTypes, true)){
                     $value = formatDecimalInConfigSettings($value, false);
                 }
 

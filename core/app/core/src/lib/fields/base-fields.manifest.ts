@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -46,6 +46,7 @@ import {BooleanDetailFieldComponent} from './boolean/templates/detail/boolean.co
 import {EmailListFieldsModule} from './email/templates/list/email.module';
 import {VarcharFilterFieldComponent} from './varchar/templates/filter/filter.component';
 import {CurrencyDetailFieldComponent} from './currency/templates/detail/currency.component';
+import {CurrencyEditFieldComponent} from './currency/templates/edit/currency.component';
 import {EnumEditFieldModule} from './enum/templates/edit/enum.module';
 import {MultiEnumDetailFieldModule} from './multienum/templates/detail/multienum.module';
 import {FileDetailFieldModule} from './file/templates/detail/file.module';
@@ -77,6 +78,8 @@ import {MultiEnumEditFieldModule} from './multienum/templates/edit/multienum.mod
 import {IntDetailFieldModule} from './int/templates/detail/int.module';
 import {FullNameDetailFieldsComponent} from './fullname/templates/detail/fullname.component';
 import {BooleanEditFieldComponent} from './boolean/templates/edit/boolean.component';
+import {BooleanCheckboxFilterFieldComponent} from "./boolean/templates/checkbox-filter/boolean-checkbox.component";
+import {BooleanCheckboxFilterFieldModule} from "./boolean/templates/checkbox-filter/boolean-checkbox.module";
 import {DateTimeEditFieldComponent} from './datetime/templates/edit/datetime.component';
 import {VarcharDetailFieldModule} from './varchar/templates/detail/varchar.module';
 import {FieldComponentMap} from './field.model';
@@ -101,10 +104,40 @@ import {TinymceDetailFieldModule} from './tinymce/templates/detail/tinymce.modul
 import {TinymceEditFieldModule} from './tinymce/templates/edit/tinymce.module';
 import {TinymceDetailFieldComponent} from './tinymce/templates/detail/tinymce.component';
 import {TinymceEditFieldComponent} from './tinymce/templates/edit/tinymce.component';
+import {SquireEditFieldModule} from './squire/templates/edit/squire.module';
+import {SquireEditFieldComponent} from './squire/templates/edit/squire.component';
 import {IconListFieldModule} from "./icon/templates/detail/icon.module";
 import {IconDetailFieldComponent} from "./icon/templates/detail/icon.component";
 import {TextListFieldModule} from './text/templates/list/text.module';
 import {TextListFieldComponent} from './text/templates/list/text.component';
+import {MultiRelateEditFieldComponent} from "./multirelate/templates/edit/multirelate.component";
+import {MultiRelateDetailFieldComponent} from "./multirelate/templates/detail/multirelate.component";
+import {MultiRelateEditFieldModule} from "./multirelate/templates/edit/multirelate.module";
+import {MultiRelateDetailFieldModule} from "./multirelate/templates/detail/multirelate.module";
+import {CurrencyEditFieldModule} from "./currency/templates/edit/currency.module";
+import {MultiFlexRelateEditFieldModule} from "./multiflexrelate/templates/edit/multiflexrelate.module";
+import {MultiFlexRelateEditFieldComponent} from "./multiflexrelate/templates/edit/multiflexrelate.component";
+import {EmailDetailFieldsComponent} from "./email/templates/detail/email.component";
+import {SquireDetailFieldModule} from "./squire/templates/detail/squire.module";
+import {SquireDetailFieldComponent} from "./squire/templates/detail/squire.component";
+import {FileEditFieldModule} from "./file/templates/edit/file.module";
+import {FileEditFieldComponent} from "./file/templates/edit/file.component";
+import {FileListFieldModule} from "./file/templates/list/file.module";
+import {FileListFieldComponent} from "./file/templates/list/file.component";
+import {AttachmentEditFieldModule} from "./attachments/templates/edit/attachment.module";
+import {AttachmentEditFieldComponent} from "./attachments/templates/edit/attachment.component";
+import {AttachmentDetailFieldModule} from "./attachments/templates/detail/attachment.module";
+import {AttachmentDetailFieldComponent} from "./attachments/templates/detail/attachment.component";
+import {AttachmentListFieldModule} from "./attachments/templates/list/attachment.module";
+import {AttachmentListFieldComponent} from "./attachments/templates/list/attachment.component";
+import {ImageEditFieldComponent} from "./image/templates/edit/image.component";
+import {ImageEditFieldModule} from "./image/templates/edit/image.module";
+import {ImageDetailFieldComponent} from "./image/templates/detail/image.component";
+import {ImageDetailFieldModule} from "./image/templates/detail/image.module";
+import {TextTemplateDetailFieldModule} from "./texttemplate/templates/detail/texttemplate.module";
+import {TextTemplateDetailFieldComponent} from "./texttemplate/templates/detail/texttemplate.component";
+import {ImageListFieldComponent} from "./image/templates/list/image.component";
+import {ImageListFieldModule} from "./image/templates/list/image.module";
 
 export const baseFieldModules = [
     VarcharDetailFieldModule,
@@ -115,6 +148,8 @@ export const baseFieldModules = [
     IntDetailFieldModule,
     IconListFieldModule,
     FileDetailFieldModule,
+    FileEditFieldModule,
+    FileListFieldModule,
     FloatDetailFieldModule,
     PhoneDetailFieldModule,
     DateDetailFieldModule,
@@ -125,6 +160,7 @@ export const baseFieldModules = [
     DateTimeFilterFieldModule,
     UrlDetailFieldModule,
     CurrencyDetailFieldModule,
+    CurrencyEditFieldModule,
     EmailListFieldsModule,
     TextDetailFieldModule,
     TextEditFieldModule,
@@ -139,14 +175,27 @@ export const baseFieldModules = [
     DropdownEnumEditFieldModule,
     RadioEnumDetailFieldModule,
     RadioEnumEditFieldModule,
+    ImageEditFieldModule,
+    ImageDetailFieldModule,
+    ImageListFieldModule,
     MultiEnumDetailFieldModule,
     MultiEnumEditFieldModule,
     MultiEnumFilterFieldModule,
+    MultiRelateDetailFieldModule,
+    MultiRelateEditFieldModule,
+    MultiFlexRelateEditFieldModule,
     BooleanDetailFieldModule,
     BooleanEditFieldModule,
+    BooleanCheckboxFilterFieldModule,
     HtmlDetailFieldModule,
     TinymceDetailFieldModule,
-    TinymceEditFieldModule
+    TinymceEditFieldModule,
+    SquireEditFieldModule,
+    SquireDetailFieldModule,
+    AttachmentEditFieldModule,
+    AttachmentDetailFieldModule,
+    AttachmentListFieldModule,
+    TextTemplateDetailFieldModule
 ];
 export const baseFieldComponents = [
     VarcharDetailFieldComponent,
@@ -156,6 +205,8 @@ export const baseFieldComponents = [
     PasswordEditFieldComponent,
     IntDetailFieldComponent,
     FileDetailFieldComponent,
+    FileEditFieldComponent,
+    FileListFieldComponent,
     FloatDetailFieldComponent,
     PhoneDetailFieldComponent,
     DateDetailFieldComponent,
@@ -167,13 +218,18 @@ export const baseFieldComponents = [
     UrlDetailFieldComponent,
     IconDetailFieldComponent,
     CurrencyDetailFieldComponent,
+    CurrencyEditFieldComponent,
     EmailListFieldsComponent,
+    EmailDetailFieldsComponent,
     TextDetailFieldComponent,
     TextEditFieldComponent,
     TextListFieldComponent,
     RelateDetailFieldComponent,
     RelateEditFieldComponent,
     RelateFilterFieldComponent,
+    MultiRelateEditFieldComponent,
+    MultiRelateDetailFieldComponent,
+    MultiFlexRelateEditFieldComponent,
     FullNameDetailFieldsComponent,
     EnumDetailFieldComponent,
     EnumEditFieldComponent,
@@ -181,14 +237,24 @@ export const baseFieldComponents = [
     DropdownEnumEditFieldComponent,
     RadioEnumDetailFieldComponent,
     RadioEnumEditFieldComponent,
+    ImageEditFieldComponent,
+    ImageDetailFieldComponent,
+    ImageListFieldComponent,
     MultiEnumDetailFieldComponent,
     MultiEnumEditFieldComponent,
     MultiEnumFilterFieldComponent,
     BooleanDetailFieldComponent,
     BooleanEditFieldComponent,
+    BooleanCheckboxFilterFieldComponent,
     HtmlDetailFieldComponent,
     TinymceDetailFieldComponent,
-    TinymceEditFieldComponent
+    TinymceEditFieldComponent,
+    SquireEditFieldComponent,
+    SquireDetailFieldComponent,
+    AttachmentEditFieldComponent,
+    AttachmentDetailFieldComponent,
+    AttachmentListFieldComponent,
+    TextTemplateDetailFieldComponent
 ];
 
 export const baseViewFieldsMap: FieldComponentMap = {
@@ -203,8 +269,9 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'char.detail': VarcharDetailFieldComponent,
     'int.list': IntDetailFieldComponent,
     'int.detail': IntDetailFieldComponent,
+    'file.edit': FileEditFieldComponent,
     'file.detail': FileDetailFieldComponent,
-    'file.list': FileDetailFieldComponent,
+    'file.list': FileListFieldComponent,
     'float.list': FloatDetailFieldComponent,
     'float.detail': FloatDetailFieldComponent,
     'phone.list': PhoneDetailFieldComponent,
@@ -226,8 +293,9 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'link.detail': UrlDetailFieldComponent,
     'currency.list': CurrencyDetailFieldComponent,
     'currency.detail': CurrencyDetailFieldComponent,
+    'currency.edit': CurrencyEditFieldComponent,
     'email.list': EmailListFieldsComponent,
-    'email.detail': EmailListFieldsComponent,
+    'email.detail': EmailDetailFieldsComponent,
     'text.detail': TextDetailFieldComponent,
     'text.edit': TextEditFieldComponent,
     'text.list': TextListFieldComponent,
@@ -235,6 +303,9 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'relate.edit': RelateEditFieldComponent,
     'relate.detail': RelateDetailFieldComponent,
     'relate.filter': RelateFilterFieldComponent,
+    'multirelate.edit': MultiRelateEditFieldComponent,
+    'multirelate.detail': MultiRelateDetailFieldComponent,
+    'multiflexrelate.edit': MultiFlexRelateEditFieldComponent,
     'fullname.list': FullNameDetailFieldsComponent,
     'fullname.detail': FullNameDetailFieldsComponent,
     'enum-radio.list': RadioEnumDetailFieldComponent,
@@ -254,6 +325,9 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'enum.detail': DropdownEnumDetailFieldComponent,
     'enum.edit': DropdownEnumEditFieldComponent,
     'enum.filter': MultiEnumFilterFieldComponent,
+    'image.edit': ImageEditFieldComponent,
+    'image.detail': ImageDetailFieldComponent,
+    'image.list': ImageListFieldComponent,
     'multienum.list': MultiEnumDetailFieldComponent,
     'multienum.detail': MultiEnumDetailFieldComponent,
     'multienum.edit': MultiEnumEditFieldComponent,
@@ -262,6 +336,9 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'dynamicenum.detail': DropdownEnumDetailFieldComponent,
     'dynamicenum.edit': DropdownEnumEditFieldComponent,
     'dynamicenum.filter': MultiEnumFilterFieldComponent,
+    'bool-dropdown.list': DropdownEnumDetailFieldComponent,
+    'bool-dropdown.detail': DropdownEnumDetailFieldComponent,
+    'bool-dropdown.edit': DropdownEnumEditFieldComponent,
     'boolean.list': BooleanDetailFieldComponent,
     'boolean.detail': BooleanDetailFieldComponent,
     'boolean.edit': BooleanEditFieldComponent,
@@ -269,6 +346,15 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'bool.detail': BooleanDetailFieldComponent,
     'bool.edit': BooleanEditFieldComponent,
     'bool.filter': MultiEnumFilterFieldComponent,
+    'bool-checkbox.filter': BooleanCheckboxFilterFieldComponent,
+    'attachment.edit': AttachmentEditFieldComponent,
+    'attachment.detail': AttachmentDetailFieldComponent,
+    'attachment.list': AttachmentListFieldComponent,
+    'html-native.detail': HtmlDetailFieldComponent,
     'html.detail': TinymceDetailFieldComponent,
-    'html.edit': TinymceEditFieldComponent
+    'html.edit': TinymceEditFieldComponent,
+    'html-squire.edit': SquireEditFieldComponent,
+    'html-squire.detail': SquireDetailFieldComponent,
+    'texttemplate.detail': TextTemplateDetailFieldComponent,
+    'texttemplate.list': TextTemplateDetailFieldComponent
 };

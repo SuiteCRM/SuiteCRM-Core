@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -30,11 +30,14 @@ import {DataTypeFormatter} from '../../../services/formatters/data-type.formatte
 import {DatetimeFormatter} from '../../../services/formatters/datetime/datetime-formatter.service';
 import {FieldLogicManager} from '../../field-logic/field-logic.manager';
 import {FieldLogicDisplayManager} from '../../field-logic-display/field-logic-display.manager';
+import {NgbDateStruct} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({template: ''})
 export class BaseDateTimeComponent extends BaseFieldComponent {
 
     vm$ = this.formatter.format$;
+    minDate: NgbDateStruct;
+    maxDate: NgbDateStruct;
 
     constructor(
         protected formatter: DatetimeFormatter,
@@ -46,7 +49,7 @@ export class BaseDateTimeComponent extends BaseFieldComponent {
     }
 
     getDateTimeFormat(): string {
-        if(this.field?.metadata?.date_time_format) {
+        if (this.field?.metadata?.date_time_format) {
             return this.field.metadata.date_time_format
         }
 
@@ -56,6 +59,25 @@ export class BaseDateTimeComponent extends BaseFieldComponent {
     protected toInternalFormat(fieldType, value): string {
         return this.formatter.toInternalFormat(value, {fromFormat: this.getDateTimeFormat()});
 
+    }
+
+    protected initMinDate(): void {
+        const minDateMetadata = this.field?.metadata?.minDate ?? {} as { year?: number; month?: number; day?: number };
+        this.minDate = {
+            year: minDateMetadata?.year ?? 1900,
+            month: minDateMetadata?.month ?? 1,
+            day: minDateMetadata?.day ?? 1
+        } as NgbDateStruct
+    }
+
+    protected initMaxDate(): void {
+
+        const maxDateMetadata = this.field?.metadata?.maxDate ?? {} as { year?: number; month?: number; day?: number };
+        this.maxDate = {
+            year: maxDateMetadata?.year ?? 2100,
+            month: maxDateMetadata?.month ?? 1,
+            day: maxDateMetadata?.day ?? 1
+        } as NgbDateStruct
     }
 
 }

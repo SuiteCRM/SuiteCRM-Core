@@ -42,12 +42,18 @@ if (!defined('sugarEntry') || !sugarEntry) {
     die('Not A Valid Entry Point');
 }
 
-/**
- * Returns the display labels for a module path and field.
- * @param $modulePath
- * @param $field
- * @return array
- */
+function getAorAllowedFieldFunctions(): array
+{
+    $list_strings = return_app_list_strings_language('en_us');
+    return array_filter(array_keys($list_strings['aor_function_list']), 'strlen');
+}
+
+function getAorAllowedSortDirections(): array
+{
+    $list_strings = return_app_list_strings_language('en_us');
+    return array_filter(array_keys($list_strings['aor_sort_operator']), 'strlen');
+}
+
 function getDisplayForField($modulePath, $field, $reportModule)
 {
     global $app_list_strings;
@@ -185,7 +191,7 @@ function getConditionsAsParameters($report, $override = array())
             continue;
         }
 
-        $path = unserialize(base64_decode($condition->module_path));
+        $path = unserialize(base64_decode($condition->module_path),['allowed_classes' => false]);
         $field_module = $report->report_module;
         if ($path[0] != $report->report_module) {
             foreach ($path as $rel) {
@@ -196,7 +202,7 @@ function getConditionsAsParameters($report, $override = array())
             }
         }
 
-        $additionalConditions = unserialize(base64_decode($condition->value));
+        $additionalConditions = unserialize(base64_decode($condition->value),['allowed_classes' => false]);
 
 
         $value = isset($override[$condition->id]['value']) ? $override[$condition->id]['value'] : $value = $condition->value;

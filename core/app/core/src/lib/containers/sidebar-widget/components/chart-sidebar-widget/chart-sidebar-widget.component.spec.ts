@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,9 +28,10 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {ChartSidebarWidgetComponent} from './chart-sidebar-widget.component';
 import {RouterTestingModule} from '@angular/router/testing';
-import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {ApolloTestingModule} from 'apollo-angular/testing';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 describe('ChartSidebarWidgetComponent', () => {
     let component: ChartSidebarWidgetComponent;
@@ -38,10 +39,10 @@ describe('ChartSidebarWidgetComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            declarations: [ChartSidebarWidgetComponent],
-            imports: [RouterTestingModule, HttpClientTestingModule, ApolloTestingModule, NoopAnimationsModule],
-            providers: [],
-        })
+    declarations: [ChartSidebarWidgetComponent],
+    imports: [RouterTestingModule, ApolloTestingModule, NoopAnimationsModule],
+    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+})
             .compileComponents();
     }));
 

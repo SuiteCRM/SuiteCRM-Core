@@ -2,7 +2,7 @@
 
 form.userprofile {
     .userprofile-nav {
-        @media only screen and (max-width: 750px) {
+        @media (max-width: 910px) {
             white-space: normal;
         }
         margin: 0;
@@ -54,7 +54,8 @@ form.userprofile {
         }
     }
 }
-    #generate_password {
+    #generate_password,
+    #two-factor-auth {
         table {
             margin-top: 0.3em;
         }
@@ -81,7 +82,8 @@ form.userprofile {
         h4 {
             display: none;
         }
-        .password-row {
+        .password-row,
+        .authentication-row {
             display: flex;
             .left-col {
                 width: 50%;

@@ -58,11 +58,8 @@ class TextMapper implements TypeMapperInterface
         }
 
         $value = $bean->$name;
-        if (is_string($value) ) {
-            $value = html_entity_decode($value);
-        }
 
-        $container[$newName] = $this->purify($bean, $name, $value);
+        $container[$newName] = html_entity_decode(($this->purify($bean, $name, $value) ?? ''),ENT_QUOTES);
     }
 
     /**

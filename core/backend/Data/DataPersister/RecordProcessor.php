@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -31,22 +31,25 @@ namespace App\Data\DataPersister;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Data\Entity\Record;
+use App\Data\Service\Record\ApiRecordMappers\ApiRecordMapperRunner;
 use App\Data\Service\RecordProviderInterface;
 
 class RecordProcessor implements ProcessorInterface
 {
-    /**
-     * @var RecordProviderInterface
-     */
-    private $recordProvider;
+    protected RecordProviderInterface $recordProvider;
+    protected ApiRecordMapperRunner $apiRecordMapperRunner;
 
     /**
      * RecordProcessor constructor.
      * @param RecordProviderInterface $recordProvider
+     * @param ApiRecordMapperRunner $apiRecordMapperRunner
      */
-    public function __construct(RecordProviderInterface $recordProvider)
-    {
+    public function __construct(
+        RecordProviderInterface $recordProvider,
+        ApiRecordMapperRunner $apiRecordMapperRunner
+    ) {
         $this->recordProvider = $recordProvider;
+        $this->apiRecordMapperRunner = $apiRecordMapperRunner;
     }
 
     /**
@@ -67,6 +70,11 @@ class RecordProcessor implements ProcessorInterface
      */
     public function process(mixed $record, Operation $operation, array $uriVariables = [], array $context = []): ?Record
     {
-        return $this->recordProvider->saveRecord($record);
+        $this->apiRecordMapperRunner->toInternal($record, 'save');
+        $resultingRecord = $this->recordProvider->saveRecord($record);
+        $this->apiRecordMapperRunner->toExternal($resultingRecord, 'save');
+
+        return $resultingRecord;
     }
+
 }

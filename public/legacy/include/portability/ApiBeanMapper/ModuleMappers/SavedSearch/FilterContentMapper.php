@@ -110,7 +110,10 @@ class FilterContentMapper implements FieldMapperInterface
         ];
 
         if (!empty($bean->contents)) {
-            $legacyContents = unserialize(base64_decode($bean->contents), ['allowed_classes' => true]);
+            $parsedContents = $this->getContents($bean->contents);
+            if ($parsedContents !== null) {
+                $legacyContents = $parsedContents;
+            }
         }
 
         if (empty($contents) || empty($contents['filters'])) {
@@ -141,7 +144,27 @@ class FilterContentMapper implements FieldMapperInterface
      */
     public function parseContent(string $filterName, string $serializedContents): array
     {
-        $contents = unserialize(base64_decode($serializedContents), ['allowed_classes' => true]);
+        if (empty($serializedContents)) {
+            return [
+                'name' => $filterName,
+                'filters' => [],
+                'searchModule' => '',
+                'orderBy' => '',
+                'sortOrder' => ''
+            ];
+        }
+
+        // Decode contents: JSON (new format) with fallback to base64+serialize (legacy)
+        $contents = $this->getContents($serializedContents);
+        if (!is_array($contents)) {
+            return [
+                'name' => $filterName,
+                'filters' => [],
+                'searchModule' => '',
+                'orderBy' => '',
+                'sortOrder' => ''
+            ];
+        }
 
         $newContents = [
             'name' => $filterName,
@@ -184,6 +207,39 @@ class FilterContentMapper implements FieldMapperInterface
             return '';
         }
 
-        return base64_encode(serialize($content));
+        return json_encode($content);
+    }
+
+    /**
+     * @param $encodedContents
+     * @return array|null
+     */
+    protected function getContents($encodedContents): ?array
+    {
+        try {
+            $contents = json_decode($encodedContents, true, 512, JSON_THROW_ON_ERROR);
+        } catch (Throwable $e) {
+            $contents = null;
+        }
+
+        if (is_array($contents)) {
+            return $contents;
+        }
+
+        if ($contents !== null) {
+            return null;
+        }
+
+        try {
+            $contents = unserialize(base64_decode($encodedContents), ['allowed_classes' => false]);
+        } catch (Throwable $e) {
+            return null;
+        }
+
+        if (is_array($contents)) {
+            return $contents;
+        }
+
+        return null;
     }
 }

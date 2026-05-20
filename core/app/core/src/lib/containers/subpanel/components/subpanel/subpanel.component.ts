@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,7 +25,9 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {ActionContext, ButtonGroupInterface, ButtonInterface} from 'common';
+import {ActionContext} from '../../../../common/actions/action.model';
+import {ButtonInterface} from '../../../../common/components/button/button.model';
+import {ButtonGroupInterface} from '../../../../common/components/button/button-group.model';
 import {Observable} from 'rxjs';
 import {TableConfig} from '../../../../components/table/table.model';
 import {SubpanelTableAdapter} from '../../adapters/table.adapter';
@@ -53,6 +55,7 @@ export class SubpanelComponent implements OnInit {
     @Input() maxColumns$: Observable<number>;
     @Input() onClose: Function;
     @Input() filterConfig: FilterConfig;
+    @Input() panelHeaderButtonClass: string = 'btn btn-sm btn-outline-light';
 
     closeButton: ButtonInterface;
     adapter: SubpanelTableAdapter;

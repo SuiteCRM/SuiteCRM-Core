@@ -75,6 +75,10 @@
       font-weight: 700;
     }
   }
+
+  &.clickable {
+    cursor: pointer;
+  }
 }
 
 .fadeout {

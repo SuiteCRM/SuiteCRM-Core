@@ -4,8 +4,8 @@
  * SugarCRM Community Edition is a customer relationship management program developed by
  * SugarCRM, Inc. Copyright (C) 2004-2013 SugarCRM Inc.
  *
- * SuiteCRM is an extension to SugarCRM Community Edition developed by SalesAgility Ltd.
- * Copyright (C) 2011 - 2024 SalesAgility Ltd.
+ * SuiteCRM is an extension to SugarCRM Community Edition developed by SuiteCRM Ltd.
+ * Copyright (C) 2011 - 2024 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -40,7 +40,6 @@
 
 namespace App\Install\Service;
 
-use AllowDynamicProperties;
 use Monolog\Logger;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -84,20 +83,31 @@ class InstallPreChecks
         $this->log = $log;
     }
 
+    public function showMissingPermissionsPage($path): void
+    {
+        $sugar_config = $this->getConfigValues();
+        $this->loadModStrings();
+
+        $cssFile = $this->getCssFile();
+
+        $loader = new FilesystemLoader(__DIR__ . '/../Resources');
+        $twig = new Environment($loader);
+        $template = $twig->load('installer_missing_permissions.html.twig');
+        echo $template->render([
+            'cssFile' => $cssFile,
+            'path' => $path,
+            'mod_strings' => $this->modStrings
+        ]);
+        return;
+    }
+
     public function setupTwigTemplate(): void
     {
 
         $sugar_config = $this->getConfigValues();
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
-        $files = scandir('dist');
-
-        foreach ($files as $file) {
-
-            if (preg_match("/styles\.[^.]+\.css/", $file)) {
-                $cssFile = $file;
-            }
-        }
+        $cssFile = $this->getCssFile();
 
         if (file_exists('legacy/config.php') && ($sugar_config['installer_locked'] ?? false) === true) {
             $loader = new FilesystemLoader(__DIR__ . '/../Resources');
@@ -182,7 +192,7 @@ class InstallPreChecks
 
     function checkMainPage(string $baseUrl = ''): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
         $this->log->info('Running curl for SuiteCRM Main Page');
         $ch = curl_init();
         $timeout = 5;
@@ -195,9 +205,24 @@ class InstallPreChecks
             'result' => '',
             'errors' => [],
         ];
+
         if (empty($baseUrl)) {
-            $baseUrl = ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . $_SERVER['HTTP_HOST'] . ($_SERVER['BASE'] ?? '');
+
+            $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '');
+            $https = $_SERVER['HTTPS'] ?? '';
+
+            if (!empty($https) && ($https == 'on' || $https['HTTPS'] == 1) ||
+                !empty($proto) && $proto == 'https') {
+                $protocol = 'https://';
+            } elseif (($_SERVER['REQUEST_SCHEME'] ?? 'https') === 'https') {
+                $protocol = 'https://';
+            } else {
+                $protocol = 'http://';
+            }
+
+            $baseUrl = $protocol . $_SERVER['HTTP_HOST'] . ($_SERVER['BASE'] ?? '');
         }
+
         $baseUrl = rtrim($baseUrl, '/');
         $baseUrl .= '/';
         curl_setopt($ch, CURLOPT_URL, $baseUrl);
@@ -313,7 +338,7 @@ class InstallPreChecks
      */
     function checkGraphQlAPI(string $baseUrl = ''): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $this->log->info('Running curl for Api');
         $ch = curl_init();
@@ -331,8 +356,22 @@ class InstallPreChecks
         ];
 
         if (empty($baseUrl)) {
-            $baseUrl = ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . $_SERVER['HTTP_HOST'] . ($_SERVER['BASE'] ?? '');
+
+            $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '');
+            $https = $_SERVER['HTTPS'] ?? '';
+
+            if (!empty($https) && ($https == 'on' || $https['HTTPS'] == 1) ||
+                !empty($proto) && $proto == 'https') {
+                $protocol = 'https://';
+            } elseif (($_SERVER['REQUEST_SCHEME'] ?? 'https') === 'https') {
+                $protocol = 'https://';
+            } else {
+                $protocol = 'http://';
+            }
+
+            $baseUrl = $protocol . $_SERVER['HTTP_HOST'] . ($_SERVER['BASE'] ?? '');
         }
+
         $baseUrl = rtrim($baseUrl, '/');
         $baseUrl .= '/';
         $apiUrl = $baseUrl . 'api/graphql';
@@ -410,7 +449,7 @@ class InstallPreChecks
         $enUsStrings = [];
         $lang = 'en_us';
 
-        $sugarConfig = $this->getConfigValues();
+        $sugar_config = $this->getConfigValues();
         $configOverride = $this->getConfigOverrideValues();
 
         $enUsLangPack = __DIR__ . '/../../../../public/legacy/install/language/' . $lang . '.lang.php';
@@ -467,7 +506,7 @@ class InstallPreChecks
 
     private function runPHPChecks($labels, $results): void
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $key = $this->modStrings['LBL_PHP_CHECKS'];
 
@@ -484,7 +523,7 @@ class InstallPreChecks
 
     private function checkMemoryLimit(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $labels[] = $this->modStrings['LBL_CHECKSYS_MEM'];
 
@@ -541,7 +580,7 @@ class InstallPreChecks
 
     private function checkAllowsStream(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $labels[] = $this->modStrings['LBL_STREAM'];
 
@@ -618,7 +657,7 @@ class InstallPreChecks
 
     private function runPermissionChecks($labels, $results): void
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $key = $this->modStrings['LBL_PERMISSION_CHECKS'];
 
@@ -655,7 +694,7 @@ class InstallPreChecks
 
     private function isWritableCustomDir(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $this->log->info('Checking if Custom Dir is writable');
 
@@ -679,7 +718,7 @@ class InstallPreChecks
 
     private function isWritableUploadDir(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $this->log->info('Checking if Upload Dir is Writable');
 
@@ -704,7 +743,7 @@ class InstallPreChecks
 
     private function isWritableLegacyCacheSubDir(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $this->log->info('Checking Legacy Cache Sub Dirs are writable');
 
@@ -754,7 +793,7 @@ class InstallPreChecks
 
     private function checkMbStringsModule(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
         $labels[] = $this->modStrings['LBL_CHECKSYS_MBSTRING'];
 
         $results = [
@@ -777,7 +816,7 @@ class InstallPreChecks
 
     private function isWritableConfigFile(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
         $labels[] = $this->modStrings['LBL_CHECKSYS_CONFIG'];
 
         $results = [
@@ -806,7 +845,7 @@ class InstallPreChecks
 
     private function isWritableSubDirFiles(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $labels[] = $this->modStrings['LBL_CHECKSYS_MODULE'];
 
@@ -847,7 +886,7 @@ class InstallPreChecks
 
     private function checkXMLParsing(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $results = [
             'result' => '',
@@ -871,7 +910,7 @@ class InstallPreChecks
 
     private function checkRequiredModulesInExtensions(&$labels, &$results): void
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $this->log->info('Checking required loaded extensions');
 
@@ -915,7 +954,7 @@ class InstallPreChecks
 
     private function checkPCRELibrary(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $results = [
             'result' => '',
@@ -946,7 +985,7 @@ class InstallPreChecks
 
     private function checkSpriteSupport(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $results = [
             'result' => '',
@@ -970,7 +1009,7 @@ class InstallPreChecks
 
     private function checkUploadFileSize(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $results = [
             'result' => '',
@@ -1022,7 +1061,7 @@ class InstallPreChecks
 
     private function runServerConfigurationCheck(array $labels, array $results): void
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $key = $this->modStrings['LBL_SERVER_CHECKS'];
 
@@ -1043,7 +1082,7 @@ class InstallPreChecks
 
     private function checkSystemPhpVersion(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $labels[] = $this->modStrings['LBL_CHECKSYS_PHPVER'];
 
@@ -1063,7 +1102,7 @@ class InstallPreChecks
 
     private function addChecks(string $key, $labels, $results, $optional = false): void
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $this->systemChecks[$key] = [
             'label' => '',
@@ -1107,7 +1146,7 @@ class InstallPreChecks
 
     private function optionalInstallChecks(): void
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $this->checkOptionalModulesInExtensions();
 
@@ -1123,7 +1162,7 @@ class InstallPreChecks
 
     private function checkOptionalModulesInExtensions(): void
     {
-        $this->modStrings = $this->getLanguageStrings();;
+        $this->loadModStrings();;
 
         $this->log->info('Checking optional loaded extensions');
 
@@ -1177,7 +1216,7 @@ class InstallPreChecks
 
     protected function isRootWritable(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $this->log->info('Checking if root is writable');
 
@@ -1205,7 +1244,7 @@ class InstallPreChecks
     public function checkFolderIsWritable(string $folderName, array &$labels, string $parentDir = ''): array
     {
 
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $this->log->info('Checking ' . $folderName . ' is writable');
 
@@ -1245,7 +1284,7 @@ class InstallPreChecks
 
     private function canTouchEnv(&$labels): array
     {
-        $this->modStrings = $this->getLanguageStrings();
+        $this->loadModStrings();
 
         $labels[] = $this->modStrings['LBL_CHECKSYS_ENV'];
 
@@ -1256,7 +1295,7 @@ class InstallPreChecks
             'errors' => []
         ];
 
-        if (file_exists($env) && is_writable($env) || !file_exists($env) && touch($env)) {
+        if ((file_exists($env) && is_writable($env)) || (!file_exists($env) && touch($env))) {
             $this->log->info('.env exists or is writable');
             $results['result'] = $this->modStrings['LBL_CHECKSYS_OK'];
 
@@ -1265,5 +1304,29 @@ class InstallPreChecks
 
         $results['errors'][] = $this->modStrings['ERR_CHECKSYS_ENV_NOT_WRITABLE'];
         return $results;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getCssFile(): mixed
+    {
+        $files = scandir('dist');
+
+        foreach ($files as $file) {
+
+            if (preg_match("/styles\.[^.]+\.css/", $file)) {
+                $cssFile = $file;
+            }
+        }
+        return $cssFile;
+    }
+
+    /**
+     * @return void
+     */
+    protected function loadModStrings(): void
+    {
+        $this->modStrings = $this->getLanguageStrings();
     }
 }

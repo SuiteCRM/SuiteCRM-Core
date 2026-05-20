@@ -42,44 +42,44 @@ if (!defined('sugarEntry') || !sugarEntry) {
  */
 
 
-
-$subpanel_layout = array(
-    'top_buttons' => array(
-        array('widget_class' => 'SubPanelTopCreateRevisionButton'),
-    ),
+$subpanel_layout = [
+    'top_buttons' => [
+        [
+            'widget_class' => 'SubPanelTopCreateRevisionButton',
+        ],
+    ],
 
     'where' => '',
 
-
-    'list_fields' => array(
-        'filename'=>array(
-            'vname'=>'LBL_REV_LIST_FILENAME',
-            'widget_class' => 'SubPanelDetailViewLink',
+    'list_fields' => [
+        'filename' => [
+            'vname' => 'LBL_REV_LIST_FILENAME',
             'width' => '15%',
-            ),
-        'revision'=>array(
+        ],
+        'revision' => [
             'vname' => 'LBL_REV_LIST_REVISION',
             'width' => '5%',
-        ),
-        'date_entered'=>array(
+            'sortable' => false,
+        ],
+        'date_entered' => [
             'vname' => 'LBL_REV_LIST_ENTERED',
             'width' => '10%',
-        ),
-        'created_by_name'=>array(
+        ],
+        'created_by_name' => [
             'vname' => 'LBL_REV_LIST_CREATED',
             'width' => '25%',
-        ),
-        'change_log'=>array(
+        ],
+        'change_log' => [
             'vname' => 'LBL_REV_LIST_LOG',
             'width' => '35%',
-        ),
-        'del_button'=>array(
-            'vname' => 'LBL_DELETE_BUTTON',
-            'widget_class' => 'SubPanelRemoveButton',
+        ],
+        'delete_button'=> [
+            'vname' => 'LBL_REMOVE',
+            'module' => 'DocumentRevisions',
             'width' => '5%',
-        ),
-        'document_id'=>array(
-            'usage' =>'query_only',
-        )
-    ),
-);
+        ],
+        'document_id' => [
+            'usage' => 'query_only',
+        ]
+    ],
+];

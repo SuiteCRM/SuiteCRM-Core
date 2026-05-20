@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,8 +24,21 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, ElementRef, ViewChild} from '@angular/core';
-import {AttributeMap, ButtonInterface, emptyObject, Field, Record} from 'common';
+import {
+    AfterViewInit,
+    Component,
+    computed,
+    ElementRef,
+    HostListener,
+    Signal,
+    signal,
+    ViewChild,
+    WritableSignal
+} from '@angular/core';
+import {emptyObject} from '../../../../common/utils/object-utils';
+import {ButtonInterface} from '../../../../common/components/button/button.model';
+import {Field} from '../../../../common/record/field.model';
+import {AttributeMap, Record} from '../../../../common/record/record.model';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ModuleNameMapper} from '../../../../services/navigation/module-name-mapper/module-name-mapper.service';
 import {DataTypeFormatter} from '../../../../services/formatters/data-type.formatter.service';
@@ -40,8 +53,12 @@ import {
 } from '../../../../containers/record-list-modal/components/record-list-modal/record-list-modal.model';
 import {FieldLogicManager} from '../../../field-logic/field-logic.manager';
 import {FieldLogicDisplayManager} from '../../../field-logic-display/field-logic-display.manager';
-import {map, take} from "rxjs/operators";
+import {debounceTime, map, take} from "rxjs/operators";
 import {Dropdown, DropdownFilterOptions} from "primeng/dropdown";
+import {ConfirmationModalService} from "../../../../services/modals/confirmation-modal.service";
+import {SystemConfigStore} from "../../../../store/system-config/system-config.store";
+import {SearchCriteria} from "../../../../common/views/list/search-criteria.model";
+import {AppStateStore} from "../../../../store/app-state/app-state.store";
 
 @Component({
     selector: 'scrm-relate-edit',
@@ -49,16 +66,28 @@ import {Dropdown, DropdownFilterOptions} from "primeng/dropdown";
     styleUrls: [],
     providers: [RelateService]
 })
-export class RelateEditFieldComponent extends BaseRelateComponent {
+export class RelateEditFieldComponent extends BaseRelateComponent implements AfterViewInit {
     @ViewChild('tag') tag: Dropdown;
     @ViewChild('dropdownFilterInput') dropdownFilterInput: ElementRef;
+    @HostListener('document:click', ['$event'])
+    onDocClick(event) {
+        const clickedInside = this.tag?.el?.nativeElement.contains(event.target);
+        if (!clickedInside) {
+            this.tag.hide();
+        }
+    }
+
     selectButton: ButtonInterface;
     idField: Field;
     selectedValue: AttributeMap = {};
+    loading: WritableSignal<boolean> = signal(false);
 
     placeholderLabel: string = '';
-    emptyFilterLabel: string = '';
+    emptyFilterLabel: Signal<string> = signal('');
     filterValue: string | undefined = '';
+
+    protected onAddChangeTriggered: boolean = false;
+
 
     /**
      * Constructor
@@ -68,8 +97,11 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
      * @param {object} relateService service
      * @param {object} moduleNameMapper service
      * @param {object} modalService service
+     * @param appStateStore
      * @param {object} logic
+     * @param config
      * @param {object} logicDisplay
+     * @param confirmation
      */
     constructor(
         protected languages: LanguageStore,
@@ -77,10 +109,13 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
         protected relateService: RelateService,
         protected moduleNameMapper: ModuleNameMapper,
         protected modalService: NgbModal,
+        protected appStateStore: AppStateStore,
         protected logic: FieldLogicManager,
-        protected logicDisplay: FieldLogicDisplayManager
+        protected config: SystemConfigStore,
+        protected logicDisplay: FieldLogicDisplayManager,
+        protected confirmation: ConfirmationModalService
     ) {
-        super(languages, typeFormatter, relateService, moduleNameMapper, logic, logicDisplay);
+        super(languages, typeFormatter, relateService, moduleNameMapper, logic, logicDisplay, config);
     }
 
     /**
@@ -102,6 +137,31 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
 
     }
 
+    ngAfterViewInit(): void {
+
+        if (this.field?.definition?.filterOnEmpty ?? false) {
+            this.tag.onLazyLoad.emit();
+        }
+
+        this.subs.push(this.field.valueChanges$.subscribe((changes) => {
+            if (changes.triggerValue != 'valueObject') {
+                return;
+            }
+
+            if (this.onAddChangeTriggered) {
+                this.onAddChangeTriggered = false;
+                return;
+            }
+
+            if (!this.field.valueObject || !this.field.valueObject.id) {
+                this.selectedValue = {};
+                return;
+            }
+
+            this.updateInput();
+        }));
+    }
+
     protected init(): void {
 
         super.init();
@@ -112,6 +172,13 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
         if (idFieldName && this.record && this.record.fields && this.record.fields[idFieldName]) {
             this.idField = this.record.fields[idFieldName];
         }
+
+        const clickDebounceTime = this.getDebounceTime();
+
+        this.subs.push(this.filterInputBuffer$.pipe(debounceTime(clickDebounceTime)).subscribe(value => {
+            this.filterResults(this.filterValue ?? '');
+        }));
+
     }
 
     protected initValue(): void {
@@ -127,13 +194,29 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
             return;
         }
 
+        const rname = this.field?.definition?.rname ?? 'name';
+
         if (this.field?.metadata?.relateSearchField) {
-            const rname = this.field?.definition?.rname ?? 'name';
-            this.field.valueObject[this.field.metadata.relateSearchField] = this.field.valueObject[rname];
+            this.field.valueObject[this.field.metadata.relateSearchField] = this.field.valueObject[rname] ?? this.field.valueObject['name'] ?? '';
         }
 
-        this.selectedValue = this.field.valueObject;
-        this.options = [this.field.valueObject];
+        const relateValue = this.field.valueObject[rname] ?? this.field.valueObject['name'] ?? '';
+        const id = this.field.valueObject.id;
+
+        if (relateValue) {
+            const relateName = this.getRelateFieldName();
+            this.selectedValue = {...this.field.valueObject, id: id, [relateName]: relateValue};
+        }
+
+        if (this.idField) {
+            this.idField.value = id;
+            this.idField.formControl.setValue(id);
+        }
+
+        this.options = [this.selectedValue];
+        if (this.selectedValue !== null) {
+            this.currentOptions.set(this.options)
+        }
     }
 
     /**
@@ -141,10 +224,34 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
      *
      * @param {object} item added
      */
-    onAdd(item): void {
+    onAdd(item, event = null): void {
+        const relateName = this.getRelateFieldName();
+
         if (item) {
-            const relateName = this.getRelateFieldName();
-            this.setValue(item.id, item[relateName]);
+            if (event && (this.field?.metadata?.selectConfirmation ?? false)) {
+                const confirmationLabel = this.field.metadata.confirmationLabel ?? '';
+                const confirmationMessages = this.field.metadata.confirmationMessages ?? [];
+                const confirmation = [confirmationLabel, ...confirmationMessages];
+                this.confirmation.showModal(
+                    confirmation,
+                    () => {
+                        this.tag.writeValue(item);
+                        this.setValue(item.id, item[relateName], item);
+                    },
+                    () => {
+                        this.tag.writeValue(this.field.valueObject);
+                        const value = this.field.value;
+
+                        if (value === '') {
+                            this.onClear(event);
+                            return;
+                        }
+
+                        this.setValue(this.field.valueObject.id, value, this.field.valueObject);
+                    });
+                return;
+            }
+            this.setValue(item.id, item[relateName], item);
             return;
         }
 
@@ -154,6 +261,30 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
         return;
     }
 
+    onModuleChange(): void {
+
+        const currentModule = this.initModule();
+        const newModule = this?.field?.definition?.module ?? this.record.fields[this.field.definition.type_name].value ?? '';
+
+        if (currentModule === newModule) {
+            return;
+        }
+
+        this.initModule.set(newModule);
+
+        if (currentModule === '' && currentModule !== newModule) {
+            this.init();
+        }
+
+        if (newModule === '') {
+            this.status = 'no-module';
+        } else {
+            this.init();
+            this.status = '';
+            this.tag.clear();
+        }
+    }
+
     /**
      * Handle item removal
      */
@@ -161,6 +292,7 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
         this.setValue('', '');
         this.selectedValue = {};
         this.options = [];
+        this.currentOptions.set([]);
     }
 
     onClear(event): void {
@@ -168,25 +300,37 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
         this.filterValue = '';
         this.options = [];
         this.onRemove();
+
+        if (this.field?.definition?.filterOnEmpty ?? false) {
+            this.tag.onLazyLoad.emit();
+        }
     }
 
     onFilter(): void {
+        this.filterInputBuffer.next(this.filterValue ?? '');
+    }
+
+    filterResults(filterValue: string): void {
+        this.loading.set(true);
         const relateName = this.getRelateFieldName();
-        this.filterValue = this.filterValue ?? '';
-        const matches = this.filterValue.match(/^\s*$/g);
+        const criteria = this.buildCriteria();
+        const matches = filterValue.match(/^\s*$/g);
         if (matches && matches.length) {
-            this.filterValue = '';
+            filterValue = '';
         }
-        let term = this.filterValue;
-        this.search(term).pipe(
+        let term = filterValue;
+        this.search(term, criteria).pipe(
             take(1),
             map(data => data.filter(item => item[relateName] !== '')),
             map(filteredData => filteredData.map(item => ({
+                ...item,
                 id: item.id,
                 [relateName]: item[relateName]
             })))
         ).subscribe(filteredOptions => {
+            this.loading.set(false);
             this.options = filteredOptions;
+            this.currentOptions.set(filteredOptions);
 
             if (!this?.selectedValue || !this?.selectedValue?.id) {
                 return;
@@ -205,6 +349,7 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
             if (found === false && this.selectedValue) {
                 this.options.push(this.selectedValue);
             }
+
         })
     }
 
@@ -226,10 +371,12 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
      *
      * @param {string} id to set
      * @param {string} relateValue to set
+     * @param other
      */
-    protected setValue(id: string, relateValue: string): void {
-        const relate = this.buildRelate(id, relateValue);
+    protected setValue(id: string, relateValue: string, other: AttributeMap = {}): void {
+        const relate = this.buildRelate(id, relateValue, other);
         this.field.value = relateValue;
+        this.onAddChangeTriggered = true;
         this.field.valueObject = relate;
         this.field.formControl.setValue(relateValue);
         this.field.formControl.markAsDirty();
@@ -242,10 +389,15 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
 
         if (relateValue) {
             const relateName = this.getRelateFieldName();
-            this.selectedValue = {id: id, [relateName]: relateValue};
+            this.selectedValue = {...other, id: id, [relateName]: relateValue};
         }
 
-        this.options = [this.selectedValue];
+
+        if (this.selectedValue === null) {
+            return;
+        }
+
+        this.addSelectedValueToOptions();
     }
 
     /**
@@ -254,11 +406,29 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
     protected showSelectModal(): void {
         const modal = this.modalService.open(RecordListModalComponent, {size: 'xl', scrollable: true});
 
+        const criteria = this.buildCriteria();
+        const filter = this.buildFilter(criteria);
+
         modal.componentInstance.module = this.getRelatedModule();
+        modal.componentInstance.presetFilter = filter;
+        modal.componentInstance.showFilter = this.field?.definition?.showFilter ?? true;
 
         modal.result.then((data: RecordListModalResult) => {
 
             if (!data || !data.selection || !data.selection.selected) {
+                return;
+            }
+
+            if (this.field?.metadata?.selectConfirmation ?? false) {
+                const confirmationLabel = this.field.metadata.confirmationLabel ?? '';
+                const confirmationMessages = this.field.metadata.confirmationMessages ?? [];
+                const confirmation = [confirmationLabel, ...confirmationMessages];
+                this.confirmation.showModal(
+                    confirmation,
+                    () => {
+                        const record = this.getSelectedRecord(data);
+                        this.setItem(record);
+                    });
                 return;
             }
 
@@ -302,12 +472,138 @@ export class RelateEditFieldComponent extends BaseRelateComponent {
         this.onAdd(record.attributes);
     }
 
-    public getTranslatedLabels(): void {
-        this.placeholderLabel = this.languages.getAppString('LBL_SELECT_ITEM') || '';
-        this.emptyFilterLabel = this.languages.getAppString('ERR_SEARCH_NO_RESULTS') || '';
+    /**
+     * Update input display when value is changed from outside the component
+     * @protected
+     */
+    protected updateInput(): void {
+        this.tag.writeValue({...this.field.valueObject});
+
+        const rname = this.field?.definition?.rname ?? 'name';
+
+        if (this.field?.metadata?.relateSearchField) {
+            this.field.valueObject[this.field.metadata.relateSearchField] = this.field.valueObject[rname] ?? this.field.valueObject['name'];
+        }
+
+        const relateValue = this.field.valueObject[rname] ?? this.field.valueObject['name'];
+        const id = this.field.valueObject.id;
+
+        if (relateValue) {
+            const relateName = this.getRelateFieldName();
+            this.selectedValue = {...this.field.valueObject, id: id, [relateName]: relateValue};
+        }
+
+        if (this.selectedValue === null) {
+            return;
+        }
+
+        this.addSelectedValueToOptions();
     }
 
+    /**
+     * Add selected value to options if not already present
+     * @protected
+     */
+    protected addSelectedValueToOptions(): void {
+        const id = this.field.valueObject.id;
+
+        const inOptions = (this.options ?? []).some((option) => {
+            return option['id'] === id;
+        });
+
+        if (!inOptions) {
+            const options = this.options ?? [];
+            options.push(this.selectedValue);
+            this.options = options;
+            this.currentOptions.set(this.options)
+        }
+    }
+
+    public getTranslatedLabels(): void {
+        this.placeholderLabel = this.languages.getAppString('LBL_SELECT_ITEM') || '';
+        this.emptyFilterLabel = computed(() => {
+            if (!this.loading()) {
+                return this.languages.getAppString('ERR_SEARCH_NO_RESULTS') || '';
+            }
+
+            return this.languages.getAppString('LBL_LOADING') || '';
+        });
+    }
+
+    protected buildCriteria(): SearchCriteria {
+
+        if (!this.field?.definition?.filter) {
+            return {} as SearchCriteria;
+        }
+
+        const filter = this.field?.definition?.filter;
+
+        const criteria = {
+            name: 'default',
+            filters: {}
+        } as SearchCriteria;
+
+        if (filter?.preset ?? false) {
+            criteria.preset = filter.preset;
+            criteria.preset.params.module = filter.preset.params?.module ?? this.module;
+        }
+
+        if (filter?.attributes ?? false) {
+            if (criteria?.preset ?? false) {
+                Object.keys(filter.attributes).forEach((key) => {
+                    criteria.preset.params[key] = this.record.attributes[filter.attributes[key]];
+                });
+                return;
+            }
+
+            Object.keys(filter.attributes).forEach((key) => {
+                let values = this.record.attributes[filter.attributes[key]] ?? '';
+
+                if (filter.attributes[key] === 'currentUser') {
+                    values = this.appStateStore.getCurrentUser().id;
+                }
+
+                criteria.filters[key] = {
+                    field: key,
+                    operator: '=',
+                    values: [values],
+                    rangeSearch: false
+                };
+            })
+        }
+
+
+        const fields = filter.static ?? [];
+
+        Object.keys(fields).forEach((field) => {
+            criteria.filters[field] = {
+                field: field,
+                operator: '=',
+                values: [fields[field]],
+                rangeSearch: false
+            };
+        })
+
+        return criteria;
+    }
+
+    protected buildFilter(criteria) {
+        return {
+            key: 'default',
+            module: 'saved-search',
+            attributes: {
+                contents: ''
+            },
+            criteria
+        };
+    }
+
+
     focusFilterInput() {
-        this.dropdownFilterInput.nativeElement.focus()
+        this.dropdownFilterInput.nativeElement.focus();
+
+        if (this.field?.definition?.filterOnEmpty ?? false) {
+            this.tag.onLazyLoad.emit();
+        }
     }
 }

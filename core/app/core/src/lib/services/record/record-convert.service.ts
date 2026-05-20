@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2024 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2024 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,25 +25,23 @@
  */
 import {Injectable} from "@angular/core";
 import {Observable, of} from "rxjs";
-import {
-    FieldDefinitionMap,
-    isVoid,
-    Record,
-    ViewFieldDefinition,
-    ViewFieldDefinitionMap,
-    FieldMetadata,
-    FieldLogicMap} from "common";
 import {map} from "rxjs/operators";
 import {SystemConfigStore} from "../../store/system-config/system-config.store";
 import {Metadata, RecordViewMetadata} from "../../store/metadata/metadata.store.service";
 import {isEmpty} from "lodash-es";
+import {FieldDefinitionMap, FieldMetadata} from "../../common/record/field.model";
+import {Record} from "../../common/record/record.model";
+import {isVoid} from "../../common/utils/value-utils";
+import {ViewFieldDefinition, ViewFieldDefinitionMap} from "../../common/metadata/metadata.model";
+import {FieldLogicMap} from "../../common/actions/field-logic-action.model";
 
 @Injectable({
     providedIn: 'root'
 })
 export class RecordConvertService {
 
-    constructor(protected systemConfigStore: SystemConfigStore) { }
+    constructor(protected systemConfigStore: SystemConfigStore) {
+    }
 
     public duplicateOnModule(prevRecord: Record, newRecord: Record, vardefs: FieldDefinitionMap, moduleMetadata: Metadata): Record {
 
@@ -96,7 +94,7 @@ export class RecordConvertService {
                     return;
                 }
 
-                if (vardef.type == 'relate'){
+                if (vardef.type == 'relate') {
                     return;
                 }
 
@@ -105,7 +103,7 @@ export class RecordConvertService {
                     vardefBased: true,
                     label: vardef.vname ?? '',
                     type: vardef.type ?? '',
-                    display: vardef.display ?? '',
+                    display: vardef.display ?? 'default',
                     fieldDefinition: vardef,
                     metadata: vardef.metadata ?? {} as FieldMetadata,
                     logic: vardef.logic ?? {} as FieldLogicMap

@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,20 +24,13 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {
-    ColumnDefinition,
-    deepClone,
-    FieldMap,
-    FieldMetadata,
-    Option,
-    Record,
-    RecordMapperRegistry,
-    SearchCriteria,
-    SearchMetaField,
-    SearchMetaFieldMap,
-    ViewFieldDefinition,
-    ObjectMap
-} from 'common';
+import {deepClone} from '../../../../common/utils/object-utils';
+import {ColumnDefinition, SearchMetaField, SearchMetaFieldMap} from '../../../../common/metadata/list.metadata.model';
+import {FieldMap, FieldMetadata, Option} from '../../../../common/record/field.model';
+import {Record} from '../../../../common/record/record.model';
+import {RecordMapperRegistry} from '../../../../common/record/record-mappers/record-mapper.registry';
+import {SearchCriteria} from '../../../../common/views/list/search-criteria.model';
+import {ViewFieldDefinition} from '../../../../common/metadata/metadata.model';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {shareReplay, tap} from 'rxjs/operators';
 import {RecordStore} from '../../../../store/record/record.store';
@@ -50,6 +43,7 @@ import {RecordManager} from '../../../../services/record/record.manager';
 import {FieldManager} from '../../../../services/record/field/field.manager';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {signal} from "@angular/core";
+import {ObjectMap} from "../../../../common/types/object-map";
 
 const initialState = {
     id: '',
@@ -186,11 +180,11 @@ export class SavedFilterRecordStore extends RecordStore {
      */
     protected initRecord(record: SavedFilter): void {
 
-        if(this.metadata) {
+        if (this.metadata) {
             record.metadata = this.metadata;
         }
 
-        if(!record?.validationTriggered) {
+        if (!record?.validationTriggered) {
             record.validationTriggered = signal(false);
         }
 
@@ -304,7 +298,7 @@ export class SavedFilterRecordStore extends RecordStore {
             label: fieldMeta.label,
             vardefBased: fieldMeta?.vardefBased ?? false,
             readonly: fieldMeta?.readonly ?? false,
-            display: fieldMeta?.display ?? '',
+            display: fieldMeta?.display ?? 'default',
             type,
             fieldDefinition: {}
         } as ViewFieldDefinition;

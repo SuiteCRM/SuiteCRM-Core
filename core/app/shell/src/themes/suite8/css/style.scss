@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -35,6 +35,7 @@
 
 @import 'components/button';
 @import 'components/button-group';
+@import 'components/button-tab';
 @import 'components/button-main';
 @import 'components/button-main-light';
 @import 'components/button-primary';
@@ -55,37 +56,51 @@
 @import 'components/message-mobile';
 @import 'components/charts';
 @import 'components/tabs';
+@import "components/tiered-menu";
 @import 'components/field-layout';
 @import 'components/subpanel';
+@import 'components/subpanel-mobile';
 @import 'components/subpanel-history';
 @import 'components/subpanel-activities';
 @import 'components/shapes';
 @import 'components/history-timeline-widget';
+@import 'components/history-sidebar-skeleton-loading';
 @import 'components/loading-spinner';
 @import 'components/inline-loading-spinner';
 @import 'components/widget';
 @import 'components/widget-bar';
+@import 'components/widget-table';
+@import 'components/minimal-table';
 @import 'components/light-filter';
 @import 'components/light-table';
 @import 'components/chips';
+@import 'components/field-grid-modal';
 @import 'components/grid-widget';
 @import 'components/record-thread';
 @import 'components/case-updates';
 @import 'components/relatemodal-mobile';
 @import 'components/classic-view-modal';
 @import 'components/favorite';
+@import 'components/listview-filter';
 @import 'components/box-loading';
 @import 'components/record-content-skeleton';
 @import 'components/notifications';
+@import 'components/drafts';
 @import 'components/notifications-mobile';
 @import 'components/searchbar';
 @import 'components/searchbar-mobile';
 @import 'components/action-group-menu';
 @import 'components/popover';
+@import 'components/sidebar-statistic';
 @import 'components/popover-mobile';
 @import 'components/sidebar';
 @import 'components/multiselect';
 @import 'components/record-pagination';
+@import 'components/squire-editor';
+@import 'components/color-selector';
+@import 'components/insert-link-popup';
+@import 'components/uploaded-file';
+@import 'components/documents';
 
 @import 'layout/panel';
 @import 'layout/app';
@@ -98,6 +113,7 @@
 @import 'layout/listview';
 @import 'layout/listview-mobile';
 @import 'layout/view';
+@import 'layout/record-modal';
 @import 'layout/recordview';
 @import 'layout/recordview-mobile';
 @import 'layout/modal';
@@ -108,10 +124,18 @@
 @import 'layout/install';
 @import 'layout/admin';
 @import 'layout/scrollbar';
+@import 'layout/two-factor';
 
 @import 'fields/email';
 @import 'fields/composite-mobile';
 @import 'fields/full-name';
+@import 'fields/attachments';
 @import 'fields/icons';
+@import 'fields/image';
+@import 'fields/image-list-mode';
 @import 'fields/relate';
 @import 'fields/multienum';
+@import 'fields/multi-flex-relate';
+@import 'fields/parent-field';
+@import 'fields/file';
+

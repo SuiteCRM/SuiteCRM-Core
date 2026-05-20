@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -48,8 +48,11 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     @ViewChild('searchInput') searchInput: ElementRef;
     @Input() labelKey: string = '';
     @Input() klass: string = '';
+    @Input() showSearchDropdown: boolean = true;
     @Input() isMobile: boolean = false;
+    @Input() clearSearchTermOnSearch: boolean = true;
     @Input() searchTrigger: 'enter' | 'input' = 'enter';
+    @Input() clearSearchTermEventEmitter: EventEmitter<boolean>;
     @Output() isSearchVisible = new EventEmitter<boolean>(false);
     @Output() searchExpression = new EventEmitter<string>();
 
@@ -70,7 +73,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
         })
     );
 
-    constructor(protected languageStore: LanguageStore) {}
+    constructor(protected languageStore: LanguageStore) {
+    }
 
     ngOnInit(): void {
         this.searchForm = new FormGroup({
@@ -89,6 +93,14 @@ export class SearchBarComponent implements OnInit, OnDestroy {
                 distinctUntilChanged(),
                 filter(searchString => searchString?.length > 1),
             ).subscribe((term: string) => this.searchWord = term));
+
+
+        if (this.clearSearchTermEventEmitter) {
+            this.subs.push(this.clearSearchTermEventEmitter?.subscribe(() => {
+                this.clearSearchTerm();
+            }));
+        }
+
     }
 
     ngOnDestroy(): void {
@@ -101,21 +113,21 @@ export class SearchBarComponent implements OnInit, OnDestroy {
             this.clearSearchTerm();
             this.searchInput.nativeElement.blur();
         } else {
-            if(this.isMobile) {
+            if (this.isMobile) {
                 this.onBlur();
             }
         }
     }
 
-    searchWithInput(value:string): void {
-            this.searchExpression.emit(value);
+    searchWithInput(value: string): void {
+        this.searchExpression.emit(value);
     }
 
     clearSearchTerm(): void {
         this.searchForm.reset();
         this.hasSearchTyped = false;
         this.searchWord = '';
-        if(this.searchTrigger === 'input') {
+        if (this.searchTrigger === 'input') {
             this.searchWithInput(this.searchWord);
         }
     }
@@ -135,10 +147,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
             this.hasSearchTyped = false;
         }, 200);
 
-        if(this.isMobile) {
+        if (this.isMobile) {
             setTimeout(() => {
                 this.isSearchVisible.emit(false);
-            },50);
+            }, 50);
         }
     }
 }

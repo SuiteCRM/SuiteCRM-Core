@@ -1,0 +1,60 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2024 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<scrm-modal [closable]="false"
+            bodyKlass='m-0 small-font'
+            footerKlass='border-0'
+            headerKlass='border-0'
+            klass='two-factor-popup'>
+
+    <div modal-body>
+        <div>
+            <div class='d-flex flex-column pt-4 align-items-center'>
+                <scrm-label labelKey='LBL_ENTER_AUTH_APP_2FA_CODE' class='pb-4'></scrm-label>
+                <input [(ngModel)]="authCode"
+                       id='auth_code'
+                       type='text'
+                       name='auth_code'
+                       autocomplete='one-time-code'
+                       class='mb-3 auth-input'/>
+
+                <scrm-button id='submit-2fa-code'
+                        [config]="checkCodeButtonConfig"
+                        type='submit'>
+                </scrm-button>
+
+                <div class='small mt-2 text-muted'>
+                    <scrm-label  labelKey='LBL_PROBLEMS_GENERATING_CODE'></scrm-label>
+                </div>
+                <div class='small mb-2 text-muted'>
+                    <scrm-label  labelKey='LBL_BACKUP_CODES_FALLBACK_INSTRUCTIONS'></scrm-label>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</scrm-modal>

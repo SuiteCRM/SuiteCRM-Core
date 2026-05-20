@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,8 +24,11 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {Button, ButtonGroupInterface, DropdownButtonInterface, AnyButtonInterface} from 'common';
+import {Component, Input, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
+import {Button} from '../../common/components/button/button.model';
+import {ButtonGroupInterface} from '../../common/components/button/button-group.model';
+import {AnyButtonInterface, DropdownButtonInterface} from '../../common/components/button/dropdown-button.model';
+
 import {Observable, Subscription} from 'rxjs';
 
 interface SplitButtons {
@@ -43,10 +46,10 @@ export class ButtonGroupComponent implements OnInit, OnDestroy {
     @Input() config$: Observable<ButtonGroupInterface>;
     @Input() klass: string = '';
 
-    buttons: SplitButtons = {
+    buttons: WritableSignal<SplitButtons> = signal({
         expanded: [],
         collapsed: [],
-    };
+    });
 
     dropdownConfig: DropdownButtonInterface;
 
@@ -93,7 +96,7 @@ export class ButtonGroupComponent implements OnInit, OnDestroy {
             label: this.internalConfig.dropdownLabel,
             klass: [...buttonClasses],
             wrapperKlass: wrapperClasses,
-            items: this.buttons.collapsed,
+            items: this.buttons().collapsed,
         } as DropdownButtonInterface;
 
         if (this.internalConfig.dropdownOptions && this.internalConfig.dropdownOptions.placement) {
@@ -116,24 +119,27 @@ export class ButtonGroupComponent implements OnInit, OnDestroy {
 
     protected splitButtons(): void {
 
-        this.buttons.expanded = [];
-        this.buttons.collapsed = [];
+        const expanded: AnyButtonInterface[] = [];
+        const collapsed: AnyButtonInterface[] = [];
 
         if (!this.internalConfig.buttons || this.internalConfig.buttons.length < 1) {
+            this.buttons.set({ expanded, collapsed });
             return;
         }
 
         let count = 0;
 
         const showAfterBreakpoint = this.internalConfig.showAfterBreakpoint ?? true;
+        const breakPoint = this.getBreakpoint();
 
+        const pushToExpanded = [];
         this.internalConfig.buttons.forEach(button => {
 
             if (!button) {
                 return;
             }
 
-            if (count < this.getBreakpoint()) {
+            if (count < breakPoint) {
                 let classes = ['button-group-button'];
                 if (this.internalConfig.buttonKlass && this.internalConfig.buttonKlass.length > 0) {
                     classes = classes.concat(this.internalConfig.buttonKlass);
@@ -141,15 +147,54 @@ export class ButtonGroupComponent implements OnInit, OnDestroy {
                 const newButton = {...button};
                 Button.appendClasses(newButton, [...classes]);
 
-                this.buttons.expanded.push(newButton);
-            } else if(showAfterBreakpoint === true) {
-                this.buttons.collapsed.push({...button});
+                expanded.push(newButton);
+            } else if (showAfterBreakpoint === true) {
+                if (this.internalConfig.pushActiveToExpanded && button?.active) {
+                    pushToExpanded.push({...button});
+                    count++;
+                    return;
+                }
+                collapsed.push({...button});
             }
 
             count++;
         });
 
+        this.applyPushActiveToExpanded(pushToExpanded, expanded, collapsed);
+
         this.buildDropdownConfig();
     }
 
+    protected applyPushActiveToExpanded(pushToExpanded: any[], expanded: AnyButtonInterface[], collapsed: AnyButtonInterface[]): void {
+        const pushToExpandedLength = pushToExpanded?.length;
+
+        if (!pushToExpandedLength) {
+            this.buttons.set({ expanded, collapsed });
+            return;
+        }
+
+        const expandedLength = expanded?.length ?? 0;
+        const pushToCollapsedCount = expandedLength - pushToExpandedLength;
+
+        if (pushToCollapsedCount < 0) {
+            const overflow = pushToExpanded.slice(pushToCollapsedCount);
+            const pushToCollapsed = overflow.concat([...expanded]);
+            const newExpanded = pushToExpanded.slice(expanded.length);
+            const newCollapsed = pushToCollapsed.concat(collapsed);
+            this.buttons.set({ expanded: newExpanded, collapsed: newCollapsed });
+            return;
+        }
+
+        if (pushToCollapsedCount === 0) {
+            const newCollapsed = [...pushToExpanded].concat(collapsed);
+            this.buttons.set({ expanded: [...pushToExpanded], collapsed: newCollapsed });
+            return;
+        }
+
+        const pushToCollapsed = expanded.slice(-1 * pushToExpandedLength);
+        const keepOnExpanded = expanded.slice(0, pushToCollapsedCount);
+        const newExpanded = keepOnExpanded.concat([...pushToExpanded]);
+        const newCollapsed = pushToCollapsed.concat(collapsed);
+        this.buttons.set({ expanded: newExpanded, collapsed: newCollapsed });
+    }
 }

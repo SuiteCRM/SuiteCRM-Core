@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -30,41 +30,39 @@ namespace App\Process\DataPersister;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\AsyncTask\Service\Dispatcher\AsyncTaskDispatcherInterface;
+use App\AsyncTask\Service\TaskHandler\AsyncTaskHandlerInterface;
+use App\AsyncTask\Service\TaskHandler\AsyncTaskHandlerRegistryInterface;
+use App\Data\Entity\Record;
+use App\Data\Service\RecordProviderInterface;
 use App\Engine\Service\AclManagerInterface;
 use App\Process\Entity\Process;
 use App\Process\Service\ProcessHandlerInterface;
 use App\Process\Service\ProcessHandlerRegistry;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Throwable;
 
 class ProcessProcessor implements ProcessorInterface
 {
-    /**
-     * @var ProcessHandlerRegistry
-     */
-    private $registry;
-
-    /**
-     * @var Security
-     */
-    private $security;
-
-    /**
-     * @var AclManagerInterface
-     */
-    private $acl;
 
     /**
      * ProcessProcessor constructor.
      * @param ProcessHandlerRegistry $registry
      * @param Security $security
      * @param AclManagerInterface $acl
+     * @param AsyncTaskDispatcherInterface $asyncTaskDispatcher
+     * @param RecordProviderInterface $recordProvider
+     * @param AsyncTaskHandlerRegistryInterface $asyncTaskHandlerRegistry
      */
-    public function __construct(ProcessHandlerRegistry $registry, Security $security, AclManagerInterface $acl)
-    {
-        $this->registry = $registry;
-        $this->security = $security;
-        $this->acl = $acl;
+    public function __construct(
+        protected ProcessHandlerRegistry $registry,
+        protected Security $security,
+        protected AclManagerInterface $acl,
+        protected AsyncTaskDispatcherInterface $asyncTaskDispatcher,
+        protected RecordProviderInterface $recordProvider,
+        protected AsyncTaskHandlerRegistryInterface $asyncTaskHandlerRegistry
+    ) {
     }
 
     /**
@@ -77,6 +75,10 @@ class ProcessProcessor implements ProcessorInterface
      */
     public function process(mixed $process, Operation $operation, array $uriVariables = [], array $context = []): ?Process
     {
+        if (!($process instanceof Process)) {
+            return null;
+        }
+
         $processHandler = $this->registry->get($process->getType());
 
         $this->checkAuthentication($processHandler);
@@ -95,8 +97,7 @@ class ProcessProcessor implements ProcessorInterface
         }
 
         if ($process->getAsync() === true) {
-            // Store process for background processing
-            // Not supported yet
+            $this->queueAsyncProcess($processHandler, $process);
         } else {
             $processHandler->run($process);
         }
@@ -125,6 +126,7 @@ class ProcessProcessor implements ProcessorInterface
      * Check acl access
      * @param ProcessHandlerInterface $processHandler
      * @param Process $process
+     * @return bool
      */
     protected function checkACLAccess(ProcessHandlerInterface $processHandler, Process $process): bool
     {
@@ -198,5 +200,133 @@ class ProcessProcessor implements ProcessorInterface
         }
 
         return true;
+    }
+
+    /**
+     * Queue async process
+     * @param ProcessHandlerInterface $processHandler
+     * @param Process $process
+     */
+    protected function queueAsyncProcess(ProcessHandlerInterface $processHandler, Process $process): void
+    {
+        $asyncHandlerKey = $process->getAsyncHandlerKey() ?? '';
+        $asyncTaskType = $process->getAsyncRunnerType() ?? 'processes';
+
+        if (empty($asyncHandlerKey)) {
+            $process->setMessages(['LBL_ASYNC_HANDLER_MISSING']);
+            $process->setStatus('error');
+            return;
+        }
+
+        if (empty($asyncTaskType)) {
+            $process->setMessages(['LBL_ASYNC_TYPE_MISSING']);
+            $process->setStatus('error');
+            return;
+        }
+
+        if ($asyncHandlerKey === 'external') {
+            $this->dispatchAsyncTaskMessage($process, $asyncTaskType, $asyncHandlerKey);
+            return;
+        }
+
+        $handler = $this->asyncTaskHandlerRegistry->getHandler($asyncTaskType, $asyncHandlerKey);
+
+        if ($handler === null) {
+            $process->setMessages(['LBL_ASYNC_HANDLER_MISSING']);
+            $process->setStatus('error');
+            return;
+        }
+
+        if (!($handler instanceof AsyncTaskHandlerInterface)) {
+            $process->setMessages(['LBL_WRONG_ASYNC_PROCESS_HANDLER_CONFIGURATION']);
+            $process->setStatus('error');
+            return;
+        }
+
+        $this->dispatchAsyncTaskMessage($process, $asyncTaskType, $asyncHandlerKey, $handler);
+    }
+
+    /**
+     * Dispatch async task message
+     * @param Process $process
+     * @param string $asyncTaskType
+     * @param string $asyncHandlerKey
+     * @param AsyncTaskHandlerInterface|null $handler
+     * @return void
+     */
+    protected function dispatchAsyncTaskMessage(
+        Process $process,
+        string $asyncTaskType,
+        string $asyncHandlerKey,
+        ?AsyncTaskHandlerInterface $handler = null
+    ): void {
+        $module = $process->getModule() ?? 'default';
+        $options = $process->getOptions() ?? [];
+        $processRecord = null;
+
+        if (!empty($process->getId())) {
+            try {
+                $processRecord = $this->recordProvider->getRecord($process->getModule() ?? 'processes', $process->getId());
+                $processRecord = $this->prepareRecordForDispatch($processRecord, $handler);
+            } catch (Throwable $e) {
+            }
+        }
+
+        if ($processRecord === null || empty($processRecord->getId())) {
+            $mappedRecord = $this->mapToRecord($process, $handler);
+            $processRecord = $this->recordProvider->saveRecord($mappedRecord);
+            $process->setId($processRecord->getId());
+        }
+
+        $this->asyncTaskDispatcher->dispatchTaskRun($module, $processRecord->getId(), $asyncTaskType, $asyncHandlerKey, $options);
+    }
+
+    /**
+     * Map Process entity to Record entity
+     * @param Process $process
+     * @param AsyncTaskHandlerInterface|null $handler
+     * @return Record
+     */
+    protected function mapToRecord(Process $process, ?AsyncTaskHandlerInterface $handler = null): Record
+    {
+        $record = new Record();
+        $record->setModule($process->getAsyncRunnerType() ?? 'processes');
+        $record->setId('');
+
+        $attributes = [
+            'id' => $process->getId(),
+            'name' => $process->getName() ?? $process->getType(),
+            'type' => 'background',
+            'status' => 'pending',
+            'phase' => '',
+            'service_key' => $process->getAsyncHandlerKey(),
+            'allow_failure_retry_action' => $handler?->allowsFailureRetry() ?? false,
+            'allow_failure_rerun_action' => $handler?->allowsFailureRerun() ?? false,
+        ];
+
+        $data = $process->getData() ?? [];
+        if (!empty($data)) {
+            $attributes = array_merge($attributes, $data);
+        }
+
+        $record->setAttributes($attributes);
+
+        return $record;
+    }
+
+    /**
+     * Prepare an existing task record for dispatch: update capability flags and transition to pending status.
+     * @param Record $processRecord
+     * @param AsyncTaskHandlerInterface|null $handler
+     * @return Record
+     */
+    protected function prepareRecordForDispatch(Record $processRecord, ?AsyncTaskHandlerInterface $handler): Record
+    {
+        $attrs = $processRecord->getAttributes();
+        $attrs['allow_failure_retry_action'] = $handler?->allowsFailureRetry() ?? false;
+        $attrs['allow_failure_rerun_action'] = $handler?->allowsFailureRerun() ?? false;
+        $attrs['status'] = 'pending';
+        $processRecord->setAttributes($attrs);
+        return $this->recordProvider->saveRecord($processRecord);
     }
 }

@@ -99,8 +99,10 @@ class ViewModulefields extends SugarView
                         $f[$mod_strings['LBL_HCUSTOM']][$def['name']] = $def;
                         $def['custom'] = true;
                     } else {
-                        $f[$mod_strings['LBL_HDEFAULT']][$def['name']] = $def;
-                        $def['custom'] = false;
+                        if (!isset($def['custom'])) {
+                            $f[$mod_strings['LBL_HDEFAULT']][$def['name']] = $def;
+                            $def['custom'] = false;
+                        }
                     }
 
                     $def['type'] = isset($fieldTypes[$def['type']]) ? $fieldTypes[$def['type']] : ucfirst($def['type']);
@@ -261,7 +263,11 @@ class ViewModulefields extends SugarView
                 return true;
             }
         }
-        
+
+        if ($def ['type'] === 'image' || $def ['type'] === 'file' || $def ['type'] === 'attachment') {
+            return true;
+        }
+
         return false;
     }
 }

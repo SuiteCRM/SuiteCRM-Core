@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,9 +25,11 @@
  */
 
 import {isEmpty} from 'lodash-es';
-import {Field, FieldDefinition, Record, ViewFieldDefinition} from 'common';
+import {Field, FieldDefinition} from '../../../common/record/field.model';
+import {Record} from '../../../common/record/record.model';
+import {ViewFieldDefinition} from '../../../common/metadata/metadata.model';
 import {LanguageStore} from '../../../store/language/language.store';
-import {Injectable} from '@angular/core';
+import {Injectable, signal} from '@angular/core';
 import {SavedFilter} from '../../../store/saved-filters/saved-filter.model';
 import {FieldBuilder} from './field.builder';
 import {GroupFieldBuilder} from './group-field.builder';
@@ -58,15 +60,19 @@ export class FieldManager {
      *
      * @param {string} type field type
      * @param {string} value field value
+     * @param labelKey
      * @returns {object} Field
      */
-    public buildShallowField(type: string, value: string): Field {
+    public buildShallowField(type: string, value: string, labelKey: string = ''): Field {
         return {
             type,
             value,
             definition: {
                 type
-            }
+            },
+            labelKey,
+            loading: signal(false),
+            display: signal('default')
         } as Field;
     }
 
@@ -75,10 +81,11 @@ export class FieldManager {
      *
      * @param {object} record Record
      * @param {object} viewField ViewFieldDefinition
+     * @param viewFieldDefinitions
      * @param {object} language LanguageStore
      * @returns {object}Field
      */
-    public addField(record: Record, viewField: ViewFieldDefinition, language: LanguageStore = null): Field {
+    public addField(record: Record, viewField: ViewFieldDefinition, viewFieldDefinitions: ViewFieldDefinition[] = [], language: LanguageStore = null): Field {
 
         const field = this.fieldBuilder.buildField(record, viewField, language);
 
@@ -89,7 +96,8 @@ export class FieldManager {
             language,
             this.isFieldInitialized.bind(this),
             this.fieldBuilder.buildField.bind(this.fieldBuilder),
-            this.addToRecord.bind(this)
+            this.addToRecord.bind(this),
+            viewFieldDefinitions
         );
 
         this.attributeBuilder.addAttributes(

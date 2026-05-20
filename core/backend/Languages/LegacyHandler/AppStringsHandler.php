@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -27,14 +27,15 @@
 
 namespace App\Languages\LegacyHandler;
 
-use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Exception\ItemNotFoundException;
 use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;
 use App\Install\LegacyHandler\InstallHandler;
 use App\Languages\Entity\AppStrings;
+use App\Languages\Service\AppStringsProviderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class AppStringsHandler extends LegacyHandler
+class AppStringsHandler extends LegacyHandler implements AppStringsProviderInterface
 {
     protected const MSG_LANGUAGE_NOT_FOUND = 'Not able to get language: ';
     public const HANDLER_KEY = 'app-strings';
@@ -55,13 +56,16 @@ class AppStringsHandler extends LegacyHandler
             'ERR_MISSING_REQUIRED_FIELDS',
             'LBL_RECOVER_PASSWORD_SUCCESS',
             'LBL_SESSION_EXPIRED',
-            'LBL_LOGOUT_SUCCESS'
+            'LBL_LOGOUT_SUCCESS',
+            'LBL_2FA_LOGIN_CANCEL'
         ]
     ];
     /**
      * @var InstallHandler
      */
     private $installHandler;
+
+    protected array $language;
 
     /**
      * LegacyHandler constructor.
@@ -72,6 +76,7 @@ class AppStringsHandler extends LegacyHandler
      * @param LegacyScopeState $legacyScopeState
      * @param RequestStack $session
      * @param InstallHandler $installHandler
+     * @param array $language
      */
     public function __construct(
         string $projectDir,
@@ -80,7 +85,8 @@ class AppStringsHandler extends LegacyHandler
         string $defaultSessionName,
         LegacyScopeState $legacyScopeState,
         RequestStack $session,
-        InstallHandler $installHandler
+        InstallHandler $installHandler,
+        array $language
     ) {
         parent::__construct(
             $projectDir,
@@ -92,6 +98,7 @@ class AppStringsHandler extends LegacyHandler
         );
 
         $this->installHandler = $installHandler;
+        $this->language = $language;
     }
 
     /**
@@ -132,6 +139,8 @@ class AppStringsHandler extends LegacyHandler
         if (empty($appStringsArray)) {
             throw new ItemNotFoundException(self::MSG_LANGUAGE_NOT_FOUND . "'$language'");
         }
+
+        $appStringsArray = $this->injectPluginAppStrings($language, $appStringsArray);
 
         foreach ($this->injectedModuleLanguages as $module => $languageKeys) {
             $this->injectModuleLanguage($language, $module, $languageKeys, $appStringsArray);
@@ -191,6 +200,8 @@ class AppStringsHandler extends LegacyHandler
 
         $this->injectLicense($appStringsArray);
 
+        $appStringsArray = $this->injectPluginAppStrings($language, $appStringsArray);
+
         $appStrings = new AppStrings();
         $appStrings->setId($language);
         $appStrings->setItems($appStringsArray);
@@ -230,13 +241,15 @@ class AppStringsHandler extends LegacyHandler
      */
     protected function removeEndingColon(array $appStringsArray): array
     {
-        $appStringsArray = array_map(static function ($label) {
-            if (is_string($label)) {
-                return preg_replace('/:$/', '', $label);
-            }
+        $appStringsArray = array_map(
+            static function ($label) {
+                if (is_string($label)) {
+                    return preg_replace('/:$/', '', $label);
+                }
 
-            return $label;
-        }, $appStringsArray);
+                return $label;
+            }, $appStringsArray
+        );
 
         return $appStringsArray;
     }
@@ -274,7 +287,7 @@ class AppStringsHandler extends LegacyHandler
 
     protected function decodeLabels(array $appStringsArray): array
     {
-        foreach($appStringsArray as $key => $string){
+        foreach ($appStringsArray as $key => $string) {
             if (!is_array($string)) {
                 $string = html_entity_decode($string ?? '', ENT_QUOTES);
             }
@@ -282,5 +295,16 @@ class AppStringsHandler extends LegacyHandler
         }
 
         return $appStringsArray;
+    }
+
+    /**
+     * @param string $language
+     * @param array $appStringsArray
+     * @return array
+     */
+    protected function injectPluginAppStrings(string $language, array $appStringsArray): array
+    {
+        $applicationStrings = $this->language[$language]['application'] ?? [];
+        return array_merge($appStringsArray, $applicationStrings);
     }
 }

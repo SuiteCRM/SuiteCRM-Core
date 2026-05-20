@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,12 +25,27 @@
 * the words "Supercharged by SuiteCRM".
 */
 -->
-<ng-container *ngIf="!field.loading">
-    <ng-container *ngIf="hasOnClick()">
-        <a (click)="onClick()" class="clickable field-link">
-            <ndc-dynamic
-                [ndcDynamicComponent]="componentType"
-                [ndcDynamicInputs]="{
+<ng-container *ngIf="!field?.loading() || !(field?.metadata?.loadingEnabled ?? true)">
+    <ng-container *ngIf="getErrorPosition() === 'top' && isEdit() && field.formControl && touched()">
+        <ng-container *ngIf="field.formControl.errors">
+            <ng-container
+                    *ngIf="validateOnlyOnSubmit ? isInvalid() : (field.formControl.invalid && field.formControl.touched)">
+                <scrm-field-validation [field]="field" [record]="record" [errors]="field.formControl.errors"></scrm-field-validation>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="field.asyncValidationErrors !== null">
+            <scrm-field-validation [field]="field" [record]="record" [errors]="field.asyncValidationErrors"></scrm-field-validation>
+        </ng-container>
+    </ng-container>
+    <div class="d-flex w-100 flex-grow-1"
+         [class.flex-column]="field?.fieldActions && ((field?.fieldActions?.position ?? 'inline' ) === 'vertical')"
+         [class.align-items-center]="(field?.fieldActions && field?.fieldActions?.position === 'inline')"
+    >
+        <ng-container *ngIf="hasOnClick()">
+            <a (click)="onClick()" class="clickable field-link flex-grow-1">
+                <ndc-dynamic
+                        [ndcDynamicComponent]="componentType"
+                        [ndcDynamicInputs]="{
                 'mode': mode,
                 'originalMode': originalMode,
                 'field': field,
@@ -38,14 +53,14 @@
                 'record': record,
                 'parent': parent
             }"
-            ></ndc-dynamic>
-        </a>
-    </ng-container>
-    <ng-container *ngIf="isLink() && !hasOnClick()">
-        <a [routerLink]="getLink()" [queryParams]="record?.metadata?.queryParams" class="field-link">
-            <ndc-dynamic
-                [ndcDynamicComponent]="componentType"
-                [ndcDynamicInputs]="{
+                ></ndc-dynamic>
+            </a>
+        </ng-container>
+        <ng-container *ngIf="isLink() && !hasOnClick()">
+            <a [routerLink]="getLink()" [queryParams]="record?.metadata?.queryParams" class="field-link flex-grow-1">
+                <ndc-dynamic
+                        [ndcDynamicComponent]="componentType"
+                        [ndcDynamicInputs]="{
                 'mode': mode,
                 'originalMode': originalMode,
                 'field': field,
@@ -53,13 +68,15 @@
                 'record': record,
                 'parent': parent
             }"
-            ></ndc-dynamic>
-        </a>
-    </ng-container>
-    <ng-container *ngIf="!isLink() && !hasOnClick()">
-        <ndc-dynamic
-            [ndcDynamicComponent]="componentType"
-            [ndcDynamicInputs]="{
+                ></ndc-dynamic>
+            </a>
+        </ng-container>
+        <ng-container *ngIf="!isLink() && !hasOnClick()">
+            <ndc-dynamic
+                    [ndcDynamicComponent]="componentType"
+                    [class]="'d-none'"
+                    [ndcDynamicAttributes]="{ 'class': 'flex-grow-1'}"
+                    [ndcDynamicInputs]="{
             'mode': mode,
             'originalMode': originalMode,
             'field': field,
@@ -67,22 +84,49 @@
             'record': record,
             'parent': parent
         }"
-        ></ndc-dynamic>
-    </ng-container>
+            ></ndc-dynamic>
+        </ng-container>
+        <ng-container *ngIf="field.fieldActions">
+            <div>
+                <scrm-action-group-menu
+                        [config]="field.fieldActions.adapter"
+                        [buttonGroupClass]="field.fieldActions?.containerKlass ?? ''"
+                        [klass]="field.fieldActions?.klass ?? ''"
+                >
+                </scrm-action-group-menu>
+            </div>
+        </ng-container>
+    </div>
+
 </ng-container>
 
-<ng-container *ngIf="field.loading">
-   <div class= "dynamic-field">
+<ng-container *ngIf="field?.loading() && (field?.metadata?.loadingEnabled ?? true) !== false">
+    <div class="dynamic-field">
         <div class="flex-grow-1 text-break rounded box-loading skeleton-field-content"></div>
-   </div>
+    </div>
 </ng-container>
-<ng-container *ngIf="isEdit() && field.formControl && field.formControl.errors">
-    <ng-container *ngIf="validateOnlyOnSubmit ? isInvalid() : (field.formControl.invalid && field.formControl.touched)">
-        <div *ngFor="let item of field.formControl.errors | keyvalue" class="invalid-feedback d-block">
-            <scrm-dynamic-label [context]="getMessageContext(item.value, record)"
+<ng-container *ngIf="activeFootnotes().length">
+    <ng-container *ngFor="let footnote of activeFootnotes()">
+        <div class="form-text small text-lighter {{footnote?.klass ?? ''}}">
+            <scrm-image *ngIf="footnote?.icon" [image]="footnote?.icon"
+                        [klass]="footnote?.iconKlass ?? ''"></scrm-image>
+            <scrm-dynamic-label [context]="footnote.context"
                                 [fields]="{field: field}"
-                                [labelKey]="getMessageLabelKey(item.value)">
+                                [labelKey]="footnote?.labelKey ?? ''"
+                                [module]="this?.record?.module ?? ''"
+            >
             </scrm-dynamic-label>
         </div>
+    </ng-container>
+</ng-container>
+<ng-container *ngIf="getErrorPosition() !== 'top' && isEdit() && field.formControl && touched()">
+    <ng-container *ngIf="field.formControl.errors">
+        <ng-container
+                *ngIf="validateOnlyOnSubmit ? isInvalid() : (field.formControl.invalid && field.formControl.touched)">
+            <scrm-field-validation [field]="field" [record]="record" [errors]="field.formControl.errors"></scrm-field-validation>
+        </ng-container>
+    </ng-container>
+    <ng-container *ngIf="field.asyncValidationErrors !== null">
+        <scrm-field-validation [field]="field" [record]="record" [errors]="field.asyncValidationErrors"></scrm-field-validation>
     </ng-container>
 </ng-container>

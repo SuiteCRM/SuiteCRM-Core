@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,7 +25,10 @@
  */
 
 import {BehaviorSubject, forkJoin, Observable, of, Subscription} from 'rxjs';
-import {deepClone, Record, ViewContext, ViewFieldDefinition, ViewMode} from 'common';
+import {ViewContext, ViewMode} from '../../common/views/view.model';
+import {deepClone} from '../../common/utils/object-utils';
+import {Record} from '../../common/record/record.model';
+import {ViewFieldDefinition} from '../../common/metadata/metadata.model';
 import {catchError, distinctUntilChanged, finalize, map, take, tap} from 'rxjs/operators';
 import {RecordStore} from '../record/record.store';
 import {AppStateStore} from '../app-state/app-state.store';
@@ -36,6 +39,7 @@ import {LanguageStore} from '../language/language.store';
 import {RecordStoreFactory} from '../record/record.store.factory';
 import {StateStore} from '../state';
 import {RecordContainerState} from './record-container.store.model';
+import {BaseRecordContainerStoreInterface} from "../../common/containers/record/record-container.store.model";
 
 const initialState: RecordContainerState = {
     module: '',
@@ -47,7 +51,7 @@ const initialState: RecordContainerState = {
     mode: 'detail',
 };
 
-export abstract class BaseRecordContainerStore<M> implements StateStore {
+export abstract class BaseRecordContainerStore<M> implements StateStore, BaseRecordContainerStoreInterface {
 
     /**
      * Public long-lived observable streams

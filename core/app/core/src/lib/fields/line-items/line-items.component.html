@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -31,13 +31,13 @@
 
 <ng-container *ngIf="isConfigured()">
 
-    <ng-container *ngIf="!field.loading">
+    <ng-container *ngIf="!field?.loading()">
         <div class="line-items d-flex flex-column {{field.type}} {{field.name}}">
 
             <div class="d-flex {{getDirection()}} justify-content-start align-items-end line-item h-100">
                 <ng-container *ngFor="let item of field.items; index as i">
                     <div *ngIf="!(item && item.attributes && item.attributes.deleted)"
-                         class="d-flex flex-row line-item-entry w-100 align-items-end">
+                         class="d-flex flex-row line-item-entry w-100">
 
                         <div class="flex-grow-1 line-item-entry-composite">
                             <div *ngFor="let itemField of getItemFields(item)"
@@ -63,7 +63,7 @@
 
 
             </div>
-            <div class="line-item-buttons d-flex justify-content-end mt-1">
+            <div class="line-item-buttons d-flex justify-content-end">
                 <scrm-button *ngIf="isEditable()" [config]="getAddItemButton()">
                 </scrm-button>
             </div>
@@ -83,7 +83,7 @@
     </ng-container>
 
 
-    <ng-container *ngIf="field.loading">
+    <ng-container *ngIf="field?.loading()">
         <div class= "dynamic-field">
             <div class="flex-grow-1 text-break rounded box-loading skeleton-field-content"></div>
         </div>

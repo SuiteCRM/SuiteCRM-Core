@@ -4,8 +4,8 @@
  * SugarCRM Community Edition is a customer relationship management program developed by
  * SugarCRM, Inc. Copyright (C) 2004-2013 SugarCRM Inc.
  *
- * SuiteCRM is an extension to SugarCRM Community Edition developed by SalesAgility Ltd.
- * Copyright (C) 2011 - 2018 SalesAgility Ltd.
+ * SuiteCRM is an extension to SugarCRM Community Edition developed by SuiteCRM Ltd.
+ * Copyright (C) 2011 - 2025 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -840,7 +840,7 @@ class SugarBean
         $final_query = '';
         $final_query_rows = '';
         $subpanel_list = array();
-        if (method_exists($subpanel_def ?? '', 'isCollection')) {
+        if ((is_object($subpanel_def) || is_string($subpanel_def)) && method_exists($subpanel_def, 'isCollection')) {
             if ($subpanel_def->isCollection()) {
                 if ($subpanel_def->load_sub_subpanels() === false) {
                     $subpanel_list = array();
@@ -953,7 +953,7 @@ class SugarBean
                         email_addr_bean_rel.bean_id = $relatedBeanTable.id AND
                         email_addr_bean_rel.bean_module = '$relatedBeanModule') as email1";
                 }
-                
+
                 //Put the query into the final_query
                 $query = $subquery['select'] . " " . $subquery['from'] . " " . $subquery['where'];
                 if (!$first) {
@@ -2489,9 +2489,6 @@ class SugarBean
             $this->save_relationship_changes($isUpdate);
             $GLOBALS['saving_relationships'] = false;
         }
-        if ($isUpdate && !$this->update_date_entered) {
-            unset($this->date_entered);
-        }
         // call the custom business logic
         $custom_logic_arguments = [];
         $custom_logic_arguments['check_notify'] = $check_notify;
@@ -2533,7 +2530,15 @@ class SugarBean
         $this->_sendNotifications($check_notify);
 
         if ($isUpdate) {
+            $tmp_date_entered = $this->date_entered;
+            if (!empty($this->fetched_row['date_entered'])) {
+                $tmp_date_entered = $this->fetched_row['date_entered'];
+            }
+            if (!$this->update_date_entered) {
+                unset($this->date_entered);
+            }
             $this->db->update($this);
+            $this->date_entered = $tmp_date_entered;
         } else {
             $this->db->insert($this);
         }
@@ -2644,15 +2649,21 @@ class SugarBean
                     $type .= $def['dbType'];
                 }
 
+                $purifyHtml = $def['metadata']['purifyHtml'] ?? true;
+                if ($purifyHtml === false) {
+                    return;
+                }
+
                 // Trim name & varchar type values on save when the value is not null
                 if (isset($def['type']) && in_array($def['type'], ['name', 'varchar']) && !is_null($this->$key ?? null)) {
                     $this->$key = trim($this->$key);
                 }
 
-                if (isset($def['type']) && ($def['type'] == 'html' || $def['type'] == 'longhtml')) {
+                if (isset($def['type']) && ($def['type'] == 'html' || $def['type'] == 'longhtml') && property_exists($this, $key)) {
                     $this->$key = purify_html($this->$key, ['HTML.ForbiddenElements' => ['iframe' => true]]);
                 } elseif (
                     (strpos((string) $type, 'char') !== false || strpos((string) $type, 'text') !== false || $type == 'enum') &&
+                    property_exists($this, $key) &&
                     !empty($this->$key)
                 ) {
                     $this->$key = purify_html($this->$key, ['HTML.ForbiddenElements' => ['iframe' => true]]);
@@ -2895,7 +2906,7 @@ class SugarBean
 
         foreach ($this->field_defs as $field => $data) {
             if (!$dbOnly || !isset($data['source']) || $data['source'] == 'db') {
-                if (!$stringOnly || is_string($this->$field)) {
+                if (!$stringOnly || (isset($this->$field) && is_string($this->$field))) {
                     if ($upperKeys) {
                         if (!isset($cache[$field])) {
                             $cache[$field] = strtoupper($field);
@@ -3476,7 +3487,7 @@ class SugarBean
 
     /**
      * This function handles create the email notifications email.
-     * @param string $notify_user the user to send the notification email to
+     * @param User $notify_user the user to send the notification email to
      * @return SugarPHPMailer
      */
     public function create_notification_email($notify_user)
@@ -3945,7 +3956,13 @@ class SugarBean
                         $localTable .= '_cstm';
                     }
                     global $beanFiles, $beanList;
-                    require_once($beanFiles[$beanList[$joinModule]]);
+                    $moduleClass = $beanList[$joinModule] ?? '';
+                    $filePath = $beanFiles[$moduleClass] ?? '';
+                    if (!empty($filePath)) {
+                        require_once($filePath);
+                    } else {
+                        $GLOBALS['log']->fatal("Unable to load module $joinModule");
+                    }
                     $rel_mod = new $beanList[$joinModule]();
                     $nameField = "$joinTableAlias.name";
                     if (isset($rel_mod->field_defs['name'])) {
@@ -4497,12 +4514,19 @@ class SugarBean
      * populate the upper limit on ListViews.
      *
      * @param string $query Select query string
+     * @param mixed $alias
      * @return string count query
      *
      * Internal function, do not override.
      */
     public function create_list_count_query($query, $alias = 'c')
     {
+        // Guard: datasource functions may return an array instead of a string query.
+        // In that case we cannot build a meaningful count query, so return early.
+        if (!is_string($query)) {
+            return '';
+        }
+
         // remove the 'order by' clause which is expected to be at the end of the query
         $pattern = '/\sORDER BY.*/is';
         $replacement = '';
@@ -4515,6 +4539,10 @@ class SugarBean
             } else {
                 $star = 'DISTINCT ' . $this->table_name . '.id';
             }
+        }
+
+        if (is_array($alias)) {
+            $alias = $alias[0];
         }
 
         // change the select expression to 'count(*)'
@@ -6081,7 +6109,7 @@ class SugarBean
      * @param $relate_values
      * @param bool $check_duplicates
      * @param bool $do_update
-     * @param null $data_values
+     * @param array $data_values
      */
     public function set_relationship(
         $table,
@@ -6245,7 +6273,7 @@ class SugarBean
             return false;
         }
 
-        $view = strtolower($view);
+        $view = strtolower((string) $view);
         switch ($view) {
             case 'list':
             case 'index':

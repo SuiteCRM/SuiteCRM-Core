@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,8 +28,12 @@
 <ng-container *ngIf="dataSource">
     <div *ngIf="config && config.layout === 'panels'" class="record-content panel-layout container-fluid pl-0 pr-0">
         <div class="row no-gutters mb-3" *ngFor="let panel of panels">
-            <div class="col">
-                <scrm-panel [title]="panel.label" [isCollapsed$]="(panel.isCollapsed | toObservable)" mode="collapsible">
+            <div class="col" *ngIf="panel.display$ | async">
+                <scrm-panel [title]="panel.label"
+                            [isCollapsed$]="(panel.isCollapsed | toObservable)"
+                            mode="collapsible"
+                            [showHeader]="panel?.meta?.showHeader ?? true"
+                >
                     <div panel-body class="panel-{{panel.key}}">
                         <scrm-field-layout [dataSource]="getLayoutDataSource(panel)"></scrm-field-layout>
                     </div>
@@ -45,7 +49,7 @@
                 <ng-container *ngFor="let panel of panels; index as i;">
                     <ng-container *ngIf="(panel.display$ | async) as panelDisplay">
                         <li class="tab" [ngbNavItem]="i+1" *ngIf="!!panelDisplay">
-                            <a class="tab-link" ngbNavLink>{{panel.label}}</a>
+                            <a class="tab-link d-flex align-items-end" ngbNavLink *ngIf="panel?.meta?.showHeader ?? true">{{panel.label}}</a>
                             <ng-template ngbNavContent>
                                 <div class="tab-{{panel.key}}">
                                     <scrm-field-layout [dataSource]="getLayoutDataSource(panel)"></scrm-field-layout>

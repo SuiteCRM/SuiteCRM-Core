@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -54,90 +54,6 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 class AppMetadataProvider implements AppMetadataProviderInterface
 {
-    /**
-     * @var ModuleNameMapperInterface
-     */
-    protected $moduleNameMapper;
-
-    /**
-     * @var SystemConfigProviderInterface
-     */
-    protected $systemConfigProvider;
-
-    /**
-     * @var UserPreferencesProviderInterface
-     */
-    protected $userPreferenceService;
-
-    /**
-     * @var NavigationProviderInterface
-     */
-    protected $navigationService;
-
-    /**
-     * @var AppStringsHandler
-     */
-    protected $appStringsHandler;
-
-    /**
-     * @var AppListStringsHandler
-     */
-    protected $appListStringsHandler;
-
-    /**
-     * @var ModStringsHandler
-     */
-    protected $modStringsHandler;
-
-    /**
-     * @var ThemeImageService
-     */
-    protected $themeImageService;
-
-    /**
-     * @var ModuleMetadataProviderInterface
-     */
-    protected $moduleMetadata;
-
-    /**
-     * @var Security
-     */
-    protected $security;
-
-    /**
-     * @var UserHandler
-     */
-    protected $userHandler;
-
-    /**
-     * @var AdminPanelDefinitionProviderInterface
-     */
-    protected $adminPanelDefinitions;
-
-    /**
-     * @var CacheInterface
-     */
-    protected $cache;
-
-    /**
-     * @var CacheManagerInterface
-     */
-    protected $cacheManager;
-
-    /**
-     * @var InstallHandler
-     */
-    private $installHandler;
-
-    /**
-     * @var RecentlyViewedHandler
-     */
-    protected $recentlyViewedHandler;
-
-    /**
-     * @var ModuleRegistryHandler $moduleRegistryHandler ;
-     */
-    protected $moduleRegistryHandler;
 
     /**
      * AppMetadataProvider constructor.
@@ -159,42 +75,25 @@ class AppMetadataProvider implements AppMetadataProviderInterface
      * @param ModuleRegistryHandler $moduleRegistryHandler
      */
     public function __construct(
-        ModuleNameMapperInterface             $moduleNameMapper,
-        SystemConfigProviderInterface         $systemConfigProvider,
-        UserPreferencesProviderInterface      $userPreferenceService,
-        NavigationProviderInterface           $navigationService,
-        AppStringsHandler                     $appStringsHandler,
-        AppListStringsHandler                 $appListStringsHandler,
-        ModStringsHandler                     $modStringsHandler,
-        ThemeImageService                     $themeImageService,
-        ModuleMetadataProviderInterface       $moduleMetadata,
-        Security                              $security,
-        UserHandler                           $userHandler,
-        AdminPanelDefinitionProviderInterface $adminPanelDefinitions,
-        CacheInterface                        $cache,
-        CacheManagerInterface                 $cacheManager,
-        InstallHandler                        $installHandler,
-        RecentlyViewedHandler                 $recentlyViewedHandler,
-        ModuleRegistryHandler                 $moduleRegistryHandler,
+        protected ModuleNameMapperInterface $moduleNameMapper,
+        protected SystemConfigProviderInterface $systemConfigProvider,
+        protected UserPreferencesProviderInterface $userPreferenceService,
+        protected NavigationProviderInterface $navigationService,
+        protected AppStringsHandler $appStringsHandler,
+        protected AppListStringsHandler $appListStringsHandler,
+        protected ModStringsHandler $modStringsHandler,
+        protected ThemeImageService $themeImageService,
+        protected ModuleMetadataProviderInterface $moduleMetadata,
+        protected Security $security,
+        protected UserHandler $userHandler,
+        protected AdminPanelDefinitionProviderInterface $adminPanelDefinitions,
+        protected CacheInterface $cache,
+        protected CacheManagerInterface $cacheManager,
+        protected InstallHandler $installHandler,
+        protected RecentlyViewedHandler $recentlyViewedHandler,
+        protected ModuleRegistryHandler $moduleRegistryHandler,
     )
     {
-        $this->moduleNameMapper = $moduleNameMapper;
-        $this->systemConfigProvider = $systemConfigProvider;
-        $this->userPreferenceService = $userPreferenceService;
-        $this->navigationService = $navigationService;
-        $this->appStringsHandler = $appStringsHandler;
-        $this->appListStringsHandler = $appListStringsHandler;
-        $this->modStringsHandler = $modStringsHandler;
-        $this->themeImageService = $themeImageService;
-        $this->moduleMetadata = $moduleMetadata;
-        $this->security = $security;
-        $this->userHandler = $userHandler;
-        $this->adminPanelDefinitions = $adminPanelDefinitions;
-        $this->cache = $cache;
-        $this->cacheManager = $cacheManager;
-        $this->installHandler = $installHandler;
-        $this->recentlyViewedHandler = $recentlyViewedHandler;
-        $this->moduleRegistryHandler = $moduleRegistryHandler;
     }
 
     /**
@@ -273,17 +172,14 @@ class AppMetadataProvider implements AppMetadataProviderInterface
 
 
         $metadata->setNavigation([]);
+        $navigation = $this->getNavigation($userId);
         if (in_array('navigation', $exposed, true)) {
-            $navigation = $this->cache->get('app-metadata-navigation-' . $userId, function () {
-                return $this->navigationService->getNavbar()->toArray();
-            });
             $metadata->setNavigation($navigation);
         }
 
         $metadata->setModuleMetadata([]);
         $metadata->setMinimalModuleMetadata([]);
         if (in_array('moduleMetadata', $exposed, true)) {
-            $navigation = $this->navigationService->getNavbar();
             $moduleMetadata = $this->getModuleMetadata($moduleName, $navigation) ?? [];
             $metadata->setModuleMetadata($moduleMetadata);
         } elseif (in_array('minimalModuleMetadata', $exposed, true)) {
@@ -292,7 +188,6 @@ class AppMetadataProvider implements AppMetadataProviderInterface
 
         $metadata->setGlobalRecentlyViewedMetadata([]);
         if (in_array('globalRecentlyViewed', $exposed, true)) {
-            $navigation = $this->navigationService->getNavbar();
             $metadata->setGlobalRecentlyViewedMetadata($this->getGlobalRecentlyViewedMetadata($navigation));
         }
 
@@ -354,9 +249,12 @@ class AppMetadataProvider implements AppMetadataProviderInterface
     protected function getDefaultMetadataLanguage(): ?string
     {
         $language = $this->getDefaultLanguage();
-        $sessionLanguage = $this->userHandler->getSessionLanguage();
-        if (!empty($sessionLanguage)) {
-            $language = $sessionLanguage;
+
+        if ($this->security->isGranted('ROLE_USER')) {
+            $sessionLanguage = $this->userHandler->getSessionLanguage();
+            if (!empty($sessionLanguage)) {
+                $language = $sessionLanguage;
+            }
         }
 
         return $language;
@@ -480,13 +378,13 @@ class AppMetadataProvider implements AppMetadataProviderInterface
 
     /**
      * @param string $module
-     * @param Navbar $navigation
+     * @param array $navigation
      * @return array
      */
-    protected function getModuleMetadata(string $module, Navbar $navigation): array
+    protected function getModuleMetadata(string $module, array $navigation): array
     {
-        $max = $navigation->maxTabs;
-        $modules = $navigation->tabs ?? [];
+        $max = $navigation['maxTabs'];
+        $modules = $navigation['tabs'] ?? [];
 
         if (!in_array($module, $modules, true)) {
             $modules[] = $module;
@@ -499,7 +397,7 @@ class AppMetadataProvider implements AppMetadataProviderInterface
             'calendar' => true,
         ];
 
-        $type = $navigation->type ?? '';
+        $type = $navigation['type'] ?? '';
         if ($type === 'gm') {
             $groupedTabsModules = $this->getGroupedTabModules($navigation, $module);
 
@@ -525,6 +423,10 @@ class AppMetadataProvider implements AppMetadataProviderInterface
                 continue;
             }
 
+            if (!in_array($this->moduleNameMapper->toLegacy($module), $this->moduleRegistryHandler->getUserAccessibleModules())) {
+                continue;
+            }
+
             $moduleMetadata[$module] = $this->moduleMetadata->getMetadata($module)->toArray();
             if ($i >= $max) {
                 break;
@@ -543,7 +445,8 @@ class AppMetadataProvider implements AppMetadataProviderInterface
     {
         $modules = [
             $module,
-            'saved-search'
+            'saved-search',
+            'emails',
         ];
 
         $toExclude = [
@@ -557,11 +460,12 @@ class AppMetadataProvider implements AppMetadataProviderInterface
     }
 
     /**
+     * @param array $navigation
      * @return array
      */
-    protected function getGlobalRecentlyViewedMetadata(Navbar $navigation): array
+    protected function getGlobalRecentlyViewedMetadata(array $navigation): array
     {
-        $modules = $navigation->tabs ?? [];
+        $modules = $navigation['tabs'] ?? [];
         $legacyModuleNames = [];
         foreach ($modules as $module) {
             $legacyModuleNames[] = $this->moduleNameMapper->toLegacy($module);
@@ -616,13 +520,13 @@ class AppMetadataProvider implements AppMetadataProviderInterface
     }
 
     /**
-     * @param Navbar $navigation
+     * @param array $navigation
      * @param string $module
      * @return string[]
      */
-    protected function getGroupedTabModules(Navbar $navigation, string $module): array
+    protected function getGroupedTabModules(array $navigation, string $module): array
     {
-        $groupedTabs = $navigation->groupedTabs ?? [];
+        $groupedTabs = $navigation['groupedTabs'] ?? [];
         $groupedTabsModules = [];
 
         foreach ($groupedTabs as $groupedTab) {
@@ -731,5 +635,18 @@ class AppMetadataProvider implements AppMetadataProviderInterface
         }
 
         return $modules;
+    }
+
+    /**
+     * @param string $userId
+     * @return array
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    protected function getNavigation(string $userId): array
+    {
+        $navigation = $this->cache->get('app-metadata-navigation-' . $userId, function () {
+            return $this->navigationService->getNavbar()->toArray();
+        });
+        return $navigation ?? [];
     }
 }

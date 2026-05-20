@@ -121,7 +121,7 @@ form
 			<input type="hidden" name="guid" value="{$GUID}" />
 			<input type="hidden" name="key" value="{$KEY}" />
 			<input type="hidden" name="return_module" value="Home" />
-			<input type="hidden" name="login" value="1" />
+			<input type="hidden" name="redirect" value="1" />
 			<input type="hidden" name="is_admin" value="{$IS_ADMIN}" />
 			<input type="hidden" name="cant_login" id="cant_login" value="" />
 			<input type="hidden" name="old_password" id="old_password" value="" />

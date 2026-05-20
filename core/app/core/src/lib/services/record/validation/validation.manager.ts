@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,7 +26,11 @@
 
 import {Injectable} from '@angular/core';
 import {ValidatorInterface} from './validator.Interface';
-import {MapEntry, OverridableMap, Record, StringMap, StringMatrix, ViewFieldDefinition} from 'common';
+import {StringMatrix} from '../../../common/types/string-matrix';
+import {StringMap} from '../../../common/types/string-map';
+import {MapEntry, OverridableMap} from '../../../common/types/overridable-map';
+import {ViewFieldDefinition} from '../../../common/metadata/metadata.model';
+import {Record} from '../../../common/record/record.model';
 import {AsyncValidatorFn, ValidatorFn} from '@angular/forms';
 import {AsyncValidatorInterface} from './aync-validator.Interface';
 import {RequiredValidator} from './validators/required.validator';
@@ -41,6 +45,9 @@ import {RangeValidator} from './validators/range.validator';
 import {PrimaryEmailValidator} from './validators/primary-email.validator';
 import {DuplicateEmailValidator} from './validators/duplicate-email.validator';
 import {LineItemsRequiredValidator} from "./validators/line-items-required.validator";
+import {AsyncProcessValidator} from "./async-validators/async-process.validator";
+import {AttachmentValidator} from "./validators/attachment.validator";
+import {SemanticVersionValidator} from "./validators/semantic-version.validator";
 
 export interface ValidationManagerInterface {
     registerSaveValidator(module: string, key: string, validator: ValidatorInterface): void;
@@ -78,6 +85,7 @@ export class ValidationManager implements ValidationManagerInterface {
     };
 
     constructor(
+        protected asyncProcessValidator: AsyncProcessValidator,
         protected requiredValidator: RequiredValidator,
         protected rangeValidator: RangeValidator,
         protected currencyValidator: CurrencyValidator,
@@ -89,7 +97,9 @@ export class ValidationManager implements ValidationManagerInterface {
         protected phoneValidator: PhoneValidator,
         protected primaryEmailValidator: PrimaryEmailValidator,
         protected duplicateEmailValidator: DuplicateEmailValidator,
-        protected lineItemsRequiredValidator: LineItemsRequiredValidator
+        protected lineItemsRequiredValidator: LineItemsRequiredValidator,
+        protected attachmentValidator: AttachmentValidator,
+        protected semanticVersionValidator: SemanticVersionValidator
     ) {
 
         this.saveValidators = new OverridableMap<ValidatorInterface>();
@@ -98,6 +108,7 @@ export class ValidationManager implements ValidationManagerInterface {
         this.filterValidators = new OverridableMap<ValidatorInterface>();
 
         this.saveValidators.addEntry('default', this.getKey('required', 'all'), requiredValidator);
+        this.saveValidators.addEntry('default', this.getKey('semantic-version', 'all'), semanticVersionValidator);
         this.saveValidators.addEntry('default', this.getKey('range', 'all'), rangeValidator);
         this.saveValidators.addEntry('default', this.getKey('currency', 'all'), currencyValidator);
         this.saveValidators.addEntry('default', this.getKey('date', 'all'), dateValidator);
@@ -106,6 +117,7 @@ export class ValidationManager implements ValidationManagerInterface {
         this.saveValidators.addEntry('default', this.getKey('float', 'all'), floatValidator);
         this.saveValidators.addEntry('default', this.getKey('int', 'all'), intValidator);
         this.saveValidators.addEntry('default', this.getKey('phone', 'all'), phoneValidator);
+        this.saveValidators.addEntry('default', this.getKey('attachment', 'all'), attachmentValidator);
         this.itemFormArraySaveValidators.addEntry('default', this.getKey('primary-email', 'all'), primaryEmailValidator);
         this.itemFormArraySaveValidators.addEntry('default', this.getKey('duplicate-email', 'all'), duplicateEmailValidator);
         this.itemFormArraySaveValidators.addEntry('default', this.getKey('line-items-required', 'all'), lineItemsRequiredValidator);
@@ -195,6 +207,17 @@ export class ValidationManager implements ValidationManagerInterface {
             if (validator.applies(record, viewField)) {
                 validations.push(validator.getValidator(viewField, record));
             }
+        });
+
+        const definitionValidators = viewField?.fieldDefinition?.asyncValidators ?? null;
+
+        if (!definitionValidators){
+            return validations;
+        }
+
+        Object.keys(definitionValidators).forEach((key) => {
+            const validator = definitionValidators[key];
+            validations.push(this.asyncProcessValidator.getValidator(validator, viewField, record));
         });
 
         return validations;

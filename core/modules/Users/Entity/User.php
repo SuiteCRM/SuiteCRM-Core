@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -29,12 +29,17 @@
 namespace App\Module\Users\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GraphQl\Query;
 use App\Module\Users\Repository\UserRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
+use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
+use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
+use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -55,7 +60,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
     name: "idx_user_name",
     options: ['lengths' => [null, null, null, 30, 30]]
 )]
-class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface, BackupCodeInterface
 {
     #[ApiProperty(
         identifier: true,
@@ -69,7 +74,7 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 36,
         nullable: false,
-        options: ["fixed" => true, "collation" => "utf8_general_ci"]
+        options: ["fixed" => true]
     )]
     #[ORM\Id()]
     private string $id;
@@ -85,11 +90,12 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 60,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $user_name;
 
     #[ApiProperty(
+        readable: false,
+        writable: false,
         openapiContext: [
             'type' => 'string',
             'description' => 'The user hash'
@@ -100,11 +106,12 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 255,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $userHash;
 
     #[ApiProperty(
+        readable: false,
+        writable: false,
         openapiContext: [
             'type' => 'string',
             'description' => 'The system generated password hash'
@@ -113,7 +120,8 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
     #[ORM\Column(
         name: "system_generated_password",
         type: "boolean",
-        nullable: true
+        length: 1,
+        nullable: true,
     )]
     private ?bool $systemGeneratedPassword;
 
@@ -141,7 +149,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 100,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $authenticateId;
 
@@ -154,8 +161,9 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
     #[ORM\Column(
         name: "sugar_login",
         type: "boolean",
+        length: 1,
         nullable: true,
-        options: ["default" => "1"]
+        options: ["default" => 1]
     )]
     private ?bool $sugarLogin = true;
 
@@ -169,8 +177,7 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         name: "first_name",
         type: "string",
         length: 255,
-        nullable: true,
-        options: ["collation" => "utf8_general_ci"]
+        nullable: true
     )]
     private ?string $firstName;
 
@@ -184,8 +191,7 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         name: "last_name",
         type: "string",
         length: 255,
-        nullable: true,
-        options: ["collation" => "utf8_general_ci"]
+        nullable: true
     )]
     private ?string $lastName;
 
@@ -199,9 +205,10 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         name: "is_admin",
         type: "boolean",
         nullable: true,
-        options: ["default" => "0"]
+        length: 1,
+        options: ["default" => 0]
     )]
-    private string|bool|null $isAdmin = '0';
+    private ?bool $isAdmin = false;
 
     #[ApiProperty(
         openapiContext: [
@@ -213,9 +220,10 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         name: "external_auth_only",
         type: "boolean",
         nullable: true,
-        options: ["default" => "0"]
+        length: 1,
+        options: ["default" => 0]
     )]
-    private string|bool|null $externalAuthOnly = '0';
+    private ?bool $externalAuthOnly = false;
 
     #[ApiProperty(
         openapiContext: [
@@ -227,7 +235,8 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         name: "receive_notifications",
         type: "boolean",
         nullable: true,
-        options: ["default" => "1"]
+        length: 1,
+        options: ["default" => 1]
     )]
     private ?bool $receiveNotifications = true;
 
@@ -242,7 +251,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "text",
         length: 65535,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $description;
 
@@ -283,7 +291,7 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 36,
         nullable: true,
-        options: ["fixed" => true, "collation" => "utf8_general_ci"]
+        options: ["fixed" => true]
     )]
     private ?string $modifiedUserId;
 
@@ -298,7 +306,7 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 36,
         nullable: true,
-        options: ["fixed" => true, "collation" => "utf8_general_ci"]
+        options: ["fixed" => true]
     )]
     private ?string $createdBy;
 
@@ -313,7 +321,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 50,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $title;
 
@@ -328,7 +335,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 255,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $photo;
 
@@ -343,7 +349,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 50,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $department;
 
@@ -358,7 +363,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 50,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $phoneHome;
 
@@ -373,7 +377,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 50,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $phoneMobile;
 
@@ -388,7 +391,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 50,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $phoneWork;
 
@@ -403,7 +405,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 50,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $phoneOther;
 
@@ -418,7 +419,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 50,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $phoneFax;
 
@@ -433,7 +433,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 100,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $status;
 
@@ -448,7 +447,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 150,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $addressStreet;
 
@@ -463,7 +461,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 100,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $addressCity;
 
@@ -478,7 +475,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 100,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $addressState;
 
@@ -493,7 +489,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 100,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $addressCountry;
 
@@ -508,7 +503,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 20,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $addressPostalcode;
 
@@ -521,9 +515,10 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
     #[ORM\Column(
         name: "deleted",
         type: "boolean",
-        nullable: true
+        length: 1,
+        nullable: true,
     )]
-    private ?bool $deleted;
+    private ?bool $deleted = false;
 
     #[ApiProperty(
         openapiContext: [
@@ -535,9 +530,10 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         name: "portal_only",
         type: "boolean",
         nullable: true,
-        options: ["default" => "0"]
+        length: 1,
+        options: ["default" => 0]
     )]
-    private string|bool|null $portalOnly = '0';
+    private ?bool $portalOnly = false;
 
     #[ApiProperty(
         openapiContext: [
@@ -548,8 +544,9 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
     #[ORM\Column(
         name: "show_on_employees",
         type: "boolean",
+        length: 1,
         nullable: true,
-        options: ["default" => "1"]
+        options: ["default" => 1]
     )]
     private ?bool $showOnEmployees = true;
 
@@ -564,7 +561,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 100,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $employeeStatus;
 
@@ -579,7 +575,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 100,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $messengerId;
 
@@ -594,7 +589,6 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 100,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $messengerType;
 
@@ -609,7 +603,7 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 36,
         nullable: true,
-        options: ["fixed" => true, "collation" => "utf8_general_ci"]
+        options: ["fixed" => true]
     )]
     private ?string $reportsToId;
 
@@ -627,6 +621,7 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
     #[ORM\Column(
         name: "is_group",
         type: "boolean",
+        length: 1,
         nullable: true
     )]
     private ?bool $isGroup;
@@ -655,9 +650,33 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         type: "string",
         length: 255,
         nullable: true,
-        options: ["collation" => "utf8_general_ci"]
     )]
     private ?string $factorAuthInterface;
+
+    #[ApiProperty(
+        readable: false,
+        writable: false,
+        openapiContext: [
+            'type' => 'string',
+            'description' => 'totp secret',
+        ]
+    )]
+    #[ORM\Column(name: "totp_secret", type: 'string', length: 255, nullable: true)]
+    private ?string $totpSecret;
+
+    #[ORM\Column(
+        name: "is_totp_enabled",
+        type: "boolean",
+        nullable: true
+    )]
+    private ?bool $isTotpEnabled = false;
+
+    #[ORM\Column(
+        name: "backup_codes",
+        type: "json",
+        nullable: true
+    )]
+    private ?array $backupCodes = [];
 
     /**
      * @see UserInterface
@@ -665,6 +684,10 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
     public function getRoles(): array
     {
         $roles[] = 'ROLE_USER';
+
+        if ($this->getIsAdmin()) {
+            $roles[] = 'ROLE_ADMIN';
+        }
 
         return array_unique($roles);
     }
@@ -685,6 +708,10 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         $this->id = $id;
     }
 
+    #[ApiProperty(
+        readable: false,
+        writable: false
+    )]
     public function getSystemGeneratedPassword(): ?bool
     {
         return $this->systemGeneratedPassword ?? null;
@@ -757,6 +784,9 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         return $this;
     }
 
+    #[ApiProperty(
+        writable: false
+    )]
     public function getIsAdmin(): ?bool
     {
         return $this->isAdmin ?? null;
@@ -1141,9 +1171,28 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         return $this;
     }
 
+    #[ApiProperty(
+        readable: false,
+        writable: false
+    )]
+    public function getBackupCodes(): array
+    {
+        return $this->backupCodes ?? [];
+    }
+
+    public function setBackupCodes(?array $backupCodes): self
+    {
+        $this->backupCodes = $backupCodes ?? [];
+        return $this;
+    }
+
     /**
      * @inheritDoc
      */
+    #[ApiProperty(
+        readable: false,
+        writable: false
+    )]
     public function getSalt(): ?string
     {
         return null;
@@ -1177,14 +1226,23 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
         return true;
     }
 
+
     /**
      * @inheritDoc
      */
+    #[ApiProperty(
+        readable: false,
+        writable: false
+    )]
     public function getPassword(): ?string
     {
         return $this->getUserHash();
     }
 
+    #[ApiProperty(
+        readable: false,
+        writable: false
+    )]
     public function getUserHash(): ?string
     {
         return $this->userHash ?? null;
@@ -1218,4 +1276,82 @@ class User implements UserInterface, EquatableInterface, PasswordAuthenticatedUs
     {
         return $this->getUserName();
     }
+
+    public function isTotpAuthenticationEnabled(): bool
+    {
+        return !empty($this->getTotpSecret()) && $this->getIsTotpEnabled();
+    }
+
+    public function getTotpAuthenticationUsername(): string
+    {
+        return $this->getUserName();
+    }
+
+    #[ApiProperty(
+        readable: false,
+        writable: false
+    )]
+    public function getTotpAuthenticationConfiguration(): ?TotpConfigurationInterface
+    {
+        return new TotpConfiguration($this->getTotpSecret(), TotpConfiguration::ALGORITHM_SHA1, 30, 6);
+    }
+
+    #[ApiProperty(
+        readable: false,
+        writable: false
+    )]
+    public function getTotpSecret(): ?string
+    {
+        return $this->totpSecret ?? '';
+    }
+
+    public function setTotpSecret(?string $totpSecret): self
+    {
+        $this->totpSecret = $totpSecret;
+
+        return $this;
+    }
+
+    public function getIsTotpEnabled(): ?bool
+    {
+        return $this->isTotpEnabled ?? false;
+    }
+
+    public function setIsTotpEnabled(?bool $isTotpEnabled): self
+    {
+        $this->isTotpEnabled = $isTotpEnabled;
+
+        return $this;
+    }
+
+    /**
+     * Check if it is a valid backup code.
+     */
+    public function isBackupCode(string $code): bool
+    {
+        $correctCode = false;
+        $backupCodes = $this->getBackupCodes();
+
+        if (in_array($code, $backupCodes, true)) {
+            $correctCode = true;
+            $this->invalidateBackupCode($code);
+        }
+
+        return $correctCode;
+    }
+
+    /**
+     * Invalidate a backup code
+     */
+    public function invalidateBackupCode(string $code): void
+    {
+        $backupCodes = $this->getBackupCodes();
+        $key = array_search($code, $backupCodes, true);
+        if ($key !== false) {
+            unset($backupCodes[$key]);
+        }
+
+        $this->setBackupCodes(array_values($backupCodes));
+    }
+
 }

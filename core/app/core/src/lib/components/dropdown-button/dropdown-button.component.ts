@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,15 +24,15 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {
-    ButtonInterface,
-    deepClone,
-    DropdownButtonInterface,
-    DropdownButtonSection,
-    DropdownButtonSectionMap,
-    emptyObject
-} from 'common';
+    ChangeDetectionStrategy,
+    Component, ElementRef, HostListener,
+    Input,
+    OnInit, ViewChild,
+} from '@angular/core';
+import {deepClone, emptyObject} from '../../common/utils/object-utils';
+import {ButtonInterface} from '../../common/components/button/button.model';
+import {DropdownButtonInterface, DropdownButtonSection, DropdownButtonSectionMap} from '../../common/components/button/dropdown-button.model';
 import {NgbDropdown} from '@ng-bootstrap/ng-bootstrap';
 import {PlacementArray} from '@ng-bootstrap/ng-bootstrap/util/positioning';
 import {LanguageStore} from '../../store/language/language.store';
@@ -49,6 +49,16 @@ export class DropdownButtonComponent implements OnInit {
     @Input() config: DropdownButtonInterface;
     @Input() disabled = false;
     @Input() autoClose: boolean | 'outside' | 'inside' = true;
+
+    @ViewChild('dropdownButtonDiv') dropdownButtonDiv: ElementRef;
+    @ViewChild('dropDown') dropdown: NgbDropdown;
+
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: Event) {
+        if (!this.dropdownButtonDiv.nativeElement.contains(event.target)) {
+            this.dropdown.close();
+        }
+    }
 
     sections: DropdownButtonSection[] = [];
     sectionsEnabled: boolean = false;

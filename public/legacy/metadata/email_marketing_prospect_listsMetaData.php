@@ -85,8 +85,22 @@ $dictionary['email_marketing_prospect_lists'] = array(
                                 'prospect_list_id'
                         )
         ),
+        array(
+            'name' => 'idx_prospect_list_id',
+            'type' => 'index',
+            'fields' => array(
+                'prospect_list_id',
+            )
+        ),
+        array(
+            'name' => 'idx_email_marketing_id',
+            'type' => 'index',
+            'fields' => array(
+                'email_marketing_id',
+            )
+        ),
     ),
-    
+
     'relationships' => array(
         'email_marketing_prospect_lists' => array(
                                             'lhs_module'=> 'EmailMarketing',

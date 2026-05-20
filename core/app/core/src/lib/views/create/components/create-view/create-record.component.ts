@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,17 +24,24 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit, Type} from '@angular/core';
 import {combineLatestWith, Observable, Subscription} from 'rxjs';
 import {ActivatedRoute, Params} from '@angular/router';
 import {CreateViewStore} from '../../store/create-view/create-view.store';
 import {RecordViewStore} from '../../../record/store/record-view/record-view.store';
 import {RecordViewModel} from '../../../record/store/record-view/record-view.store.model';
 import {AppStateStore} from '../../../../store/app-state/app-state.store';
-import {Action, ActionContext, ViewContext, ViewMode} from 'common';
+import {Action, ActionContext} from '../../../../common/actions/action.model';
+import {ViewContext, ViewMode} from '../../../../common/views/view.model';
 import {RecordActionsAdapter} from "../../../record/adapters/actions.adapter";
+import {RecordPaginationStore} from "../../../record/store/record-pagination/record-pagination.store";
+import {RecordSectionTabActionsAdapter} from "../../../record/adapters/section-tab-actions.adapter";
 import {RecordViewSidebarWidgetService} from "../../../record/services/record-view-sidebar-widget.service";
 import {filter, map} from "rxjs/operators";
+import {
+    BaseRecordHeaderComponent
+} from "../../../record/components/record-header/base-record-header/base-record-header.component";
+import {RecordHeaderRegistry} from "../../../record/components/record-header/record-header.registry";
 
 @Component({
     selector: 'scrm-create-record',
@@ -47,7 +54,9 @@ import {filter, map} from "rxjs/operators";
             provide: RecordViewStore,
             useExisting: CreateViewStore
         },
-        RecordViewSidebarWidgetService
+        RecordViewSidebarWidgetService,
+        RecordPaginationStore,
+        RecordSectionTabActionsAdapter
     ]
 })
 export class CreateRecordComponent implements OnInit, OnDestroy {
@@ -56,8 +65,9 @@ export class CreateRecordComponent implements OnInit, OnDestroy {
     showStatusBar = false;
     saveAction: Action;
     context: ActionContext;
+    recordHeaderComponent: Type<BaseRecordHeaderComponent>;
 
-    actionConfig$ =  this.recordStore.mode$.pipe(
+    actionConfig$ = this.recordStore.mode$.pipe(
         combineLatestWith(
             this.actionsAdapter.getActions(),
             this.getViewContext$()),
@@ -81,8 +91,10 @@ export class CreateRecordComponent implements OnInit, OnDestroy {
         protected appState: AppStateStore,
         protected recordStore: CreateViewStore,
         protected actionsAdapter: RecordActionsAdapter,
-        private route: ActivatedRoute
-    ) {}
+        private route: ActivatedRoute,
+        protected recordHeaderRegistry: RecordHeaderRegistry
+    ) {
+    }
 
     ngOnInit(): void {
         let mode = 'detail' as ViewMode;
@@ -123,6 +135,8 @@ export class CreateRecordComponent implements OnInit, OnDestroy {
                 });
             })
         );
+
+        this.initHeaderModuleComponentType();
     }
 
     getViewContext$(): Observable<ViewContext> {
@@ -133,5 +147,13 @@ export class CreateRecordComponent implements OnInit, OnDestroy {
         this.subs.forEach(sub => sub.unsubscribe());
 
         this.recordStore.destroy();
+    }
+
+    protected initHeaderModuleComponentType() {
+        let headerModule = 'default';
+        if (this.recordHeaderRegistry.has(this.appState.getModule(), 'default')) {
+            headerModule = this.appState.getModule();
+        }
+        this.recordHeaderComponent = this.recordHeaderRegistry.get(headerModule, 'default');
     }
 }

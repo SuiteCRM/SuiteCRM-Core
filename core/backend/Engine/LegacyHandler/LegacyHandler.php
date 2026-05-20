@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -116,6 +116,9 @@ abstract class LegacyHandler
 
         $this->startSession();
 
+        // force legacy dir
+        chdir($this->legacyDir);
+
         $this->state->setActiveScope($this->getHandlerKey());
     }
 
@@ -148,6 +151,16 @@ abstract class LegacyHandler
         $this->state->setLegacyBootstrapped(true);
 
         return true;
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->projectDir;
+    }
+
+    public function setProjectDir(string $projectDir): void
+    {
+        $this->projectDir = $projectDir;
     }
 
     /**
@@ -207,7 +220,7 @@ abstract class LegacyHandler
         /* @noinspection PhpIncludeInspection */
         require_once 'include/MVC/SugarApplication.php';
 
-        global $sugar_config;
+        global $sugar_config, $current_user;
 
         $app = new SugarApplication();
 
@@ -227,7 +240,9 @@ abstract class LegacyHandler
         $app->controller = $controller;
         // If the entry point is defined to not need auth, then don't authenticate.
         if (empty($_REQUEST['entryPoint']) || $controller->checkEntryPointRequiresAuth($_REQUEST['entryPoint'])) {
-            $app->loadUser();
+            if (empty($current_user->id)) {
+                $app->loadUser();
+            }
             $app->ACLFilter();
             $app->preProcess();
             $controller->preProcess();

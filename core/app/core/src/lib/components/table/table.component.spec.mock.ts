@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,19 +26,13 @@
 
 import {Observable, of} from 'rxjs';
 import {shareReplay} from 'rxjs/operators';
-import {
-    BulkAction,
-    BulkActionsMap,
-    ColumnDefinition,
-    PaginationCount,
-    PaginationDataSource,
-    Record,
-    RecordSelection,
-    SelectionDataSource,
-    SelectionStatus,
-    SortDirection,
-    SortingSelection
-} from 'common';
+import {BulkAction, BulkActionsMap} from '../../common/actions/bulk-action.model';
+import {ColumnDefinition} from '../../common/metadata/list.metadata.model';
+import {PaginationDataSource} from '../../common/components/pagination/pagination.model';
+import {PaginationCount, SortDirection, SortingSelection} from '../../common/views/list/list-navigation.model';
+import {Record} from '../../common/record/record.model';
+import {RecordSelection, SelectionStatus} from '../../common/views/list/record-selection.model';
+import {SelectionDataSource} from '../../common/views/list/selection.model';
 import {DataSource} from '@angular/cdk/collections';
 import {BulkActionDataSource} from '../bulk-action-menu/bulk-action-menu.component';
 import {TableConfig} from './table.model';

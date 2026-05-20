@@ -123,7 +123,7 @@ $viewdefs = array(
             ),
             1 =>
             array(
-              'name' => 'found_in_release',
+              'name' => 'release_name',
             ),
           ),
           4 =>

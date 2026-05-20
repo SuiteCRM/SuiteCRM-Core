@@ -41,36 +41,390 @@ if (!defined('sugarEntry') || !sugarEntry) {
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
+$viewdefs['Schedulers'] = [
+    'ListView' =>  [
+        'sidebarWidgets' => [
+            'scheduler-info' => [
+                'type' => 'statistics',
+                'modes' => ['detail'],
+                'allowCollapse' => true,
+                'labelKey' => 'LBL_SCHEDULERS_INFO',
+                'options' => [
+                    'sidebarStatistic' => [
+                        'rows' => [
+                            [
+                                'display' => 'none',
+                                'cols' => [
+                                    [
+                                        'statistic' => 'scheduler-cron-last-run',
+                                    ]
+                                ]
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'labelKey' => 'LBL_CRON_LAST_USER_TO_RUN',
+                                        'hideIfLoading' => true,
+                                        'class' => 'scheduler-sidebar-header',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'class' => 'scheduler-status-row-value',
+                                        'dynamicLabel' => 'LBL_LAST_USER_RUN_VALUE',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'labelKey' => 'LBL_CRON_LAST_RUN',
+                                        'hideIfLoading' => true,
+                                        'class' => 'scheduler-sidebar-header',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'labelKey' => 'LBL_RUN_USER_INVALID',
+                                        'hideIfLoading' => true,
+                                        'class' => 'cron-label',
+                                        'activeOnFields' => [
+                                            'validUser' => [
+                                                [
+                                                    'operator' => 'is-false',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_LAST_RUN_VALUE',
+                                        'class' => 'scheduler-status-row-value',
+                                        'activeOnFields' => [
+                                            'validUser' => [
+                                                [
+                                                    'operator' => 'is-true',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'class' => 'cron-label pt-1',
+                                        'dynamicLabel' => 'LBL_LAST_RUN_VALUE',
+                                        'activeOnFields' => [
+                                            'validUser' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'noUser',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                        ]
+                    ]
+                ],
+            ],
+            'scheduler-widget' => [
+                'type' => 'statistics',
+                'modes' => ['detail'],
+                'allowCollapse' => true,
+                'labelKey' => 'LBL_CRON_SETUP',
+                'options' => [
+                    'sidebarStatistic' => [
+                        'rows' => [
+                            [
+                                'display' => 'none',
+                                'cols' => [
+                                    [
+                                        'statistic' => 'scheduler-cron-setup-widget',
+                                    ]
+                                ]
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_LINUX_DESC1_DYNAMIC',
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Unix',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_LINUX_DESC2_DYNAMIC',
+                                        'class' => 'pt-2',
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Unix',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_LINUX_DESC3_DYNAMIC',
+                                        'class' => 'cron-code-label pt-2 pb-2',
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Unix',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_LINUX_DESC4_DYNAMIC',
+                                        'hideIfLoading' => true,
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Unix',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_LINUX_DESC5_DYNAMIC',
+                                        'hideIfLoading' => true,
+                                        'class' => 'cron-code-label pb-2 pt-2',
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Unix',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_LINUX_DESC6_DYNAMIC',
+                                        'hideIfLoading' => true,
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Unix',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_LINUX_DESC7_DYNAMIC',
+                                        'hideIfLoading' => true,
+                                        'class' => 'cron-code-label pt-2',
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Unix',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_LINUX_DESC8_DYNAMIC',
+                                        'hideIfLoading' => true,
+                                        'class' => 'cron-label pt-2',
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Unix',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_WIN_DESC1_DYNAMIC',
+                                        'hideIfLoading' => true,
+                                        'class' => 'cron-label',
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Windows',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_WIN_DESC2_DYNAMIC',
+                                        'hideIfLoading' => true,
+                                        'class' => 'cron-label pt-2',
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Windows',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_WIN_DESC3_DYNAMIC',
+                                        'hideIfLoading' => true,
+                                        'class' => 'cron-code-label pt-1',
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Windows',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_WIN_DESC4_DYNAMIC',
+                                        'class' => 'cron-code-label',
+                                        'hideIfLoading' => true,
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Windows',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                            [
+                                'justify' => 'start',
+                                'cols' => [
+                                    [
+                                        'dynamicLabel' => 'LBL_CRON_WIN_DESC5_DYNAMIC',
+                                        'class' => 'cron-label pt-1',
+                                        'hideIfLoading' => true,
+                                        'activeOnFields' => [
+                                            'type' => [
+                                                [
+                                                    'operator' => 'is-equal',
+                                                    'value' => 'Windows',
+                                                ],
+                                            ],
+                                        ]
+                                    ],
+                                ],
+                            ],
+                        ]
+                    ]
+                ],
+            ],
+        ],
+        'bulkActions' => [
+            'exclude' => [
+                'merge',
+            ]
+        ]
+    ]
+];
 
-$listViewDefs ['Schedulers'] =
-array(
-  'NAME' =>
-  array(
-    'width' => '35%',
-    'label' => 'LBL_LIST_NAME',
-    'link' => true,
-    'sortable' => true,
-    'default' => true,
-  ),
-  'JOB_INTERVAL' =>
-  array(
-    'width' => '20%',
-    'label' => 'LBL_LIST_JOB_INTERVAL',
-    'default' => true,
-    'sortable' => false,
-  ),
-  'DATE_TIME_START' =>
-  array(
-    'width' => '25%',
-    'label' => 'LBL_LIST_RANGE',
-    'customCode' => '{$DATE_TIME_START} - {$DATE_TIME_END}',
-    'default' => true,
-    'related_fields' => array('date_time_end'),
-  ),
-  'STATUS' =>
-  array(
-    'width' => '15%',
-    'label' => 'LBL_LIST_STATUS',
-    'default' => true,
-  ),
-);
+$listViewDefs ['Schedulers'] = [
+    'NAME' => [
+        'width' => '35%',
+        'label' => 'LBL_LIST_NAME',
+        'link' => true,
+        'sortable' => true,
+        'default' => true,
+    ],
+    'JOB_INTERVAL' => [
+        'width' => '20%',
+        'label' => 'LBL_LIST_JOB_INTERVAL',
+        'default' => true,
+        'sortable' => false,
+    ],
+    'DATE_TIME_START' => [
+        'width' => '25%',
+        'label' => 'LBL_LIST_RANGE',
+        'customCode' => '{$DATE_TIME_START} - {$DATE_TIME_END}',
+        'type' => 'varchar',
+        'default' => true,
+        'related_fields' => ['date_time_end'],
+    ],
+    'STATUS' => [
+        'width' => '15%',
+        'label' => 'LBL_LIST_STATUS',
+        'default' => true,
+    ],
+];

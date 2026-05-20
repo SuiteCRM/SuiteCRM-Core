@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -27,10 +27,9 @@
 import { ComponentFixture, TestBed, inject, waitForAsync } from '@angular/core/testing';
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import {RouterTestingModule} from '@angular/router/testing';
-import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
-
-
+import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {LogoUiComponent} from './logo.component';
+import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 describe('LogoComponent', () => {
     let component: LogoUiComponent;
@@ -38,10 +37,11 @@ describe('LogoComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            schemas: [CUSTOM_ELEMENTS_SCHEMA],
-            imports: [RouterTestingModule, HttpClientTestingModule],
-            declarations: [LogoUiComponent]
-        })
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    declarations: [LogoUiComponent],
+    imports: [RouterTestingModule],
+    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+})
             .compileComponents();
     }));
 

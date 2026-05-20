@@ -45,7 +45,7 @@ if (!defined('sugarEntry') || !sugarEntry) {
 
 require_once("include/JSON.php");
 
-
+#[\AllowDynamicProperties]
 class SugarEmailAddress extends SugarBean
 {
     const ERR_INVALID_REQUEST_NO_USER_PROFILE_PAGE_SAVE_ACTION = 1;
@@ -192,7 +192,7 @@ class SugarEmailAddress extends SugarBean
         'Users',
         'Employees'
     );
-    
+
     /**
      * For saveAtUserProfile() method to telling what
      * went wrong at the last call.
@@ -454,47 +454,23 @@ class SugarEmailAddress extends SugarBean
             return false;
         }
 
-        // do we have to update the address?
-
-        if ($email->email_address != $address) {
-            $_address = $db->quote($address);
-            $_addressCaps = $db->quote(strtoupper($address));
-            $_id = $db->quoted($id);
-            $query =
-                "UPDATE email_addresses 
-                  SET 
-                    email_address = '$_address', 
-                    email_address_caps = '$_addressCaps' 
-                  WHERE 
-                    id = {$_id} AND
-                    deleted = 0";
-            $result = $db->query($query);
-            if (!$result) {
-                $GLOBALS['log']->warn("Undefined behavior: Missing error information about email save (1)");
-            }
-            if ($db->getAffectedRowCount($result) != 1) {
-                $GLOBALS['log']->debug("Email address has not change");
-            }
-        }
-
         // update primary and replyTo
-
         $_primary = (bool)$primary ? '1' : '0';
         $_replyTo = (bool)$replyTo ? '1' : '0';
         $_id = $db->quoted($id);
         $query =
-            "UPDATE email_addr_bean_rel 
-              SET 
-                primary_address = '{$_primary}', 
-                reply_to_address = '{$_replyTo}' 
-              WHERE 
-                email_address_id = {$_id} AND             
-                bean_module = 'Users' AND 
+            "UPDATE email_addr_bean_rel
+              SET
+                primary_address = '{$_primary}',
+                reply_to_address = '{$_replyTo}'
+              WHERE
+                email_address_id = {$_id} AND
+                bean_module = 'Users' AND
                 bean_id = '{$current_user->id}' AND
                 deleted = 0";
         $result = $db->query($query);
         if (!$result) {
-            $GLOBALS['log']->warn("Undefined behavior: Missing error information about email save (2)");
+            $GLOBALS['log']->warn("Undefined behavior: Missing error information about email save");
         }
         if ($db->getAffectedRowCount($result) != 1) {
             $GLOBALS['log']->debug("Primary or reply-to Email address has not change");
@@ -549,6 +525,15 @@ class SugarEmailAddress extends SugarBean
         $module_dir = $this->getCorrectedModule($bean->module_dir);
         $this->addresses = $this->getAddressesByGUID($bean->id, $module_dir);
         $this->populateLegacyFields($bean);
+
+        if (empty($bean->fetched_row)){
+            return;
+        }
+
+        if ($bean->fetched_row === false) {
+            $bean->fetched_row = [];
+        }
+
         if (isset($bean->email1) && !isset($bean->fetched_row['email1'])) {
             $bean->fetched_row['email1'] = $bean->email1;
         }
@@ -867,10 +852,7 @@ class SugarEmailAddress extends SugarBean
         $optOut = ''
     ) {
         if (!is_array($new_addrs)) {
-            $GLOBALS['log']->fatal(
-                'Invalid Argument: new address should be an array of strings, ' .
-                gettype($new_addrs) . ' given.'
-            );
+            $new_addrs = array($new_addrs);
         }
         $module = $this->getCorrectedModule($module);
         //One last check for the ConvertLead action in which case we need to change $module to 'Leads'
@@ -1078,6 +1060,11 @@ class SugarEmailAddress extends SugarBean
         $optIn = null
     ) {
         $addr = html_entity_decode($addr, ENT_QUOTES);
+
+        if (empty($addr)) {
+            return;
+        }
+
         if (preg_match($this->regex, $addr)) {
             $primaryFlag = ($primary) ? '1' : '0';
             $replyToFlag = ($replyTo) ? '1' : '0';
@@ -1150,10 +1137,10 @@ class SugarEmailAddress extends SugarBean
                         $id = $this->db->quote($a['id']);
 
                         $qUpdate = /** @lang sql */
-                            "UPDATE email_addresses SET 
-                              invalid_email = {$addressMetaInvalidEmailInt}, 
-                              opt_out = {$addressMetaOptOutInt}, 
-                              date_modified = '{$now}' 
+                            "UPDATE email_addresses SET
+                              invalid_email = {$addressMetaInvalidEmailInt},
+                              opt_out = {$addressMetaOptOutInt},
+                              date_modified = '{$now}'
                             WHERE id = '{$id}'";
 
                         $this->db->query($qUpdate);
@@ -1165,6 +1152,10 @@ class SugarEmailAddress extends SugarBean
 
     public function splitEmailAddress($addr)
     {
+        if ($addr === null) {
+            $addr = '';
+        }
+
         $email = $this->_cleanAddress($addr);
         if (!preg_match($this->regex, $email)) {
             $email = ''; // remove bad email addr
@@ -1465,7 +1456,7 @@ class SugarEmailAddress extends SugarBean
         $return = array();
         $module = $this->getCorrectedModule($module);
 
-        $q = "SELECT 
+        $q = "SELECT
                     ea.email_address,
                     ea.email_address_caps,
                     ea.invalid_email,
@@ -1481,7 +1472,7 @@ class SugarEmailAddress extends SugarBean
                     ear.reply_to_address,
                     ear.deleted
                 FROM email_addresses ea LEFT JOIN email_addr_bean_rel ear ON ea.id = ear.email_address_id
-                WHERE 
+                WHERE
                     ear.bean_module = '" . $this->db->quote($module) . "'
                     AND ear.bean_id = '" . $this->db->quote($id) . "'
                     AND ear.deleted = 0

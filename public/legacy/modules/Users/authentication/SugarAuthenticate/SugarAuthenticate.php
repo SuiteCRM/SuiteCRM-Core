@@ -214,7 +214,7 @@ class SugarAuthenticate
         require_once 'include/TemplateHandler/TemplateHandler.php';
         TemplateHandler::clearAll();
 
-        if (str_contains($sugar_config['disabled_languages'] ?? '', $authenticated_user_language)){
+        if (!empty($sugar_config['disabled_languages']) && str_contains($sugar_config['disabled_languages'] ?? '', $authenticated_user_language)){
             $authenticated_user_language = $sugar_config['default_language'];
         }
 
@@ -622,7 +622,18 @@ class SugarAuthenticate
      */
     public function redirectToLogin(SugarApplication $app)
     {
-        $loginVars = $app->createLoginVars();
-        SugarApplication::redirect('index.php?action=Login&module=Users' . $loginVars);
+        $returnUrl = $_SERVER['REQUEST_URI'];
+
+        $legacyCheck = explode('legacy/', $returnUrl);
+        $base = count($legacyCheck) > 1 ? $legacyCheck[0] : $returnUrl;
+
+        $epCheck = explode('ep/', $base);
+        $base = count($epCheck) > 1 ? $epCheck[0] : $base;
+
+        // Strip any query string from $base so the login URL is always well-formed.
+        // $returnUrl retains the full original URI including query params.
+        $base = strtok($base, '?');
+
+        SugarApplication::redirect($base . '?return_url=' . urlencode($returnUrl) . '#/Login');
     }
 }

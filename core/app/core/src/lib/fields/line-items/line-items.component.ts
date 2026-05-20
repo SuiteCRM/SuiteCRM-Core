@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -29,10 +29,12 @@ import {DataTypeFormatter} from '../../services/formatters/data-type.formatter.s
 import {RecordManager} from '../../services/record/record.manager';
 import {FieldLogicManager} from '../field-logic/field-logic.manager';
 import {BaseLineItemsComponent} from '../base/base-line-items.component';
-import {ButtonInterface, EDITABLE_VIEW_MODES, ObjectMap, ViewMode} from 'common';
+import {ObjectMap} from '../../common/types/object-map';
+import {ButtonInterface} from '../../common/components/button/button.model';
 import {FieldManager} from '../../services/record/field/field.manager';
 import {FieldRegistry} from '../field.registry';
 import {FieldLogicDisplayManager} from '../field-logic-display/field-logic-display.manager';
+import {ViewMode} from "../../common/views/view.model";
 
 @Component({
     selector: 'scrm-line-items-field',
@@ -57,7 +59,7 @@ export class LineItemsComponent extends BaseLineItemsComponent {
 
         this.field.metadata = this?.field?.metadata ?? {};
         const emptyItemInitialized = this?.field?.metadata?.emptyItemInitialized ?? false;
-        if (['create'].includes(this.originalMode as ViewMode) && !emptyItemInitialized) {
+        if (['create', 'edit'].includes(this.originalMode as ViewMode) && !emptyItemInitialized) {
             this.initEmptyItem();
             this.field.metadata.emptyItemInitialized = true;
         }

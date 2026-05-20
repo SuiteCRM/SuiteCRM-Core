@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,7 +25,12 @@
  */
 
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {AttributeMap, ButtonInterface, deepClone, Field, ObjectMap, Record} from 'common';
+import {AttributeMap} from '../../../../common/record/record.model';
+import {deepClone} from '../../../../common/utils/object-utils';
+import {ObjectMap} from '../../../../common/types/object-map';
+import {Field} from '../../../../common/record/field.model';
+import {Record} from '../../../../common/record/record.model';
+import {ButtonInterface} from '../../../../common/components/button/button.model';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ModuleNameMapper} from '../../../../services/navigation/module-name-mapper/module-name-mapper.service';
 import {DataTypeFormatter} from '../../../../services/formatters/data-type.formatter.service';
@@ -41,8 +46,9 @@ import {
 import {FieldLogicManager} from '../../../field-logic/field-logic.manager';
 import {SavedFilter} from '../../../../store/saved-filters/saved-filter.model';
 import {FieldLogicDisplayManager} from '../../../field-logic-display/field-logic-display.manager';
-import {map, take} from "rxjs/operators";
+import {debounceTime, map, take} from "rxjs/operators";
 import {MultiSelect} from "primeng/multiselect";
+import {SystemConfigStore} from "../../../../store/system-config/system-config.store";
 
 @Component({
     selector: 'scrm-relate-filter',
@@ -73,6 +79,7 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
      * @param {object} modalService service
      * @param {object} logic
      * @param {object} logicDisplay
+     * @param config
      */
     constructor(
         protected languages: LanguageStore,
@@ -81,9 +88,10 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
         protected moduleNameMapper: ModuleNameMapper,
         protected modalService: NgbModal,
         protected logic: FieldLogicManager,
-        protected logicDisplay: FieldLogicDisplayManager
+        protected logicDisplay: FieldLogicDisplayManager,
+        protected config: SystemConfigStore
     ) {
-        super(languages, typeFormatter, relateService, moduleNameMapper, logic, logicDisplay);
+        super(languages, typeFormatter, relateService, moduleNameMapper, logic, logicDisplay, config);
 
         this.selectButton = {
             klass: ['btn', 'btn-sm', 'btn-outline-secondary', 'm-0', 'border-0'],
@@ -126,7 +134,7 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
 
         super.ngOnInit();
 
-        this.options = this.options ?? [];
+        this.currentOptions.set(this.options ?? [])
 
         this.getTranslatedLabels();
 
@@ -144,6 +152,12 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
                 this.idField.valueList = deepClone(idValues);
             }
         }
+
+        const clickDebounceTime = this.getDebounceTime();
+
+        this.subs.push(this.filterInputBuffer$.pipe(debounceTime(clickDebounceTime)).subscribe(value => {
+            this.filterResults();
+        }));
     }
 
     /**
@@ -164,6 +178,7 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
 
     onClear(): void {
         this.options = [];
+        this.currentOptions.set([]);
         this.selectedValues = [];
         this.selectAll = false;
         this.filterValue = '';
@@ -209,6 +224,10 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
     }
 
     onFilter(): void {
+        this.filterInputBuffer.next(this.filterValue ?? '');
+    }
+
+    filterResults(): void {
         const relateName = this.getRelateFieldName();
         this.filterValue = this.filterValue ?? '';
         const matches = this.filterValue.match(/^\s*$/g);
@@ -225,6 +244,7 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
             })))
         ).subscribe(filteredOptions => {
             this.options = filteredOptions;
+            this.currentOptions.set(this.options);
             this.addCurrentlySelectedToOptions(filteredOptions);
             this.calculateSelectAll();
         });
@@ -309,7 +329,12 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
     protected showSelectModal(): void {
         const modal = this.modalService.open(RecordListModalComponent, {size: 'xl', scrollable: true});
 
+        const selectedIds = this.idField.valueList.join(',');
+
         modal.componentInstance.module = this.getRelatedModule();
+        modal.componentInstance.multiSelect = true;
+        modal.componentInstance.multiSelectButtonLabelKey = 'LBL_SAVE';
+        modal.componentInstance.selectedValues = selectedIds;
 
         modal.result.then((data: RecordListModalResult) => {
 
@@ -317,16 +342,30 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
                 return;
             }
 
-            const record = this.getSelectedRecord(data);
+            const records = this.getSelectedRecords(data);
+            const allRecords = data.records ?? [];
+            const selected = [];
 
-            const found = this.field.valueObjectArray.find(element => element.id === record.id);
+            records.forEach((record) => {
+                selected.push(record.id);
+                const found = this.field.valueObjectArray.find(element => element.id === record.id);
 
-            if (found) {
-                return;
-            }
+                if (found) {
+                    return;
+                }
 
-            this.setItem(record);
+                this.setItem(record);
+            });
+
+            allRecords.forEach((record) => {
+                if (!selected.includes(record.id)) {
+                    this.selectedValues = this.selectedValues.filter((value) => value.id !== record.id);
+                }
+            });
+
+            this.onAdd();
             this.tag.updateModel(this.selectedValues);
+            this.currentOptions.set(this.selectedValues ?? []);
         });
     }
 
@@ -334,25 +373,22 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
      * Get Selected Record
      *
      * @param {object} data RecordListModalResult
-     * @returns {object} Record
      */
-    protected getSelectedRecord(data: RecordListModalResult): Record {
-        let id = '';
+    protected getSelectedRecords(data: RecordListModalResult) {
+        let ids = [];
         Object.keys(data.selection.selected).some(selected => {
-            id = selected;
-            return true;
+            ids[selected] = selected;
         });
 
-        let record: Record = null;
+        let records: Record[] = [];
 
         data.records.some(rec => {
-            if (rec && rec.id === id) {
-                record = rec;
-                return true;
+            if (ids[rec.id]) {
+                records.push(rec);
             }
         });
 
-        return record;
+        return records;
     }
 
     /**
@@ -364,7 +400,8 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
         const relateName = this.getRelateFieldName();
         const newItem = {
             id: record?.attributes?.id,
-            [relateName]: record?.attributes[relateName]
+            [relateName]: record?.attributes[relateName],
+            attributes: record?.attributes
         } as ObjectMap;
 
         const inList = this.isInList(this.selectedValues, newItem);
@@ -372,7 +409,8 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
             return;
         }
 
-        this.selectedValues.push(newItem)
+        this.selectedValues = [...this.selectedValues ?? [], newItem];
+
         this.addCurrentlySelectedToOptions(this.options);
 
         this.onAdd();
@@ -390,6 +428,8 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
                 this.options.push(selectedValue);
             }
         });
+
+        this.currentOptions.set(this.options ?? []);
     }
 
     protected isInList(filteredOptions: AttributeMap[], selectedValue: AttributeMap): boolean {
@@ -408,19 +448,19 @@ export class RelateFilterFieldComponent extends BaseRelateComponent {
     }
 
     protected calculateSelectAll(): void {
-        const visibleOptions = this?.tag?.visibleOptions() ?? [];
-        const selectedValuesKeys = (this?.selectedValues ?? []).map(item => item.value);
+        const selectedValuesKeys = (this?.selectedValues ?? []).map(item => {
+            return item.id;
+        });
 
-        if (!visibleOptions.length || !selectedValuesKeys.length) {
+        if (!this.options.length || !selectedValuesKeys.length) {
             this.selectAll = false;
             return;
         }
 
-        if (visibleOptions.length > selectedValuesKeys.length) {
+        if (this.options.length > selectedValuesKeys.length) {
             this.selectAll = false;
             return;
         }
-
-        this.selectAll = visibleOptions.every(item => selectedValuesKeys.includes(item.value));
+        this.selectAll = this.options.every(item => selectedValuesKeys.includes(item.id));
     }
 }

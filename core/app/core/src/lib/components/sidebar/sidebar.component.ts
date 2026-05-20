@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2024 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2024 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,7 +28,7 @@ import {Component, OnDestroy, OnInit, signal, ViewChild, WritableSignal} from '@
 import {AppStateStore} from "../../store/app-state/app-state.store";
 import {combineLatestWith, Subscription} from "rxjs";
 import {NavbarModuleMap, Navigation, NavigationStore} from "../../store/navigation/navigation.store";
-import {MenuItem} from "common";
+import {MenuItem} from '../../common/menu/menu.model';
 import {ModuleNameMapper} from "../../services/navigation/module-name-mapper/module-name-mapper.service";
 import {ModuleNavigation} from "../../services/navigation/module-navigation/module-navigation.service";
 import {LanguageListStringMap, LanguageStore, LanguageStrings} from "../../store/language/language.store";

@@ -40,6 +40,10 @@ $filter_operator_map = [
             '{field}_{type}_range_choice' => '{operator}',
             'range_{field}_{type}' => '{target}'
         ],
+        'not_in' => [
+            '{field}_{type}_range_choice' => '{operator}',
+            'range_{field}_{type}' => 'values'
+        ],
         'between' => [
             '{field}_{type}_range_choice' => '{operator}',
             'range_{field}_{type}' => '',
@@ -125,14 +129,14 @@ $filter_operator_map = [
     ],
     'date' => [
         '=' => [
-            '{field}_{type}_range_choice' => '{operator}',
-            'range_{field}_{type}' => '{target}'
+            '{field}_{type}' => 'values',
+            '{field}_{type}_range_choice' => '',
         ],
     ],
     'datetime' => [
         '=' => [
-            '{field}_{type}_range_choice' => '{operator}',
-            'range_{field}_{type}' => '{target}'
+            '{field}_{type}' => 'values',
+            '{field}_{type}_range_choice' => '',
         ],
     ]
 ];

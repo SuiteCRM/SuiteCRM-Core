@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,16 +26,12 @@
 
 import {ValidatorInterface} from '../validator.Interface';
 import {AbstractControl, Validators} from '@angular/forms';
-import {
-    FieldDefinition,
-    Record,
-    StandardValidationErrors,
-    StandardValidatorFn,
-    ValidationDefinition,
-    ViewFieldDefinition
-} from 'common';
 import {Injectable} from '@angular/core';
+import {Record} from '../../../../common/record/record.model';
+import {StandardValidatorFn, StandardValidationErrors} from '../../../../common/services/validators/validators.model';
+import {ViewFieldDefinition} from '../../../../common/metadata/metadata.model';
 import {isNumber} from "lodash-es";
+import {ValidationDefinitionManager} from "../validation-definition.manager";
 
 export const minValidator = (min: number): StandardValidatorFn => (
     (control: AbstractControl): StandardValidationErrors | null => {
@@ -90,6 +86,12 @@ export const maxValidator = (max: number): StandardValidatorFn => (
 })
 export class RangeValidator implements ValidatorInterface {
 
+    constructor(
+        protected validationManager: ValidationDefinitionManager
+    ) {
+    }
+
+
     applies(record: Record, viewField: ViewFieldDefinition): boolean {
         if (!viewField || !viewField.fieldDefinition) {
             return false;
@@ -97,7 +99,7 @@ export class RangeValidator implements ValidatorInterface {
 
         const definition = viewField.fieldDefinition;
 
-        return this.getRangeValidation(definition) !== null;
+        return this.validationManager.getValidationDefinition(definition, 'range') !== null;
     }
 
     getValidator(viewField: ViewFieldDefinition): StandardValidatorFn[] {
@@ -106,7 +108,7 @@ export class RangeValidator implements ValidatorInterface {
             return [];
         }
 
-        const validation = this.getRangeValidation(viewField.fieldDefinition);
+        const validation = this.validationManager.getValidationDefinition(viewField.fieldDefinition, 'range');
 
         if (!validation) {
             return [];
@@ -133,29 +135,5 @@ export class RangeValidator implements ValidatorInterface {
         }
 
         return validations;
-    }
-
-    protected getRangeValidation(definition: FieldDefinition): ValidationDefinition {
-
-        if (this.isRangeValidation(definition.validation)) {
-            return definition.validation;
-        }
-
-        if (!definition.validations || !definition.validations.length) {
-            return null;
-        }
-
-        let validation: ValidationDefinition = null;
-
-        definition.validations.some(entry => {
-            validation = entry;
-            return this.isRangeValidation(entry);
-        });
-
-        return validation;
-    }
-
-    protected isRangeValidation(validation: ValidationDefinition): boolean {
-        return validation && validation.type === 'range';
     }
 }

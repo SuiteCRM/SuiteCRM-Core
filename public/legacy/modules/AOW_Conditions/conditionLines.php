@@ -1,25 +1,28 @@
 <?php
 /**
- * Advanced OpenWorkflow, Automating SugarCRM.
- * @package Advanced OpenWorkflow for SugarCRM
- * @copyright SalesAgility Ltd http://www.salesagility.com
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2011 - 2025 SuiteCRM Ltd.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU AFFERO GENERAL PUBLIC LICENSE
- * along with this program; if not, see http://www.gnu.org/licenses
- * or write to the Free Software Foundation,Inc., 51 Franklin Street,
- * Fifth Floor, Boston, MA 02110-1301  USA
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author SalesAgility <info@salesagility.com>
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
  */
 
 
@@ -57,13 +60,13 @@ function display_condition_lines($focus, $field, $value, $view)
                 while ($row = $focus->db->fetchByAssoc($result)) {
                     $condition_name = BeanFactory::newBean('AOW_Conditions');
                     $condition_name->retrieve($row['id']);
-                    $condition_name->module_path = unserialize(base64_decode($condition_name->module_path));
+                    $condition_name->module_path = unserialize(base64_decode($condition_name->module_path), ['allowed_classes' => false]);
                     if ($condition_name->module_path == '') {
                         $condition_name->module_path = $focus->flow_module;
                     }
                     $html .= "flow_fields = \"".trim(preg_replace('/\s+/', ' ', (string) getModuleFields(getRelatedModule($focus->flow_module, $condition_name->module_path[0]))))."\";";
                     if ($condition_name->value_type == 'Date') {
-                        $condition_name->value = unserialize(base64_decode($condition_name->value));
+                        $condition_name->value = unserialize(base64_decode($condition_name->value), ['allowed_classes' => false]);
                     }
                     $condition_item = json_encode($condition_name->toArray());
                     $html .= "loadConditionLine(".$condition_item.");";
@@ -88,13 +91,13 @@ function display_condition_lines($focus, $field, $value, $view)
             while ($row = $focus->db->fetchByAssoc($result)) {
                 $condition_name = BeanFactory::newBean('AOW_Conditions');
                 $condition_name->retrieve($row['id']);
-                $condition_name->module_path = unserialize(base64_decode($condition_name->module_path));
+                $condition_name->module_path = unserialize(base64_decode($condition_name->module_path), ['allowed_classes' => false]);
                 if (empty($condition_name->module_path)) {
                     $condition_name->module_path[0] = $focus->flow_module;
                 }
                 $html .= "flow_fields = \"".trim(preg_replace('/\s+/', ' ', (string) getModuleFields(getRelatedModule($focus->flow_module, $condition_name->module_path[0]))))."\";";
                 if ($condition_name->value_type == 'Date') {
-                    $condition_name->value = unserialize(base64_decode($condition_name->value));
+                    $condition_name->value = unserialize(base64_decode($condition_name->value), ['allowed_classes' => false]);
                 }
                 $condition_item = json_encode($condition_name->toArray());
                 $html .= "loadConditionLine(".$condition_item.");";

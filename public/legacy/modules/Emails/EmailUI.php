@@ -134,7 +134,7 @@ class EmailUI
             'out' => array(),
         );
 
-        $this->_generateComposeConfigData('email_compose');
+        $this->_generateComposeConfigData();
 
 
         //Check quick create module access
@@ -356,7 +356,7 @@ eoq;
     {
         $this->preflightUserCache();
 
-        $this->_generateComposeConfigData('email_compose_light');
+        $this->_generateComposeConfigData("minimal");
         $javascriptOut = $this->smarty->fetch("modules/Emails/templates/_baseConfigData.tpl");
 
         $divOut = $this->smarty->fetch("modules/Emails/templates/overlay.tpl");
@@ -429,7 +429,7 @@ eoq;
         if ($current_user->getEmailClient() == 'sugar') {
             $html =<<<HTML
             <a class="email-link" href="mailto:{$addr}"
-                    onclick="$(document).openComposeViewModal(this);"
+                    onclick="$(document).openEmailModal(this);"
                     data-module="{$module_name}" data-record-id="{$record_id}"
                     data-module-name="{$name}" data-email-address="{$addr}"
                 >{$text}</a>
@@ -692,7 +692,7 @@ HTML;
      * @param String $type Drives which tinyMCE options will be included.
      * @throws RuntimeException
      */
-    public function _generateComposeConfigData($type = "email_compose_light")
+    public function _generateComposeConfigData(string $type = "standard"): void
     {
         global $app_list_strings, $current_user, $app_strings, $mod_strings, $current_language, $locale;
 
@@ -1085,7 +1085,7 @@ HTML;
         }
 
         // subscribed accounts
-        $showFolders = sugar_unserialize(base64_decode($user->getPreference('showFolders', 'Emails')));
+        $showFolders = sugar_unserialize(base64_decode((string) $user->getPreference('showFolders', 'Emails')));
 
         // general settings
         $emailSettings = $user->getPreference('emailSettings', 'Emails');
@@ -1233,7 +1233,7 @@ HTML;
     /**
      * Generates cache folder structure
      */
-    public function preflightEmailCache($cacheRoot)
+    public static function preflightEmailCache($cacheRoot)
     {
         // base
         if (!file_exists($cacheRoot)) {
@@ -1297,7 +1297,7 @@ HTML;
         global $current_user;
         global $app_strings;
 
-        if (!$user) {
+        if (empty($user)) {
             $user = $current_user;
         }
 
@@ -1312,7 +1312,7 @@ HTML;
         $rootNode->dynamicloadfunction = '';
         $rootNode->expanded = true;
         $rootNode->dynamic_load = true;
-        $showFolders = sugar_unserialize(base64_decode($user->getPreference('showFolders', 'Emails')));
+        $showFolders = sugar_unserialize(base64_decode((string) $user->getPreference('showFolders', 'Emails')));
 
         if (empty($showFolders)) {
             $showFolders = array();
@@ -1326,7 +1326,7 @@ HTML;
                 if (in_array($personalAccount->id, $showFolders)) {
                     // check for cache value
                     $cacheRoot = sugar_cached("modules/Emails/{$personalAccount->id}");
-                    $this->preflightEmailCache($cacheRoot);
+                    self::preflightEmailCache($cacheRoot);
 
                     if ($this->validCacheFileExists($personalAccount->id, 'folders', "folders.php")) {
                         $mailboxes = $this->getMailBoxesFromCacheValue($personalAccount);
@@ -1373,7 +1373,7 @@ HTML;
             if (in_array($groupAccount->id, $showFolders)) {
                 // check for cache value
                 $cacheRoot = sugar_cached("modules/Emails/{$groupAccount->id}");
-                $this->preflightEmailCache($cacheRoot);
+                self::preflightEmailCache($cacheRoot);
                 //$groupAccount->connectMailserver();
 
                 if ($this->validCacheFileExists($groupAccount->id, 'folders', "folders.php")) {
@@ -1561,7 +1561,7 @@ HTML;
         }
         if (file_exists($cache)) {
             include($cache); // profides $cacheFile
-            $metaOut = unserialize($cacheFile['out']);
+            $metaOut = unserialize($cacheFile['out'], ['allowed_classes' => false]);
             $meta = $metaOut['meta']['email'];
             if (isset($meta['attachments'])) {
                 $attachmentHtmlData = $meta['attachments'];
@@ -3391,9 +3391,7 @@ eoq;
             include($cacheFilePath); // provides $cacheFile
 
             if (isset($cacheFile[$key])) {
-                $ret = unserialize($cacheFile[$key]);
-
-                return $ret;
+                return unserialize($cacheFile[$key], ['allowed_classes' => false]);
             }
         } else {
             $GLOBALS['log']->debug("EMAILUI: cache file not found [ {$cacheFilePath} ] - creating blank cache file");

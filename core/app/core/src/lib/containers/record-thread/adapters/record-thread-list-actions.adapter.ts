@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,9 +25,11 @@
  */
 
 import {Injectable} from '@angular/core';
-import {Action, ActionContext, isTrue, ModeActions, ViewMode} from 'common';
+import {isTrue} from '../../../common/utils/value-utils';
 import {combineLatestWith, Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {Action, ActionContext, ModeActions} from '../../../common/actions/action.model';
+import {ViewMode} from '../../../common/views/view.model';
 import {AsyncActionInput, AsyncActionService} from '../../../services/process/processes/async-action/async-action';
 import {LanguageStore} from '../../../store/language/language.store';
 import {MessageService} from '../../../services/message/message.service';
@@ -41,6 +43,10 @@ import {RecordThreadListActionData} from "../actions/list-actions/record-thread-
 import {RecordThreadListActionManager} from "../actions/list-actions/record-thread-list-action-manager.service";
 import {RecordThreadListMetadata} from '../store/record-thread/record-thread-list.store.model';
 import {AppMetadataStore} from "../../../store/app-metadata/app-metadata.store.service";
+import {FieldModalService} from "../../../services/modals/field-modal.service";
+import {RecordMapperRegistry} from "../../../common/record/record-mappers/record-mapper.registry";
+import {FieldLogicManager} from "../../../fields/field-logic/field-logic.manager";
+import {RecordManager} from "../../../services/record/record.manager";
 
 @Injectable()
 export class RecordThreadListActionsAdapter extends BaseRecordActionsAdapter<RecordThreadListActionData> {
@@ -61,8 +67,12 @@ export class RecordThreadListActionsAdapter extends BaseRecordActionsAdapter<Rec
         protected message: MessageService,
         protected confirmation: ConfirmationModalService,
         protected selectModalService: SelectModalService,
+        protected fieldModalService: FieldModalService,
         protected metadata: MetadataStore,
-        protected appMetadataStore: AppMetadataStore
+        protected appMetadataStore: AppMetadataStore,
+        protected recordMappers: RecordMapperRegistry,
+        protected logic: FieldLogicManager,
+        protected recordManager: RecordManager
     ) {
         super(
             actionManager,
@@ -71,8 +81,12 @@ export class RecordThreadListActionsAdapter extends BaseRecordActionsAdapter<Rec
             confirmation,
             language,
             selectModalService,
+            fieldModalService,
             metadata,
-            appMetadataStore
+            appMetadataStore,
+            recordMappers,
+            logic,
+            recordManager
         );
     }
 
@@ -92,8 +106,9 @@ export class RecordThreadListActionsAdapter extends BaseRecordActionsAdapter<Rec
     /**
      * Get action name
      * @param action
+     * @param context
      */
-    protected getActionName(action: Action) {
+    protected getActionName(action: Action, context: ActionContext = null) {
         return `record-thread-list-${action.key}`;
     }
 
@@ -144,7 +159,7 @@ export class RecordThreadListActionsAdapter extends BaseRecordActionsAdapter<Rec
     /**
      * @inheritDoc
      */
-    protected shouldReload(process: Process): boolean {
+    protected shouldReload(process: Process, action: Action = null): boolean {
         const reloadThread = process?.data?.reloadThread ?? false;
         return isTrue(reloadThread);
     }

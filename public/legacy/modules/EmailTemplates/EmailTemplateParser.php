@@ -101,9 +101,9 @@ class EmailTemplateParser
      * @param string $trackerId
      */
     public function __construct(
-        EmailTemplate $template,
-        Campaign $campaign,
-        EmailInterface $module,
+        ?EmailTemplate $template,
+        ?Campaign $campaign,
+        ?SugarBean $module,
         $siteUrl,
         $trackerId
     ) {
@@ -135,13 +135,17 @@ class EmailTemplateParser
      *
      * @return string
      */
-    private function getParsedValue($attributeValue)
+    public function getParsedValue($attributeValue, $replaceEmpty = true)
     {
         $matches = preg_match_all(static::PATTERN, $attributeValue, $variables);
 
         if ($matches !== 0) {
             foreach ($variables[0] as $variable) {
-                $attributeValue = str_replace($variable, $this->getValueFromBean($variable), $attributeValue);
+                $beanValue = $this->getValueFromBean($variable);
+                if ($beanValue === '' && !$replaceEmpty){
+                    continue;
+                }
+                $attributeValue = str_replace($variable, $beanValue, $attributeValue);
             }
         }
 
@@ -235,7 +239,7 @@ class EmailTemplateParser
     {
         $value = '';
 
-        if ($attribute === 'survey_url_display' && $this->module instanceof Person) {
+        if ($attribute === 'survey_url_display' && $this->module instanceof Person && !empty($this->campaign->survey_id)) {
             /** @var Contact $contact */
             $contact = $this->module;
             $value = sprintf(

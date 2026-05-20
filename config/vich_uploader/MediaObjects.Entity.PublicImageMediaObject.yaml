@@ -1,0 +1,8 @@
+App\MediaObjects\Entity\PublicImageMediaObject:
+  file:
+    mapping: public_images_media_object # required
+    filename_property: filePath  # required
+    size: size
+    mime_type: mimeType
+    original_name: originalName
+    dimensions: dimensions

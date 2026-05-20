@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,33 +24,80 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, Input, OnInit, signal} from '@angular/core';
-import {ButtonInterface} from "common";
+import {
+    Component,
+    EventEmitter,
+    Input,
+    OnDestroy,
+    OnInit, Signal,
+    signal,
+    ViewChild,
+    WritableSignal
+} from '@angular/core';
+import {ButtonInterface, PopoverValidation} from '../../../../common/components/button/button.model';
+import {Subscription} from "rxjs";
+import {NgbPopover} from "@ng-bootstrap/ng-bootstrap";
+
 
 @Component({
     selector: 'scrm-popup-button',
     templateUrl: 'popup-button.component.html',
 })
 
-export class PopupButtonComponent implements OnInit{
+export class PopupButtonComponent implements OnInit, OnDestroy {
 
     @Input() icon: string;
+    @Input() titleKey: string;
     @Input() klass: string = 'line-action-item line-action float-right';
+    @Input() placement: string | string[] = 'right';
+    @Input() popoverClass: string = 'popover-wrapper';
+    @Input() openStatusEventEmitter: EventEmitter<boolean>;
+    @Input() displayButton: WritableSignal<boolean> = signal(true);
+    @Input() dynamicClass: Signal<string> = signal('');
+    @Input() disabled: Signal<boolean> = signal(false);
+    @Input() showPopup: PopoverValidation = () => {return true};
+
+    @ViewChild('popover') popover: NgbPopover;
 
     buttonConfig = signal<ButtonInterface>({});
+
+    protected subs: Subscription[] = [];
 
     constructor() {
     }
 
     ngOnInit(): void {
-        this.buttonConfig.update( () => this.getButtonConfig());
+        this.buttonConfig.update(() => this.getButtonConfig());
+        this.subs = [];
+
+        if (this.openStatusEventEmitter) {
+            this.subs.push(this.openStatusEventEmitter.subscribe((status: boolean) => {
+                if (status === true) {
+                    this.popover.open();
+                    return;
+                }
+
+                this.popover.close();
+            }));
+        }
+    }
+
+    ngOnDestroy(): void {
+        this.subs.forEach((sub: Subscription) => {
+            sub.unsubscribe();
+        });
+        this.subs = [];
     }
 
     getButtonConfig(): ButtonInterface {
         return {
             icon: this.icon,
             klass: this.klass,
+            titleKey: this.titleKey,
+            dynamicClass: this.dynamicClass,
+            disabled: this.disabled
         } as ButtonInterface;
     }
+
 
 }

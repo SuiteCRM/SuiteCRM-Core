@@ -46,37 +46,100 @@
 
 
 {include file="modules/DynamicFields/templates/Fields/Forms/coreTop.tpl"}
-
 <tr>
-	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_IMAGE_WIDTH"}:</td>
+	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_METADATA"}</td>
+	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_STORAGE_TYPE"}:</td>
 	<td>
-		<input id ="width" type="text" name="width" 
-		{if !$vardef.width && !$vardef.height}
-			value="120"
-		{else}
-			value="{$vardef.width}"
-		{/if}
-		>
-		{sugar_help text=$mod_strings.LBL_POPHELP_IMAGE_WIDTH FIXX=300 FIXY=200}
+		{html_options name="storage_type" id="storage_type" options=$storage_type_options selected=$vardef.metadata.storage_type}
 	</td>
 </tr>
 <tr>
+	<td class="mbLBL"></td>
 	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_IMAGE_HEIGHT"}:</td>
 	<td>
-		<input id ="height" type="text" name="height" 
-		{if !$vardef.width && !$vardef.height}
+		<input id="height" type="text" name="maxHeight"
+		{if !$vardef.metadata.maxHeight}
 			value=""
 		{else}
-			value="{$vardef.height}"
+			value="{$vardef.metadata.maxHeight}"
 		{/if}
 		>
-		{sugar_help text=$mod_strings.LBL_POPHELP_IMAGE_HEIGHT FIXX=300 FIXY=220}
+		{sugar_help text=$mod_strings.LBL_POPHELP_IMAGE_HEIGHT FIXX=250 FIXY=80}
 	</td>
 </tr>
 <tr>
-	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_IMAGE_BORDER"}:</td>
-	<td>	
-		<input type="checkbox" id ="border" name="border" value="1" {if !empty($vardef.border)}checked{/if}/>
+	<td class="mbLBL"></td>
+	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_IMAGE_WIDTH"}:</td>
+	<td>
+		<input id="maxWidth" type="text" name="maxWidth"
+				{if !$vardef.metadata.maxWidth}
+					value=""
+				{else}
+					value="{$vardef.metadata.maxWidth}"
+				{/if}
+		>
+		{sugar_help text=$mod_strings.LBL_POPHELP_IMAGE_WIDTH FIXX=250 FIXY=80}
+	</td>
+</tr>
+<tr>
+	<td class="mbLBL"></td>
+	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_UPLOAD_MAXSIZE"}:</td>
+	<td>
+		<input id="upload_maxsize" type="text" name="upload_maxsize"
+				{if !$vardef.metadata.upload_maxsize}
+					value=""
+				{else}
+					value="{$vardef.metadata.upload_maxsize}"
+				{/if}
+		>
+	</td>
+</tr>
+<tr>
+	<td class="mbLBL"></td>
+	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_ALLOW_PREVIEW"}:</td>
+	<td>
+		<input type="hidden" name="preview" value="0"/>
+		<input type="checkbox" id="preview" name="preview" value="1"
+			   {if !empty($vardef.metadata.preview)}checked{/if}/>
+	</td>
+</tr>
+<tr>
+	<td class="mbLBL"></td>
+	<td class='mb-muted-header'>{sugar_translate module="DynamicFields" label="LBL_THUMBNAIL_CONFIG"}</td>
+</tr>
+<tr>
+	<td class="mbLBL"></td>
+	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_CREATE_THUMBNAIL"}:</td>
+	<td>
+		<input type="hidden" name="createThumbnail" value="0"/>
+		<input type="checkbox" id="createThumbnail" name="createThumbnail" value="1"
+			   {if !empty($vardef.metadata.createThumbnail)}checked{/if}/>
+	</td>
+</tr>
+<tr>
+	<td class="mbLBL"></td>
+	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_THUMBNAIL_WIDTH"}:</td>
+	<td>
+		<input id="thumbnailWidth" type="text" name="thumbnailWidth"
+				{if !$vardef.metadata.thumbnailWidth}
+					value=""
+				{else}
+					value="{$vardef.metadata.thumbnailWidth}"
+				{/if}
+		>
+	</td>
+</tr>
+<tr>
+	<td class="mbLBL"></td>
+	<td class='mbLBL'>{sugar_translate module="DynamicFields" label="LBL_THUMBNAIL_HEIGHT"}:</td>
+	<td>
+		<input id="thumbnailHeight" type="text" name="thumbnailHeight"
+				{if !$vardef.metadata.thumbnailHeight}
+					value=""
+				{else}
+					value="{$vardef.metadata.thumbnailHeight}"
+				{/if}
+		>
 	</td>
 </tr>
 {include file="modules/DynamicFields/templates/Fields/Forms/coreBottom.tpl"}

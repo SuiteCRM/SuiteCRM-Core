@@ -1,28 +1,29 @@
 <?php
 
 /**
- * Products, Quotations & Invoices modules.
- * Extensions to SugarCRM
- * @package Advanced OpenSales for SugarCRM
- * @subpackage Products
- * @copyright SalesAgility Ltd http://www.salesagility.com
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2011 - 2025 SuiteCRM Ltd.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU AFFERO GENERAL PUBLIC LICENSE
- * along with this program; if not, see http://www.gnu.org/licenses
- * or write to the Free Software Foundation,Inc., 51 Franklin Street,
- * Fifth Floor, Boston, MA 02110-1301  USA
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author SalesAgility Ltd <support@salesagility.com>
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
  */
 
 use SuiteCRM\Utility\SuiteValidator as SuiteValidator;
@@ -30,11 +31,11 @@ use SuiteCRM\Utility\SuiteValidator as SuiteValidator;
 #[\AllowDynamicProperties]
 class templateParser
 {
-    public static function parse_template($string, $bean_arr)
+    public static function parse_template($string, $bean_arr, $userFormat = false)
     {
         foreach ($bean_arr as $bean_name => $bean_id) {
             $focus = BeanFactory::getBean($bean_name, $bean_id);
-            $string = templateParser::parse_template_bean($string, $focus->table_name, $focus);
+            $string = templateParser::parse_template_bean($string, $focus->table_name, $focus, $userFormat);
 
             foreach ($focus->field_defs as $focus_name => $focus_arr) {
                 if ($focus_arr['type'] == 'relate') {
@@ -42,7 +43,7 @@ class templateParser
                         $idName = $focus_arr['id_name'];
                         $relate_focus = BeanFactory::getBean($focus_arr['module'], $focus->$idName);
 
-                        $string = templateParser::parse_template_bean($string, $focus_arr['name'], $relate_focus);
+                        $string = templateParser::parse_template_bean($string, $focus_arr['name'], $relate_focus, $userFormat);
                     }
                 }
             }
@@ -57,7 +58,7 @@ class templateParser
      * @return mixed
      * @throws Exception
      */
-    public static function parse_template_bean($string, $key, &$focus)
+    public static function parse_template_bean($string, $key, &$focus, $userFormat = false)
     {
         global $app_strings, $sugar_config, $locale, $current_user;
         $repl_arr = array();
@@ -67,7 +68,7 @@ class templateParser
             if (isset($field_def['name']) && $field_def['name'] != '') {
                 $fieldName = $field_def['name'];
 
-                if (empty($focus->$fieldName)) {
+                if (!isset($focus->$fieldName) || $focus->$fieldName === '') {
                     $repl_arr[$key . '_' . $fieldName] = '';
                     continue;
                 }
@@ -81,7 +82,14 @@ class templateParser
                     $translatedVals = array();
 
                     foreach ($mVals as $mVal) {
-                        $translatedVals[] = translate($field_def['options'], $focus->module_dir, $mVal);
+                        if ($mVal === '' || $mVal === null) {
+                            continue;
+                        }
+                        $translated = translate($field_def['options'], $focus->module_dir, $mVal);
+                        if (is_array($translated)) {
+                            $translated = implode(", ", $translated);
+                        }
+                        $translatedVals[] = $translated;
                     }
 
                     $repl_arr[$key . "_" . $fieldName] = implode(", ", $translatedVals);
@@ -90,9 +98,9 @@ class templateParser
                     $repl_arr[$key . "_" . $fieldName] = (string)$focus->$fieldName;
                 } elseif ($field_def['type'] == 'bool') {
                     if ($focus->{$fieldName} == "1") {
-                        $repl_arr[$key . "_" . $fieldName] = "true";
+                        $repl_arr[$key . "_" . $fieldName] = translate('checkbox_dom', '', '1');
                     } else {
-                        $repl_arr[$key . "_" . $fieldName] = "false";
+                        $repl_arr[$key . "_" . $fieldName] = translate('checkbox_dom', '', '2');
                     }
                 } elseif ($field_def['type'] == 'image') {
                     $secureLink = $sugar_config['site_url'] . '/' . "public/" . $focus->id . '_' . $fieldName;
@@ -117,7 +125,7 @@ class templateParser
                     $repl_arr[$key . "_" . $fieldName] = html_entity_decode((string) $focus->{$fieldName},
                         ENT_COMPAT, 'UTF-8');
                 } elseif ($field_def['type'] == 'decimal' || $field_def['type'] == 'float') {
-                    if ($_REQUEST['entryPoint'] == 'formLetter') {
+                    if (!empty($_REQUEST['entryPoint']) && $_REQUEST['entryPoint'] == 'formLetter') {
                         $value = formatDecimalInConfigSettings($focus->$fieldName, true);
                     } else {
                         $value = formatDecimalInConfigSettings($focus->$fieldName, false);

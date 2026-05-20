@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2024 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2024 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,7 +25,6 @@
  */
 
 import {Injectable} from "@angular/core";
-import {Pagination, PaginationType, Record, ObjectMap, emptyObject} from 'common';
 import {AppStateStore} from "../../../../store/app-state/app-state.store";
 import {UserPreferenceStore} from "../../../../store/user-preference/user-preference.store";
 import {LocalStorageService} from "../../../../services/local-storage/local-storage.service";
@@ -33,6 +32,10 @@ import {BehaviorSubject, Subscription} from "rxjs";
 import {ActivatedRoute} from "@angular/router";
 import {toNumber} from "lodash-es";
 import {RecordPaginationModel} from "./record-pagination.model";
+import {Pagination, PaginationType} from "../../../../common/views/list/list-navigation.model";
+import {ObjectMap} from "../../../../common/types/object-map";
+import {Record} from "../../../../common/record/record.model";
+import {emptyObject} from "../../../../common/utils/object-utils";
 
 @Injectable({
     providedIn: 'root'
@@ -50,7 +53,8 @@ export class RecordPaginationService {
         protected preferences: UserPreferenceStore,
         protected appStateStore: AppStateStore,
         protected route: ActivatedRoute,
-    ) {}
+    ) {
+    }
 
     public triggerNextRecord(value: boolean): void {
         this.nextRecordSubject.next(value);
@@ -81,7 +85,7 @@ export class RecordPaginationService {
     }
 
     public mapRecordIds(records: Record[]): ObjectMap[] {
-        return records.map(record => ({ id: record.id }));
+        return records.map(record => ({id: record.id}));
     }
 
     public getModule(): string {
@@ -112,7 +116,7 @@ export class RecordPaginationService {
 
         let index = (offset - 1) % pageSize;
         if (this.paginationType === PaginationType.LOAD_MORE) {
-            index = offset  - 1;
+            index = offset - 1;
         }
         if (index >= 0 && index < recordIds.length) {
 
@@ -134,7 +138,7 @@ export class RecordPaginationService {
 
     public getRecordPaginationObj(module: string): RecordPaginationModel {
         const key = module + '-' + 'recordview-current-record-pagination';
-        const data = this.localStorageService.get(key)[module];
+        const data = this.localStorageService.get(key)[module] ?? null;
         if (!data || emptyObject(data)) {
             return;
         }

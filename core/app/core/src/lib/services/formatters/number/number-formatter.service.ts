@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,7 +28,7 @@ import {Inject, Injectable, LOCALE_ID} from '@angular/core';
 import {UserPreferenceStore} from '../../../store/user-preference/user-preference.store';
 import {formatNumber} from '@angular/common';
 import {FormatOptions, Formatter} from '../formatter.model';
-import {isFalse, isVoid} from 'common';
+import {isFalse, isVoid} from '../../../common/utils/value-utils';
 import {FormControlUtils} from '../../record/field/form-control.utils';
 
 @Injectable({
@@ -76,12 +76,14 @@ export class NumberFormatter implements Formatter {
             groupSymbolRegex = new RegExp('\\.', 'g');
         }
 
-        value = value.replace(groupSymbolRegex, 'group_separator');
-        value = value.replace(decimalSymbolRegex, 'decimal_separator');
+        value = value ?? '';
+
+        value = value.toString().replace(groupSymbolRegex, 'group_separator');
+        value = value.toString().replace(decimalSymbolRegex, 'decimal_separator');
 
 
-        value = value.replace(/decimal_separator/g, '.');
-        value = value.replace(/group_separator/g, '');
+        value = value.toString().replace(/decimal_separator/g, '.');
+        value = value.toString().replace(/group_separator/g, '');
 
         return value;
     }
@@ -139,18 +141,30 @@ export class NumberFormatter implements Formatter {
             return transformed;
         }
 
-        transformed = transformed.replace(/,/g, 'group_separator');
-        transformed = transformed.replace(/\./g, 'decimal_separator');
+        transformed = transformed ?? '';
+        transformed = transformed.toString().replace(/,/g, 'group_separator');
+        transformed = transformed.toString().replace(/\./g, 'decimal_separator');
 
         const decimalSymbol = this.getDecimalsSymbol() || '.';
         const groupSymbol = this.getGroupSymbol() || ',';
 
-        transformed = transformed.replace(/decimal_separator/g, decimalSymbol);
-        transformed = transformed.replace(/group_separator/g, groupSymbol);
+        transformed = transformed.toString().replace(/decimal_separator/g, decimalSymbol);
+        transformed = transformed.toString().replace(/group_separator/g, groupSymbol);
 
         return transformed;
     }
 
+    replaceSeparatorsToInternalFormat(value: string): string {
+        const decimalSymbol = this.getDecimalsSymbol() || '.';
+
+        const formattedValue = this.toInternalFormat(value);
+
+        if (decimalSymbol !== '.' && value?.toString()?.includes(decimalSymbol)) {
+            value = formattedValue;
+        }
+
+        return value;
+    }
     validateIntUserFormat(inputValue: any): boolean {
 
         const trimmedInputValue = this.formUtils.getTrimmedInputValue(inputValue);

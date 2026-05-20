@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,14 +24,19 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Injectable, signal} from '@angular/core';
+import {EventEmitter, Injectable, signal, WritableSignal} from '@angular/core';
 import {BehaviorSubject, combineLatestWith, Observable, Subscription} from 'rxjs';
 import {distinctUntilChanged, map} from 'rxjs/operators';
-import {deepClone, isVoid, User} from 'common';
+import {isVoid} from '../../common/utils/value-utils';
+import {deepClone} from '../../common/utils/object-utils';
+import {User} from '../../common/types/user';
 import {StateStore} from '../state';
 import {LoadingBufferFactory} from '../../services/ui/loading-buffer/loading-buffer.factory';
 import {LoadingBuffer} from '../../services/ui/loading-buffer/loading-buffer.service';
 import {SystemConfigStore} from '../system-config/system-config.store';
+import {NgbModalRef} from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import {RecordModalOptions} from "../../services/modals/record-modal.model";
+import {RecordThreadModalModel} from "../../services/modals/record-thread-modal.model";
 
 export interface AppState {
     loading?: boolean;
@@ -65,6 +70,10 @@ const initialState: AppState = {
 
 let internalState: AppState = deepClone(initialState);
 
+interface EventEmitterMap {
+    [key: string]: EventEmitter<any>;
+}
+
 @Injectable({
     providedIn: 'root',
 })
@@ -80,6 +89,17 @@ export class AppStateStore implements StateStore {
     activeRequests$: Observable<number>;
     isSidebarVisible$: Observable<boolean>;
     activeNavbarDropdown$: Observable<number>;
+    recordModalOpenEventEmitter: EventEmitter<RecordModalOptions> = new EventEmitter<RecordModalOptions>();
+    recordThreadModalOpenEventEmitter: EventEmitter<RecordThreadModalModel> = new EventEmitter<RecordThreadModalModel>();
+    refreshDraftsEventEmitter: EventEmitter<boolean> = new EventEmitter<boolean>();
+    draftOpenedEventEmitter: EventEmitter<string> = new EventEmitter<string>();
+    eventEmitterMapper: EventEmitterMap = {
+        'open-record-modal': this.recordModalOpenEventEmitter,
+        'open-record-thread-modal': this.recordThreadModalOpenEventEmitter,
+        'refresh-drafts': this.refreshDraftsEventEmitter,
+        'draft-opened': this.draftOpenedEventEmitter,
+    };
+    asyncActionEventEmitter: EventEmitter<any> = new EventEmitter<any>();
 
     /**
      * ViewModel that resolves once all the data is ready (or updated)...
@@ -91,8 +111,9 @@ export class AppStateStore implements StateStore {
     protected loadingQueue = {};
     protected loadingBuffer: LoadingBuffer;
     protected subs: Subscription[] = [];
+    protected activeModals: NgbModalRef[] = [];
 
-    isTouchScreen = signal<boolean>(false);
+    private isLoginWizardCompleted: WritableSignal<boolean> = signal<boolean>(true);
 
     constructor(
         protected loadingBufferFactory: LoadingBufferFactory,
@@ -120,12 +141,6 @@ export class AppStateStore implements StateStore {
 
             }))
         );
-
-        if('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-            this.isTouchScreen.set(true);
-        } else {
-            this.isTouchScreen.set(false);
-        }
     }
 
     /**
@@ -139,9 +154,11 @@ export class AppStateStore implements StateStore {
         this.loadingQueue = {};
         this.updateState(deepClone(initialState));
         this.subs.forEach(sub => sub.unsubscribe());
+        this.closeAllModals();
     }
 
     public clearAuthBased(): void {
+        this.closeAllModals();
     }
 
     public init(): void {
@@ -173,6 +190,45 @@ export class AppStateStore implements StateStore {
             this.onLogout();
         }
         this.updateState({...internalState, currentUser: user});
+    }
+
+    public addEventEmitter(key: string, emitter: EventEmitter<any>): void {
+        this.eventEmitterMapper[key] = emitter;
+    }
+
+    public addModalRef(modalRef: NgbModalRef): void {
+        this.activeModals.push(modalRef);
+        if (this.activeModals.length > 0) {
+            window.document.body.classList.add('detached-modal-open');
+        }
+    }
+
+    public removeModalRef(modalRef: NgbModalRef): void {
+        const index = this.activeModals.indexOf(modalRef);
+        if (index > -1) {
+            this.activeModals.splice(index, 1);
+        }
+        if (this.activeModals.length < 1) {
+            window.document.body.classList.remove('detached-modal-open');
+            window.document.body.classList.remove('modal-open');
+            window.document.body.style.removeProperty('padding-right');
+            window.document.body.style.removeProperty('overflow');
+        }
+    }
+
+    public closeAllModals(): void {
+        this.activeModals.forEach(modal => {
+            try {
+                modal.close();
+            } catch (error) {
+                console.error('Error closing modal:', error);
+            }
+        });
+        this.activeModals = [];
+    }
+
+    public getActiveModals(): NgbModalRef[] {
+        return [...this.activeModals];
     }
 
     /**
@@ -456,5 +512,17 @@ export class AppStateStore implements StateStore {
 
     public resetActiveDropdown(): void {
         this.updateState({...internalState, activeNavbarDropdown: 0});
+    }
+
+    public setLoginWizardComplete(isComplete: boolean): void {
+        this.isLoginWizardCompleted.set(isComplete);
+    }
+
+    public getLoginWizardComplete(): boolean {
+        return this.isLoginWizardCompleted();
+    }
+
+    public openRecordModal(options: RecordModalOptions) {
+        this.recordModalOpenEventEmitter.emit(options);
     }
 }

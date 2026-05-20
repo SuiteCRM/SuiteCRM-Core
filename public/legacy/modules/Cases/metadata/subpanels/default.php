@@ -49,57 +49,6 @@ $subpanel_layout = array(
         array('widget_class' => 'SubPanelTopSelectButton', 'popup_module' => 'Cases'),
     ),
 
-    'insightWidget' => [
-        'rows' => [
-            [
-                'justify' => 'end',
-                'cols' => [
-                    [
-                        'icon' => 'Cases',
-                    ],
-                ]
-            ],
-            [
-                'align' => 'end',
-                'justify' => 'start',
-                'class' => 'flex-grow-1',
-                'cols' => [
-                    [
-                        'display' => 'hidden',
-                        'statistic' => 'cases'
-                    ],
-                    [
-                        'dynamicLabel' => 'LBL_CASES_INSIGHT',
-                        'class' => 'sub-panel-banner-value',
-                        'bold' => true,
-                    ],
-                    [
-                        'display' => 'hidden',
-                        'statistic' => 'default'
-                    ]
-                ]
-            ],
-            [
-                'justify' => 'start',
-                'cols' => [
-                    [
-                        'descriptionKey' => '{{title_key}}_INSIGHT_DESCRIPTION',
-                        'class' => 'sub-panel-banner-tooltip',
-                    ]
-                ]
-            ],
-            [
-                'justify' => 'start',
-                'cols' => [
-                    [
-                        'labelKey' => '{{title_key}}',
-                        'class' => 'sub-panel-banner-button-title',
-                        'bold' => true,
-                    ]
-                ]
-            ],
-        ]
-    ],
 
     'where' => '',
 

@@ -52,7 +52,11 @@ class UpgradeSavedSearch
         while ($row = DBManagerFactory::getInstance()->fetchByAssoc($result)) {
             $focus = BeanFactory::newBean('SavedSearch');
             $focus->retrieve($row['id']);
-            $contents = unserialize(base64_decode($focus->contents));
+            // Decode contents: JSON (new format) with fallback to base64+serialize (legacy)
+            $contents = json_decode($focus->contents, true);
+            if ($contents === null) {
+                $contents = unserialize(base64_decode($focus->contents), ['allowed_classes' => false]);
+            }
             $has_team_name_saved = isset($contents['team_name_advanced']) || isset($contents['team_name_basic']) ? true : false;
             //If $contents['searchFormTab'] is set then this is coming from a 4.x saved search
             if (isset($contents['searchFormTab']) && $contents['searchFormTab'] == 'saved_views') {
@@ -115,7 +119,7 @@ class UpgradeSavedSearch
                     }
                 }
                 $new_contents['searchFormTab'] = $advanced ? 'advanced_search' : 'basic_search';
-                $content = base64_encode(serialize($new_contents));
+                $content = json_encode($new_contents);
                 DBManagerFactory::getInstance()->query("UPDATE saved_search SET contents = '{$content}' WHERE id = '{$row['id']}'");
             } else {
                 if ($has_team_name_saved) {
@@ -128,7 +132,7 @@ class UpgradeSavedSearch
                             $contents['id_team_name_advanced_collection_0'] = $contents['team_name_advanced'];
                             $contents['team_name_advanced_type'] = 'any';
                             unset($contents['team_name_advanced']);
-                            $content = base64_encode(serialize($contents));
+                            $content = json_encode($contents);
                             DBManagerFactory::getInstance()->query("UPDATE saved_search SET contents = '{$content}' WHERE id = '{$row['id']}'");
                         }
                     }

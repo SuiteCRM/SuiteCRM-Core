@@ -1,0 +1,262 @@
+<?php
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+/**
+ * Shared detail view definition for async task modules.
+ *
+ * Note: module-specific "trigger" actions (e.g. run-migration, run-process)
+ * must be added in the module's own detailviewdefs.php. Everything else here
+ * (rerun, retry-failed, dismiss, panel layout) is shared.
+ *
+ * Note: the 'dismiss-async-task' params below omit 'disableOnRun'. Modules
+ * that want to disable the button while the dismiss action runs should add it
+ * in their own detailviewdefs.php.
+ */
+$module_name = '<module_name>';
+$viewdefs[$module_name]['DetailView'] = [
+    'templateMeta' => [
+        'form' => [
+            'buttons' => [],
+        ],
+        'maxColumns' => '2',
+        'widths' => [
+            ['label' => '10', 'field' => '30'],
+            ['label' => '10', 'field' => '30'],
+        ],
+        'tabDefs' => [
+            'DEFAULT' => [
+                'newTab' => true,
+                'panelDefault' => 'expanded',
+            ],
+        ],
+    ],
+    'header' => [
+        'showFavoritesToggle' => false,
+    ],
+    'recordActions' => [
+        'actions' => [
+            // Module-specific trigger action (e.g. run-migration, run-process) goes here
+            // at priority 100. Define it in the module's own detailviewdefs.php.
+
+            'rerun-async-task' => [
+                'key' => 'rerun-async-task',
+                'labelKey' => 'LBL_RERUN',
+                'asyncProcess' => true,
+                'priority' => 185,
+                'modes' => ['detail'],
+                'display' => 'hide',
+                'params' => [
+                    'expanded' => true,
+                    'disableOnRun' => true,
+                    'displayConfirmation' => true,
+                    'confirmationMessages' => ['LBL_RERUN_CONFIRMATION'],
+                ],
+                'displayLogic' => [
+                    'show-on-failures' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'fieldDependencies' => ['allow_failure_rerun_action', 'status'],
+                            'activeOnFields' => [
+                                'allow_failure_rerun_action' => [
+                                    ['operator' => 'is-true'],
+                                ],
+                                'status' => [
+                                    ['operator' => 'is-equal', 'values' => ['completed_with_failures', 'failed']],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'retry-failed-async-task' => [
+                'key' => 'retry-failed-async-task',
+                'labelKey' => 'LBL_RETRY_FAILED',
+                'asyncProcess' => true,
+                'priority' => 190,
+                'modes' => ['detail'],
+                'display' => 'hide',
+                'params' => [
+                    'expanded' => true,
+                    'disableOnRun' => true,
+                    'displayConfirmation' => true,
+                    'confirmationMessages' => ['LBL_RETRY_FAILED_CONFIRMATION'],
+                ],
+                'displayLogic' => [
+                    'show-on-failures' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'fieldDependencies' => ['allow_failure_retry_action', 'status'],
+                            'activeOnFields' => [
+                                'allow_failure_retry_action' => [
+                                    ['operator' => 'is-true'],
+                                ],
+                                'status' => [
+                                    ['operator' => 'is-equal', 'values' => ['completed_with_failures', 'failed']],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'dismiss-completed' => [
+                'key' => 'dismiss-async-task',
+                'labelKey' => 'LBL_DELETE',
+                'asyncProcess' => true,
+                'priority' => 200,
+                'modes' => ['detail'],
+                'display' => 'hide',
+                'params' => [
+                    'expanded' => true,
+                    'disableOnRun' => true,
+                    'displayConfirmation' => true,
+                    'confirmationMessages' => ['LBL_DELETE_COMPLETED_CONFIRMATION'],
+                ],
+                'displayLogic' => [
+                    'show-on-completed' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'fieldDependencies' => ['status'],
+                            'activeOnFields' => [
+                                'status' => [
+                                    ['operator' => 'is-equal', 'values' => ['completed']],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'dismiss-completed-with-failures' => [
+                'key' => 'dismiss-async-task',
+                'labelKey' => 'LBL_DELETE',
+                'asyncProcess' => true,
+                'priority' => 200,
+                'modes' => ['detail'],
+                'display' => 'hide',
+                'params' => [
+                    'expanded' => true,
+                    'disableOnRun' => true,
+                    'displayConfirmation' => true,
+                    'confirmationMessages' => ['LBL_DELETE_COMPLETED_WITH_FAILURES_CONFIRMATION'],
+                ],
+                'displayLogic' => [
+                    'show-on-completed-with-failures' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'fieldDependencies' => ['status'],
+                            'activeOnFields' => [
+                                'status' => [
+                                    ['operator' => 'is-equal', 'values' => ['completed_with_failures']],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'dismiss-failed' => [
+                'key' => 'dismiss-async-task',
+                'labelKey' => 'LBL_DELETE',
+                'asyncProcess' => true,
+                'priority' => 200,
+                'modes' => ['detail'],
+                'display' => 'hide',
+                'params' => [
+                    'expanded' => true,
+                    'disableOnRun' => true,
+                    'displayConfirmation' => true,
+                    'confirmationMessages' => ['LBL_DELETE_FAILED_CONFIRMATION'],
+                ],
+                'displayLogic' => [
+                    'show-on-failed' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'fieldDependencies' => ['status'],
+                            'activeOnFields' => [
+                                'status' => [
+                                    ['operator' => 'is-equal', 'values' => ['failed']],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'exclude' => [
+            'duplicate',
+            'delete',
+            'duplicate-merge',
+            'save',
+            'saveNew',
+            'saveContinue',
+            'edit',
+            'create',
+        ],
+    ],
+    'panels' => [
+        'default' => [
+            [
+                'name',
+                'assigned_user_name',
+            ],
+            [
+                'status',
+                'type',
+            ],
+            [
+                'phase',
+                'service_key',
+            ],
+            [
+                'progress',
+                'last_run_datetime',
+            ],
+            [
+                'attachments',
+            ],
+            [
+                'description',
+            ],
+            [
+                [
+                    'name' => 'date_entered',
+                    'label' => 'LBL_DATE_ENTERED',
+                ],
+                [
+                    'name' => 'date_modified',
+                    'label' => 'LBL_DATE_MODIFIED',
+                ],
+            ],
+            [
+                [
+                    'name' => 'allow_failure_retry_action',
+                ],
+                [
+                    'name' => 'allow_failure_rerun_action',
+                ],
+            ],
+        ],
+    ],
+];

@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,38 +28,82 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {distinctUntilChanged, map, shareReplay, tap} from 'rxjs/operators';
 import {EntityGQL} from '../../services/api/graphql-api/api.entity.get';
-import {
-    Action,
-    ColumnDefinition,
-    deepClone,
-    Favorite,
-    FieldActions,
-    FieldDefinitionMap,
-    ListViewMeta,
-    MassUpdateMeta,
-    Panel,
-    RecentlyViewed,
-    SearchMeta,
-    SubPanelMeta,
-    WidgetMetadata,
-    TabDefinitions,
-    ObjectMap
-} from 'common';
+import {Action} from '../../common/actions/action.model';
+import {ColumnDefinition, ListViewMeta, MassUpdateMeta, SearchMeta} from '../../common/metadata/list.metadata.model';
+import {FieldDefinitionMap} from '../../common/record/field.model';
+import {deepClone} from '../../common/utils/object-utils';
+import {RecentlyViewed} from '../../common/record/recently-viewed.model';
+import {Favorite} from '../../common/record/favorites.model';
+import {FieldActions, Panel, TabDefinitions} from '../../common/metadata/metadata.model';
+import {SubPanelMeta} from '../../common/metadata/subpanel.metadata.model';
+import {WidgetMetadata} from '../../common/metadata/widget.metadata';
 import {StateStore} from '../state';
 import {AppStateStore} from '../app-state/app-state.store';
+import {ObjectMap} from "../../common/types/object-map";
 
 export interface SummaryTemplates {
     [key: string]: string;
+}
+
+export interface BackButtonConfig {
+    display?: boolean;
+    navigate?: ParentNavigation;
+
+    [key: string]: any;
+}
+
+export interface ParentNavigation {
+    parentIdParam?: string;
+    parentModuleParam?: string;
+    parentModule?: string;
+    parentId?: string;
+}
+
+export interface HeaderMetadata {
+    backButton?: BackButtonConfig;
+    showFavoritesToggle?: boolean;
+
+    [key: string]: any;
 }
 
 export interface RecordViewMetadata {
     topWidget?: WidgetMetadata;
     sidebarWidgets?: WidgetMetadata[];
     bottomWidgets?: WidgetMetadata[];
+    headerWidgets?: WidgetMetadata[];
     actions?: Action[];
+    modalHeaderActions?: Action[];
+    modalFooterActions?: Action[];
     templateMeta?: RecordTemplateMetadata;
     panels?: Panel[];
     summaryTemplates?: SummaryTemplates;
+    vardefs?: FieldDefinitionMap;
+    metadata?: ObjectMap;
+    header?: HeaderMetadata;
+    sections?: RecordViewSectionMetadataMap;
+}
+
+export interface RecordViewSectionMetadataMap {
+    [key: string]: RecordViewSectionMetadata;
+}
+
+export interface RecordViewSectionMetadata {
+    order?: number;
+    tabAction?: Action;
+    topWidget?: WidgetMetadata;
+    sidebarWidgets?: WidgetMetadata[];
+    bottomWidgets?: WidgetMetadata[];
+    headerWidgets?: WidgetMetadata[];
+    templateMeta?: RecordTemplateMetadata;
+    panels?: Panel[];
+    subpanels?: any[];
+    metadata?: ObjectMap;
+}
+
+export interface RecordModalMetadata {
+    actions?: Action[];
+    templateMeta?: RecordTemplateMetadata;
+    panels?: Panel[];
     vardefs?: FieldDefinitionMap;
     metadata?: ObjectMap;
 }
@@ -68,6 +112,7 @@ export interface RecordTemplateMetadata {
     maxColumns: number;
     useTabs: boolean;
     tabDefs: TabDefinitions;
+    colClasses?: string[];
 }
 
 export interface Metadata {
@@ -77,11 +122,13 @@ export interface Metadata {
     listView?: ListViewMeta;
     search?: SearchMeta;
     recordView?: RecordViewMetadata;
+    recordModal?: RecordModalMetadata;
     subPanel?: SubPanelMeta;
     massUpdate?: MassUpdateMeta;
     recentlyViewed?: RecentlyViewed[];
     favorites?: Favorite[];
     fieldActions?: FieldActions;
+    extra?: ObjectMap;
 }
 
 export interface MetadataMap {
@@ -95,6 +142,7 @@ const initialState: Metadata = {
     listView: {} as ListViewMeta,
     search: {} as SearchMeta,
     recordView: {} as RecordViewMetadata,
+    recordModal: {} as RecordModalMetadata,
     subPanel: {} as SubPanelMeta,
     massUpdate: {} as MassUpdateMeta,
     recentlyViewed: [],
@@ -131,6 +179,7 @@ export class MetadataStore implements StateStore {
     listMetadata$: Observable<ListViewMeta>;
     searchMetadata$: Observable<SearchMeta>;
     recordViewMetadata$: Observable<RecordViewMetadata>;
+    recordModalMetadata$: Observable<RecordModalMetadata>;
     fieldActions$: Observable<any>;
     metadata$: Observable<Metadata>;
     allModuleMetadata$: Observable<MetadataMap>;
@@ -170,6 +219,7 @@ export class MetadataStore implements StateStore {
         'listView',
         'search',
         'recordView',
+        'subPanel',
         'favorites'
     ];
 
@@ -180,6 +230,7 @@ export class MetadataStore implements StateStore {
         this.listMetadata$ = this.state$.pipe(map(state => state.listView), distinctUntilChanged());
         this.searchMetadata$ = this.state$.pipe(map(state => state.search), distinctUntilChanged());
         this.recordViewMetadata$ = this.state$.pipe(map(state => state.recordView), distinctUntilChanged());
+        this.recordModalMetadata$ = this.state$.pipe(map(state => state.recordModal), distinctUntilChanged());
         this.fieldActions$ = this.state$.pipe(map(state => state.fieldActions), distinctUntilChanged());
         this.subPanelMetadata$ = this.state$.pipe(map(state => state.subPanel), distinctUntilChanged());
         this.metadata$ = this.state$;
@@ -319,11 +370,17 @@ export class MetadataStore implements StateStore {
         this.parseListViewMetadata(data, metadata);
         this.parseSearchMetadata(data, metadata);
         this.parseRecordViewMetadata(data, metadata);
+        this.parseRecordModalMetadata(data, metadata);
         this.parseSubPanelMetadata(data, metadata);
         this.parseMassUpdateMetadata(data, metadata);
         this.parseRecentlyViewedMetadata(data, metadata);
         this.parseFavoritesMetadata(data, metadata);
         this.parseFieldViewMetada(data, metadata);
+
+        if (data.extra) {
+            metadata.extra = data.extra;
+        }
+
         return metadata;
     }
 
@@ -490,14 +547,42 @@ export class MetadataStore implements StateStore {
             topWidget: 'topWidget',
             sidebarWidgets: 'sidebarWidgets',
             bottomWidgets: 'bottomWidgets',
+            headerWidgets: 'headerWidgets',
             summaryTemplates: 'summaryTemplates',
             vardefs: 'vardefs',
-            metadata: 'metadata'
+            metadata: 'metadata',
+            header: 'header',
+            sections: 'sections'
         };
 
         this.addDefinedMeta(recordViewMeta, receivedMeta, entries);
 
         metadata.recordView = recordViewMeta;
+    }
+
+    protected parseRecordModalMetadata(data, metadata: Metadata): void {
+        if (!data || !data.recordModal) {
+            return;
+        }
+
+        const recordModalMeta: RecordModalMetadata = {
+            actions: [] as Action[],
+            templateMeta: {} as RecordTemplateMetadata,
+            panels: []
+        };
+
+        const receivedMeta = data.recordModal;
+        const entries = {
+            templateMeta: 'templateMeta',
+            actions: 'actions',
+            panels: 'panels',
+            vardefs: 'vardefs',
+            metadata: 'metadata'
+        };
+
+        this.addDefinedMeta(recordModalMeta, receivedMeta, entries);
+
+        metadata.recordModal = recordModalMeta;
     }
 
     protected parseRecentlyViewedMetadata(data, metadata: Metadata): void {

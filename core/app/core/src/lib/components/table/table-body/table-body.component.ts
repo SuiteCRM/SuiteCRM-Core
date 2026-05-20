@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,24 +24,20 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {combineLatestWith, BehaviorSubject, Observable, of, Subscription} from 'rxjs';
+import {Component, Input, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
+import {BehaviorSubject, combineLatestWith, Observable, of, Subscription} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
-import {
-    ColumnDefinition,
-    Field,
-    Record,
-    RecordSelection,
-    SelectionStatus,
-    SortDirection,
-    SortingSelection,
-    ActiveLineAction
-} from 'common';
+import {ColumnDefinition} from '../../../common/metadata/list.metadata.model';
+import {Field} from '../../../common/record/field.model';
+import {Record} from '../../../common/record/record.model';
+import {RecordSelection, SelectionStatus} from '../../../common/views/list/record-selection.model';
+import {SortDirection, SortingSelection} from '../../../common/views/list/list-navigation.model';
 import {FieldManager} from '../../../services/record/field/field.manager';
 import {TableConfig} from '../table.model';
 import {SortDirectionDataSource} from '../../sort-button/sort-button.model';
 import {LoadingBufferFactory} from '../../../services/ui/loading-buffer/loading-buffer.factory';
 import {LoadingBuffer} from '../../../services/ui/loading-buffer/loading-buffer.service';
+import {ActiveLineAction} from "../../../common/actions/action.model";
 
 interface TableViewModel {
     columns: ColumnDefinition[];
@@ -61,9 +57,14 @@ export class TableBodyComponent implements OnInit, OnDestroy {
     @Input() config: TableConfig;
 
     private activeAction: BehaviorSubject<string> = new BehaviorSubject<string>('');
-    protected activeAction$: Observable<string> =this.activeAction.asObservable();
+    protected activeAction$: Observable<string> = this.activeAction.asObservable();
 
-    activeLineAction: ActiveLineAction
+    loading: WritableSignal<boolean> = signal(false);
+    fetching: WritableSignal<boolean> = signal(true);
+    vm: WritableSignal<TableViewModel> = signal(null);
+    columns: WritableSignal<ColumnDefinition[]> = signal([]);
+    displayedColumns: WritableSignal<string[]> = signal([]);
+    activeLineAction: ActiveLineAction;
 
     maxColumns = 4;
     popoverColumns: ColumnDefinition[];
@@ -73,6 +74,7 @@ export class TableBodyComponent implements OnInit, OnDestroy {
 
     currentPage: number = 1;
     pageSize: number = 20;
+    records: WritableSignal<Record[]> = signal([]);
 
     constructor(
         protected fieldManager: FieldManager,
@@ -103,12 +105,14 @@ export class TableBodyComponent implements OnInit, OnDestroy {
             this.currentPage = Math.ceil(pagination.pageLast / pagination.pageSize);
         }));
 
+        this.subs.push(loading$.subscribe((loading) => {
+            this.setLoading(loading)
+        }));
 
         this.vm$ = this.config.columns.pipe(
             combineLatestWith(
                 selection$,
                 this.config.maxColumns$,
-                this.config.dataSource.connect(null),
                 loading$
             ),
             map((
@@ -116,7 +120,6 @@ export class TableBodyComponent implements OnInit, OnDestroy {
                     columns,
                     selection,
                     maxColumns,
-                    records,
                     loading
                 ]
             ) => {
@@ -142,15 +145,10 @@ export class TableBodyComponent implements OnInit, OnDestroy {
                 const selected = selection && selection.selected || {};
                 const selectionStatus = selection && selection.status || SelectionStatus.NONE;
 
-                records.forEach((record, index) => {
-                    if (!record.metadata) {
-                        record.metadata = {};
-                    }
 
-                    record.metadata.queryParams = {
-                        offset: (index + 1 ) + ((this.currentPage - 1) * this.pageSize)
-                    };
-                });
+                const records = this.records() ?? [];
+                this.columns.set(columns);
+                this.displayedColumns.set(displayedColumns);
 
                 return {
                     columns,
@@ -158,15 +156,39 @@ export class TableBodyComponent implements OnInit, OnDestroy {
                     selected,
                     selectionStatus,
                     displayedColumns,
-                    records: records || [],
+                    records: records,
                     loading
                 };
             })
         );
+
+        this.subs.push(this.config.dataSource.connect(null).subscribe(records => {
+            this.setLoading(true);
+            records.forEach((record, index) => {
+                if (!record.metadata) {
+                    record.metadata = {};
+                }
+
+                record.metadata.queryParams = {
+                    offset: (index + 1) + ((this.currentPage - 1) * this.pageSize)
+                };
+            });
+
+            this.records.set([...records])
+            this.vm.update(currentVm => currentVm ? {...currentVm, records: [...records]} : null);
+
+            setTimeout(() => {
+                this.setLoading(false);
+            }, 250);
+        }));
+
+        this.subs.push(this.vm$.subscribe((vm)=> {
+            this.vm.set(vm);
+        }));
     }
 
     ngOnDestroy() {
-        this.subs.forEach(sub => sub.unsubscribe());
+        this.subs.forEach(sub => sub?.unsubscribe());
     }
 
     toggleSelection(id: string): void {
@@ -205,7 +227,7 @@ export class TableBodyComponent implements OnInit, OnDestroy {
         return displayedColumns;
     }
 
-    buildHiddenColumns(metaFields: ColumnDefinition[], displayedColumns:string[]): ColumnDefinition[] {
+    buildHiddenColumns(metaFields: ColumnDefinition[], displayedColumns: string[]): ColumnDefinition[] {
         const fields = metaFields.filter(function (field) {
             return !field.hasOwnProperty('default')
                 || (field.hasOwnProperty('default') && field.default === true);
@@ -219,7 +241,7 @@ export class TableBodyComponent implements OnInit, OnDestroy {
             }
         }
 
-        let hiddenColumns= fields.filter(obj => missingFields.includes(obj.name));
+        let hiddenColumns = fields.filter(obj => missingFields.includes(obj.name));
 
         return hiddenColumns;
     }
@@ -249,7 +271,21 @@ export class TableBodyComponent implements OnInit, OnDestroy {
             return null;
         }
 
+        this.ensureAllFields(record);
         return this.fieldManager.addField(record, column);
+    }
+
+    protected ensureAllFields(record: Record): void {
+        const columns = this.columns();
+        if (!columns?.length) {
+            return;
+        }
+
+        for (const col of columns) {
+            if (!record.fields?.[col.name]) {
+                this.fieldManager.addField(record, col);
+            }
+        }
     }
 
     protected initLoading(): Observable<boolean> {
@@ -257,6 +293,14 @@ export class TableBodyComponent implements OnInit, OnDestroy {
 
         if (this.config.loading$) {
             this.subs.push(this.config.loading$.subscribe(loading => {
+                if (this.fetching() === true && loading === false && !this.records?.length) {
+                    setTimeout(() => {
+                        this.fetching.set(loading);
+                    }, 400);
+                    this.loadingBuffer.updateLoading(loading);
+                    return;
+                }
+                this.fetching.set(loading);
                 this.loadingBuffer.updateLoading(loading);
             }));
 
@@ -267,6 +311,10 @@ export class TableBodyComponent implements OnInit, OnDestroy {
 
     trackRecord(index: number, item: Record): any {
         return item?.id ?? '';
+    }
+
+    protected setLoading(value: boolean): void {
+        this.loading.set(value);
     }
 }
 

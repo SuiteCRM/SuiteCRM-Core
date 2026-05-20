@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,10 +25,12 @@
  */
 
 import {Component, ElementRef, OnDestroy, OnInit} from '@angular/core';
-import {isFalse, SingleSeries} from 'common';
+import {SingleSeries} from '../../../../common/containers/chart/chart.model';
+import {isFalse, isTrue} from '../../../../common/utils/value-utils';
 import {BaseChartComponent} from '../base-chart/base-chart.component';
 import {ScreenSizeObserverService} from "../../../../services/ui/screen-size-observer/screen-size-observer.service";
 import {debounceTime} from "rxjs/operators";
+import {LanguageStore} from "../../../../store/language/language.store";
 
 @Component({
     selector: 'scrm-vertical-bar-chart',
@@ -39,7 +41,7 @@ export class VerticalBarChartComponent extends BaseChartComponent implements OnI
 
     results: SingleSeries;
 
-    constructor(protected elementRef: ElementRef, protected screenSize: ScreenSizeObserverService) {
+    constructor(protected elementRef: ElementRef, protected screenSize: ScreenSizeObserverService, protected language: LanguageStore) {
         super(elementRef, screenSize);
     }
 
@@ -54,6 +56,12 @@ export class VerticalBarChartComponent extends BaseChartComponent implements OnI
             this.results = value.singleSeries;
             this.calculateView()
         }));
+
+        this.results.forEach((result) => {
+            if (result?.label) {
+                result.name = this.language.getFieldLabel(result.label);
+            }
+        })
     }
 
     ngOnDestroy(): void {
@@ -69,7 +77,7 @@ export class VerticalBarChartComponent extends BaseChartComponent implements OnI
     }
 
     get xAxis(): boolean {
-        return this.dataSource.options.xAxis || false;
+        return isTrue(this.dataSource.options.xAxis ?? false);
     }
 
     get yAxis(): boolean {
@@ -80,12 +88,16 @@ export class VerticalBarChartComponent extends BaseChartComponent implements OnI
         return !isFalse(this.dataSource.options.legend);
     }
 
+    get legendTitle(): string {
+        return this.language.getFieldLabel(this.dataSource.options.legendTitle) || this.language.getFieldLabel('LBL_LEGEND');
+    }
+
     get showXAxisLabel(): boolean {
-        return this.dataSource.options.showXAxisLabel || false;
+        return isTrue(this.dataSource.options.showXAxisLabel ?? false);
     }
 
     get showYAxisLabel(): boolean {
-        return this.dataSource.options.showYAxisLabel || false;
+        return isTrue(this.dataSource.options.showYAxisLabel ?? false);
     }
 
     get xAxisLabel(): string {
@@ -101,6 +113,29 @@ export class VerticalBarChartComponent extends BaseChartComponent implements OnI
             return this.dataSource.tickFormatting;
         }
         return null;
+    }
+
+    get noBarWhenZero(): boolean {
+        return !isFalse(this.dataSource.options.noBarWhenZero ?? false);
+    }
+
+    get showDataLabel(): boolean {
+        return !isFalse(this.dataSource.options.showDataLabel ?? false);
+    }
+    get rotateXAxisTicks(): boolean {
+        return !isFalse(this.dataSource.options.rotateXAxisTicks ?? false);
+    }
+    get trimXAxisTicks(): boolean {
+        return !isFalse(this.dataSource.options.trimXAxisTicks ?? false);
+    }
+    get trimYAxisTicks(): boolean {
+        return !isFalse(this.dataSource.options.trimYAxisTicks ?? false);
+    }
+    get maxXAxisTickLength(): number {
+        return parseInt(this.dataSource.options.maxXAxisTickLength) || 16;
+    }
+    get maxYAxisTickLength(): number {
+        return parseInt(this.dataSource.options.maxYAxisTickLength) || 16;
     }
 
     formatTooltipValue(value: any): any {

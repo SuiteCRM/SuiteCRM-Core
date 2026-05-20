@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2024 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2024 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -27,9 +27,11 @@ import {Injectable} from "@angular/core";
 import {ProcessService} from "../../../../process/process.service";
 import {take} from "rxjs/operators";
 import {AsyncActionInput} from "../../../../process/processes/async-action/async-action";
-import {BaseField, Field, Record} from "common";
+import {BaseField, Field} from '../../../../../common/record/field.model';
+import {Record} from '../../../../../common/record/record.model';
 import {BaseFieldHandler} from "./base.field-handler";
 import {MessageService} from "../../../../message/message.service";
+
 @Injectable({
     providedIn: 'root'
 })
@@ -39,7 +41,7 @@ export class DateFieldHandler extends BaseFieldHandler<BaseField> {
         protected processService: ProcessService,
         protected messages: MessageService,
     ) {
-        super();
+        super(processService, messages);
     }
 
     initDefaultValue(field: BaseField, record: Record): void {
@@ -73,18 +75,18 @@ export class DateFieldHandler extends BaseFieldHandler<BaseField> {
             displayDefault: displayDefault
         } as AsyncActionInput;
 
-        field.loading = true;
+        field.loading.set(true)
 
         this.processService.submit(processType, options).pipe(take(1)).subscribe((result) => {
 
             const value = result?.data?.value ?? null;
-            field.loading = false;
+            field.loading.set(false)
 
             if (value === null) {
                 this.messages.addDangerMessageByKey("ERR_FIELD_LOGIC_BACKEND_CALCULATION");
                 return;
             }
-            this.updateValue(field, value.toString(), record);
+            this.setValue(field, value.toString(), record);
             field.defaultValueInitialized = true;
 
         });
@@ -92,7 +94,7 @@ export class DateFieldHandler extends BaseFieldHandler<BaseField> {
 
     }
 
-    protected updateValue(field: Field, value: string, record: Record): void {
+    protected setValue(field: Field, value: string, record: Record): void {
         field.value = value.toString();
         field.formControl.setValue(value);
         // re-validate the parent form-control after value update

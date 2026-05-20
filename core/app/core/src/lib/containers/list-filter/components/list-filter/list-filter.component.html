@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -50,15 +50,19 @@
                          (click)="onFocusSearch()"
         >
 
-            <div *ngIf="store.special.length > 0" class="float-right mt-4" field-grid-special>
+            <div *ngIf="store.special.length > 0" class="special-field-grid" field-grid-special>
 
-                <div *ngFor="let item of store.special " class="d-inline-block form-check mb-2 mr-sm-2">
-
-                    <input class="form-check-input" type="checkbox" [value]="item.value">
+                <div *ngFor="let item of store.special " class="d-inline-block mr-sm-2 w-25 special-field-grid-col">
 
                     <label class="form-check-label">
                         <scrm-label [labelKey]="item.labelKey"></scrm-label>
                     </label>
+
+                    <scrm-field [field]="item"
+                                [mode]="store.mode"
+                                [record]="vm"
+                                [type]="item.type">
+                    </scrm-field>
 
                 </div>
             </div>

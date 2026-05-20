@@ -78,6 +78,10 @@ $module_name_map = [
         'frontend' => 'accounts',
         'core' => 'Accounts'
     ],
+    'CalendarAccount' => [
+        'frontend' => 'calendar-account',
+        'core' => 'CalendarAccount'
+    ],
     'Opportunities' => [
         'frontend' => 'opportunities',
         'core' => 'Opportunities'
@@ -217,6 +221,14 @@ $module_name_map = [
     'ExternalOAuthConnection' => [
         'frontend' => 'external-oauth-connection',
         'core' => 'ExternalOAuthConnection'
+    ],
+    'ManualMigrationTasks' => [
+        'frontend' => 'manual-migration-tasks',
+        'core' => 'ManualMigrationTasks'
+    ],
+    'Processes' => [
+        'frontend' => 'processes',
+        'core' => 'Processes'
     ],
     'TemplateSectionLine' => [
         'frontend' => 'template-section-line',

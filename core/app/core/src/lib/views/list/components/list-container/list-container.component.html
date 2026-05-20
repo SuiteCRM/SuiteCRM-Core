@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -29,8 +29,8 @@
 
 <div class="list-view-container container-fluid pt-2">
     <div class="row">
-        <ng-container *ngIf="!swapWidgets || (swapWidgets && !displayWidgets)">
-            <div [ngClass]="{ 'col-lg-12': !displayWidgets }"
+        <ng-container *ngIf="!swapWidgets() || (swapWidgets() && !showSidebar())">
+            <div [ngClass]="{ 'col-lg-12': !showSidebar() }"
                  class="col-lg-9"
             >
                 <scrm-table [config]="tableConfig"></scrm-table>
@@ -39,18 +39,21 @@
 
 
         <ng-container *ngIf="sidebarWidgetConfig.widgetsEnabled">
-            <ng-container *ngIf="!swapWidgets || (swapWidgets && displayWidgets)">
-            <div [style.display]="widgetDisplayType"
-                 [class.mt-0]="swapWidgets"
-                 class="col-lg-3 list-widget-container pl-0">
-                <div *ngFor="let widget of sidebarWidgetConfig.widgets" class="mb-3">
-                    <scrm-sidebar-widget [config]="widget"
-                                         [context]="getViewContext()"
-                                         [context$]="store.context$"
-                                         [type]="widget.type">
-                    </scrm-sidebar-widget>
+            <ng-container *ngIf="!swapWidgets() || (swapWidgets() && showSidebar())">
+                <div [style.display]="widgetDisplayType()"
+                     [class.mt-0]="swapWidgets()"
+                     class="col-lg-3 list-widget-container pl-0">
+                    <ng-container *ngIf="displayWidgets()">
+                        <div *ngFor="let widget of sidebarWidgetConfig.widgets" class="mb-3">
+                            <scrm-sidebar-widget [config]="widget"
+                                                 [context]="getViewContext()"
+                                                 [context$]="store.context$"
+                                                 [type]="widget.type">
+                            </scrm-sidebar-widget>
+                        </div>
+                    </ng-container>
+
                 </div>
-            </div>
             </ng-container>
         </ng-container>
 

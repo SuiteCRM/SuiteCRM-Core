@@ -146,7 +146,7 @@ $viewdefs ['Leads'] =
                     'options' => [
                         'statistics' => [
                             [
-                                'labelKey' => 'LBL_DAYS_OPEN',
+                                'endLabelKey' => 'LBL_DAYS_OPEN',
                                 'type' => 'lead-days-open',
                                 'hideValueIfEmpty' => true
                             ],
@@ -183,6 +183,8 @@ $viewdefs ['Leads'] =
                             'acl' => ['view'],
                             'aclModule' => 'AOS_PDF_Templates',
                             'params' => [
+                                'createNote' => true,
+                                'fileNaming' => 'template',
                                 'selectModal' => [
                                     'module' => 'AOS_PDF_Templates'
                                 ]
@@ -201,7 +203,10 @@ $viewdefs ['Leads'] =
                                                 'name' => 'full_name',
                                                 'label' => 'LBL_NAME',
                                             ),
-                                        1 => 'phone_work',
+                                        1 => array(
+                                            'name' => 'assigned_user_name',
+                                            'label' => 'LBL_ASSIGNED_TO',
+                                        ),
                                     ),
                                 1 =>
                                     array(
@@ -211,7 +216,7 @@ $viewdefs ['Leads'] =
                                 2 =>
                                     array(
                                         0 => 'department',
-                                        1 => 'phone_fax',
+                                        1 => 'phone_work',
                                     ),
                                 3 =>
                                     array(
@@ -247,18 +252,12 @@ $viewdefs ['Leads'] =
                                 5 =>
                                     array(
                                         0 => 'email1',
+                                        1 => '',
                                     ),
                                 6 =>
                                     array(
                                         0 => 'description',
-                                    ),
-                                7 =>
-                                    array(
-                                        0 =>
-                                            array(
-                                                'name' => 'assigned_user_name',
-                                                'label' => 'LBL_ASSIGNED_TO',
-                                            ),
+                                        1 => '',
                                     ),
                             ),
                         'LBL_PANEL_ADVANCED' =>
@@ -285,6 +284,7 @@ $viewdefs ['Leads'] =
                                                 'name' => 'campaign_name',
                                                 'label' => 'LBL_CAMPAIGN',
                                             ),
+                                        1 => ''
                                     ),
                             ),
                         'LBL_PANEL_ASSIGNMENT' =>

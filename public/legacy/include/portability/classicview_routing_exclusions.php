@@ -41,6 +41,9 @@ $classicview_routing_exclusions = [
     ],
     'Users' => [
         'ChangePassword'
+    ],
+    'Home' => [
+        'UnifiedSearch',
     ]
 ];
 

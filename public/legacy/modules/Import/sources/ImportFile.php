@@ -105,6 +105,12 @@ class ImportFile extends ImportDataSource
      */
     private $_encoding;
 
+    /**
+     * Whether to apply securexss() sanitization when reading rows.
+     * Set to false when reading pre-sanitized display cache files.
+     */
+    private bool $_sanitize = true;
+
 
     /**
      * Constructor
@@ -125,10 +131,8 @@ class ImportFile extends ImportDataSource
             return null;
         }
 
-        // turn on auto-detection of line endings to fix bug #10770
-        ini_set('auto_detect_line_endings', '1');
 
-        $this->_fp         = sugar_fopen($filename, 'r');
+        $this->_fp         = sugar_fopen($filename, 'rb'); // Ensure compatibility Windows/Linux
         $this->_sourcename   = $filename;
         $this->_deleteFile = $deleteFile;
         $this->_delimiter  = (empty($delimiter) ? ',' : $delimiter);
@@ -172,7 +176,6 @@ class ImportFile extends ImportDataSource
             }
         }
 
-        ini_restore('auto_detect_line_endings');
     }
 
     /**
@@ -219,12 +222,15 @@ class ImportFile extends ImportDataSource
                 return false;
             }
         } else {
-            $row = fgetcsv($this->_fp, 8192, $this->_delimiter, $this->_enclosure);
+            $row = fgetcsv($this->_fp, 8192, $this->_delimiter, $this->_enclosure, '\\');
             if ($row !== false && $row != array(null)) {
                 $this->_currentRow = $row;
             } else {
                 return false;
             }
+        }
+        if(!is_array($this->_currentRow)) {
+            return false;
         }
 
         global $locale;
@@ -235,7 +241,9 @@ class ImportFile extends ImportDataSource
                 $this->_currentRow[$key] = $locale->translateCharset($value, $this->_encoding);
             }
 
-            $this->_currentRow[$key] = securexss($value);
+            if ($this->_sanitize) {
+                $this->_currentRow[$key] = securexss($value);
+            }
 
             // Convert all line endings to the same style as PHP_EOL
             // Use preg_replace instead of str_replace as str_replace may cause extra lines on Windows
@@ -382,6 +390,11 @@ class ImportFile extends ImportDataSource
         $this->_hasHeader = $hasHeader;
     }
 
+    public function setSanitize(bool $sanitize): void
+    {
+        $this->_sanitize = $sanitize;
+    }
+
     public function hasHeaderRow($autoDetect = true)
     {
         if ($autoDetect) {
@@ -416,27 +429,27 @@ class ImportFile extends ImportDataSource
     }
 
     //Begin Implementation for SPL's Iterator interface
-    public function key()
+    public function key(): mixed
     {
         return $this->_rowsCount;
     }
 
-    public function current()
+    public function current(): mixed
     {
         return $this->_currentRow;
     }
 
-    public function next()
+    public function next(): void
     {
         $this->getNextRow();
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return $this->_currentRow !== false;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->setFpAfterBOM();
         //Load our first row

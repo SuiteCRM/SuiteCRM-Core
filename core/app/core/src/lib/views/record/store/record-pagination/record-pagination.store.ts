@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2024 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2024 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,7 +25,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {deepClone, Pagination, ObjectMap, SortingSelection, SearchCriteria, emptyObject} from 'common';
 import {BehaviorSubject, Observable, of, Subscription} from "rxjs";
 import {distinctUntilChanged, map, shareReplay} from "rxjs/operators";
 import {isArray, union} from "lodash-es";
@@ -37,6 +36,10 @@ import {SavedFilterMap} from "../../../../store/saved-filters/saved-filter.model
 import {LocalStorageService} from "../../../../services/local-storage/local-storage.service";
 import {RecordPaginationService} from "./record-pagination.service";
 import {RecordPaginationModel} from "./record-pagination.model";
+import {ObjectMap} from "../../../../common/types/object-map";
+import {Pagination, SortingSelection} from "../../../../common/views/list/list-navigation.model";
+import {deepClone, emptyObject} from "../../../../common/utils/object-utils";
+import {SearchCriteria} from "../../../../common/views/list/search-criteria.model";
 
 export interface RecordPaginationState {
     paginationEnabled?: boolean;
@@ -51,7 +54,7 @@ const initialState: RecordPaginationState = {
 };
 
 @Injectable()
-export class RecordPaginationStore  {
+export class RecordPaginationStore {
 
     recordListStore: RecordListStore;
 
@@ -115,7 +118,7 @@ export class RecordPaginationStore  {
         const data = this.loadPreference(module, 'current-record-pagination');
         this.checkPaginationExist(data);
 
-        if (!isArray(data.recordIds) || !data.recordIds || !data.recordIds.length) {
+        if (!data?.recordIds || !isArray(data?.recordIds) || !data?.recordIds?.length) {
             return null;
         }
         return data;
@@ -125,7 +128,7 @@ export class RecordPaginationStore  {
         const module = this.getModule();
         const hasPagination = this.loadPreference(module, 'current-pagination', 'listview');
         if (!hasPagination) {
-            this.recordListStore.pagination = data.pagination;
+            this.recordListStore.pagination = data?.pagination ?? {} as Pagination;
         }
     }
 
@@ -196,7 +199,7 @@ export class RecordPaginationStore  {
         this.updateSearchCriteria(filters, reload)
     }
 
-    protected updateSearchCriteria(filters:SavedFilterMap, reload = true): void {
+    protected updateSearchCriteria(filters: SavedFilterMap, reload = true): void {
         let criteria = this.mergeCriteria(filters);
         this.recordListStore.updateSearchCriteria(criteria, reload);
     }

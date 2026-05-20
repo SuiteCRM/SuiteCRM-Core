@@ -105,12 +105,13 @@ if (!empty($_REQUEST['guid']) && !empty($_REQUEST['key'])) {
         }
 
         if (!$expired) {
+            global $RAW_REQUEST;
+            $password = $RAW_REQUEST['new_password'] ?? $_POST['new_password'] ?? '';
+            $usr = new user();
+            $errors = $usr->passwordValidationCheck($password);
             // if the form is filled and we want to login
             if (isset($_REQUEST['login']) && $_REQUEST['login'] == '1') {
                 if ($row['username'] == $_POST['user_name']) {
-                    $password = $_POST['new_password'];
-                    $usr = new user();
-                    $errors = $usr->passwordValidationCheck($password);
                     if (!$errors) {
                         $usr_id = $usr->retrieve_user_id($_POST['user_name']);
                         $usr->retrieve($usr_id);
@@ -136,6 +137,16 @@ if (!empty($_REQUEST['guid']) && !empty($_REQUEST['key'])) {
                 }
             } else {
                 $redirect = false;
+                if (!$errors && !empty($password)){
+                    $usr_id = $usr->retrieve_user_id($_POST['user_name']);
+                    $usr->retrieve($usr_id);
+                    $usr->setNewPassword($password);
+                    $query2 = "UPDATE users_password_link SET deleted='1' where id='" . $db->quote($_REQUEST['guid']) . "'";
+                    DBManagerFactory::getInstance()->query($query2, true, "Error setting link for $usr->user_name: ");
+                    if ($_REQUEST['redirect'] === '1') {
+                        $redirect = true;
+                    }
+                }
             }
         } else {
             $query2 = "UPDATE users_password_link SET deleted='1' where id='" . $db->quote($_REQUEST['guid']) . "'";

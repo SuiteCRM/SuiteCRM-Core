@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,12 +28,15 @@
 namespace App\UserPreferences\LegacyHandler;
 
 use ApiPlatform\Exception\InvalidArgumentException;
+use App\Engine\LegacyHandler\CacheManagerHandler;
 use App\Engine\LegacyHandler\LegacyHandler;
+use App\Engine\LegacyHandler\LegacyScopeState;
 use App\Process\Entity\Process;
 use App\Process\Service\ProcessHandlerInterface;
 use Exception;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class SaveUiPreferences extends LegacyHandler implements ProcessHandlerInterface, LoggerAwareInterface
 {
@@ -44,6 +47,38 @@ class SaveUiPreferences extends LegacyHandler implements ProcessHandlerInterface
      * @var LoggerInterface
      */
     private $logger;
+
+    private CacheManagerHandler $cacheManagerHandler;
+
+    /**
+     * LegacyHandler constructor.
+     * @param string $projectDir
+     * @param string $legacyDir
+     * @param string $legacySessionName
+     * @param string $defaultSessionName
+     * @param LegacyScopeState $legacyScopeState
+     * @param RequestStack $requestStack
+     * @param CacheManagerHandler $cacheManagerHandler
+     */
+    public function __construct(
+        string $projectDir,
+        string $legacyDir,
+        string $legacySessionName,
+        string $defaultSessionName,
+        LegacyScopeState $legacyScopeState,
+        RequestStack $requestStack,
+        CacheManagerHandler $cacheManagerHandler
+    ) {
+        parent::__construct(
+            $projectDir,
+            $legacyDir,
+            $legacySessionName,
+            $defaultSessionName,
+            $legacyScopeState,
+            $requestStack
+        );
+        $this->cacheManagerHandler = $cacheManagerHandler;
+    }
 
     /**
      * @inheritDoc
@@ -130,12 +165,14 @@ class SaveUiPreferences extends LegacyHandler implements ProcessHandlerInterface
         }
 
         $this->close();
+
+        $this->cacheManagerHandler->markAsNeedsUpdate('app-metadata-user-preferences-' . $current_user->id);
     }
 
     /**
      * @inheritDoc
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }

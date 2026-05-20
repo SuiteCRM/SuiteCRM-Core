@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2023 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2023 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -26,15 +26,24 @@
 */
 -->
 <ng-template #popContent>
-    <ng-content select="[popup-content]"></ng-content>
+    <ng-container *ngIf="showPopup() === true">
+        <ng-content select="[popup-content]"></ng-content>
+    </ng-container>
 </ng-template>
 <ng-template #popTitle>
-    <ng-content select="[popup-title]"></ng-content>
+    <ng-container *ngIf="showPopup() === true">
+        <ng-content select="[popup-title]"></ng-content>
+    </ng-container>
 </ng-template>
-<scrm-button [config]="buttonConfig()"
-             [autoClose]="'outside'"
-             [ngbPopover]="popContent"
-             [popoverTitle]="popTitle"
-             [popoverClass]="'popover-wrapper'"
-             [placement]="'right'"
-></scrm-button>
+<div #wrapper>
+    <scrm-button [config]="buttonConfig()"
+                 [autoClose]="'outside'"
+                 [ngbPopover]="popContent"
+                 [popoverTitle]="popTitle"
+                 [popoverClass]="popoverClass"
+                 [placement]="placement"
+                 [positionTarget]="wrapper"
+                 #popover="ngbPopover"
+                 [class.d-none]="displayButton() === false"
+    ></scrm-button>
+</div>

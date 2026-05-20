@@ -385,8 +385,22 @@ class Bug extends SugarBean
     }
 }
 
+/**
+ * Returns an associative array of active releases for dropdown use.
+ *
+ * @deprecated Release fields now use relate type with
+ *             direct module lookup. This function is kept only for backward
+ *             compatibility during upgrades and will be removed in a future
+ *             major version.
+ *
+ * @return array
+ */
 function getReleaseDropDown()
 {
+    LoggerManager::getLogger()->deprecated(
+        'getReleaseDropDown() is deprecated. Use relate fields for release selection instead.'
+    );
+
     static $releases = null;
     if (!$releases) {
         $seedRelease = BeanFactory::newBean('Releases');

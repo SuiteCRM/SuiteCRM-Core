@@ -1,5 +1,39 @@
 parameters:
   module.base_actions:
+    modules:
+      manual-migration-tasks:
+        exclude:
+          - edit
+          - create
+          - duplicate
+          - delete
+          - duplicate-merge
+          - save
+          - saveNew
+          - saveContinue
+      processes:
+        exclude:
+          - edit
+          - create
+          - duplicate
+          - delete
+          - duplicate-merge
+          - save
+          - saveNew
+          - saveContinue
+      email-marketing:
+        actions:
+          edit:
+            key: edit
+            labelKey: LBL_EDIT
+            priority: 1
+            params:
+              expanded: true
+            acl:
+              - edit
+            availability:
+              - email-marketing-status-checker
+              - acls
     default:
       actions:
         index: &index

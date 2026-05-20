@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2024 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2024 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -27,6 +27,82 @@
 p-multiselect {
   .p-inputtext {
     font-size: .875rem;
+  }
+
+  .p-multiselect-panel .p-multiselect-items {
+    padding-top: 0;
+
+    .p-multiselect-item {
+      .p-checkbox{
+        vertical-align: middle;
+      }
+
+      .multi-relate-item-header-field {
+        width: 100%;
+        table-layout: fixed;
+        white-space: nowrap;
+        overflow: hidden;
+        line-height: 1.15rem;
+        text-overflow: ellipsis;
+      }
+
+      .multi-relate-item-subheader-field {
+        font-size: 85%;
+        color: $shell-grey;
+        width: 100%;
+        table-layout: fixed;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: .975rem;
+      }
+    }
+
+  }
+
+  .multi-relate-selected-entry {
+    table-layout: fixed;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .multi-relate-selected-entry-icon {
+      width: 18px;
+    }
+
+    .multi-relate-selected-entry-value {
+      width: 100%;
+      table-layout: fixed;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    svg {
+      fill: $bright-purple;
+      stroke: $bright-purple;
+    }
+  }
+
+  .p-multiselect-trigger {
+    .pi-spin {
+      border: 2px solid #495057;
+      border-bottom-color: transparent;
+      border-radius: 50%;
+      display: table-cell;
+      box-sizing: border-box;
+      animation: rotation 1s linear infinite;
+      width: 15px;
+      height: 15px;
+    }
+
+    @keyframes rotation {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
   }
 
   .p-multiselect-trigger-icon {

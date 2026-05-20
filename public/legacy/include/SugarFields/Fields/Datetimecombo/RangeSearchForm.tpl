@@ -58,7 +58,7 @@
 </select>
 </div>
 
-<div id="{$id}_range_div" style="{if preg_match('/^\[/', $smarty.request.{{$id_range}})  || $starting_choice == 'between'}display:none{else}display:''{/if};" class="datecalendar">
+<div id="{$id}_range_div" style="{if preg_match('/^\[/', (string) $smarty.request.{{$id_range}}|default:'')  || $starting_choice == 'between'}display:none{else}display:''{/if};" class="datecalendar">
 <input autocomplete="off" type="text" name="range_{$id}" id="range_{$id}" value='{if empty($smarty.request.{{$id_range}}) && !empty($smarty.request.{{$original_id}})}{$smarty.request.{{$original_id}}}{else}{$smarty.request.{{$id_range}}}{/if}' title='{{$vardef.help}}' {{$displayParams.field}} {{if !empty($tabindex)}} tabindex='{{$tabindex}}' {{/if}} size="11" class="dateRangeInput">
 {{if !$displayParams.hiddeCalendar}}
     <button id="{$id}_trigger" type="button" onclick="return false;" class="btn btn-danger">
@@ -82,7 +82,7 @@ weekNumbers:false
 {rdelim}
 );
 </script>
-{{/if}}    
+{{/if}}
 </div>
 
 <div id="{$id}_between_range_div" style="{if $starting_choice=='between'}display:'';{else}display:none;{/if}">
@@ -108,7 +108,7 @@ weekNumbers:false
 {rdelim}
 );
 </script>
-{{/if}} 
+{{/if}}
 {$APP.LBL_AND}
 {assign var=date_value value={{sugarvar key='value' string=true}} }
 <input autocomplete="off" type="text" name="end_range_{$id}" id="end_range_{$id}" value='{$smarty.request.{{$id_range_end}} }' title='{{$vardef.help}}' {{$displayParams.field}} tabindex='{{$tabindex}}' size="11" class="dateRangeInput" maxlength="10">
@@ -134,18 +134,18 @@ weekNumbers:false
 {rdelim}
 );
 </script>
-{{/if}} 
+{{/if}}
 </div>
 
 
 <script type='text/javascript'>
 
-function {$id}_range_change(val) 
+function {$id}_range_change(val)
 {ldelim}
   if(val == 'between') {ldelim}
-     document.getElementById("range_{$id}").value = '';  
+     document.getElementById("range_{$id}").value = '';
      document.getElementById("{$id}_range_div").style.display = 'none';
-     document.getElementById("{$id}_between_range_div").style.display = ''; 
+     document.getElementById("{$id}_between_range_div").style.display = '';
   {rdelim} else if (val == '=' || val == 'not_equal' || val == 'greater_than' || val == 'less_than') {ldelim}
      if((/^\[.*\]$/).test(document.getElementById("range_{$id}").value))
      {ldelim}
@@ -156,11 +156,11 @@ function {$id}_range_change(val)
      document.getElementById("{$id}_range_div").style.display = '';
      document.getElementById("{$id}_between_range_div").style.display = 'none';
   {rdelim} else {ldelim}
-     document.getElementById("range_{$id}").value = '[' + val + ']';    
+     document.getElementById("range_{$id}").value = '[' + val + ']';
      document.getElementById("start_range_{$id}").value = '';
-     document.getElementById("end_range_{$id}").value = ''; 
+     document.getElementById("end_range_{$id}").value = '';
      document.getElementById("{$id}_range_div").style.display = 'none';
-     document.getElementById("{$id}_between_range_div").style.display = 'none';         
+     document.getElementById("{$id}_between_range_div").style.display = 'none';
   {rdelim}
 {rdelim}
 

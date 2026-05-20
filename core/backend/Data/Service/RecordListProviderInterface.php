@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -49,4 +49,14 @@ interface RecordListProviderInterface
         int $limit = -1,
         array $sort = []
     ): RecordList;
+
+    /**
+     * Fetch record IDs from task options, supporting both explicit ID lists and criteria-based queries.
+     *
+     * @param array $options Options containing 'module' and either 'ids' or 'criteria'+'sort'
+     * @param int $offset Current enqueue offset
+     * @param int $batchSize Maximum number of IDs to return
+     * @return array Flat array of record ID strings
+     */
+    public function fetchRecordIds(array $options, int $offset, int $batchSize): array;
 }

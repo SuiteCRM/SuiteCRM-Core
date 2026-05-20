@@ -41,41 +41,43 @@ if (!defined('sugarEntry') || !sugarEntry) {
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
+$viewdefs['DocumentRevisions'] = [
+    'ListView' =>  [
+        'bulkActions' => [
+            'exclude' => [
+                'delete',
+            ]
+        ]
+    ]
+];
 
 
 
-$listViewDefs['DocumentRevisions'] = array(
-  'FILENAME' =>
-  array(
+$listViewDefs['DocumentRevisions'] = [
+  'FILENAME' => [
     'width' => '20%',
     'label' => 'LBL_REV_LIST_FILENAME',
     'link' => true,
-    'default' => true,
-    'bold' => true,
-  ),
-  'REVISION' =>
-  array(
+  ],
+  'REVISION' => [
     'width' => '5%',
     'label' => 'LBL_REV_LIST_REVISION',
     'default' => true,
-  ),
-  'DATE_ENTERED' =>
-  array(
+  ],
+  'DATE_ENTERED' => [
     'width' => '15%',
     'label' => 'LBL_REV_LIST_ENTERED',
     'default' => true,
-  ),
-  'CREATED_BY_NAME' =>
-  array(
+  ],
+  'CREATED_BY_NAME' => [
     'width' => '25%',
     'label' => 'LBL_REV_LIST_CREATED',
     'default' => true,
     'sortable' => false,
-  ),
-  'CHANGE_LOG' =>
-  array(
+  ],
+  'CHANGE_LOG' => [
     'width' => '35%',
     'label' => 'LBL_REV_LIST_LOG',
     'default' => true,
-  ),
-);
+  ],
+];

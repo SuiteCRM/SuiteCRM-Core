@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -36,6 +36,9 @@ import {CancelCreateAction} from './cancel-create/cancel-create.action';
 import {BaseActionManager} from '../../../services/actions/base-action-manager.service';
 import {AsyncProcessRecordAction} from './async-process/async-process.service';
 import {RecordSaveContinueAction} from "./save-continue/record-save-continue.action";
+import {RecordSaveScheduleAction} from "./save-schedule/record-save-schedule.action";
+import {ModalEditAction} from "./modal-edit/modal-edit.action";
+import {ModalCreateAction} from "./modal-create/modal-create.action";
 
 @Injectable({
     providedIn: 'root',
@@ -51,7 +54,10 @@ export class RecordActionManager extends BaseActionManager<RecordActionData> {
         protected save: RecordSaveAction,
         protected saveNew: RecordSaveNewAction,
         protected saveContinue: RecordSaveContinueAction,
+        protected saveSchedule: RecordSaveScheduleAction,
         protected async: AsyncProcessRecordAction,
+        protected recordModalEdit: ModalEditAction,
+        protected recordModalCreate: ModalCreateAction,
     ) {
         super();
         edit.modes.forEach(mode => this.actions[mode][edit.key] = edit);
@@ -60,8 +66,11 @@ export class RecordActionManager extends BaseActionManager<RecordActionData> {
         cancel.modes.forEach(mode => this.actions[mode][cancel.key] = cancel);
         save.modes.forEach(mode => this.actions[mode][save.key] = save);
         saveNew.modes.forEach(mode => this.actions[mode][saveNew.key] = saveNew);
+        saveSchedule.modes.forEach(mode => this.actions[mode][saveSchedule.key] = saveSchedule);
         saveContinue.modes.forEach(mode => this.actions[mode][saveContinue.key] = saveContinue);
         cancelCreate.modes.forEach(mode => this.actions[mode][cancelCreate.key] = cancelCreate);
         async.modes.forEach(mode => this.actions[mode][async.key] = async);
+        recordModalEdit.modes.forEach(mode => this.actions[mode][recordModalEdit.key] = recordModalEdit);
+        recordModalCreate.modes.forEach(mode => this.actions[mode][recordModalCreate.key] = recordModalCreate);
     }
 }

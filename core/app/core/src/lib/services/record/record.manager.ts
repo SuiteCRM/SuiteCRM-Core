@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,12 +25,19 @@
  */
 
 import {Injectable} from '@angular/core';
-import {FieldDefinitionMap, FieldMap, isVoid, Record, ViewFieldDefinition} from 'common';
+import {ViewFieldDefinition} from '../../common/metadata/metadata.model';
+import {FieldDefinitionMap, FieldMap} from '../../common/record/field.model';
+import {Record} from '../../common/record/record.model';
+import {isVoid} from '../../common/utils/value-utils';
 import {UntypedFormGroup} from '@angular/forms';
 import {LanguageStore} from '../../store/language/language.store';
 import {FieldManager} from './field/field.manager';
 import {Params} from '@angular/router';
 import {FieldHandlerRegistry} from "./field/handler/field-handler.registry";
+import {ActionDataSourceBuilderFunction} from "../../common/actions/action.model";
+import {ObjectMap} from "../../common/types/object-map";
+import {deepClone} from "../../common/utils/object-utils";
+import {FieldMapper} from "./field/field.mapper";
 
 @Injectable({
     providedIn: 'root'
@@ -40,7 +47,8 @@ export class RecordManager {
     constructor(
         protected fieldManager: FieldManager,
         protected language: LanguageStore,
-        protected fieldHandlerRegistry: FieldHandlerRegistry
+        protected fieldHandlerRegistry: FieldHandlerRegistry,
+        protected fieldMapper: FieldMapper
     ) {
     }
 
@@ -61,6 +69,35 @@ export class RecordManager {
             formGroup: new UntypedFormGroup({}),
         } as Record;
     }
+
+    /**
+     * Get base record
+     *
+     * @param {object} record to use
+     * @param {object} options to use
+     * @returns {object} baseRecord
+     */
+    public getBaseRecord(record: Record, options: ObjectMap = {updateAttributes: true}): Record {
+        if (!record) {
+            return null;
+        }
+
+        let attributes = record?.attributes ?? {};
+        if (options?.updateAttributes ?? false) {
+            attributes = this.fieldMapper.getAttributesMappedFromFields(record);
+        }
+
+        const baseRecord = {
+            id: record?.id ?? '',
+            type: record?.type ?? '',
+            module: record?.module ?? '',
+            attributes: attributes ?? {},
+            acls: record?.acls ?? []
+        } as Record;
+
+        return deepClone(baseRecord);
+    }
+
 
     /**
      * Init Fields
@@ -84,7 +121,7 @@ export class RecordManager {
                 return;
             }
 
-            if(record.fields[viewField.name]) {
+            if (record.fields[viewField.name]) {
                 return;
             }
 
@@ -95,7 +132,7 @@ export class RecordManager {
                 return;
             }
 
-            this.fieldManager.addField(record, viewField, this.language);
+            this.fieldManager.addField(record, viewField, viewFieldDefinitions, this.language);
         });
 
         return record.fields;
@@ -109,7 +146,8 @@ export class RecordManager {
 
         Object.entries(record.fields).forEach(([key, field]) => {
             const fieldHandler = this.fieldHandlerRegistry.get(record.module, field.type);
-            fieldHandler.initDefaultValue(field, record);
+            fieldHandler.initDefaultValue(field, record, false);
+            fieldHandler.initDefaultValueObject(field, record);
         });
     }
 
@@ -146,7 +184,7 @@ export class RecordManager {
                     const groupField = vardefs[groupFieldKey] ?? {};
                     const parentName = groupField.groupFields[paramKey];
 
-                    if(parentName  && parentName.rname) {
+                    if (parentName && parentName.rname) {
                         rname = parentName.rname;
                     }
 
@@ -164,7 +202,7 @@ export class RecordManager {
                 }
 
                 if (type === 'relate') {
-                    const relate = {} as any;
+                    let relate = {} as any;
 
                     if (rname) {
                         relate[rname] = params[paramKey];
@@ -172,6 +210,10 @@ export class RecordManager {
 
                     if (idName && params[idName]) {
                         relate.id = params[idName];
+                    }
+
+                    if (params[paramKey + '_record'] ?? false) {
+                        relate = this.mapRelateAttributes(params[paramKey + '_record']?.attributes ?? {}, relate);
                     }
 
                     record.attributes[paramKey] = relate;
@@ -248,5 +290,28 @@ export class RecordManager {
                 }
             });
         }
+    }
+
+    initVardefBasedFieldActions(record: Record, buildFieldActionAdapter: ActionDataSourceBuilderFunction): void {
+        Object.values(record?.fields ?? {}).forEach(field => {
+            let fieldActions = field.fieldActions ?? field?.definition?.fieldActions ?? null;
+            if (fieldActions && !fieldActions.adapter) {
+                fieldActions = deepClone(fieldActions);
+                fieldActions.adapter = buildFieldActionAdapter({field} as ObjectMap);
+                field.fieldActions = fieldActions;
+            }
+        });
+
+    }
+
+    protected mapRelateAttributes(param: [], relate: {}): {} {
+        Object.entries(param).forEach(([key, value]) => {
+            if (key === 'id') {
+                return;
+            }
+            relate[key] = value;
+        });
+
+        return relate;
     }
 }

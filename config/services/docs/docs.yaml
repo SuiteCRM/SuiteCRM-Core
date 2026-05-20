@@ -1,0 +1,3 @@
+parameters:
+  docs.urls:
+    messenger_setup: 'https://docs.suitecrm.com/8.x/admin/async-tasks/messenger-setup/'

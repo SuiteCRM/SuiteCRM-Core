@@ -46,7 +46,7 @@ $mod_strings = array(
     'LBL_RECOVER_PASSWORD_SUCCESS' => 'If the provided user name and email are correct, you should receive an email with information to recover your password',
     'ERR_NO_2FACTOR_EMAIL_TMPL' => 'Two-factor email template is not set, please change settings on password management page.',
     'ERR_NO_2FACTOR_EMAIL_TMPL_CODE' => 'Two-factor email template should contain a $code at least.',
-    'LBL_DELETE_USER_CONFIRM' => 'When the User record is deleted, the corresponding Employee record will also be deleted. After the user is deleted, any workflow definitions and reports involving the user might need to be updated.<br/><br/> Deleting a User record cannot be undone.',
+    'LBL_DELETE_USER_CONFIRM' => 'When the User record is deleted, the corresponding Employee record will also be deleted. After the user is deleted, any workflow definitions and reports involving the user might need to be updated.<br/><br/> Personal / Group Inbound Accounts that contain / are assigned to this user will also need updated. <br/><br/> Deleting a User record cannot be undone.',
     'LBL_DELETE_GROUP_CONFIRM' => 'Are you sure you want to delete this Group User? Click OK to delete the User record.<br/>After clicking OK, you will be given the ability to reassign records assigned to the Group User to another user.',
     'LNK_IMPORT_USERS' => 'Import Users',
     'ERR_DELETE_RECORD' => 'A record number must be specified to delete the account.',
@@ -686,21 +686,25 @@ $mod_strings = array(
     'LBL_PROJECT_USERS_1_FROM_PROJECT_TITLE' => 'Project Users from Project Title',
     'LBL_ROLES' => 'Roles',
     'LBL_SECURITYGROUPS' => 'Security Groups',
-    'LBL_FACTOR_AUTH' => 'Two Factor Authentication:',
     'LBL_FACTOR_AUTH_INTERFACE' => 'Two Factor Authentication Interface:',
     'ERR_USER_FACTOR_SMTP_REQUIRED' => 'SMTP server settings required first.',
     'ERR_USER_FACTOR_CHANGE_DISABLED' => 'Current user is not able to change two factor authentication settings.',
     'LNK_IMPORT_CAMPAIGNS' => 'Import Campaign',
-    // for Google Token/Synchronization settings
-    'LBL_GOOGLE_API_SETTINGS' => 'Google Account Synchronization',
-    'LBL_GOOGLE_API_TOKEN' => 'Google API Token',
-    'LBL_GOOGLE_API_TOKEN_HELP' => 'Use this to authorize SuiteCRM to access your Google Calendar. This is required for synchronization. Don\'t forget to check the "Enable Calendar Sync" checkbox when done.',
-    'LBL_GOOGLE_API_TOKEN_BTN' => 'Get Token',
-    'LBL_GSYNC_CAL' => 'Enable Calendar Sync',
-    // END Google Token/Synchronization settings
 
+    'LNK_ACCESS_TOKENS' => 'API Access Tokens',
     'LNK_LIST_OUTBOUND_EMAIL_ACCOUNTS' => 'Outbound Email Accounts',
     'LNK_LIST_INBOUND_EMAIL_ACCOUNTS' => 'Inbound Email Accounts',
     'LNK_EXTERNAL_OAUTH_CONNECTIONS' => 'External OAuth Connections',
+
+    'LNK_LIST_CALENDAR_ACCOUNTS' => 'View Calendar Accounts',
+
+    // 2FA
+    'LBL_FACTOR_AUTH' => 'Two Factor Authentication',
+    'LBL_FACTOR_AUTH_DISABLE' => 'Two Factor Authentication was Disabled for this User',
+    'LBL_DISABLED' => 'Disabled',
+    'LBL_ENABLED' => 'Enabled',
+    'LBL_ENABLE_2FA' => 'Enable 2FA',
+    'LBL_2FA_CONFIG' => 'Two Factor Configuration',
+    'LBL_DISABLE_2FA' => 'Disable 2FA',
 
 ); // END STRINGS DEFS

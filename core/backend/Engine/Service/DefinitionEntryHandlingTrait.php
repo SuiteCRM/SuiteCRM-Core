@@ -1,13 +1,13 @@
 <?php
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -36,7 +36,8 @@ trait DefinitionEntryHandlingTrait
      * @param string $module
      * @param string $entryName
      * @param array $config
-     * @param ActionAvailabilityChecker $actionAvailabilityChecker
+     * @param ActionAvailabilityChecker|null $actionAvailabilityChecker
+     * @param array|null $actionAclModuleOverride
      * @param array|null $context
      * @return array
      */
@@ -44,7 +45,8 @@ trait DefinitionEntryHandlingTrait
         string $module,
         string $entryName,
         array &$config,
-        ActionAvailabilityChecker $actionAvailabilityChecker,
+        ?ActionAvailabilityChecker $actionAvailabilityChecker,
+        ?array $actionAclModuleOverride = null,
         ?array $context = []
     ): array {
         $defaults = $config['default'] ?? [];
@@ -54,16 +56,16 @@ trait DefinitionEntryHandlingTrait
         $exclude = $moduleEntryConfig['exclude'] ?? [];
         $moduleEntries = $moduleEntryConfig[$entryName] ?? [];
 
-        $entries = array_merge($defaultEntries, $moduleEntries);
+        $entries = $this->applyActionOverrides($defaultEntries, $moduleEntries);
         $filteredEntries = [];
         foreach ($entries as $entryKey => $entry) {
             if (in_array($entryKey, $exclude, true)) {
                 continue;
             }
 
-            $aclModule = $entry['aclModule'] ?? $module;
+            $aclModule = $entry['aclModule'] ?? $actionAclModuleOverride[$module][$entryKey] ?? $module;
 
-            if ($this->checkAvailability($aclModule, $entry, $actionAvailabilityChecker, $context) === false) {
+            if ($actionAvailabilityChecker && $this->checkAvailability($aclModule, $entry, $actionAvailabilityChecker, $context) === false) {
                 continue;
             }
 
@@ -87,7 +89,14 @@ trait DefinitionEntryHandlingTrait
         ActionAvailabilityChecker $actionAvailabilityChecker,
         ?array $context = []
     ): bool {
-        $availabilityCheckerKeys = $entry['availability'] ?? ['acls'];
+
+        $checker = $entry['availability'] ?? null;
+
+        if (empty($checker)) {
+            $checker = ['acls'];
+        }
+
+        $availabilityCheckerKeys = $checker;
 
         if (empty($availabilityCheckerKeys)) {
             return true;
@@ -101,5 +110,42 @@ trait DefinitionEntryHandlingTrait
         }
 
         return true;
+    }
+
+    /**
+     * @param array $defaultEntries
+     * @param array $moduleEntries
+     * @return array
+     */
+    protected function applyActionOverrides(array $defaultEntries, array $moduleEntries): array
+    {
+        $newDefaultEntries = $defaultEntries;
+
+        $entries = [];
+
+        foreach ($moduleEntries as $key => $entry) {
+            if (!empty($newDefaultEntries[$key])) {
+                $newDefaultEntries[$key] = $entry;
+
+                if (!isset($entry['priority'])) {
+                    $newDefaultEntries[$key]['priority'] = $defaultEntries[$key]['priority'] ?? 1000;
+                }
+
+            } else {
+                $entries[$key] = $entry;
+            }
+        }
+
+
+        $unionEntries = $entries + $newDefaultEntries;
+
+
+        uasort($unionEntries, function ($a, $b) {
+            $priorityA = $a['priority'] ?? 1000;
+            $priorityB = $b['priority'] ?? 1000;
+            return $priorityA <=> $priorityB;
+        });
+
+        return $unionEntries;
     }
 }

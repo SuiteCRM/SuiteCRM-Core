@@ -47,12 +47,11 @@
     {
         padding-left: 0px;
     }
-    div.resultsTable {
-        overflow: auto;
-        width: 100%;
-        padding-top: 20px;
-        position: relative;
-    }
+div.resultsTable {
+    overflow: auto;
+    padding-top: 20px;
+    position: relative;
+}
 </style>
 {/literal}
 
@@ -98,7 +97,7 @@
 </form>
 
 <br/>
-    
+
 <table width="100%" id="tabListContainerTable" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td nowrap id="tabListContainerTD">
@@ -114,7 +113,7 @@
                         <li id="pageNumIW_0" class="active" >
                             <a id="pageNumIW_0_anchor" class="current" href="javascript:SUGAR.IV.togglePages('0');">
                             <span id="pageNum_0_input_span" style="display:none;">
-                            <input type="hidden" id="pageNum_0_name_hidden_input" value="{$pageData.pageTitle}"/>
+                            <input type="hidden" id="pageNum_0_name_hidden_input" value="{$pageData.pageTitle|default:''}"/>
                             <input type="text" id="pageNum_0_name_input" value="Testing" size="10"/>
                             </span>
                             <span id="pageNum_0_link_span" class="tabText">
@@ -125,7 +124,7 @@
                         <li id="pageNumIW_1" >
                             <a id="pageNumIW_1_anchor" class="" href="javascript:SUGAR.IV.togglePages('1');">
                             <span id="pageNum_1_input_span" style="display:none;">
-                            <input type="hidden" id="pageNum_1_name_hidden_input" value="{$pageData.pageTitle}"/>
+                            <input type="hidden" id="pageNum_1_name_hidden_input" value="{$pageData.pageTitle|default:''}"/>
                             <input type="text" id="pageNum_1_name_input" value="Testing" size="10"/>
                             </span>
                             <span id="pageNum_1_link_span" class="tabText">
@@ -136,7 +135,7 @@
                         <li id="pageNumIW_2" >
                             <a id="pageNumIW_2_anchor" class="" href="javascript:SUGAR.IV.togglePages('2');">
                             <span id="pageNum_2_input_span" style="display:none;">
-                            <input type="hidden" id="pageNum_2_name_hidden_input" value="{$pageData.pageTitle}"/>
+                            <input type="hidden" id="pageNum_2_name_hidden_input" value="{$pageData.pageTitle|default:''}"/>
                             <input type="text" id="pageNum_2_name_input" value="Testing" size="10" />
                             </span>
                             <span id="pageNum_2_link_span" class="tabText">

@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -25,7 +25,10 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {ChartDataSource, ChartMetadata, ChartsWidgetOptions, StatisticsQuery, ViewContext} from 'common';
+import {ChartDataSource} from '../../../../common/containers/chart/chart.model';
+import {ChartMetadata, ChartsWidgetOptions} from '../../../../common/metadata/charts-widget.metadata';
+import {StatisticsQuery} from '../../../../common/statistics/statistics.model';
+import {ViewContext} from '../../../../common/views/view.model';
 import {combineLatestWith, Observable, of, Subscription} from 'rxjs';
 import {map, take, tap} from 'rxjs/operators';
 import {ChartDataStoreFactory} from '../../../../store/chart-data/chart-data.store.factory';
@@ -81,6 +84,8 @@ export class ChartSidebarWidgetComponent extends BaseWidgetComponent implements 
 
     ngOnInit(): void {
         this.appStrings$ = this.language.appStrings$;
+
+        super.ngOnInit();
 
         if (this.validateConfig() === false) {
             return;
@@ -226,8 +231,9 @@ export class ChartSidebarWidgetComponent extends BaseWidgetComponent implements 
         this.title = this.language.getFieldLabel(this.titleLabelKey);
     }
 
-    onChartSelect(): void {
+    onChartSelect(event): void {
         this.dataSource = null;
+        this.selectedChart = event;
         this.chartType = this.charts[this.selectedChart].chartType;
         this.reloadSelectedChart(false);
     }

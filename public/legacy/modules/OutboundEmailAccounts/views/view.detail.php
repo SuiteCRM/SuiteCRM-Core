@@ -52,6 +52,7 @@ class OutboundEmailAccountsViewDetail extends ViewDetail
     {
         global $current_user;
         $this->dv->ss->assign('is_admin', is_admin($current_user));
+        $this->dv->ss->assign('current_user_id', $current_user->id);
         parent::display();
     }
 }

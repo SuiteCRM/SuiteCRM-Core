@@ -76,6 +76,9 @@ if (file_exists($autoloader)) {
 // config|_override.php
 if (is_file('config.php')) {
     require_once 'config.php'; // provides $sugar_config
+    if (isset($GLOBALS['sugar_config']['installed']) && $GLOBALS['sugar_config']['installed'] === false) {
+        $GLOBALS['installing'] = true;
+    }
 } else {
     // load minimal sugar config required to provide basic data to Suite8 application
     $sugar_config = array(
@@ -187,8 +190,10 @@ if (empty($GLOBALS['installing']) && !empty($sugar_config['dbconfig']['db_name']
         $gcProbability = $sessionGCConfig['gc_probability'] ?? 1;
         $gcDivisor = $sessionGCConfig['gc_divisor'] ?? 100;
 
-        ini_set('session.gc_probability', $gcProbability);
-        ini_set('session.gc_divisor', $gcDivisor);
+        if (!headers_sent()) {
+            ini_set('session.gc_probability', $gcProbability);
+            ini_set('session.gc_divisor', $gcDivisor);
+        }
     }
 
     if (!empty($sugar_config['session_dir']) && session_status() !== PHP_SESSION_ACTIVE) {
@@ -229,4 +234,7 @@ if (empty($GLOBALS['installing']) && !empty($sugar_config['dbconfig']['db_name']
 ///////////////////////////////////////////////////////////////////////////////
 
 //It does a check to see if the host is valid
-check_trusted_hosts();
+$sapi_type = php_sapi_name();
+if ($sapi_type !== 'cli') {
+    check_trusted_hosts();
+}

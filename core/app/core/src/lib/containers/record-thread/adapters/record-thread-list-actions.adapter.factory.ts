@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2023 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2023 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -36,6 +36,11 @@ import {RecordThreadListActionsAdapter} from "./record-thread-list-actions.adapt
 import {RecordThreadListActionManager} from "../actions/list-actions/record-thread-list-action-manager.service";
 import {RecordThreadConfig} from '../components/record-thread/record-thread.model';
 import {AppMetadataStore} from "../../../store/app-metadata/app-metadata.store.service";
+import {FieldModalService} from "../../../services/modals/field-modal.service";
+import {RecordMapperRegistry} from "../../../common/record/record-mappers/record-mapper.registry";
+import {BaseSaveRecordMapper} from "../../../store/record/record-mappers/base-save.record-mapper";
+import {FieldLogicManager} from "../../../fields/field-logic/field-logic.manager";
+import {RecordManager} from "../../../services/record/record.manager";
 
 @Injectable({
     providedIn: 'root',
@@ -49,9 +54,15 @@ export class RecordThreadListActionsAdapterFactory {
         protected message: MessageService,
         protected confirmation: ConfirmationModalService,
         protected selectModalService: SelectModalService,
+        protected fieldModalService: FieldModalService,
         protected metadata: MetadataStore,
-        protected appMetadataStore: AppMetadataStore
+        protected appMetadataStore: AppMetadataStore,
+        protected recordMappers: RecordMapperRegistry,
+        protected baseMapper: BaseSaveRecordMapper,
+        protected logic: FieldLogicManager,
+        protected recordManager: RecordManager
     ) {
+        recordMappers.register('default', baseMapper.getKey(), baseMapper);
     }
 
     create(threadStore: RecordThreadStore, config: RecordThreadConfig): RecordThreadListActionsAdapter {
@@ -63,8 +74,12 @@ export class RecordThreadListActionsAdapterFactory {
             this.message,
             this.confirmation,
             this.selectModalService,
+            this.fieldModalService,
             this.metadata,
-            this.appMetadataStore
+            this.appMetadataStore,
+            this.recordMappers,
+            this.logic,
+            this.recordManager
         );
 
         const collapseButtons = config?.collapseListActions ?? null;

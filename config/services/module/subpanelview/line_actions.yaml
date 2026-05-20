@@ -28,4 +28,22 @@ parameters:
             - list
           acl:
             - edit
-
+    modules:
+      document-revisions:
+        actions:
+          delete:
+            key: document-revision-delete
+            labelKey: LBL_DELETE_RECORD
+            titleKey: LBL_DELETE_RECORD
+            action: document-revision-delete
+            icon: trash-filled
+            aclModule: 'Documents'
+            asyncProcess: true
+            routing: false
+            params:
+              displayConfirmation: true
+              confirmationLabel: LBL_DELETE_REVISION_CONFIRM
+            modes:
+              - list
+            acl:
+              - edit

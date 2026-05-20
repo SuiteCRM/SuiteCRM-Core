@@ -1,13 +1,13 @@
 <! --
 /**
-* SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
-* Copyright (C) 2021 SalesAgility Ltd.
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU Affero General Public License version 3 as published by the
 * Free Software Foundation with the addition of the following permission added
 * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
-* IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
 * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -35,7 +35,7 @@
                 <scrm-logo-ui></scrm-logo-ui>
             </div>
         </div>
-        <div class="form-row" *ngIf="vm.showLanguages">
+        <div class="form-row" *ngIf="vm.showLanguages && cardState() !== '2fa'">
             <div class="col">
                 <label class="" for="languages">{{vm.appStrings['LBL_LANGUAGE']}}</label>
             </div>
@@ -59,7 +59,7 @@
 
             <!-- Card front -->
             <div class="fade-card-front col"
-                 *ngIf="cardState==='front'"
+                 *ngIf="cardState() === 'front'"
                  [@fade]>
 
                 <div class="inner-addon left-addon">
@@ -71,6 +71,7 @@
                            #username="ngModel"
                            placeholder="{{vm.appStrings['LBL_USER_NAME']}}"
                            aria-label="Username"
+                           autocomplete="username"
                            required>
                     <div *ngIf="username.invalid && username.touched" class="invalid-feedback">
                         {{vm.appStrings['ERR_MISSING_REQUIRED_FIELDS']}}
@@ -86,6 +87,7 @@
                            #password="ngModel"
                            placeholder="{{vm.appStrings['LBL_PASSWORD']}}"
                            aria-label="Password"
+                           autocomplete="current-password"
                            required>
                     <div *ngIf="password.invalid && password.touched" class="invalid-feedback">
                         {{vm.appStrings['ERR_MISSING_REQUIRED_FIELDS']}}
@@ -108,7 +110,7 @@
 
             <!-- Card back-->
             <div class="fade-card-back col"
-                 *ngIf="cardState==='back'"
+                 *ngIf="cardState() === 'back'"
                  [@fade]>
                 <div class="inner-addon left-addon">
                     <scrm-image image="login_user"></scrm-image>
@@ -119,6 +121,7 @@
                            #username="ngModel"
                            placeholder="{{vm.appStrings['LBL_USER_NAME']}}"
                            aria-label="Username"
+                           autocomplete="username"
                            required>
                     <div *ngIf="username.invalid && username.touched" class="invalid-feedback">
                         {{vm.appStrings['ERR_MISSING_REQUIRED_FIELDS']}}
@@ -134,6 +137,7 @@
                            #mail="ngModel"
                            placeholder="{{vm.appStrings['LBL_EMAIL']}}"
                            aria-label="Email"
+                           autocomplete="email"
                            required>
                     <div *ngIf="mail.invalid && mail.touched" class="invalid-feedback">
                         {{vm.appStrings['ERR_MISSING_REQUIRED_FIELDS']}}
@@ -147,6 +151,20 @@
                 </button>
                 <div>
                     <a class="back-link forgotten-password-link" (click)="flipCard()">
+                        {{vm.appStrings['LBL_BACK']}}
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2fa Card-->
+            <div class="fade-card-back col"
+                 *ngIf="cardState() === '2fa'"
+                 [@fade]>
+                <div class="inner-addon left-addon">
+                    <scrm-2fa-check class='login-button'></scrm-2fa-check>
+                </div>
+                <div>
+                    <a class="back-link forgotten-password-link" (click)="returnToLogin()">
                         {{vm.appStrings['LBL_BACK']}}
                     </a>
                 </div>

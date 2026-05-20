@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,19 +24,22 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {APP_INITIALIZER, NgModule} from '@angular/core';
+import {APP_INITIALIZER, NgModule, provideExperimentalZonelessChangeDetection} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
-import {HTTP_INTERCEPTORS, HttpClientModule, HttpClientXsrfModule} from '@angular/common/http';
+import {
+    HTTP_INTERCEPTORS,
+    provideHttpClient,
+    withInterceptorsFromDi,
+    withXsrfConfiguration
+} from '@angular/common/http';
 
 import {Apollo, ApolloModule} from 'apollo-angular';
 import {HttpLink} from 'apollo-angular/http';
 import {ApolloLink, InMemoryCache} from '@apollo/client/core';
 import {FetchPolicy} from '@apollo/client/core/watchQueryOptions';
 import {onError} from '@apollo/client/link/error';
-
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-
 import {
     AppStateStore,
     AuthService,
@@ -57,18 +60,19 @@ import {
     ModuleTitleModule,
     NavbarUiModule,
     RecordListModalModule,
+    RecordModalComponent,
     RecordModule,
-    TableModule,
-    SidebarComponent
+    SidebarComponent,
+    ButtonModule,
+    TableModule
 } from 'core';
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-
 import {environment} from '../environments/environment';
 import {RouteReuseStrategy} from '@angular/router';
 import {AppRouteReuseStrategy} from './app-router-reuse-strategy';
-import {AppInit} from '@app/app-initializer';
+import {AppInit} from './app-initializer';
 import {GraphQLError} from 'graphql';
 import {AngularSvgIconModule} from 'angular-svg-icon';
 
@@ -78,10 +82,8 @@ export const initializeApp = (appInitService: AppInit) => (): Promise<any> => ap
     declarations: [
         AppComponent,
     ],
-    imports: [
+    bootstrap: [AppComponent], imports: [
         BrowserModule,
-        HttpClientModule,
-        HttpClientXsrfModule,
         AppRoutingModule,
         FooterUiModule,
         NavbarUiModule,
@@ -90,6 +92,7 @@ export const initializeApp = (appInitService: AppInit) => (): Promise<any> => ap
         ListModule,
         RecordModule,
         CreateRecordModule,
+        ButtonModule,
         InstallViewModule,
         TableModule,
         ModuleTitleModule,
@@ -100,24 +103,32 @@ export const initializeApp = (appInitService: AppInit) => (): Promise<any> => ap
         ImageModule,
         BrowserAnimationsModule,
         NgbModule,
+        ButtonModule,
         FullPageSpinnerModule,
         MessageModalModule,
         RecordListModalModule,
+        RecordModalComponent,
         ApolloModule,
         SidebarComponent
     ],
     providers: [
         {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
         {provide: RouteReuseStrategy, useClass: AppRouteReuseStrategy},
+        provideExperimentalZonelessChangeDetection(),
         AppInit,
         {
             provide: APP_INITIALIZER,
             useFactory: initializeApp,
             multi: true,
             deps: [AppInit]
-        }
+        },
+        provideHttpClient(withInterceptorsFromDi(),
+            withXsrfConfiguration({
+                cookieName: 'XSRF-TOKEN',
+                headerName: 'X-XSRF-TOKEN'
+            })
+        )
     ],
-    bootstrap: [AppComponent]
 })
 export class AppModule {
     constructor(apollo: Apollo, httpLink: HttpLink, protected auth: AuthService, protected appStore: AppStateStore, protected baseRoute: BaseRouteService) {

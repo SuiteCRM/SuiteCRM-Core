@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2024 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2024 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -24,10 +24,9 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {ActivatedRoute, Router} from "@angular/router";
-import {PaginationCount, PageSelection, PaginationType, ObjectMap, ViewMode, ButtonInterface, ModalButtonInterface} from "common";
 import {combineLatestWith, Observable, Subscription} from "rxjs";
 import {filter, map, tap} from "rxjs/operators";
 import {toNumber} from "lodash-es";
@@ -43,6 +42,11 @@ import {RecordPaginationService} from "../../store/record-pagination/record-pagi
 import {RecordPaginationStore} from "../../store/record-pagination/record-pagination.store";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ButtonModule} from "../../../../components/button/button.module";
+import {PageSelection, PaginationCount, PaginationType} from "../../../../common/views/list/list-navigation.model";
+import {ViewMode} from "../../../../common/views/view.model";
+import {ObjectMap} from "../../../../common/types/object-map";
+import {ButtonInterface} from "../../../../common/components/button/button.model";
+import {ModalButtonInterface} from "../../../../common/components/modal/modal.model";
 
 interface RecordPaginationViewModel {
     appStrings: LanguageStringMap;
@@ -106,7 +110,7 @@ export class RecordPaginationComponent implements OnInit, OnDestroy {
         this.currentPage = this.recordPaginationStore.getCurrentPage();
         this.pageSize = this.recordPaginationStore.getPageSize();
         this.totalRecordsCount = this.recordPaginationStore.getRecordsCount();
-        this.paginationType= this.preferences.getUserPreference('listview_pagination_type') ?? this.systemConfigStore.getConfigValue('listview_pagination_type');
+        this.paginationType = this.preferences.getUserPreference('listview_pagination_type') ?? this.systemConfigStore.getConfigValue('listview_pagination_type');
         this.recordPaginationService.paginationType = this.paginationType;
         this.subs.push(this.mode$.subscribe(mode => {
             this.mode = mode;
@@ -120,7 +124,9 @@ export class RecordPaginationComponent implements OnInit, OnDestroy {
             },
             icon: 'paginate_previous',
             iconKlass: 'sicon-2x',
-            disabled: this.currentIndex === 1 || this.isRecordsLoading,
+            disabled: computed((): boolean => {
+                return this.currentIndex === 1 || this.isRecordsLoading;
+            }),
             onClick: () => this.prevRecord()
         } as ButtonInterface;
 
@@ -132,7 +138,9 @@ export class RecordPaginationComponent implements OnInit, OnDestroy {
             },
             icon: 'paginate_next',
             iconKlass: 'sicon-2x',
-            disabled: this.currentIndex === this.totalRecordsCount  || this.isRecordsLoading,
+            disabled: computed((): boolean => {
+                return this.currentIndex === this.totalRecordsCount || this.isRecordsLoading;
+            }),
             onClick: () => this.nextRecord()
         } as ButtonInterface;
 
@@ -147,10 +155,16 @@ export class RecordPaginationComponent implements OnInit, OnDestroy {
                 if (!isRecordPaginationExist || !isRecordValid || (this.currentIndex > this.totalRecordsCount)) {
                     paginationEnabled = false;
                 }
-                this.prevButton = { ...this.prevButton, titleKey: appStrings['LBL_SEARCH_PREV'] || '' } as ButtonInterface;
-                this.nextButton = { ...this.nextButton, titleKey: appStrings['LBL_SEARCH_NEXT'] || '' } as ButtonInterface;
+                this.prevButton = {
+                    ...this.prevButton,
+                    titleKey: appStrings['LBL_SEARCH_PREV'] || ''
+                } as ButtonInterface;
+                this.nextButton = {
+                    ...this.nextButton,
+                    titleKey: appStrings['LBL_SEARCH_NEXT'] || ''
+                } as ButtonInterface;
 
-                return { appStrings, pageCount, paginationEnabled };
+                return {appStrings, pageCount, paginationEnabled};
             })
         );
 
@@ -208,7 +222,7 @@ export class RecordPaginationComponent implements OnInit, OnDestroy {
         let nextRecordIndex = this.currentIndex % this.pageSize;
         let nextPageThreshold = this.currentIndex - ((this.currentPage - 1) * this.pageSize);
 
-        if (nextPageThreshold > this.recordIds.length -1) {
+        if (nextPageThreshold > this.recordIds.length - 1) {
             this.loadPage(PageSelection.NEXT);
         } else {
             if (this.mode === 'edit' && this.recordViewStore.recordStore.isDirty() && !this.isSaveContinueClicked) {
@@ -223,7 +237,7 @@ export class RecordPaginationComponent implements OnInit, OnDestroy {
         this.isRecordsLoading = true;
         let nextRecordIndex = 0;
         let isPaginationLoadMore = false;
-        if(this.paginationType === PaginationType.LOAD_MORE) {
+        if (this.paginationType === PaginationType.LOAD_MORE) {
             isPaginationLoadMore = true;
         }
         if (direction === PageSelection.PREVIOUS) {
@@ -232,7 +246,7 @@ export class RecordPaginationComponent implements OnInit, OnDestroy {
             nextRecordIndex = this.currentIndex;
         }
 
-        if (isPaginationLoadMore && direction !== PageSelection.PREVIOUS ) {
+        if (isPaginationLoadMore && direction !== PageSelection.PREVIOUS) {
             const jump = this.preferences.getUserPreference('list_max_entries_per_page') ?? this.systemConfigStore.getConfigValue('list_max_entries_per_page');
             const pagination = this.recordPaginationStore.recordListStore.getPagination();
             const currentPageSize = pagination.pageSize || 0;
@@ -257,12 +271,12 @@ export class RecordPaginationComponent implements OnInit, OnDestroy {
 
     protected navigateNextRoute(nextRecordIndex: number): void {
         const nextRoute = this.buildRoute(this.recordIds[nextRecordIndex]);
-        this.router.navigate([nextRoute], { queryParams: { offset: this.currentIndex + 1 }});
+        this.router.navigate([nextRoute], {queryParams: {offset: this.currentIndex + 1}});
     }
 
     protected navigatePrevRoute(nextRecordIndex: number): void {
         const nextRoute = this.buildRoute(this.recordIds[nextRecordIndex]);
-        this.router.navigate([nextRoute], { queryParams: { offset: this.currentIndex - 1 }});
+        this.router.navigate([nextRoute], {queryParams: {offset: this.currentIndex - 1}});
     }
 
     protected showConfirmationModal(direction: PageSelection, nextRecordIndex: number): void {

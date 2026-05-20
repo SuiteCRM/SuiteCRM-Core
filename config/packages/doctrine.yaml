@@ -1,9 +1,9 @@
 doctrine:
   dbal:
-    url: '%env(resolve:DATABASE_URL)%'
+    url: '%env(DATABASE_URL)%'
     driver: pdo_mysql
     charset: UTF8
-    auto_commit: false
+    auto_commit: true
     schema_filter: '/^(users|migration_versions|)$/'
     default_table_options:
       charset: utf8
@@ -14,6 +14,8 @@ doctrine:
     # either here or in the DATABASE_URL env var (see .env file)
     #server_version: '15'
     profiling_collect_backtrace: '%kernel.debug%'
+    types:
+      standard_text: App\Doctrine\Type\StandardTextType
   orm:
     auto_generate_proxy_classes: true
     enable_lazy_ghost_objects: true

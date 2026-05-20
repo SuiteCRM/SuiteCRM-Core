@@ -98,7 +98,7 @@ class SearchResultsController extends Controller
 
     public function display(): void
     {
-        global $app_strings;
+        global $app_strings, $sugar_config;
         $headers = [];
 
         try {
@@ -108,6 +108,7 @@ class SearchResultsController extends Controller
         }
 
         $total = $this->results->getTotal();
+        $pageCalc = $this->results->getLargestHitsCount();
         if ($total > 1) {
             $size = $this->query->getSize();
             if ($size) {
@@ -117,8 +118,8 @@ class SearchResultsController extends Controller
 
                 $page = (int)($from / $size) + 1;
                 $prev = $page > 1;
-                $next = $total - $from > $size;
-                $last = (int)($total / $size) + ($total % $size === 0 ? 0 : 1);
+                $next = $pageCalc - $from > $size;
+                $last = (int)($pageCalc / $size) + ($pageCalc % $size === 0 ? 0 : 1);
 
                 $this->view->getTemplate()->assign('pagination', [
                     'prev' => $prev,
@@ -135,13 +136,24 @@ class SearchResultsController extends Controller
             }
         }
 
+        $siteUrl = $sugar_config['site_url'] ?? '';
+
         $smarty = $this->view->getTemplate();
         $smarty->assign('total', $total);
         $smarty->assign('headers', $headers);
         $smarty->assign('results', $this->results);
         $smarty->assign('APP', $app_strings);
+        $smarty->assign('APP_CONFIG', $GLOBALS['sugar_config']);
+        $smarty->assign('SITE_URL', $siteUrl);
+        $moduleName = [];
         try {
-            $smarty->assign('resultsAsBean', $this->results->getHitsAsBeans());
+            $hitsAsBeans = $this->results->getHitsAsBeans();
+            foreach($hitsAsBeans as $bean){
+                $moduleName[$bean[0]->module_name] = translate('LBL_MODULE_NAME', $bean[0]->module_name);
+            }
+            $smarty->assign('moduleLabel', $moduleName);
+
+            $smarty->assign('resultsAsBean', $hitsAsBeans);
         } catch (\SuiteCRM\Exception\Exception $e) {
             LoggerManager::getLogger()->fatal("Failed to retrieve ElasticSearch options");
         }
@@ -219,8 +231,8 @@ class SearchResultsController extends Controller
 
         return [
             'label' => $this->getListViewHeaderLabel($bean, $fieldValue, $fieldDef),
-            'comment' => $fieldDef['comment'] ?? null,
-            'field' => $fieldDef['name'],
+            'comment' => is_array($fieldDef) ? ($fieldDef['comment'] ?? null) : null,
+            'field' => is_array($fieldDef) ? ($fieldDef['name'] ?? null) : null,
         ];
     }
 

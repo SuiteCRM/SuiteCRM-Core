@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="30px" height="14px" viewBox="0 0 30 14" version="1.1" xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink">
-  <title>Hamburger Icon</title>
   <g id="hamburger" stroke-width="2" stroke="#FFFFFF">
     <g id="Group">
       <path d="M0.5,1 L30.5,1" id="Line"></path>

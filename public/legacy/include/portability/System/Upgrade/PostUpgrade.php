@@ -148,6 +148,7 @@ class PostUpgrade
 
             $this->clearLanguageCache();
             $this->rebuildHTAccess();
+            $this->removeUploadHtaccess();
 
             $phpErrors = ob_get_clean();
             $this->log("Potential PHP generated error messages: {$phpErrors}");
@@ -599,6 +600,21 @@ class PostUpgrade
     {
         require_once __DIR__ . '/../../../../install/install_utils.php';
         handleHtaccess();
+    }
+
+    /**
+     * Remove deprecated upload/.htaccess file.
+     * In S8 the root .htaccess already contains "RedirectMatch 403 /+upload"
+     * which protects the upload directory. The per-directory .htaccess is
+     * redundant and blocks product images from loading.
+     */
+    protected function removeUploadHtaccess(): void
+    {
+        $uploadHtaccess = __DIR__ . '/../../../../upload/.htaccess';
+        if (file_exists($uploadHtaccess)) {
+            unlink($uploadHtaccess);
+            $this->log('Removed deprecated upload/.htaccess');
+        }
     }
 
     /**

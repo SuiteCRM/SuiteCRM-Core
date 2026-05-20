@@ -584,6 +584,17 @@ class EditViewMerge
     }
 
     /**
+     * Merge header widget
+     * @return void
+     */
+    protected function mergeHeaderWidgets(): void
+    {
+        $key = 'headerWidgets';
+        $sources = $this->getViewDefsSources();
+        $this->newData[$this->module][$this->viewDefs][$key] = $this->mergeMetadataArrayEntry($key, $sources);
+    }
+
+    /**
      * Merge top widget
      * @return void
      */
@@ -649,6 +660,7 @@ class EditViewMerge
         $this->mergeTemplateMeta();
         $this->mergeSidebarWidgets();
         $this->mergeBottomWidgets();
+        $this->mergeHeaderWidgets();
         $this->mergeTopWidget();
         $this->mergeRecordActions();
         $this->setPanels();

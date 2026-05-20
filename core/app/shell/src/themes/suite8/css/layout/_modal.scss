@@ -1,12 +1,12 @@
 /**
- * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2021 SuiteCRM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
  * Free Software Foundation with the addition of the following permission added
  * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
- * IN WHICH THE COPYRIGHT IS OWNED BY SALESAGILITY, SALESAGILITY DISCLAIMS THE
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -29,6 +29,26 @@
   .modal-footer {
     background-color: $white;
   }
+
+  .modal-header {
+    .close-button {
+      border: none;
+      color: $cool-blue;
+      font-size: 2em;
+      font-weight: normal;
+      margin: 0;
+      padding: 0;
+      width: auto;
+      &:hover {
+        background: none;
+      }
+      &:focus {
+        box-shadow: none;
+      }
+    }
+  }
+
+
   .modal-body {
     margin: 0;
     overflow-y: scroll;
@@ -40,6 +60,23 @@
   .modal-header,
   .modal-footer {
     background-color: $white;
+  }
+  .modal-header {
+    .close-button {
+      border: none;
+      color: $cool-blue;
+      font-size: 2em;
+      font-weight: normal;
+      margin: 0;
+      padding: 0;
+      width: auto;
+      &:hover {
+        background: none;
+      }
+      &:focus {
+        box-shadow: none;
+      }
+    }
   }
   .modal-redirect-text {
     color: $white;
@@ -58,8 +95,10 @@
 }
 
 .modal-title {
+  display: flex;
+  flex-direction: column;
   text-align: center;
-  margin: 0 auto;
+  margin: 0.5rem auto;
   padding: 0;
   line-height: 0.9em;
 }
@@ -85,7 +124,6 @@
   .modal-header,
   .modal-footer {
     background-color: $white;
-    max-height: 2.7rem;
   }
 
   .modal-header {

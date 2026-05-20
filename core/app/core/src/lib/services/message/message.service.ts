@@ -26,8 +26,9 @@
 
 import {Injectable} from '@angular/core';
 import {Message, MessageTypes} from '../../common/types/messages';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, Observable, Subscription} from 'rxjs';
 import {SystemConfigStore} from '../../store/system-config/system-config.store';
+import {distinctUntilChanged, filter, map} from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
@@ -37,11 +38,38 @@ export class MessageService {
     protected messages: Message[] = [];
     protected messagesStage: BehaviorSubject<Message[]>;
     protected timeout = 3;
+    private subscription: Subscription;
 
     constructor(public config: SystemConfigStore) {
         this.messagesStage = new BehaviorSubject<Message[]>([]);
         this.messages$ = this.messagesStage.asObservable();
+        this.listenForConfigChanges();
         this.initTimeOut();
+    }
+
+    /**
+     * Listens for configuration changes related to alert timeout settings.
+     *
+     * This method subscribes to changes in the configuration observable stream,
+     * specifically monitoring the 'alert_timeout' UI configuration. When a change
+     * is detected, it parses the new alert timeout value and updates the instance's
+     * timeout property accordingly if the parsed value is a valid number.
+     *
+     * @return {void}
+     */
+    private listenForConfigChanges(): void {
+        this.subscription = this.config.configs$
+            .pipe(
+                map(() => this.config.getUi('alert_timeout')),
+                filter(alertTimeout => alertTimeout !== null),
+                distinctUntilChanged(),
+            )
+            .subscribe(alertTimeout => {
+                const parsedTimeout = parseInt(alertTimeout, 10);
+                if (!isNaN(parsedTimeout)) {
+                    this.timeout = parsedTimeout;
+                }
+            });
     }
 
     updateState(messages: Message[]): void {

@@ -94,10 +94,6 @@ class PrintAsPdfAction implements ProcessHandlerInterface
                     'action' => 'view',
                     'record' => $options['id'] ?? ''
                 ],
-                [
-                    'action' => 'export',
-                    'record' => $options['id'] ?? ''
-                ]
             ],
         ];
 

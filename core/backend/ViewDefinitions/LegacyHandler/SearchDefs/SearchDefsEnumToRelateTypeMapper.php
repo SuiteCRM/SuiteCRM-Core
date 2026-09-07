@@ -74,53 +74,47 @@ class SearchDefsEnumToRelateTypeMapper implements ViewDefinitionMapperInterface
 
         $mapped = [];
         foreach ($advanced as $fieldKey => $field) {
+            $id = $field['name'] ?? '';
+            $group = [
+                'created_by' => 'created_by',
+                'modified_user_id' => 'modified_by'
+            ][$id] ?? '';
 
+            if (!$group && ($field['function']['name'] ?? '') === 'get_user_array'
+                && ($field['type'] ?? '') === 'enum') {
+                $id = 'assigned_user_id';
+                $group = 'assigned_user';
+            }
 
-            if (empty($field['function'])) {
+            if (!$group) {
                 $mapped[$fieldKey] = $field;
-
                 continue;
             }
 
-            if (empty($field['function']['name'])) {
-                $mapped[$fieldKey] = $field;
-
-                continue;
-            }
-
-            if ($field['function']['name'] !== 'get_user_array') {
-                $mapped[$fieldKey] = $field;
-
-                continue;
-            }
-
-            if ($field['type'] !== 'enum') {
-                $mapped[$fieldKey] = $field;
-
-                continue;
-            }
+            $nameField = $group . '_name';
 
             $field['type'] = 'grouped-field';
             $field['name'] .= '-group';
-            $field['fieldDefinition']['layout'] = ['assigned_user_name'];
+            $field['fieldDefinition']['layout'] = [$nameField];
             $field['fieldDefinition']['display'] = 'inline';
             $field['fieldDefinition']['type'] = 'grouped-field';
-            $field['fieldDefinition']['groupKey'] = 'assigned_user';
+            $field['fieldDefinition']['groupKey'] = $group;
 
             $field['fieldDefinition']['groupFields'] = [
-                'assigned_user_id' => array_merge($vardefs['assigned_user_id'] ?? [], [
-                    'name' => 'assigned_user_id',
+                $id => array_merge($vardefs[$id] ?? [], [
+                    'name' => $id,
                     'type' => 'id',
                     'showLabel' => [],
                     'display' => 'none',
-                    'group' => 'assigned_user'
+                    'group' => $group
                 ]),
-                'assigned_user_name' => array_merge($vardefs['assigned_user_name'] ?? [], [
-                    'name' => 'assigned_user_name',
+                $nameField => array_merge($vardefs[$nameField] ?? [], [
+                    'name' => $nameField,
                     'type' => 'relate',
+                    'id_name' => $id,
                     'showLabel' => ['*'],
                     'display' => 'inline',
-                    'group' => 'assigned_user'
+                    'group' => $group
                 ]),
             ];
 

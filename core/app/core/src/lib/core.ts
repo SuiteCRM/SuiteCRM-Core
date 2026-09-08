@@ -739,6 +739,7 @@ export * from './services/record/relate/relate.service';
 export * from './services/record/validation/aync-validator.Interface';
 export * from './services/record/validation/record-validation.handler';
 export * from './services/record/validation/validation-definition.manager';
+export * from './services/record/validation/validation-message.service';
 export * from './services/record/validation/validation.manager';
 export * from './services/record/validation/validator.Interface';
 export * from './services/record/validation/async-validators/async-process.validator';

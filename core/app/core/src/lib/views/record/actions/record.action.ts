@@ -33,6 +33,7 @@ import {ValidationManager} from '../../../services/record/validation/validation.
 import {RecordViewStore} from '../store/record-view/record-view.store';
 import {ModuleNavigation} from '../../../services/navigation/module-navigation/module-navigation.service';
 import {MetadataStore} from '../../../store/metadata/metadata.store.service';
+import {ValidationMessageService} from '../../../services/record/validation/validation-message.service';
 import {Params, Router} from "@angular/router";
 import {RecordPaginationService} from "../store/record-pagination/record-pagination.service";
 
@@ -45,6 +46,7 @@ export abstract class RecordActionHandler extends ActionHandler<RecordActionData
 
     protected validationManager = inject(ValidationManager);
     protected metadataStore = inject(MetadataStore);
+    protected validationMessage = inject(ValidationMessageService);
 
     abstract run(data: RecordActionData): void;
 

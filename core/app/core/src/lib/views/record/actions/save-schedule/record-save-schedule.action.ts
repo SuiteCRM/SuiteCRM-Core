@@ -36,6 +36,7 @@ import {ViewMode} from "../../../../common/views/view.model";
 import {Router} from "@angular/router";
 import {
     allValidationErrorsSilent,
+    collectRecordValidationErrors,
     collectValidationErrors
 } from "../../../../common/services/validators/validators.model";
 
@@ -66,6 +67,7 @@ export class RecordSaveScheduleAction extends RecordActionHandler {
 
         data.store.recordStore.validate().pipe(take(1)).subscribe(valid => {
             const collectedErrors = collectValidationErrors(formGroup, fields);
+            const recordErrors = collectRecordValidationErrors(formGroup);
 
             if (valid) {
                 const statusKey = params.statusKey ?? 'status';
@@ -80,7 +82,7 @@ export class RecordSaveScheduleAction extends RecordActionHandler {
             }
 
             if (!allValidationErrorsSilent(collectedErrors)) {
-                this.message.addWarningMessageByKey('LBL_VALIDATION_ERRORS');
+                this.validationMessage.reportValidationErrors(recordErrors, record?.module);
             }
         });
     }

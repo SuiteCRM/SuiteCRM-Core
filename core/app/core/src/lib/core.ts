@@ -509,6 +509,7 @@ export * from './fields/field-logic/currency-conversion/update-currency.action';
 export * from './fields/field-logic/display-type/field-logic-display-type.action';
 export * from './fields/field-logic/display-type-backend/display-type-backend.action';
 export * from './fields/field-logic/email-primary-select/email-primary-select.action';
+export * from './fields/field-logic/readonly/readonly.action';
 export * from './fields/field-logic/required/required.action';
 export * from './fields/field-logic/set-empty/set-empty.action';
 export * from './fields/field-logic/update-email-signature/update-email-signature.action';

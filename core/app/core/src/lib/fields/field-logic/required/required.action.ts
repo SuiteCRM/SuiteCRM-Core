@@ -77,7 +77,8 @@ export class RequiredAction extends FieldLogicActionHandler {
 
             const viewField: ViewFieldDefinition = {
                 ...field,
-                display: field?.display()
+                display: field?.display(),
+                readonly: field?.readonly?.() ?? false
             }
 
             logicValidators = this.requiredValidator.getValidator(viewField, record);

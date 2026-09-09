@@ -33,6 +33,7 @@ import {Record} from '../../common/record/record.model';
 import {ViewMode} from '../../common/views/view.model';
 import {FieldLogicDisplayTypeAction} from './display-type/field-logic-display-type.action';
 import {EmailPrimarySelectAction} from './email-primary-select/email-primary-select.action';
+import {ReadonlyAction} from './readonly/readonly.action';
 import {RequiredAction} from './required/required.action';
 import {UpdateBaseCurrencyAction} from './currency-conversion/update-base-currency.action';
 import {UpdateCurrencyAction} from './currency-conversion/update-currency.action';
@@ -61,6 +62,7 @@ export class FieldLogicManager extends BaseActionManager<FieldLogicActionData> {
     constructor(
         displayType: FieldLogicDisplayTypeAction,
         emailPrimarySelectAction: EmailPrimarySelectAction,
+        readOnlyAction: ReadonlyAction,
         required: RequiredAction,
         updateBaseCurrency: UpdateBaseCurrencyAction,
         updateCurrency: UpdateCurrencyAction,
@@ -75,6 +77,7 @@ export class FieldLogicManager extends BaseActionManager<FieldLogicActionData> {
         super();
         displayType.modes.forEach(mode => this.actions[mode][displayType.key] = displayType);
         emailPrimarySelectAction.modes.forEach(mode => this.actions[mode][emailPrimarySelectAction.key] = emailPrimarySelectAction);
+        readOnlyAction.modes.forEach(mode => this.actions[mode][readOnlyAction.key] = readOnlyAction);
         required.modes.forEach(mode => this.actions[mode][required.key] = required);
         updateBaseCurrency.modes.forEach(mode => this.actions[mode][updateBaseCurrency.key] = updateBaseCurrency);
         updateCurrency.modes.forEach(mode => this.actions[mode][updateCurrency.key] = updateCurrency);

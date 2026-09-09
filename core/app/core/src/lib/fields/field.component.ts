@@ -60,7 +60,7 @@ export class FieldComponent implements OnInit {
             mode = 'edit';
         }
 
-        if (['edit', 'filter'].includes(mode) && this.field.readonly) {
+        if (['edit', 'filter'].includes(mode) && this.field.readonly()) {
             mode = 'detail';
         }
 

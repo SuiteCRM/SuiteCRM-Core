@@ -110,7 +110,7 @@ export class GroupFieldComponent extends BaseFieldComponent implements AfterView
 
             fieldModes[name] = this.mode;
 
-            if (this.record?.fields[name]?.readonly) {
+            if (this.record?.fields[name]?.readonly()) {
                 fieldModes[name] = 'detail' as ViewMode;
             }
 

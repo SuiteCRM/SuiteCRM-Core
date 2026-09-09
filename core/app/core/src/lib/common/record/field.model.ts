@@ -197,7 +197,8 @@ export interface Field {
     parentKey?: string;
     attributes?: FieldAttributeMap;
     items?: Record[];
-    readonly?: boolean;
+    readonly?: WritableSignal<boolean>;
+    defaultReadonly?: boolean;
     display?: WritableSignal<DisplayType>;
     required?: WritableSignal<boolean>;
     defaultDisplay?: string;
@@ -245,7 +246,8 @@ export class BaseField implements Field {
     labelKey?: string;
     loading?: WritableSignal<boolean> = signal(false);
     dynamicLabelKey?: string;
-    readonly?: boolean;
+    readonly?: WritableSignal<boolean> = signal(false);
+    defaultReadonly?: boolean = false;
     defaultValueObject?: any;
     display?: WritableSignal<DisplayType>;
     required?: WritableSignal<boolean>;

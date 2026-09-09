@@ -232,7 +232,7 @@ export class ListFilterStore implements StateStore {
                 return;
             }
 
-            if (field.readonly === true) {
+            if (field.readonly() === true) {
                 return;
             }
 
@@ -274,7 +274,7 @@ export class ListFilterStore implements StateStore {
             }
 
             if (!this.searchFields[name]) {
-                field.readonly = true;
+                field.readonly.set(true);
             }
             fields.push(field);
         });

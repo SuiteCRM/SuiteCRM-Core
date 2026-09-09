@@ -46,7 +46,7 @@ export class ValidationMessageService {
     /**
      * Report record level validation errors to the user.
      *
-     * Errors which provide a start label are displayed as an error message using it.
+     * Errors which provide an error label are displayed as an error message using it.
      * Falls back to the generic validation warning when there is no label to display.
      *
      * @param {object} errors record level validation errors
@@ -57,7 +57,7 @@ export class ValidationMessageService {
 
         Object.keys(errors ?? {}).forEach(key => {
             const error = errors[key] as StandardValidationError;
-            const labelKey = error?.message?.labels?.startLabelKey ?? '';
+            const labelKey = error?.message?.labelKey ?? '';
 
             if (!labelKey || error?.silent === true) {
                 return;

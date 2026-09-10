@@ -303,6 +303,7 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'relate.edit': RelateEditFieldComponent,
     'relate.detail': RelateDetailFieldComponent,
     'relate.filter': RelateFilterFieldComponent,
+    'multirelate.list': MultiRelateDetailFieldComponent,
     'multirelate.edit': MultiRelateEditFieldComponent,
     'multirelate.detail': MultiRelateDetailFieldComponent,
     'multiflexrelate.edit': MultiFlexRelateEditFieldComponent,

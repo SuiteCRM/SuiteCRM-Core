@@ -206,6 +206,10 @@ export class DynamicFieldComponent implements OnInit, OnChanges, OnDestroy {
             return false;
         }
 
+        if (this.type === 'multirelate') {
+            return false;
+        }
+
         if (this?.record?.module && !this.navigation?.hasAccessToModule(this?.record?.module)) {
             return false;
         }

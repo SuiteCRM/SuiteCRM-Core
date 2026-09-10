@@ -111,7 +111,11 @@ export class MultiRelateDetailFieldComponent extends BaseMultiEnumComponent {
     }
 
     getDirection(): string {
-        return this.field.definition.displayDirection ?? 'vertical';
+        if (this.field.definition.displayDirection) {
+            return this.field.definition.displayDirection;
+        }
+
+        return this.mode === 'list' ? 'inline' : 'vertical';
     }
 
     getBreakpoint() {

@@ -29,6 +29,7 @@ require_once __DIR__ . '/Mappers/DateFilterMapper.php';
 require_once __DIR__ . '/Mappers/DateTimeFilterMapper.php';
 require_once __DIR__ . '/Mappers/DefaultFilterMapper.php';
 require_once __DIR__ . '/Mappers/MultiEnumFilterMapper.php';
+require_once __DIR__ . '/Mappers/MultiRelateFilterMapper.php';
 require_once __DIR__ . '/Mappers/BooleanFilterMapper.php';
 
 $filter_mappers = [
@@ -36,6 +37,7 @@ $filter_mappers = [
     'date' => new DateFilterMapper(),
     'datetime' => new DateTimeFilterMapper(),
     'multienum' => new MultiEnumFilterMapper(),
+    'multirelate' => new MultiRelateFilterMapper(),
     'bool' => new BooleanFilterMapper(),
 ];
 

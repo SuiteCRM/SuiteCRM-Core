@@ -48,4 +48,12 @@ export abstract class FieldLogicActionHandler extends ActionHandler<FieldLogicAc
     getTriggeringStatus() : string[] {
         return ['onDependencyChange'];
     }
+
+    /**
+     * Whether this action may run for a field that has no component. Fields on a
+     * non active tab are never instantiated, so their init logic has no other driver.
+     */
+    canRunOnUnrenderedField(): boolean {
+        return false;
+    }
 }

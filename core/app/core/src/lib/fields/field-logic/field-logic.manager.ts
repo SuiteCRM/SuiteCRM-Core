@@ -100,15 +100,99 @@ export class FieldLogicManager extends BaseActionManager<FieldLogicActionData> {
      * @param dependentField
      */
     runLogic(field: Field, mode: ViewMode, record: Record, triggeringStatus: string = '', dependentField: Field = {} as Field): void {
-        const onInitFieldLogicExecuted = field?.onInitFieldLogicExecutedModes?.[mode] ?? false
-        if (!field.logic || (onInitFieldLogicExecuted && triggeringStatus === 'onFieldInitialize')) {
+        this.runFieldLogic(field, mode, record, triggeringStatus, dependentField, null);
+    }
+
+    /**
+     * Run init logic across every field on the record, limited to actions that opted in via
+     * canRunOnUnrenderedField.
+     *
+     * @param {object} record
+     * @param {string} mode
+     */
+    runInitLogicForAllFields(record: Record, mode: ViewMode): void {
+        const fields = record?.fields ?? {};
+
+        Object.keys(fields).forEach(name => {
+            const field = fields[name] ?? null;
+
+            if (!field || !field.logic) {
+                return;
+            }
+
+            this.runFieldLogic(
+                field,
+                mode,
+                record,
+                'onFieldInitialize',
+                {} as Field,
+                action => this.actions[mode]?.[action.key]?.canRunOnUnrenderedField() ?? false
+            );
+        });
+    }
+
+    /**
+     * Run the logic entries of a field, optionally limited to actions matching a filter.
+     *
+     * The init latch is keyed per logic entry rather than per field: the all fields sweep
+     * and the field's own component each own a different subset of the entries, and neither
+     * may latch the other's out of existence.
+     *
+     * @param {object} field
+     * @param {string} mode
+     * @param {object} record
+     * @param triggeringStatus
+     * @param dependentField
+     * @param actionFilter
+     */
+    protected runFieldLogic(
+        field: Field,
+        mode: ViewMode,
+        record: Record,
+        triggeringStatus: string,
+        dependentField: Field,
+        actionFilter: ((action: Action) => boolean) | null
+    ): void {
+        if (!field.logic) {
             return;
         }
-        field.onInitFieldLogicExecutedModes = {...(field.onInitFieldLogicExecutedModes ?? {}), [mode]: true};
 
-        const actions = Object.keys(field.logic).map(key => field.logic[key]);
+        const isInit = triggeringStatus === 'onFieldInitialize';
+        const alreadyExecuted = field?.onInitFieldLogicExecutedModes?.[mode] ?? {};
 
-        const modeActions = this.parseModeActions(actions, mode, triggeringStatus, dependentField);
+        // Filter out logic entries that have already been executed during init, if applicable
+        const availableLogicEntries = Object.keys(field.logic)
+            .filter(name => !(isInit && (alreadyExecuted[name] ?? false)))
+            .map(name => ({name, action: field.logic[name]}));
+
+        if (!availableLogicEntries.length) {
+            return;
+        }
+
+        const availableLogicActions = availableLogicEntries.map(entry => entry.action);
+
+        let modeActions = this.parseModeActions(availableLogicActions, mode, triggeringStatus, dependentField);
+
+        if (actionFilter) {
+            modeActions = modeActions.filter(action => actionFilter(action));
+        }
+
+        if (!modeActions.length) {
+            return;
+        }
+
+        if (isInit) {
+            const ran = {...alreadyExecuted};
+
+            availableLogicEntries.forEach(entry => {
+                if (modeActions.includes(entry.action)) {
+                    ran[entry.name] = true;
+                }
+            });
+
+            field.onInitFieldLogicExecutedModes = {...(field.onInitFieldLogicExecutedModes ?? {}), [mode]: ran};
+        }
+
         const context = {
             record,
             field,

@@ -25,6 +25,7 @@
  */
 
 import {Injectable} from '@angular/core';
+import {ValidatorFn} from '@angular/forms';
 import {Action} from '../../../common/actions/action.model';
 import {StringArrayMap} from '../../../common/types/string-map';
 import {ViewMode} from '../../../common/views/view.model';
@@ -70,7 +71,7 @@ export class RequiredAction extends FieldLogicActionHandler {
         const isActive = this.activeFieldsChecker.isActive(relatedFields, record, activeOnFields, relatedAttributesFields, activeOnAttributes);
 
         let required = false;
-        let validators = [...data.field.validators || []];
+        let logicValidators: ValidatorFn[] = [];
         if (isActive) {
             required = true;
 
@@ -79,12 +80,15 @@ export class RequiredAction extends FieldLogicActionHandler {
                 display: field?.display()
             }
 
-            validators = validators.concat(this.requiredValidator.getValidator(viewField, record));
+            logicValidators = this.requiredValidator.getValidator(viewField, record);
         }
+
+        const validators = [...(data.field.validators ?? []), ...logicValidators];
 
         data.field.formControl.updateValueAndValidity({onlySelf: true, emitEvent: true});
         record.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
         data.field.required.set(required);
+        data.field.logicValidators = logicValidators;
         data.field.formControl.setValidators(validators);
         data.field.formControl.updateValueAndValidity({onlySelf: true, emitEvent: true});
         record.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
@@ -92,5 +96,9 @@ export class RequiredAction extends FieldLogicActionHandler {
 
     getTriggeringStatus(): string[] {
         return ['onAnyLogic', 'onFieldInitialize'];
+    }
+
+    canRunOnUnrenderedField(): boolean {
+        return true;
     }
 }

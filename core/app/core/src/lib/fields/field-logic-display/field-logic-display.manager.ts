@@ -56,7 +56,9 @@ export class FieldLogicDisplayManager extends BaseActionManager<FieldLogicDispla
         if(!field.displayLogic || (onInitFieldDisplayLogicExecuted && triggeringStatus === 'onFieldInitialize')) {
             return;
         }
-        field.onInitFieldDisplayLogicExecutedModes = {...(field.onInitFieldDisplayLogicExecutedModes ?? {}), [mode]: true};
+        if (triggeringStatus === 'onFieldInitialize') {
+            field.onInitFieldDisplayLogicExecutedModes = {...(field.onInitFieldDisplayLogicExecutedModes ?? {}), [mode]: true};
+        }
 
         const validModeLogic = Object.values(field.displayLogic).filter(logic => {
             const allowedModes = logic['modes'] ?? [];

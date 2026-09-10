@@ -232,7 +232,8 @@ export interface Field {
     initDefaultValueObject?: DefaultValueInitCallback;
     initValueSignal?: InitValueSignalFunction;
 
-    onInitFieldLogicExecutedModes?: BooleanMap;
+    logicValidators?: ValidatorFn[];
+    onInitFieldLogicExecutedModes?: { [mode: string]: BooleanMap };
     onInitFieldDisplayLogicExecutedModes?: BooleanMap;
 }
 
@@ -283,7 +284,8 @@ export class BaseField implements Field {
     defaultValueInitialized: boolean = false;
     defaultValueObjectInitialized: boolean = false;
 
-    onInitFieldLogicExecutedModes: BooleanMap = {};
+    logicValidators?: ValidatorFn[] = [];
+    onInitFieldLogicExecutedModes: { [mode: string]: BooleanMap } = {};
     onInitFieldDisplayLogicExecutedModes: BooleanMap = {};
 
     constructor() {

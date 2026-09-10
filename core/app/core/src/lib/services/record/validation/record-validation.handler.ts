@@ -117,7 +117,9 @@ export class RecordValidationHandler {
     initFieldValidators(field: Field): void {
         this.resetFormControlValidators(field);
 
-        this.setFormControlValidators(field, field?.validators ?? [], field?.asyncValidators ?? []);
+        const validators = [...(field?.validators ?? []), ...(field?.logicValidators ?? [])];
+
+        this.setFormControlValidators(field, validators, field?.asyncValidators ?? []);
 
         const fieldAttributes = field?.attributes ?? {} as FieldAttributeMap;
 

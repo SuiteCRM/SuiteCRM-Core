@@ -308,7 +308,8 @@ class ViewModulefield extends SugarView
         }
         
         if ((!empty($vardef['studio']) && is_array($vardef['studio']) && !empty($vardef['studio']['no_duplicate']) && $vardef['studio']['no_duplicate'] == true)
-           || (strcmp($field_name, "name") == 0) || (isset($vardef['type']) && $vardef['type'] == 'name')) { // bug #35767, do not allow cloning of name field
+           || (strcmp($field_name, "name") == 0) || (isset($vardef['type']) && $vardef['type'] == 'name')
+           || (isset($vardef['type']) && $vardef['type'] == 'multirelate')) { // bug #35767, do not allow cloning of name field; multirelate fields are not creatable via Studio
             $fv->ss->assign('no_duplicate', true);
         }
 

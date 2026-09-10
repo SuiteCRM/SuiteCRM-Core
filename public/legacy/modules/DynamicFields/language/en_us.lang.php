@@ -81,6 +81,7 @@ $mod_strings = array(
     'LBL_MULTI_SELECT_LIST' => 'Multi Select List',
     'COLUMN_TITLE_PRECISION' => 'Precision',
     'LBL_MODULE' => 'Module',
+    'LBL_RELATIONSHIP' => 'Relationship',
     'COLUMN_TITLE_MASS_UPDATE' => 'Mass Update',
     'COLUMN_TITLE_IMPORTABLE' => 'Importable',
     'COLUMN_TITLE_DUPLICATE_MERGE' => 'Duplicate Merge',

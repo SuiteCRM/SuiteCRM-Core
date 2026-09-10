@@ -111,7 +111,7 @@ export class MultiRelateDetailFieldComponent extends BaseMultiEnumComponent {
     }
 
     getDirection(): string {
-        if (this.field.definition.displayDirection) {
+        if (this?.field?.definition?.displayDirection) {
             return this.field.definition.displayDirection;
         }
 

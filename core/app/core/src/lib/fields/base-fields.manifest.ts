@@ -114,6 +114,8 @@ import {MultiRelateEditFieldComponent} from "./multirelate/templates/edit/multir
 import {MultiRelateDetailFieldComponent} from "./multirelate/templates/detail/multirelate.component";
 import {MultiRelateEditFieldModule} from "./multirelate/templates/edit/multirelate.module";
 import {MultiRelateDetailFieldModule} from "./multirelate/templates/detail/multirelate.module";
+import {MultiRelateFilterFieldComponent} from "./multirelate/templates/filter/multirelate.component";
+import {MultiRelateFilterFieldModule} from "./multirelate/templates/filter/multirelate.module";
 import {CurrencyEditFieldModule} from "./currency/templates/edit/currency.module";
 import {MultiFlexRelateEditFieldModule} from "./multiflexrelate/templates/edit/multiflexrelate.module";
 import {MultiFlexRelateEditFieldComponent} from "./multiflexrelate/templates/edit/multiflexrelate.component";
@@ -183,6 +185,7 @@ export const baseFieldModules = [
     MultiEnumFilterFieldModule,
     MultiRelateDetailFieldModule,
     MultiRelateEditFieldModule,
+    MultiRelateFilterFieldModule,
     MultiFlexRelateEditFieldModule,
     BooleanDetailFieldModule,
     BooleanEditFieldModule,
@@ -306,6 +309,7 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'multirelate.list': MultiRelateDetailFieldComponent,
     'multirelate.edit': MultiRelateEditFieldComponent,
     'multirelate.detail': MultiRelateDetailFieldComponent,
+    'multirelate.filter': MultiRelateFilterFieldComponent,
     'multiflexrelate.edit': MultiFlexRelateEditFieldComponent,
     'fullname.list': FullNameDetailFieldsComponent,
     'fullname.detail': FullNameDetailFieldsComponent,

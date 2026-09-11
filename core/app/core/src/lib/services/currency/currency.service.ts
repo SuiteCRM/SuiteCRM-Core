@@ -43,32 +43,35 @@ export class CurrencyService {
     }
 
     getFieldCurrencyValue(field: Field, record: Record): string {
-        const isBase = this.isBase(field);
-        const currencyId = this.getCurrencyId(record);
+        const rawValue = parseFloat(field.value);
 
-        if (!isBase && currencyId !== null) {
+        if (!isFinite(rawValue)) {
             return field.value;
         }
 
-        const value = parseFloat(field.value);
+        const baseCurrencyId = this.getBaseCurrency()?.id ?? null;
+        let recordCurrencyId = baseCurrencyId;
 
-        if (!isFinite(value)) {
+        if (!this.isBase(field)) {
+            recordCurrencyId = this.getCurrencyId(record) ?? (record as any)?.attributes?.currency_id ?? baseCurrencyId;
+        }
+
+        const targetCurrencyId = this.getUserCurrency()?.id ?? baseCurrencyId;
+
+        if (recordCurrencyId === targetCurrencyId) {
             return field.value;
         }
 
-        let currency = this.getUserCurrency();
+        const baseValue = this.currencyToBase(recordCurrencyId, rawValue);
+        const finalValue = this.baseToCurrency(targetCurrencyId, baseValue);
 
-        if (!currency?.id) {
-            currency = this.getBaseCurrency();
-        }
-
-        return this.baseToCurrency(currency.id, value).toString();
+        return finalValue.toString();
     }
 
-    baseToCurrency(currencyId: string, value: number): number {
 
+    baseToCurrency(currencyId: string, value: number): number {
         const conversionRate = this.getConversionRate(currencyId);
-        if (!isFinite(conversionRate)) {
+        if (!isFinite(conversionRate) || conversionRate === 0) {
             return value;
         }
 
@@ -76,9 +79,8 @@ export class CurrencyService {
     }
 
     currencyToBase(currencyId: string, value: number): number {
-
         const conversionRate = this.getConversionRate(currencyId);
-        if (!isFinite(conversionRate)) {
+        if (!isFinite(conversionRate) || conversionRate === 0) {
             return value;
         }
 
@@ -100,7 +102,6 @@ export class CurrencyService {
 
     getCurrency(id: string): any {
         const currencies = this.config.getConfigValue('currencies');
-
         return currencies[id] ?? [];
     }
 
@@ -113,7 +114,6 @@ export class CurrencyService {
     }
 
     getPrecision(): number {
-
         const userPrecision = parseInt(this.preferences.getUserPreference('default_currency_significant_digits'));
 
         if (isFinite(userPrecision)) {
@@ -126,7 +126,7 @@ export class CurrencyService {
             return systemPrecision;
         }
 
-        return 0;
+        return 2;
     }
 
     getConversionRate(id: string): number {

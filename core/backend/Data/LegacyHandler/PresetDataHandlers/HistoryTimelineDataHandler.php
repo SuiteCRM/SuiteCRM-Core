@@ -41,6 +41,7 @@ use BeanFactory;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use SubpanelDataPort;
+use SubPanelDefinitions;
 use SugarBean;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -51,6 +52,102 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
     use StatisticsHandlingTrait;
 
     public const HANDLER_KEY = 'history-timeline-data-handlers';
+
+    protected const BASE_UNION_QUERY_COLUMNS = [
+        'tasks' => [
+            "name" => [],
+            "status" => [],
+            "date_modified" => [],
+            "date_entered" => [],
+            "date_due" => [
+                "alias" => 'date_end',
+                "sort_by" => 'date_end'
+            ]
+        ],
+        'tasks_parent' => [
+            "name" => [],
+            "status" => [],
+            "date_modified" => [],
+            "date_entered" => [],
+            "date_due" => [
+                "alias" => 'date_end',
+                "sort_by" => 'date_end'
+            ]
+        ],
+        'meetings' => [
+            "name" => [],
+            "status" => [],
+            "date_modified" => [],
+            "date_entered" => [],
+            "date_end" => [],
+        ],
+        'oldmeetings' => [
+            "name" => [],
+            "status" => [],
+            "date_modified" => [],
+            "date_entered" => [],
+            "date_end" => [],
+        ],
+        'calls' => [
+            "name" => [],
+            "status" => [],
+            "date_modified" => [],
+            "date_entered" => [],
+            "date_end" => [],
+        ],
+        'oldcalls' => [
+            "name" => [],
+            "status" => [],
+            "date_modified" => [],
+            "date_entered" => [],
+            "date_end" => [],
+        ],
+        'notes' => [
+            "name" => [],
+            "status" => [],
+            "date_modified" => [],
+            "date_entered" => [
+                "alias" => 'date_end',
+                "sort_by" => 'date_end'
+            ],
+            "date_due" => [],
+        ],
+        'emails' => [
+            "name" => [],
+            "status" => [],
+            "date_modified" => [
+                "alias" => 'date_end',
+                "sort_by" => 'date_end'
+            ],
+            "date_entered" => [],
+            "date_due" => [],
+        ],
+        'emailman' => [
+            "name" => [],
+            "status" => [],
+            "date_modified" => [],
+            "date_entered" => [],
+            "date_end" => [],
+        ],
+        'linkedemails' => [
+            "name" => [],
+            "status" => [],
+            "date_modified" => [
+                "alias" => 'date_end',
+                "sort_by" => 'date_end'
+            ],
+            "date_entered" => [],
+            "date_due" => [],
+        ],
+    ];
+
+    protected const DEFAULT_UNION_QUERY_COLUMNS = [
+        "name" => [],
+        "status" => [],
+        "date_modified" => [],
+        "date_entered" => [],
+        "date_end" => [],
+    ];
 
     /**
      * @var LoggerInterface
@@ -151,108 +248,7 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
             throw new AccessDeniedHttpException('User does not have view access to parent record');
         }
 
-        $unionQueryColumns =
-            [
-                'tasks' => [
-                    "name" => [],
-                    "status" => [],
-                    "date_modified" => [],
-                    "date_entered" => [],
-                    "date_due" => [
-                        "alias" => 'date_end',
-                        "sort_by" => 'date_end'
-                    ]
-                ],
-                'tasks_parent' => [
-                    "name" => [],
-                    "status" => [],
-                    "date_modified" => [],
-                    "date_entered" => [],
-                    "date_due" => [
-                        "alias" => 'date_end',
-                        "sort_by" => 'date_end'
-                    ]
-                ],
-                'meetings' => [
-                    "name" => [],
-                    "status" => [],
-                    "date_modified" => [],
-                    "date_entered" => [],
-                    "date_end" => [],
-                ],
-                'oldmeetings' => [
-                    "name" => [],
-                    "status" => [],
-                    "date_modified" => [],
-                    "date_entered" => [],
-                    "date_end" => [],
-                ],
-                'calls' => [
-                    "name" => [],
-                    "status" => [],
-                    "date_modified" => [],
-                    "date_entered" => [],
-                    "date_end" => [],
-                ],
-                'oldcalls' => [
-                    "name" => [],
-                    "status" => [],
-                    "date_modified" => [],
-                    "date_entered" => [],
-                    "date_end" => [],
-                ],
-                'notes' => [
-                    "name" => [],
-                    "status" => [],
-                    "date_modified" => [],
-                    "date_entered" => [
-                        "alias" => 'date_end',
-                        "sort_by" => 'date_end'
-                    ],
-                    "date_due" => [],
-                ],
-                'emails' => [
-                    "name" => [],
-                    "status" => [],
-                    "date_modified" => [
-                        "alias" => 'date_end',
-                        "sort_by" => 'date_end'
-                    ],
-                    "date_entered" => [],
-                    "date_due" => [],
-                ],
-                'emailman' => [
-                    "name" => [],
-                    "status" => [],
-                    "date_modified" => [],
-                    "date_entered" => [],
-                    "date_end" => [],
-                ],
-                'linkedemails' => [
-                    "name" => [],
-                    "status" => [],
-                    "date_modified" => [
-                        "alias" => 'date_end',
-                        "sort_by" => 'date_end'
-                    ],
-                    "date_entered" => [],
-                    "date_due" => [],
-                ],
-            ];
-
-        $panelToModuleName = [
-            'tasks' => 'Tasks',
-            'tasks_parent' => 'Tasks',
-            'meetings' => 'Meetings',
-            'oldmeetings' => 'Meetings',
-            'calls' => 'Calls',
-            'oldcalls' => 'Calls',
-            'notes' => 'Notes',
-            'emails' => 'Emails',
-            'emailman' => 'EmailMan',
-            'linkedemails' => 'Emails',
-            'audit' => 'audit'
-        ];
+        [$unionQueryColumns, $panelToModuleName] = $this->getUnionCollectionDefs($parentBean, [$selectModule, 'activities']);
 
         /* @noinspection PhpIncludeInspection */
         require_once 'include/portability/Subpanels/SubpanelDataPort.php';
@@ -342,7 +338,7 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
 
             $listData[$key]['assigned_user_name']['user_name'] = $userName;
             $listData[$key]['assigned_user_name']['user_id'] = $record['assigned_user_id'] ?? '';
-            $listData[$key]['module_name'] = $panelToModuleName[$listData[$key]['panel_name']];
+            $listData[$key]['module_name'] = $panelToModuleName[$listData[$key]['panel_name']] ?? '';
         }
 
         $timelineEntryData = new ListData();
@@ -350,6 +346,58 @@ class HistoryTimelineDataHandler extends SubpanelDataQueryHandler implements Pre
         $timelineEntryData->setOrdering($listData['ordering'] ?? []);
         $timelineEntryData->setRecords($this->recordMapper->mapRecords($listData ?? []));
         return $timelineEntryData;
+    }
+
+    /**
+     * Build the union query columns and the panel name to module name map from the
+     * 'collection_list' of the given subpanels.
+     *
+     * A collection entry may override the built-in columns for its panel with a
+     * 'union_fields' key, in the same format as self::BASE_UNION_QUERY_COLUMNS:
+     *
+     *  $layout_defs['Accounts']['subpanel_setup']['history']['collection_list']['notes_accounts'] = [
+     *      'module' => 'Notes',
+     *      'subpanel_name' => 'ForHistory',
+     *      'get_subpanel_data' => 'notes_accounts',
+     *      'union_fields' => [
+     *          'name' => [],
+     *          'status' => [],
+     *          'date_modified' => [],
+     *          'date_entered' => ['alias' => 'date_end', 'sort_by' => 'date_end'],
+     *          'date_due' => [],
+     *      ],
+     *  ];
+     *
+     * @param SugarBean $parentBean
+     * @param string[] $subpanels
+     * @return array [$unionQueryColumns, $panelToModuleName]
+     */
+    protected function getUnionCollectionDefs(SugarBean $parentBean, array $subpanels): array
+    {
+        /* @noinspection PhpIncludeInspection */
+        require_once 'include/SubPanel/SubPanelDefinitions.php';
+
+        $subpanelDefinitions = new SubPanelDefinitions($parentBean);
+
+        $unionQueryColumns = self::BASE_UNION_QUERY_COLUMNS;
+        $panelToModuleName = ['audit' => 'audit'];
+
+        foreach ($subpanels as $subpanel) {
+            $collectionList = $subpanelDefinitions->layout_defs['subpanel_setup'][$subpanel]['collection_list'] ?? [];
+
+            foreach ($collectionList as $panelName => $collectionDef) {
+                $panelToModuleName[$panelName] = $collectionDef['module'] ?? '';
+
+                // Every panel has to contribute the same columns to the union, so a panel with
+                // no entry at all still needs the defaults. Left unset it would fall back to the
+                // subpanel's own list_fields and break the union with a column count mismatch.
+                $unionQueryColumns[$panelName] = $collectionDef['union_fields']
+                    ?? $unionQueryColumns[$panelName]
+                    ?? self::DEFAULT_UNION_QUERY_COLUMNS;
+            }
+        }
+
+        return [$unionQueryColumns, $panelToModuleName];
     }
 
     /**

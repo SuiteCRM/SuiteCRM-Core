@@ -52,6 +52,7 @@ export class DataTypeFormatter {
     ) {
         this.map.int = numberFormatter;
         this.map.float = numberFormatter;
+        this.map.decimal = numberFormatter;
         this.map.date = dateFormatter;
         this.map.datetime = datetimeFormatter;
         this.map.currency = currencyFormatter;

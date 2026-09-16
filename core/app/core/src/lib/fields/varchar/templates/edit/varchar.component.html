@@ -27,6 +27,5 @@
 -->
 <input [class.is-invalid]="validateOnlyOnSubmit ? isInvalid() : (field.formControl.invalid && field.formControl.touched)"
        [formControl]="field.formControl"
-       [value]="field.value"
        [ngClass]="klass"
        type="text">

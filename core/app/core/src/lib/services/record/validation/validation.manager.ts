@@ -38,6 +38,7 @@ import {CurrencyValidator} from './validators/currency.validator';
 import {DateValidator} from './validators/date.validator';
 import {DateTimeValidator} from './validators/datetime.validator';
 import {FloatValidator} from './validators/float.validator';
+import {DecimalValidator} from './validators/decimal.validator';
 import {IntValidator} from './validators/int.validator';
 import {EmailValidator} from './validators/email.validator';
 import {PhoneValidator} from './validators/phone.validator';
@@ -101,7 +102,8 @@ export class ValidationManager implements ValidationManagerInterface {
         protected duplicateEmailValidator: DuplicateEmailValidator,
         protected lineItemsRequiredValidator: LineItemsRequiredValidator,
         protected attachmentValidator: AttachmentValidator,
-        protected semanticVersionValidator: SemanticVersionValidator
+        protected semanticVersionValidator: SemanticVersionValidator,
+        protected decimalValidator: DecimalValidator
     ) {
 
         this.saveValidators = new OverridableMap<ValidatorInterface>();
@@ -117,6 +119,7 @@ export class ValidationManager implements ValidationManagerInterface {
         this.saveValidators.addEntry('default', this.getKey('datetime', 'all'), datetimeValidator);
         this.saveValidators.addEntry('default', this.getKey('email', 'all'), emailValidator);
         this.saveValidators.addEntry('default', this.getKey('float', 'all'), floatValidator);
+        this.saveValidators.addEntry('default', this.getKey('decimal', 'all'), decimalValidator);
         this.saveValidators.addEntry('default', this.getKey('int', 'all'), intValidator);
         this.saveValidators.addEntry('default', this.getKey('phone', 'all'), phoneValidator);
         this.saveValidators.addEntry('default', this.getKey('attachment', 'all'), attachmentValidator);
@@ -127,6 +130,7 @@ export class ValidationManager implements ValidationManagerInterface {
         this.filterValidators.addEntry('default', this.getKey('date', 'all'), dateValidator);
         this.filterValidators.addEntry('default', this.getKey('datetime', 'all'), datetimeValidator);
         this.filterValidators.addEntry('default', this.getKey('float', 'all'), floatValidator);
+        this.filterValidators.addEntry('default', this.getKey('decimal', 'all'), decimalValidator);
         this.filterValidators.addEntry('default', this.getKey('currency', 'all'), currencyValidator);
         this.filterValidators.addEntry('default', this.getKey('int', 'all'), intValidator);
         this.filterValidators.addEntry('default', this.getKey('phone', 'all'), phoneValidator);

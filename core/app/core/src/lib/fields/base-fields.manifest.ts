@@ -52,8 +52,10 @@ import {MultiEnumDetailFieldModule} from './multienum/templates/detail/multienum
 import {FileDetailFieldModule} from './file/templates/detail/file.module';
 import {FileDetailFieldComponent} from './file/templates/detail/file.component';
 import {FloatDetailFieldModule} from './float/templates/detail/float.module';
+import {DecimalDetailFieldModule} from './decimal/templates/detail/decimal.module';
 import {DateDetailFieldComponent} from './date/templates/detail/date.component';
 import {FloatDetailFieldComponent} from './float/templates/detail/float.component';
+import {DecimalDetailFieldComponent} from './decimal/templates/detail/decimal.component';
 import {DateEditFieldComponent} from './date/templates/edit/date.component';
 import {EnumDetailFieldComponent} from './enum/templates/detail/enum.component';
 import {VarcharFilterFieldModule} from './varchar/templates/filter/filter.module';
@@ -151,6 +153,7 @@ export const baseFieldModules = [
     FileEditFieldModule,
     FileListFieldModule,
     FloatDetailFieldModule,
+    DecimalDetailFieldModule,
     PhoneDetailFieldModule,
     DateDetailFieldModule,
     DateEditFieldModule,
@@ -274,6 +277,8 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'file.list': FileListFieldComponent,
     'float.list': FloatDetailFieldComponent,
     'float.detail': FloatDetailFieldComponent,
+    'decimal.list': DecimalDetailFieldComponent,
+    'decimal.detail': DecimalDetailFieldComponent,
     'phone.list': PhoneDetailFieldComponent,
     'phone.detail': PhoneDetailFieldComponent,
     'date.list': DateDetailFieldComponent,

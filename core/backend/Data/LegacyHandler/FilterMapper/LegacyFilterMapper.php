@@ -58,7 +58,7 @@ class LegacyFilterMapper extends LegacyHandler
         require_once 'include/portability/FilterMapper/FilterMapper.php';
         $filterMapper = new FilterMapper();
 
-        $mapped = $filterMapper->toLegacy($criteria, $type);
+        $mapped = $filterMapper->toLegacySearch($criteria, $type);
 
         $this->close();
 

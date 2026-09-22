@@ -496,7 +496,7 @@ class DeployedMetaDataImplementation extends AbstractMetaDataImplementation impl
         }
         $insights = $viewdefs[$moduleName][$view] ?? [];
         if (!empty($insights)) {
-            $out = "\$$viewDefsLabel ['".$moduleName."'] ['".$view."'] = \n" . var_export($insights, true);
+            $out = ";\n\$$viewDefsLabel ['".$moduleName."'] ['".$view."'] = \n" . var_export($insights, true);
         }
         $out .= ";\n?>\n";
         file_put_contents($fileName, $out, FILE_APPEND);

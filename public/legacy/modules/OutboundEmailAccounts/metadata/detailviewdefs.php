@@ -8,7 +8,7 @@ $viewdefs ['OutboundEmailAccounts'] = [
                     'DELETE',
                     [
                         'customCode' => '
-                            {if $fields.type.value === "user" && $fields.created_by.value == $current_user_id}
+                            {if $fields.type.value === "user" && ($fields.user_id.value == $current_user_id || $is_admin)}
                             <input title="{$MOD.LBL_SET_AS_DEFAULT_BUTTON}"
                                    type="button"
                                    class="button"

@@ -2108,6 +2108,7 @@ $app_strings = array(
     'LBL_NEXT_BTN' => 'Next',
     'LBL_ONLY_IMAGE_ATTACHMENT' => 'Only the following supported image type attachments can be embedded: JPG, PNG.',
     'LBL_TRAINING' => 'Community Forum',
+    'LBL_SUITECRM_STORE' => 'SuiteCRM Store',
     'ERR_MSSQL_DB_CONTEXT' => 'Changed database context to',
     'ERR_MSSQL_WARNING' => 'Warning:',
 

@@ -50,13 +50,20 @@ class CreateUser
         $userInfo['status'] = 'Active';
         $userInfo['is_admin'] = 0;
         $userInfo['external_auth_only'] = 1;
-        $userInfo['user_hash'] = '';
 
         if (empty($userInfo['first_name'])) {
             $userInfo['first_name'] = $name;
         }
 
-        return $this->create($name, $userInfo);
+        global $current_user;
+        $previousUser = $current_user;
+        $current_user = BeanFactory::newBean('Users')->getSystemUser();
+
+        try {
+            return $this->create($name, $userInfo);
+        } finally {
+            $current_user = $previousUser;
+        }
     }
 
     /**

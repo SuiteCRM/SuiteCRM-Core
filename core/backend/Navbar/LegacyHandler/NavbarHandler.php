@@ -719,7 +719,8 @@ class NavbarHandler extends LegacyHandler implements NavigationProviderInterface
                     'quickAction' => $menuEntry['quickAction'] ?? false,
                     'type' => $type,
                     'module' => $module,
-                    'process' => $menuEntry['process'] ?? null
+                    'process' => $menuEntry['process'] ?? null,
+                    'processParams' => $menuEntry['processParams'] ?? []
                 ];
 
                 if ($count >= $maxQuickActions) {

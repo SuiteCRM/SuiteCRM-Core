@@ -36,7 +36,7 @@
         >
 
             <ng-container *ngIf="col.field && col.field.display() !== 'none'">
-                <div class="field-layout-field-group-wrapper form-group row">
+                <div class="field-layout-field-group-wrapper form-group row" [title]="col.field.definition?.help ?? '' ">
                     <div *ngIf="col?.field?.metadata?.labelDisplay !== 'none'"
                             class="{{col?.headerColumnClass}} field-layout-field-label-wrapper col-form-label label-container">
                         <strong>

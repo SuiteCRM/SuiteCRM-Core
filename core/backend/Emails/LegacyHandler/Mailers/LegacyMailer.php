@@ -170,7 +170,18 @@ class LegacyMailer extends LegacyHandler
         if (!empty($message->getTextBody() ?? '')) {
             $mail->AltBody = $message->getTextBody() ?? '';
         }
-
+        
+        if (empty($message->getReplyTo()) || empty($message->getReplyTo()[0]) || empty($message->getReplyTo()[0]->getAddress())) {
+            $replyAddress = '';
+            $replyName = '';
+        } else {
+            $replyAddress = $message->getReplyTo()[0]->getAddress() ?? '';
+            $replyName = $message->getReplyTo()[0]->getName() ?? '';
+        }
+        if(!empty($replyAddress)){
+            $mail->addReplyTo($replyAddress,$replyName);
+        }
+        
         $this->addRecipients($mail, $message);
 
         $mail->handleAttachments($attachments);

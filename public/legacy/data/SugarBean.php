@@ -2672,7 +2672,7 @@ class SugarBean
 
                 $purifyHtml = $def['metadata']['purifyHtml'] ?? true;
                 if ($purifyHtml === false) {
-                    return;
+                    continue;
                 }
 
                 // Trim name & varchar type values on save when the value is not null

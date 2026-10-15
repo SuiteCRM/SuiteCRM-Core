@@ -1,7 +1,7 @@
 <?php
 /**
  * SuiteCRM is a customer relationship management program developed by SalesAgility Ltd.
- * Copyright (C) 2021 SalesAgility Ltd.
+ * Copyright (C) 2021 - 2026 SalesAgility Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -212,6 +212,9 @@ class SubpanelCustomQueryPort
             'where' => '',
             'order_by' => '',
         ];
+
+        // Normalize whitespace in query
+        $query = trim(preg_replace('/\s+/', ' ', $query));
 
         $fromPos = stripos($query, ' FROM ');
         if ($fromPos !== false) {

@@ -16,6 +16,6 @@ exclude_paths:
   - 'modules/AOS_PDF_Templates/PDF_Lib/**'
   - 'Zend/**'
   - 'modules/Users/authentication/SAML2Authenticate/lib/**'
-  - 'install/demoData.en_us.php*'
+  - 'install/seed_data/demoData.en_us.php*'
   - 'include/tcpdf/**'
   - 'modules/AOR_Charts/lib/**'

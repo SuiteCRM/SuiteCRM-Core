@@ -91,6 +91,7 @@ class SugarTinyMCE
         'entities' => '160,nbsp,38,amp,60,lt,62,gt,34,quot,39,apos,162,cent,163,pound,165,yen,8364,euro,169,copy,174,reg,8482,trade',
         'forced_root_block' => false,
         'fix_list_elements' => false,
+        'browser_spellcheck' => false,
     ];
 
     /**
@@ -304,7 +305,7 @@ eoq;
     private function overloadDefaultConfigs()
     {
         if (file_exists($this->customDefaultConfigFile)) {
-            require_once($this->customDefaultConfigFile);
+            require($this->customDefaultConfigFile);
 
             if (!isset($defaultConfig)) {
                 return;

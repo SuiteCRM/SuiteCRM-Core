@@ -26,6 +26,7 @@
 */
 -->
 <ng-container *ngIf="dataSource">
+    <ng-content select="[top-right-placement]"></ng-content>
     <div *ngIf="config && config.layout === 'panels'" class="record-content panel-layout container-fluid pl-0 pr-0">
         <div class="row no-gutters mb-3" *ngFor="let panel of panels">
             <div class="col" *ngIf="panel.display$ | async">
@@ -59,7 +60,6 @@
                     </ng-container>
                 </ng-container>
             </ul>
-            <ng-content select="[top-right-placement]"></ng-content>
         </div>
 
         <div [ngbNavOutlet]="nav" class="p-2 pt-3 rounded-right rounded-bottom"></div>

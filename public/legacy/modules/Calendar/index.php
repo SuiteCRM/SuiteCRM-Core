@@ -56,7 +56,7 @@ global $cal_strings, $current_language;
 $cal_strings = return_module_language($current_language, 'Calendar');
 
 if (empty($_REQUEST['view'])) {
-    if (isset($_SESSION['CALENDAR_VIEW']) && in_array($_SESSION['CALENDAR_VIEW'], $views)) {
+    if (isset($_SESSION['CALENDAR_VIEW']) && in_array($_SESSION['CALENDAR_VIEW'], array_keys($views))) {
         $_REQUEST['view'] = $_SESSION['CALENDAR_VIEW'];
     } else {
         $_REQUEST['view'] = SugarConfig::getInstance()->get('calendar.default_view', 'agendaWeek');

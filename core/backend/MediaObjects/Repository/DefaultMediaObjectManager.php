@@ -45,6 +45,7 @@ use Imagine\Gd\Imagine;
 use Imagine\Gmagick\Imagine as GmagickImagine;
 use Imagine\Imagick\Imagine as ImagickImagine;
 use Imagine\Image\Box;
+use Imagine\Image\ImageInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mime\MimeTypes;
@@ -560,7 +561,7 @@ class DefaultMediaObjectManager extends LegacyHandler implements MediaObjectMana
         $ext = $this->getExtension($mediaObject);
         $path = $this->temporaryFileManager->getWorkingFilePath('thumbnail', $id . $ext);
 
-        $imagine->load($contents)->resize(new Box($width, $height))->save($path);
+        $imagine->load($contents)->thumbnail(new Box($width, $height), ImageInterface::THUMBNAIL_INSET)->save($path);
         return [new ReplacingFile($path), $path];
     }
 

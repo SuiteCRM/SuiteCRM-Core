@@ -28,7 +28,7 @@
 
 namespace App\Data\LegacyHandler;
 
-use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Exception\ItemNotFoundException;
 
 class PresetListDataHandlers
 {

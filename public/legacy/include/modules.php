@@ -86,8 +86,6 @@ $moduleList[] = 'Bugs';
 $moduleList[] = 'ResourceCalendar';
 $moduleList[] = 'AOBH_BusinessHours';
 
-$moduleList[] = 'Alerts';
-
 // this list defines all of the module names and bean names in the app
 // to create a new module's bean class, add the bean definition here
 $beanList = [];
@@ -226,6 +224,7 @@ $beanFiles['AOBH_BusinessHours'] = 'modules/AOBH_BusinessHours/AOBH_BusinessHour
 
 // added these lists for security settings for tabs
 $modInvisList = [
+    'Alerts',
     'Administration',
     'Currencies',
     'CustomFields',

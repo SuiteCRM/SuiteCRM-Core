@@ -72,7 +72,8 @@ export class FieldManager {
             },
             labelKey,
             loading: signal(false),
-            display: signal('default')
+            display: signal('default'),
+            readonly: signal(false)
         } as Field;
     }
 

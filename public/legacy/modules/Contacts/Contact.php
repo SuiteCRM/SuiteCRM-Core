@@ -465,7 +465,7 @@ class Contact extends Person implements EmailInterface
          * 'name' attribute constructed to pass onto related items, such as Tasks
          * Notes, etc.
          */
-        $this->name = $locale->getLocaleFormattedName($this->first_name, $this->last_name);
+        $this->name = $locale->getLocaleFormattedName($this->first_name, $this->last_name, $this->salutation);
         if (!empty($this->contacts_users_id)) {
             $this->sync_contact = true;
         }

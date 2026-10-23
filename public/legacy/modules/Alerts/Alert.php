@@ -120,6 +120,29 @@ class Alert extends Basic
         return date("Y-m-d H:i:s", strtotime("+ $snoozeTimer sec"));
     }
 
+    /**
+     * Disable full page views and anything that is not your own alert
+     * @param $view string
+     * @param $is_owner bool
+     */
+    public function ACLAccess($view, $is_owner='not_set', $in_group='not_set')
+    {
+
+        if(!$is_owner) {
+            return false;
+        }
+
+        switch ($view) {
+            case 'list':
+            case 'index':
+            case 'detail':
+                return false;
+        }
+
+        return parent::ACLAccess($view, $is_owner, $in_group);
+    }
+
+
 
     public function bean_implements($interface)
     {

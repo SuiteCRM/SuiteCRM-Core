@@ -941,9 +941,7 @@ class User extends Person implements EmailInterface
                 $this->setPreference('timezone', $timezone, 0, 'global');
             }
 
-            $ut = $_POST['ut'] ?? '0';
-
-            if (isset($ut)) {
+            if (isset($_POST['ut'])) {
                 $value = $_POST['ut'] === 'on' ? '0' : '1';
                 $this->setPreference('ut', $value, 0, 'global');
             } else {

@@ -191,9 +191,67 @@ class FilterContentMapper implements FieldMapperInterface
         );
 
         $filters = $this->filterMapper->toApi($contents);
+        $this->resolveMultirelateLabels($filters, $newContents['searchModule']);
         $newContents['filters'] = $filters;
 
         return $newContents;
+    }
+
+    /**
+     * Resolve multirelate ids in $filters to valueObjectArray entries with display names
+     * @param array $filters
+     * @param string $searchModule
+     */
+    protected function resolveMultirelateLabels(array &$filters, string $searchModule): void
+    {
+        if (empty($searchModule)) {
+            return;
+        }
+
+        foreach ($filters as $fieldName => &$filter) {
+            if (($filter['fieldType'] ?? '') !== 'multirelate') {
+                continue;
+            }
+
+            $ids = $filter['values'] ?? [];
+            if (empty($ids) || !is_array($ids)) {
+                continue;
+            }
+
+            $legacyModule = $this->moduleNameMapper->toLegacy($searchModule);
+            $bean = BeanFactory::getBean($legacyModule);
+            if (empty($bean) || empty($bean->field_defs[$fieldName])) {
+                continue;
+            }
+
+            $relatedModule = $bean->field_defs[$fieldName]['module'] ?? '';
+            $rname = $bean->field_defs[$fieldName]['rname'] ?? 'name';
+
+            if (empty($relatedModule)) {
+                continue;
+            }
+
+            $valueObjectArray = [];
+            foreach ($ids as $id) {
+                if (empty($id)) {
+                    continue;
+                }
+
+                $relatedBean = BeanFactory::getBean($relatedModule, $id);
+                if (empty($relatedBean) || empty($relatedBean->id)) {
+                    continue;
+                }
+
+                $valueObjectArray[] = [
+                    'id' => $relatedBean->id,
+                    $rname => $relatedBean->$rname ?? '',
+                ];
+            }
+
+            if (!empty($valueObjectArray)) {
+                $filter['valueObjectArray'] = $valueObjectArray;
+            }
+        }
     }
 
     /**

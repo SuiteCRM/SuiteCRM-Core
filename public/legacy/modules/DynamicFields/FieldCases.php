@@ -70,6 +70,7 @@ require_once('modules/DynamicFields/templates/Fields/TemplateId.php');
 require_once('modules/DynamicFields/templates/Fields/TemplateImage.php');
 require_once('modules/DynamicFields/templates/Fields/TemplateDecimal.php');
 require_once('modules/DynamicFields/templates/Fields/TemplateFile.php');
+require_once('modules/DynamicFields/templates/Fields/TemplateMultirelate.php');
 function get_widget($type)
 {
     $type = (string) $type;
@@ -135,6 +136,8 @@ function get_widget($type)
                         $local_temp = new TemplateDatetimecombo(); break;
             case 'image':
                         $local_temp = new TemplateImage(); break;
+            case 'multirelate':
+                        $local_temp = new TemplateMultirelate(); break;
             default:
                         $file = false;
                         if (file_exists('custom/modules/DynamicFields/templates/Fields/Template'. ucfirst($type) . '.php')) {

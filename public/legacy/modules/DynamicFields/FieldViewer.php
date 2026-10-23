@@ -99,6 +99,9 @@ class FieldViewer
             case 'relate':
                 require_once('modules/DynamicFields/templates/Fields/Forms/relate.php');
                 return get_body($this->ss, $vardef);
+            case 'multirelate':
+                require_once('modules/DynamicFields/templates/Fields/Forms/multirelate.php');
+                return get_body($this->ss, $vardef);
             case 'parent':
                 require_once('modules/DynamicFields/templates/Fields/Forms/parent.php');
                 return get_body($this->ss, $vardef);

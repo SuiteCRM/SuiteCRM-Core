@@ -33,6 +33,8 @@ import {FieldMap} from "../../../../common/record/field.model";
 import {Record} from "../../../../common/record/record.model";
 import {ValidationManager} from "../../../../services/record/validation/validation.manager";
 import {MetadataStore} from "../../../../store/metadata/metadata.store.service";
+import {ValidationMessageService} from '../../../../services/record/validation/validation-message.service';
+import {MessageService} from "../../../../services/message/message.service";
 
 export interface RecordModalActionData extends RecordBasedActionData {
     store: RecordModalStore;
@@ -45,6 +47,8 @@ export abstract class RecordModalRecordActionHandler extends ActionHandler<Recor
 
     protected validationManager = inject(ValidationManager);
     protected metadataStore = inject(MetadataStore);
+    protected validationMessage = inject(ValidationMessageService);
+    protected messageService = inject(MessageService);
 
     abstract run(data: RecordModalActionData): void;
 
@@ -75,6 +79,8 @@ export abstract class RecordModalRecordActionHandler extends ActionHandler<Recor
     }
 
     protected setRecordAsyncValidators(record: Record, formGroup: UntypedFormGroup): void {
+        this.messageService.removeMessages();
+
         const meta = this.metadataStore.get() || {};
         const viewMeta = meta.recordView || {};
         const validators: AsyncValidatorFn[] = this.validationManager.getAsyncRecordSaveValidations(record, viewMeta);

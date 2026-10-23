@@ -27,6 +27,9 @@ parameters:
           acl:
             - edit
             - delete
+          availability:
+            - duplicate-merge
+            - acls
         massupdate:
           key: massupdate
           labelKey: LBL_MASS_UPDATE

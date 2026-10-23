@@ -1034,6 +1034,15 @@ class SearchForm
                                 $field_value .= '(' . $db_field . ' IS NULL or ' . $db_field . "='^^' or " . $db_field . "='')";
                             }
                         }
+                    } elseif ($type == 'multirelate') {
+                        $operator = 'multirelate_in';
+                        $ids = array();
+                        foreach ($parms['value'] as $val) {
+                            if ($val !== ' ' && $val !== '') {
+                                $ids[] = $val;
+                            }
+                        }
+                        $field_value = (string) $this->getMultirelateSubquery($field, $ids);
                     } else {
 
                         $acceptedOperators = ['in', 'not in', 'not_in', 'subquery'];
@@ -1106,8 +1115,9 @@ class SearchForm
 
                     foreach ($parms['db_field'] as $db_field) {
                         if (strstr($db_field, '.') === false) {
-                            //Try to get the table for relate fields from link defs
-                            if ($type == 'relate' && !empty($this->seed->field_name_map[$field]['link'])
+                            if ($type == 'multirelate') {
+                                $db_field = $this->seed->table_name . '.id';
+                            } elseif ($type == 'relate' && !empty($this->seed->field_name_map[$field]['link'])
                                 && !empty($this->seed->field_name_map[$field]['rname'])
                             ) {
                                 $link = $this->seed->field_name_map[$field]['link'];
@@ -1319,6 +1329,10 @@ class SearchForm
 
                                 break;
 
+                            case 'multirelate_in':
+                                $where .= "{$db_field} IN ({$field_value})";
+                                break;
+
                             case 'like':
                                 if ($type == 'bool' && $field_value == 0) {
                                     // Bug 43452 - FG - Added parenthesis surrounding the OR (without them the WHERE clause would be broken)
@@ -1471,6 +1485,53 @@ class SearchForm
         return $where_clauses;
     }
 
+    /**
+     * Builds a "SELECT <known_key> FROM <join_table> WHERE deleted = 0 AND <target_key> IN (...)"
+     * subquery for a multirelate field, resolved generically from the field's link/relationship
+     * metadata (no hardcoded table/column names per module).
+     *
+     * A subquery (rather than a JOIN against the relationship table) is used deliberately here:
+     * a JOIN would multiply the seed record once per matching related row, producing duplicate
+     * search results whenever more than one selected related record matches the same seed record.
+     *
+     * @param string $field The multirelate field name
+     * @param array $ids Selected related record ids to match against
+     * @return string|null The subquery SQL, or null if the relationship metadata couldn't be resolved
+     */
+    private function getMultirelateSubquery($field, array $ids)
+    {
+        if (empty($ids) || empty($this->seed->field_name_map[$field]['link'])) {
+            return null;
+        }
+
+        $link = $this->seed->field_name_map[$field]['link'];
+        if (empty($this->seed->field_defs[$link]['relationship']) || !$this->seed->load_relationship($link)) {
+            return null;
+        }
+
+        $relationshipName = $this->seed->field_defs[$link]['relationship'];
+        $relMeta = !empty($GLOBALS['dictionary'][$relationshipName]['relationships'][$relationshipName])
+            ? $GLOBALS['dictionary'][$relationshipName]['relationships'][$relationshipName]
+            : null;
+
+        if (empty($relMeta['join_table']) || empty($relMeta['join_key_lhs']) || empty($relMeta['join_key_rhs'])) {
+            return null;
+        }
+
+        $seedIsLHS = !empty($relMeta['lhs_module']) && $relMeta['lhs_module'] == $this->seed->module_dir;
+        $knownKey = $seedIsLHS ? $relMeta['join_key_lhs'] : $relMeta['join_key_rhs'];
+        $targetKey = $seedIsLHS ? $relMeta['join_key_rhs'] : $relMeta['join_key_lhs'];
+
+        $db = $this->seed->db;
+        $quotedIds = array();
+        foreach ($ids as $id) {
+            $quotedIds[] = $db->quote($id);
+        }
+
+        return "SELECT {$relMeta['join_table']}.{$knownKey} FROM {$relMeta['join_table']}"
+            . " WHERE {$relMeta['join_table']}.deleted = 0"
+            . " AND {$relMeta['join_table']}.{$targetKey} IN ('" . implode("','", $quotedIds) . "')";
+    }
 
     /**
      * isEmptyDropdownField

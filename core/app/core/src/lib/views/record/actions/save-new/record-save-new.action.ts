@@ -32,6 +32,7 @@ import {MessageService} from '../../../../services/message/message.service';
 import {ModuleNavigation} from '../../../../services/navigation/module-navigation/module-navigation.service';
 import {
     allValidationErrorsSilent,
+    collectRecordValidationErrors,
     collectValidationErrors
 } from "../../../../common/services/validators/validators.model";
 
@@ -62,6 +63,7 @@ export class RecordSaveNewAction extends RecordActionHandler {
 
         data.store.recordStore.validate().pipe(take(1)).subscribe(valid => {
             const collectedErrors = collectValidationErrors(formGroup, fields);
+            const recordErrors = collectRecordValidationErrors(formGroup);
             this.clearAsyncValidators(fields);
             this.clearRecordAsyncValidators(formGroup);
             data.action.isRunning.set(false);
@@ -79,7 +81,7 @@ export class RecordSaveNewAction extends RecordActionHandler {
             }
 
             if (!allValidationErrorsSilent(collectedErrors)) {
-                this.message.addWarningMessageByKey('LBL_VALIDATION_ERRORS');
+                this.validationMessage.reportValidationErrors(recordErrors, record?.module);
             }
         });
     }

@@ -264,7 +264,7 @@ class ViewModulefields extends SugarView
             }
         }
 
-        if ($def ['type'] === 'image' || $def ['type'] === 'file' || $def ['type'] === 'attachment') {
+        if ($def ['type'] === 'image' || $def ['type'] === 'file' || $def ['type'] === 'attachment' || $def ['type'] === 'multirelate') {
             return true;
         }
 

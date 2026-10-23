@@ -36,6 +36,7 @@ import {Router} from "@angular/router";
 import {RecordPaginationService} from "../../store/record-pagination/record-pagination.service";
 import {
     allValidationErrorsSilent,
+    collectRecordValidationErrors,
     collectValidationErrors
 } from "../../../../common/services/validators/validators.model";
 
@@ -78,6 +79,7 @@ export class RecordSaveAction extends RecordActionHandler {
 
         data.store.recordStore.validate().pipe(take(1)).subscribe(valid => {
             const collectedErrors = collectValidationErrors(formGroup, fields);
+            const recordErrors = collectRecordValidationErrors(formGroup);
             this.clearAsyncValidators(fields);
             this.clearRecordAsyncValidators(formGroup);
             data.action.isRunning.set(false);
@@ -107,7 +109,7 @@ export class RecordSaveAction extends RecordActionHandler {
             }
 
             if (!allValidationErrorsSilent(collectedErrors)) {
-                this.message.addWarningMessageByKey('LBL_VALIDATION_ERRORS');
+                this.validationMessage.reportValidationErrors(recordErrors, record?.module);
             }
         });
     }

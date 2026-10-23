@@ -67,6 +67,10 @@ export function collectValidationErrors(formGroup: AbstractControl, fields: {[ke
     return errorSets;
 }
 
+export function collectRecordValidationErrors(formGroup: AbstractControl): StandardValidationErrors {
+    return {...(formGroup?.errors ?? {})} as StandardValidationErrors;
+}
+
 export function allValidationErrorsSilent(errorSets: StandardValidationErrors[]): boolean {
     if (errorSets.length === 0) {
         return false;

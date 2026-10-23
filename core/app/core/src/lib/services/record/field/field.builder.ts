@@ -191,7 +191,8 @@ export class FieldBuilder {
         field.type = type;
         field.name = viewField.name || definition.name || '';
         field.vardefBased = viewField?.vardefBased ?? definition?.vardefBased ?? false;
-        field.readonly = isTrue(viewField.readonly) || isTrue(definition.readonly) || false;
+        field.readonly = signal(isTrue(viewField.readonly) || isTrue(definition.readonly) || false);
+        field.defaultReadonly = field.readonly();
         field.display = signal((viewField.display || definition.display || 'default') as DisplayType);
         field.required = signal(isTrue(definition?.required) ?? isTrue(viewField?.fieldDefinition?.required) ?? false);
         field.defaultDisplay = field?.display();

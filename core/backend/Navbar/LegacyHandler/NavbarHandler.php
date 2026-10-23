@@ -693,10 +693,12 @@ class NavbarHandler extends LegacyHandler implements NavigationProviderInterface
             return $preDefinedQuickActions;
         }
 
+        $includedActions = [];
+
         $quickActions = [];
-        $count = 0;
-        foreach ($navbar->modules ?? [] as $module => $entry) {
-            $menu = $entry['menu'] ?? [];
+
+        foreach ($navbar->tabs ?? [] as $module) {
+            $menu = $navbar->modules[$module]['menu'] ?? [];
 
             if (empty($menu)) {
                 continue;
@@ -708,7 +710,13 @@ class NavbarHandler extends LegacyHandler implements NavigationProviderInterface
                     continue;
                 }
 
-                $count++;
+                $uniqueKey = $menuEntry['labelKey'] ?? '';
+
+                if (isset($includedActions[$uniqueKey])) {
+                    continue;
+                }
+
+                $includedActions[$uniqueKey] = true;
 
                 $quickActions[] = [
                     'name' => $menuEntry['name'] ?? '',
@@ -719,19 +727,14 @@ class NavbarHandler extends LegacyHandler implements NavigationProviderInterface
                     'quickAction' => $menuEntry['quickAction'] ?? false,
                     'type' => $type,
                     'module' => $module,
-                    'process' => $menuEntry['process'] ?? null
+                    'process' => $menuEntry['process'] ?? null,
+                    'processParams' => $menuEntry['processParams'] ?? []
                 ];
 
-                if ($count >= $maxQuickActions) {
-                    break;
+                if (count($quickActions) >= $maxQuickActions) {
+                    return $quickActions;
                 }
             }
-
-            if ($count >= $maxQuickActions) {
-                break;
-            }
-
-
         }
 
         return $quickActions;

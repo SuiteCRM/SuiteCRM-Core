@@ -30,6 +30,7 @@ import {AsyncValidatorFn, UntypedFormArray, UntypedFormControl, ValidatorFn} fro
 import {Record} from './record.model';
 import {FieldLogicMap} from '../actions/field-logic-action.model';
 import {ObjectMap} from '../types/object-map';
+import {BooleanMap} from '../types/boolean-map';
 import {ViewMode} from '../views/view.model';
 import {signal, WritableSignal} from "@angular/core";
 import {FieldActions} from "../metadata/metadata.model";
@@ -196,7 +197,8 @@ export interface Field {
     parentKey?: string;
     attributes?: FieldAttributeMap;
     items?: Record[];
-    readonly?: boolean;
+    readonly?: WritableSignal<boolean>;
+    defaultReadonly?: boolean;
     display?: WritableSignal<DisplayType>;
     required?: WritableSignal<boolean>;
     defaultDisplay?: string;
@@ -231,8 +233,9 @@ export interface Field {
     initDefaultValueObject?: DefaultValueInitCallback;
     initValueSignal?: InitValueSignalFunction;
 
-    onInitFieldLogicExecuted?: boolean;
-    onInitFieldDisplayLogicExecuted?: boolean;
+    logicValidators?: ValidatorFn[];
+    onInitFieldLogicExecutedModes?: { [mode: string]: BooleanMap };
+    onInitFieldDisplayLogicExecutedModes?: BooleanMap;
 }
 
 export class BaseField implements Field {
@@ -243,7 +246,8 @@ export class BaseField implements Field {
     labelKey?: string;
     loading?: WritableSignal<boolean> = signal(false);
     dynamicLabelKey?: string;
-    readonly?: boolean;
+    readonly?: WritableSignal<boolean> = signal(false);
+    defaultReadonly?: boolean = false;
     defaultValueObject?: any;
     display?: WritableSignal<DisplayType>;
     required?: WritableSignal<boolean>;
@@ -282,8 +286,9 @@ export class BaseField implements Field {
     defaultValueInitialized: boolean = false;
     defaultValueObjectInitialized: boolean = false;
 
-    onInitFieldLogicExecuted: boolean = false;
-    onInitFieldDisplayLogicExecuted: boolean = false;
+    logicValidators?: ValidatorFn[] = [];
+    onInitFieldLogicExecutedModes: { [mode: string]: BooleanMap } = {};
+    onInitFieldDisplayLogicExecutedModes: BooleanMap = {};
 
     constructor() {
         this.valueSubject = new BehaviorSubject<FieldValueChanges>({} as FieldValueChanges);

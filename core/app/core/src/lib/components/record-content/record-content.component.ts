@@ -36,6 +36,7 @@ import {FieldLayoutConfig, FieldLayoutDataSource} from '../field-layout/field-la
 import {LanguageStore} from '../../store/language/language.store';
 import {emptyObject} from "../../common/utils/object-utils";
 import {RecordLogicDependencyService} from "./record-logic/record-logic-dependency.service";
+import {FieldLogicManager} from "../../fields/field-logic/field-logic.manager";
 
 @Component({
     selector: 'scrm-record-content',
@@ -57,7 +58,8 @@ export class RecordContentComponent implements OnInit, OnDestroy {
 
     constructor(
         protected language: LanguageStore,
-        protected recordLogicDependencyService: RecordLogicDependencyService
+        protected recordLogicDependencyService: RecordLogicDependencyService,
+        protected fieldLogic: FieldLogicManager
     ) {}
 
     ngOnInit(): void {
@@ -82,6 +84,10 @@ export class RecordContentComponent implements OnInit, OnDestroy {
                 this.dataSource.getDisplayConfig(),
                 this.dataSource.getRecord()
             ]).subscribe(([config, record]) => {
+
+                // Init logic fields that aren't rendered
+                this.fieldLogic.runInitLogicForAllFields(record, config.mode);
+
                 const recordLogic = config?.recordLogic;
                 if (recordLogic && Object.keys(recordLogic).length) {
                     this.recordLogicDependencyService.init(record, recordLogic, config.mode);

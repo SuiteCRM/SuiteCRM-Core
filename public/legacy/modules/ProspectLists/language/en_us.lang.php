@@ -91,4 +91,6 @@ $mod_strings = array(
 
     'LBL_ASCENDING' => 'Ascending',
     'LBL_DESCENDING' => 'Descending',
+
+    'LBL_EXPORT_MEMBERS' => 'Export Members',
 );

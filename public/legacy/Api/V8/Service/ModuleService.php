@@ -74,13 +74,14 @@ class ModuleService
     public function getRecord(GetModuleParams $params, $path)
     {
         $fields = $params->getFields();
+        $module = $this->beanManager->resolveModuleAlias($params->getModuleName());
         $bean = $this->beanManager->getBeanSafe(
-            $params->getModuleName(),
+            $module,
             $params->getId()
         );
 
-        $this->assertSelfOrAdmin($params->getModuleName(), $bean->id);
-        if ($params->getModuleName() === 'Employees' && !isTrue($bean->show_on_employees)) {
+        $this->assertSelfOrAdmin($module, $bean->id);
+        if ($module === 'Employees' && !isTrue($bean->show_on_employees)) {
             throw new AccessDeniedException();
         }
 
@@ -107,7 +108,7 @@ class ModuleService
         $beanResult = [];
         global $db, $current_user;
         // this whole method should split into separated classes later
-        $module = $params->getModuleName();
+        $module = $this->beanManager->resolveModuleAlias($params->getModuleName());
 
         $orderBy = $params->getSort();
         $where = $params->getFilter();
@@ -261,7 +262,7 @@ class ModuleService
      */
     public function createRecord(CreateModuleParams $params, Request $request)
     {
-        $module = $params->getData()->getType();
+        $module = $this->beanManager->resolveModuleAlias($params->getData()->getType());
         $id = $params->getData()->getId();
         $attributes = $params->getData()->getAttributes();
 
@@ -441,7 +442,7 @@ class ModuleService
      */
     public function updateRecord(UpdateModuleParams $params, Request $request)
     {
-        $module = $params->getData()->getType();
+        $module = $this->beanManager->resolveModuleAlias($params->getData()->getType());
         $id = $params->getData()->getId();
         $attributes = $params->getData()->getAttributes();
         unset(
@@ -540,14 +541,16 @@ class ModuleService
      */
     public function deleteRecord(DeleteModuleParams $params)
     {
-        $this->assertAdmin($params->getModuleName());
+        $module = $this->beanManager->resolveModuleAlias($params->getModuleName());
+
+        $this->assertAdmin($module);
 
         $bean = $this->beanManager->getBeanSafe(
-            $params->getModuleName(),
+            $module,
             $params->getId()
         );
 
-        $this->assertNotSelf($params->getModuleName(), $bean->id);
+        $this->assertNotSelf($module, $bean->id);
 
         if (!$bean->ACLAccess('delete')) {
             throw new AccessDeniedException();

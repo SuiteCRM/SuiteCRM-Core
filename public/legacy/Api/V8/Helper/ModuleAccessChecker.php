@@ -28,6 +28,7 @@
 namespace Api\V8\Helper;
 
 use ACLController;
+use Api\V8\BeanDecorator\BeanManager;
 use SuiteCRM\Exception\NotAllowedException;
 
 /**
@@ -38,12 +39,29 @@ use SuiteCRM\Exception\NotAllowedException;
 class ModuleAccessChecker
 {
     /**
+     * @var BeanManager
+     */
+    private $beanManager;
+
+    /**
+     * @param BeanManager $beanManager
+     */
+    public function __construct(BeanManager $beanManager)
+    {
+        $this->beanManager = $beanManager;
+    }
+
+    /**
      * @param string $module
      * @throws NotAllowedException
      */
     public function checkAccess(string $module): void
     {
         global $current_user, $adminOnlyList;
+
+        // The rest of the API accepts bean aliases, e.g. 'Contracts' for 'AOS_Contracts', so
+        // resolve before matching: the lists checked below only ever hold real module names.
+        $module = $this->beanManager->resolveModuleAlias($module);
 
         // not in $moduleList, so the tab check below would reject it for everyone; row/field-level
         // enforcement happens in ModuleService instead

@@ -2,9 +2,11 @@ api_platform:
   title: SuiteCRM API
   version: 8.5.0
   formats:
-    multipart: ['multipart/form-data']
+    json: [ 'application/json' ]
     jsonld: [ 'application/ld+json' ]
+    multipart: [ 'multipart/form-data' ]
   docs_formats:
+    json: [ 'application/json' ]
     jsonld: [ 'application/ld+json' ]
     jsonopenapi: [ 'application/vnd.openapi+json' ]
     html: [ 'text/html' ]

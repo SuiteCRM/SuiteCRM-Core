@@ -105,8 +105,22 @@ class CacheManagerHandler extends LegacyHandler implements CacheManagerInterface
         }
 
         $this->init();
+        $this->runLegacyEntryPoint();
 
         global $db, $current_user;
+
+        // Legacy bootstrap should initialise the global DB connection; avoid hard-failing if it didn't.
+        if (empty($db)) {
+            $this->close();
+            return;
+        }
+
+        $currentUserId = '';
+        $currentUserName = '';
+        if (is_object($current_user)) {
+            $currentUserId = $current_user->id ?? '';
+            $currentUserName = $current_user->user_name ?? '';
+        }
 
         $query = "SELECT * FROM cache_rebuild WHERE cache_key='rebuild_all'";
         $result = $db->fetchOne($query);
@@ -114,6 +128,7 @@ class CacheManagerHandler extends LegacyHandler implements CacheManagerInterface
             $this->cachePool->clear();
             $query = "DELETE FROM cache_rebuild ";
             $db->query($query);
+            $this->close();
             return;
         }
 
@@ -123,17 +138,18 @@ class CacheManagerHandler extends LegacyHandler implements CacheManagerInterface
         $result = $db->query($query);
 
         if (empty($result)) {
+            $this->close();
             return;
         }
         while ($row = $db->fetchByAssoc($result)) {
             foreach ($keys as $key) {
                 if ($row['cache_key'] == $key && $row['rebuild'] == 1) {
-                    if (str_contains($row['cache_key'], 'all-module-metadata-' . $current_user->id ) && !empty($modules)) {
+                    if ($currentUserId !== '' && str_contains($row['cache_key'], 'all-module-metadata-' . $currentUserId) && !empty($modules)) {
                         foreach ($modules as $module) {
-                            if (empty($module)){
+                            if (empty($module)) {
                                 continue;
                             }
-                            $moduleKey = 'app-metadata-module-metadata-' . $module . '-' . $current_user->id;
+                            $moduleKey = 'app-metadata-module-metadata-' . $module . '-' . $currentUserId;
                             $this->cache->delete($moduleKey);
                         }
 
@@ -143,7 +159,9 @@ class CacheManagerHandler extends LegacyHandler implements CacheManagerInterface
                         continue;
                     }
                     $this->cache->delete($key);
-                    $_SESSION[$current_user->user_name . '_PREFERENCES'] = [];
+                    if ($currentUserName !== '') {
+                        $_SESSION[$currentUserName . '_PREFERENCES'] = [];
+                    }
                     $query = "DELETE FROM cache_rebuild ";
                     $query .= "WHERE cache_key='$key'";
                     $db->query($query);

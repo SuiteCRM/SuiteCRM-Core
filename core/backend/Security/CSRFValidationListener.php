@@ -82,9 +82,11 @@ class CSRFValidationListener
      */
     public function onKernelRequest(RequestEvent $event): void
     {
+        $method = $event->getRequest()->getMethod();
+
         if (
             HttpKernelInterface::MAIN_REQUEST !== $event->getRequestType() ||
-            Request::METHOD_HEAD === $event->getRequest()->getMethod() ||
+            in_array($method, [Request::METHOD_GET, Request::METHOD_HEAD, Request::METHOD_OPTIONS], true) ||
             !$this->routeMatcher->match($event->getRequest(), $this->routes)
         ) {
             return;

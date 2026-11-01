@@ -1,0 +1,209 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// Home dashboard (views/dashboard): the page, its dashlets and their modals.
+.dashboard-view {
+    // Below the fixed navbar, like the list view (padding-top: 3em).
+    padding: calc(3rem + 16px) 22px 48px;
+    color: $median-grey;
+    font-size: 14px;
+
+    .dashboard-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin: 0 0 16px; }
+
+    .dashboard-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+    .dashboard-tab { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 1px solid $lilac-grey; border-radius: 22px; background: $white; color: $median-grey; font-size: 14px; cursor: pointer; }
+    .dashboard-tab:hover { border-color: $midnight-blue; }
+    .dashboard-tab.is-active { border-color: $midnight-blue; background: $midnight-blue; color: $white; font-weight: 700; }
+
+    .dashboard-manage { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid $lilac-grey; border-radius: 6px; background: $white; color: $midnight-blue; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .dashboard-manage:hover { border-color: $midnight-blue; }
+
+    .dashboard-message { margin: 0 0 16px; padding: 24px; border: 1px dashed $lilac-grey; border-radius: 8px; background: $white; color: $dusky-blue; text-align: center; }
+    .dashboard-error { border-color: $amaranth; color: $amaranth; }
+
+    // Columns of the dashboard tab, of equal width (see gridColumns()); one column on small screens.
+    .dashboard-grid { display: grid; gap: 16px; align-items: start; transition: opacity .15s; }
+    .dashboard-grid.is-loading { opacity: .6; }
+    .dashboard-column { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+    .dashboard-dashlet { border: 1px solid $slade-grey; border-radius: 8px; background: $white; overflow: hidden; }
+    .dashboard-dashlet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 4px 8px 4px 16px; border-bottom: 1px solid $bright-blue; }
+    .dashboard-dashlet-head h3 { margin: 0; color: $midnight-blue; font-size: 16px; font-weight: 700; overflow-wrap: anywhere; }
+    .dashboard-dashlet-actions { display: flex; flex: 0 0 auto; align-items: center; }
+
+    // Editing: tabs menu, dashlets moved by their title (drag and drop).
+    .dashboard-tab-add, .dashboard-tab-more { min-width: 44px; justify-content: center; padding: 0 12px; font-size: 18px; font-weight: 700; }
+    .dashboard-tab-more::after { display: none; }
+    .dashboard-tab-menu, .dashboard-move { display: inline-flex; }
+    .dashboard-move .dropdown-toggle::after { display: none; }
+    // The theme gives .cdk-drag a z-index (1250 !important), which puts the dashlets (flex items) above the modals.
+    .dashboard-dashlet.cdk-drag { z-index: auto !important; }
+    .dashboard-grid.is-editable .dashboard-dashlet-head { cursor: grab; }
+    .dashboard-grid.is-editable .dashboard-column { min-height: 120px; }
+    .dashboard-column.cdk-drop-list-dragging { outline: 2px dashed $lilac-grey; outline-offset: 4px; border-radius: 8px; }
+    .dashboard-drop-placeholder { min-height: 72px; border: 2px dashed $pale-bue-grey; border-radius: 8px; background: $off-white-lighter; }
+    .dashboard-dashlet.cdk-drag-animating, .dashboard-column.cdk-drop-list-dragging .dashboard-dashlet:not(.cdk-drag-placeholder) { transition: transform 200ms cubic-bezier(0, 0, .2, 1); }
+
+    .dashboard-icon-btn { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 6px; background: none; color: $dusky-blue; cursor: pointer; }
+    .dashboard-icon-btn:hover { background: $bright-blue; color: $median-grey; }
+    .dashboard-icon-btn:disabled { opacity: .4; cursor: default; }
+
+    .dashboard-dashlet-message { margin: 0; padding: 18px 16px; color: $dusky-blue; text-align: center; }
+
+    // List dashlets: the table scrolls in its card when its columns are wider.
+    .dashboard-table-wrap { overflow-x: auto; transition: opacity .15s; }
+    .dashboard-table-wrap.is-loading { opacity: .6; }
+    .dashboard-table { width: 100%; margin: 0; border-collapse: collapse; }
+    .dashboard-table th { padding: 8px 12px; background: $off-white-lighter; color: $dusky-light-blue; font-size: 11px; font-weight: 700; letter-spacing: .6px; text-align: left; text-transform: uppercase; white-space: nowrap; }
+    .dashboard-table td { max-width: 280px; padding: 8px 12px; border-top: 1px solid $bright-blue; vertical-align: middle; white-space: normal; overflow-wrap: normal; }
+    .dashboard-table .dashboard-name-cell { min-width: 140px; }
+    .dashboard-table .dashboard-name-cell .field-link { font-weight: 700; }
+    .dashboard-table .dashboard-action-cell { width: 1%; white-space: nowrap; }
+    .dashboard-sort { padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; white-space: nowrap; cursor: pointer; }
+    .dashboard-sort:hover, .dashboard-sort.is-sorted { color: $median-grey; }
+    .dashboard-sort-icon { color: $pale-bue-grey; }
+    .dashboard-sort.is-sorted .dashboard-sort-icon { color: inherit; }
+    .dashboard-table .dashboard-icon-btn { width: 36px; height: 36px; }
+    .dashboard-table tfoot td { border-top: 2px solid $slade-grey; font-weight: 700; }
+
+    .dashboard-accept { display: inline-flex; gap: 4px; }
+    .dashboard-chip { min-height: 32px; padding: 0 10px; border: 1px solid $lilac-grey; border-radius: 16px; background: $white; color: $median-grey; font-size: 12px; cursor: pointer; }
+    .dashboard-chip:hover { border-color: $midnight-blue; }
+    .dashboard-status { color: $dusky-blue; font-size: 13px; }
+
+    .dashboard-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 12px; padding: 4px 12px; border-top: 1px solid $bright-blue; color: $dusky-blue; font-size: 13px; }
+    .dashboard-page-btn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid $lilac-grey; border-radius: 6px; background: $white; color: $median-grey; font-size: 20px; cursor: pointer; }
+    .dashboard-page-btn:disabled { opacity: .4; cursor: default; }
+
+    // Chart dashlets (ngx-charts): the chart fills its box (no padding: ngx-charts
+    // measures it); slices and bars open the opportunities list.
+    .dashboard-chart-body { padding: 12px 16px 0; transition: opacity .15s; }
+    .dashboard-chart-body.is-loading { opacity: .6; }
+    .dashboard-chart { width: 100%; min-width: 0; }
+    .dashboard-chart-body.is-clickable .arc, .dashboard-chart-body.is-clickable .bar { cursor: pointer; }
+    .dashboard-chart .tick text { fill: $dusky-blue; font-size: 11px; }
+    .dashboard-chart-caption { margin: 0; padding: 4px 16px 12px; color: $dusky-light-blue; font-size: 12px; text-align: right; }
+
+    // Legend: chips below the stacked bars; a list with the amounts next to the pie.
+    .dashboard-legend { display: flex; flex-wrap: wrap; gap: 2px 16px; margin: 0; padding: 8px 0; list-style: none; }
+    .dashboard-legend-item { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 28px; margin: 0; padding: 2px 6px; border: 0; border-radius: 4px; background: none; color: $dark-midnight-grey; font-size: 13px; text-align: left; }
+    button.dashboard-legend-item { cursor: pointer; }
+    button.dashboard-legend-item:hover { background: $bright-blue; }
+    .dashboard-legend-color { flex: 0 0 auto; width: 12px; height: 12px; border-radius: 3px; }
+    .dashboard-legend-value { margin-left: auto; padding-left: 12px; color: $median-grey; font-weight: 700; white-space: nowrap; }
+    .dashboard-chart-pie { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; align-items: center; }
+    .dashboard-chart-pie .dashboard-legend { flex-direction: column; flex-wrap: nowrap; max-height: 300px; overflow-y: auto; }
+
+    // Activity Stream: posts and replies (the messages are inserted HTML).
+    .dashboard-feed { transition: opacity .15s; }
+    .dashboard-feed.is-loading { opacity: .6; }
+    .dashboard-feed-post { display: flex; gap: 8px; padding: 12px 16px; border-bottom: 1px solid $bright-blue; }
+    .dashboard-feed-post .form-control { flex: 1 1 auto; min-width: 0; }
+    .dashboard-feed-list, .dashboard-feed-replies { margin: 0; padding: 0; list-style: none; }
+    .dashboard-feed-list > li { padding: 10px 16px; border-bottom: 1px solid $bright-blue; }
+    .dashboard-feed-replies { margin: 6px 0 0 18px; padding-left: 12px; border-left: 2px solid $bright-blue; }
+    .dashboard-feed-reply { padding: 8px 0 0 30px; border-bottom: 0; }
+    .dashboard-feed-text { overflow-wrap: anywhere; }
+    .dashboard-feed-meta { display: flex; align-items: center; gap: 8px; color: $dusky-light-blue; font-size: 12px; }
+    .dashboard-feed-action { padding: 0; font-size: 12px; }
+
+    // Legacy dashlets: the frame takes the height of the dashlet (see the component).
+    .dashboard-frame { display: block; width: 100%; border: 0; }
+
+    .dashboard-menu .dropdown-item { min-height: 40px; }
+    .dashboard-menu .dropdown-item.is-active { font-weight: 700; }
+    .dashboard-menu .dropdown-item.is-active::before { content: '✓ '; }
+    .dashboard-menu .dashboard-danger { color: $amaranth; }
+
+    @media (max-width: 991px) {
+        padding-left: 16px;
+        padding-right: 16px;
+
+        .dashboard-grid { grid-template-columns: minmax(0, 1fr) !important; }
+    }
+
+    // Phones: the table keeps readable columns and scrolls sideways in its card.
+    @media (max-width: 767px) {
+        .dashboard-table { width: max-content; min-width: 100%; }
+        .dashboard-table td { max-width: 220px; }
+        .dashboard-chart-pie { grid-template-columns: minmax(0, 1fr); }
+    }
+}
+
+// Dragged dashlet: a card with its title (the content, a frame for some
+// dashlets, is not copied).
+.dashboard-drag-preview { padding: 14px 18px; border: 1px solid $lilac-grey; border-radius: 8px; background: $white; color: $midnight-blue; font-size: 16px; font-weight: 700; box-shadow: 0 8px 24px rgba(0, 0, 0, .18); }
+
+.cdk-drag-preview.dashboard-drag-preview { z-index: 1100; }
+
+// Modals of the dashboard (add dashlets, options, tab), rendered at the end of
+// the page, outside .dashboard-view: scoped under .dashboard-modal (their window class).
+.dashboard-modal {
+    color: $median-grey;
+    font-size: 14px;
+
+    .modal-title { color: $midnight-blue; font-size: 18px; font-weight: 700; }
+    .dashboard-modal-message { margin: 8px 0; color: $dusky-blue; text-align: center; }
+    .dashboard-modal-error { color: $amaranth; }
+
+    .dashboard-tab { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border: 1px solid $lilac-grey; border-radius: 20px; background: $white; color: $median-grey; cursor: pointer; }
+    .dashboard-tab.is-active { border-color: $midnight-blue; background: $midnight-blue; color: $white; font-weight: 700; }
+    .dashboard-count { font-size: 12px; opacity: .75; }
+
+    // Add dashlets
+    .dashboard-catalog-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 12px; }
+    .dashboard-catalog-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+    .dashboard-catalog-search { max-width: 260px; }
+    .dashboard-catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .dashboard-catalog-item { display: flex; flex-direction: column; gap: 2px; width: 100%; min-height: 48px; padding: 10px 12px; border: 1px solid $slade-grey; border-radius: 6px; background: $white; color: $median-grey; text-align: left; cursor: pointer; }
+    .dashboard-catalog-item:hover, .dashboard-catalog-item:focus-visible { border-color: $midnight-blue; background: $off-white-lighter; }
+    .dashboard-catalog-item:disabled { opacity: .6; cursor: default; }
+    .dashboard-catalog-title { font-weight: 700; }
+    .dashboard-catalog-description { color: $dusky-light-blue; font-size: 12px; }
+
+    // Options
+    .dashboard-options fieldset { margin: 0 0 18px; }
+    .dashboard-options legend { margin: 0 0 8px; color: $midnight-blue; font-size: 15px; font-weight: 700; }
+    .dashboard-field { margin: 0 0 12px; }
+    .dashboard-field > label { display: block; margin: 0 0 4px; font-weight: 600; }
+    .dashboard-check label { display: flex; align-items: center; gap: 8px; font-weight: 400; }
+    .dashboard-columns-list { margin: 0 0 12px; padding: 0; list-style: none; border: 1px solid $slade-grey; border-radius: 6px; }
+    .dashboard-columns-list li { display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 2px 6px; border-top: 1px solid $bright-blue; background: $white; }
+    .dashboard-columns-list li:first-child { border-top: 0; }
+    .dashboard-columns-name { flex: 1 1 auto; }
+    .dashboard-drag-handle { color: $pale-bue-grey; cursor: grab; }
+    .dashboard-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 6px; background: none; color: $dusky-blue; cursor: pointer; }
+    .dashboard-icon-btn:hover { background: $bright-blue; color: $median-grey; }
+    .dashboard-icon-btn:disabled { opacity: .35; cursor: default; }
+    .dashboard-multi { border: 1px solid $slade-grey; border-radius: 6px; }
+    .dashboard-multi-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 8px; border-bottom: 1px solid $bright-blue; }
+    .dashboard-multi-search { flex: 1 1 180px; max-width: 280px; }
+    .dashboard-multi-count { color: $dusky-light-blue; font-size: 13px; }
+    .dashboard-multi-clear { padding: 0 4px; font-size: 13px; }
+    .dashboard-multi-list { max-height: 180px; margin: 0; padding: 4px 8px; overflow-y: auto; list-style: none; }
+    .dashboard-multi-list label { display: flex; align-items: center; gap: 8px; min-height: 32px; margin: 0; font-weight: 400; cursor: pointer; }
+    .dashboard-options-frame { display: block; width: 100%; height: min(70vh, 640px); border: 0; }
+}

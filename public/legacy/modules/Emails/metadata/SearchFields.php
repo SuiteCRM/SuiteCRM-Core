@@ -54,6 +54,11 @@ $searchFields[$module_name] = array(
         'type' => 'bool',
     ),
     'assigned_user_id' => array('query_type' => 'default'),
+    'status' => array('query_type' => 'default', 'options' => 'dom_email_status'),
+    'parent_name' => array('query_type' => 'default', 'db_field' => array('parent_id')),
+    'range_date_sent_received' => array('query_type' => 'default', 'enable_range_search' => true, 'is_date_field' => true),
+    'start_range_date_sent_received' => array('query_type' => 'default', 'enable_range_search' => true, 'is_date_field' => true),
+    'end_range_date_sent_received' => array('query_type' => 'default', 'enable_range_search' => true, 'is_date_field' => true),
     'category_id' => array(
         'query_type' => 'default',
         'options' => 'email_category_dom',

@@ -121,67 +121,62 @@ $viewdefs['Emails']['ListView'] = array(
     )
 );
 
-$listViewDefs['Emails'] = array(
-    'FROM_ADDR_NAME' => array(
-        'width' => '32',
+// Columns of the email list: the emails stored in SuiteCRM (sent, archived, imported and
+// drafts), with their sender and recipients as text (email_from, email_to).
+$listViewDefs['Emails'] = [
+    'NAME' => [
+        'width' => '30',
+        'label' => 'LBL_LIST_SUBJECT',
+        'link' => true,
+        'default' => true,
+    ],
+    'EMAIL_FROM' => [
+        'width' => '15',
         'label' => 'LBL_LIST_FROM_ADDR',
         'default' => true,
         'sortable' => false,
-    ),
-    'INDICATOR' => array(
-        'width' => '32',
-        'label' => 'LBL_INDICATOR',
+    ],
+    'EMAIL_TO' => [
+        'width' => '15',
+        'label' => 'LBL_LIST_TO_ADDR',
         'default' => true,
         'sortable' => false,
-        'hide_header_label' => true,
-    ),
-    'SUBJECT' => array(
-        // Uses function field
-        'width' => '32',
-        'label' => 'LBL_LIST_SUBJECT',
+    ],
+    'PARENT_NAME' => [
+        'width' => '15',
+        'label' => 'LBL_LIST_RELATED_TO',
+        'dynamic_module' => 'PARENT_TYPE',
+        'id' => 'PARENT_ID',
+        'link' => true,
         'default' => true,
-        'link' => false,
-        'customCode' => '',
         'sortable' => false,
-    ),
-    'HAS_ATTACHMENT' => array(
-        'width' => '32',
-        'label' => 'LBL_HAS_ATTACHMENT_INDICATOR',
-        'default' => false,
-        'sortable' => false,
-        'hide_header_label' => true,
-    ),
-    'ASSIGNED_USER_NAME' => array(
-        'width' => '9',
+        'related_fields' => ['parent_id', 'parent_type'],
+    ],
+    'DATE_SENT_RECEIVED' => [
+        'width' => '10',
+        'label' => 'LBL_LIST_DATE_SENT_RECEIVED',
+        'default' => true,
+    ],
+    'STATUS' => [
+        'width' => '8',
+        'label' => 'LBL_LIST_STATUS',
+        'default' => true,
+    ],
+    'ASSIGNED_USER_NAME' => [
+        'width' => '10',
         'label' => 'LBL_ASSIGNED_TO_NAME',
         'module' => 'Employees',
         'id' => 'ASSIGNED_USER_ID',
-        'default' => false,
-        'sortable' => false,
-    ),
-    'DATE_ENTERED' => array(
-        'width' => '32',
-        'label' => 'LBL_DATE_ENTERED',
         'default' => true,
-        'sortable' => false,
-    ),
-    'DATE_SENT_RECEIVED' => array(
-        'width' => '32',
-        'label' => 'LBL_LIST_DATE_SENT_RECEIVED',
-        'default' => true,
-        'sortable' => false,
-        'force_show_sort_direction' => true
-    ),
-    'TO_ADDRS_NAMES' => array(
-        'width' => '32',
-        'label' => 'LBL_LIST_TO_ADDR',
-        'default' => false,
-        'sortable' => false,
-    ),
-    'CATEGORY_ID' => array(
-        'width' => '10%',
+    ],
+    'CATEGORY_ID' => [
+        'width' => '10',
         'label' => 'LBL_LIST_CATEGORY',
-        'default' => true,
-        'sortable' => false,
-    ),
-);
+        'default' => false,
+    ],
+    'DATE_ENTERED' => [
+        'width' => '10',
+        'label' => 'LBL_DATE_ENTERED',
+        'default' => false,
+    ],
+];

@@ -27,7 +27,7 @@
 
 namespace App\Module\Home\LegacyHandler;
 
-use Symfony\Component\ErrorHandler\DebugClassLoader;
+use App\Engine\LegacyHandler\LegacyClassNamesTrait;
 
 /**
  * The user's Home dashboard in the legacy user preferences (`Home` category): `pages` (tabs,
@@ -37,6 +37,8 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
  */
 trait DashboardPreferencesTrait
 {
+    use LegacyClassNamesTrait;
+
     protected function inLegacy(callable $callback)
     {
         $this->init();
@@ -46,34 +48,6 @@ trait DashboardPreferencesTrait
             return $callback();
         } finally {
             $this->close();
-        }
-    }
-
-    /**
-     * Runs legacy dashlet code that loads widget classes by names of another case
-     * (SugarWidgetFieldenum, SugarWidgetFielddatetime...): Symfony's debug class loader
-     * (dev environment only) rejects them.
-     */
-    protected function withLegacyClassNames(callable $callback)
-    {
-        $debugClassLoader = false;
-        foreach (spl_autoload_functions() as $function) {
-            if (is_array($function) && $function[0] instanceof DebugClassLoader) {
-                $debugClassLoader = true;
-                break;
-            }
-        }
-
-        if ($debugClassLoader) {
-            DebugClassLoader::disable();
-        }
-
-        try {
-            return $callback();
-        } finally {
-            if ($debugClassLoader) {
-                DebugClassLoader::enable();
-            }
         }
     }
 

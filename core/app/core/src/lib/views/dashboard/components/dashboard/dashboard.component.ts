@@ -46,6 +46,7 @@ import {DashboardData, DashboardPage, DashletData} from '../../dashboard.model';
 import {ListDashletComponent} from '../list-dashlet/list-dashlet.component';
 import {ChartDashletComponent} from '../chart-dashlet/chart-dashlet.component';
 import {LegacyDashletComponent} from '../legacy-dashlet/legacy-dashlet.component';
+import {ReportDashletComponent} from '../report-dashlet/report-dashlet.component';
 import {FrameDashletComponent} from '../frame-dashlet/frame-dashlet.component';
 import {FeedDashletComponent} from '../feed-dashlet/feed-dashlet.component';
 import {DashboardEditService} from '../../services/dashboard-edit.service';
@@ -57,9 +58,9 @@ import {DashboardTabModalComponent} from '../dashboard-tab-modal/dashboard-tab-m
  * Home dashboard, on the /home route (the legacy dashboard stays on /home/index).
  *
  * The dashboard is the user's legacy one (same tabs, columns and dashlets, read
- * by the `dashboard` process), so both stay the same. List, chart, Activity
- * Stream and iFrame dashlets are rendered natively, the others (reports,
- * tools...) by their legacy page in a frame.
+ * by the `dashboard` process), so both stay the same. List, chart, report,
+ * Activity Stream and iFrame dashlets are rendered natively, the others (grouped
+ * reports, reports with charts, tools...) by their legacy page in a frame.
  *
  * The dashboard is edited here (`dashboard-edit` process): dashlets are
  * added, moved by drag and drop, configured and removed, tabs added, renamed,
@@ -73,7 +74,7 @@ import {DashboardTabModalComponent} from '../dashboard-tab-modal/dashboard-tab-m
     standalone: true,
     imports: [
         CommonModule, DragDropModule, NgbDropdownModule, ListDashletComponent, ChartDashletComponent,
-        FeedDashletComponent, FrameDashletComponent, LegacyDashletComponent
+        ReportDashletComponent, FeedDashletComponent, FrameDashletComponent, LegacyDashletComponent
     ],
     templateUrl: './dashboard.component.html'
 })
@@ -81,6 +82,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     @ViewChildren(ListDashletComponent) listDashlets: QueryList<ListDashletComponent>;
     @ViewChildren(ChartDashletComponent) chartDashlets: QueryList<ChartDashletComponent>;
+    @ViewChildren(ReportDashletComponent) reportDashlets: QueryList<ReportDashletComponent>;
     @ViewChildren(FrameDashletComponent) frameDashlets: QueryList<FrameDashletComponent>;
     @ViewChildren(FeedDashletComponent) feedDashlets: QueryList<FeedDashletComponent>;
     @ViewChildren(LegacyDashletComponent) legacyDashlets: QueryList<LegacyDashletComponent>;
@@ -155,6 +157,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     refresh(id: string): void {
         this.listDashlets.find(item => item.dashlet?.id === id)?.refresh();
         this.chartDashlets.find(item => item.dashlet?.id === id)?.refresh();
+        this.reportDashlets.find(item => item.dashlet?.id === id)?.refresh();
         this.frameDashlets.find(item => item.dashlet?.id === id)?.refresh();
         this.feedDashlets.find(item => item.dashlet?.id === id)?.refresh();
         this.legacyDashlets.find(item => item.id === id)?.refresh();

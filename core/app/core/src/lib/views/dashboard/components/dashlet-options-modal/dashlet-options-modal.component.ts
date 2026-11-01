@@ -32,14 +32,15 @@ import {CdkDragDrop, DragDropModule, moveItemInArray} from '@angular/cdk/drag-dr
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {DashboardEditService} from '../../services/dashboard-edit.service';
-import {DashletOptionChoice, DashletOptions} from '../../dashboard.model';
+import {DashletOptionChoice, DashletOptions, DashletReportOptions, DashletReportParameter} from '../../dashboard.model';
 import {DashletMultiSelectComponent} from '../dashlet-multi-select/dashlet-multi-select.component';
 
 /**
- * Options of a dashlet. List and chart dashlets get a native form (title, rows,
- * auto refresh, "my items", columns, filters or chart fields), saved by the
- * dashlet itself (see DashboardEditHandler); the other dashlets (reports,
- * Activity Stream, iFrame...) their legacy form, in a frame. The modal closes with 'saved' when the
+ * Options of a dashlet. List, chart and report dashlets get a native form (title,
+ * rows, auto refresh, "my items", columns, filters or chart fields; report, "only
+ * show charts", charts and parameters of the report), saved by the dashlet itself
+ * (see DashboardEditHandler); the other dashlets (Activity Stream, iFrame...) their
+ * legacy form, in a frame. The modal closes with 'saved' when the
  * options changed.
  */
 @Component({
@@ -84,6 +85,62 @@ import {DashletMultiSelectComponent} from '../dashlet-multi-select/dashlet-multi
                             <input type="checkbox" name="myItemsOnly" [(ngModel)]="myItemsOnly">
                             {{ label('LBL_DASHBOARD_MY_ITEMS') }}
                         </label>
+                    </div>
+                </fieldset>
+
+                <fieldset *ngIf="options.type === 'report'">
+                    <legend>{{ label('LBL_DASHBOARD_REPORT') }}</legend>
+                    <div class="dashboard-field">
+                        <input class="form-control dashboard-report-search" name="reportSearch" [(ngModel)]="reportSearch"
+                               [placeholder]="label('LBL_DASHBOARD_SEARCH')" [attr.aria-label]="label('LBL_DASHBOARD_SEARCH')">
+                        <select id="dashlet-option-report" class="form-control dashboard-report-list" size="8" name="report"
+                                [attr.aria-label]="label('LBL_DASHBOARD_REPORT')"
+                                [ngModel]="report" (ngModelChange)="chooseReport($event)">
+                            <option value="">{{ label('LBL_DASHBOARD_NO_REPORT') }}</option>
+                            <option *ngFor="let option of filteredReports()" [value]="option.value">{{ option.label }}</option>
+                        </select>
+                    </div>
+                    <div class="dashboard-field dashboard-check">
+                        <label>
+                            <input type="checkbox" name="onlyCharts" [(ngModel)]="onlyCharts">
+                            {{ label('LBL_DASHBOARD_ONLY_CHARTS') }}
+                        </label>
+                    </div>
+                    <div *ngIf="report" class="dashboard-field">
+                        <label id="dashlet-option-charts-label">{{ label('LBL_DASHBOARD_CHARTS') }}</label>
+                        <scrm-dashlet-multi-select *ngIf="chartOptions.length; else noCharts" [options]="chartOptions"
+                                          labelId="dashlet-option-charts-label" [value]="charts" (valueChange)="charts = $event"
+                                          [searchLabel]="label('LBL_DASHBOARD_SEARCH')" [allLabel]="label('LBL_DASHBOARD_ALL')"
+                                          [selectedLabel]="label('LBL_DASHBOARD_SELECTED')" [clearLabel]="appLabel('LBL_CLEAR_BUTTON_LABEL')">
+                        </scrm-dashlet-multi-select>
+                        <ng-template #noCharts>
+                            <p class="dashboard-modal-message">{{ label('LBL_DASHBOARD_NO_CHARTS') }}</p>
+                        </ng-template>
+                    </div>
+                </fieldset>
+
+                <fieldset *ngIf="options.type === 'report' && parameters.length">
+                    <legend>{{ label('LBL_DASHBOARD_PARAMETERS') }}</legend>
+                    <div *ngFor="let parameter of parameters; let index = index" class="dashboard-field">
+                        <label [id]="'dashlet-option-parameter-label-' + index"
+                               [attr.for]="parameter.kind === 'multi' || parameter.kind === 'fixed' ? null : 'dashlet-option-parameter-' + index">{{ parameter.label }}</label>
+                        <ng-container [ngSwitch]="parameter.kind">
+                            <p *ngSwitchCase="'fixed'" class="dashboard-modal-message">{{ parameter.display }}</p>
+                            <scrm-dashlet-multi-select *ngSwitchCase="'multi'" [options]="parameter.options" [labelId]="'dashlet-option-parameter-label-' + index"
+                                              [value]="$any(parameterValues[parameter.key])" (valueChange)="parameterValues[parameter.key] = $event"
+                                              [searchLabel]="label('LBL_DASHBOARD_SEARCH')" [allLabel]="label('LBL_DASHBOARD_ALL')"
+                                              [selectedLabel]="label('LBL_DASHBOARD_SELECTED')" [clearLabel]="appLabel('LBL_CLEAR_BUTTON_LABEL')">
+                            </scrm-dashlet-multi-select>
+                            <select *ngSwitchCase="'select'" class="form-control" [id]="'dashlet-option-parameter-' + index"
+                                    [name]="'parameter-' + parameter.key" [(ngModel)]="parameterValues[parameter.key]">
+                                <option value=""></option>
+                                <option *ngFor="let option of parameter.options" [value]="option.value">{{ option.label }}</option>
+                            </select>
+                            <input *ngSwitchCase="'date'" type="date" class="form-control" [id]="'dashlet-option-parameter-' + index"
+                                   [name]="'parameter-' + parameter.key" [(ngModel)]="parameterValues[parameter.key]">
+                            <input *ngSwitchDefault class="form-control" [id]="'dashlet-option-parameter-' + index"
+                                   [name]="'parameter-' + parameter.key" [(ngModel)]="parameterValues[parameter.key]">
+                        </ng-container>
                     </div>
                 </fieldset>
 
@@ -163,6 +220,15 @@ export class DashletOptionsModalComponent implements OnInit, OnDestroy {
     columns: string[] = [];
     fields: { [name: string]: string | string[] } = {};
 
+    // Report dashlets
+    report = '';
+    reportSearch = '';
+    onlyCharts = false;
+    charts: string[] = [];
+    chartOptions: DashletOptionChoice[] = [];
+    parameters: DashletReportParameter[] = [];
+    parameterValues: { [key: string]: string | string[] } = {};
+
     protected messageListener = (event: MessageEvent): void => this.onFrameMessage(event);
 
     constructor(
@@ -176,7 +242,7 @@ export class DashletOptionsModalComponent implements OnInit, OnDestroy {
     }
 
     get isNative(): boolean {
-        return this.options?.type === 'list' || this.options?.type === 'chart';
+        return this.options?.type === 'list' || this.options?.type === 'chart' || this.options?.type === 'report';
     }
 
     ngOnInit(): void {
@@ -201,6 +267,10 @@ export class DashletOptionsModalComponent implements OnInit, OnDestroy {
                 this.autoRefresh = options.autoRefresh?.value ?? '';
                 this.myItemsOnly = !!options.myItemsOnly;
                 this.columns = [...(options.columns?.value ?? [])];
+                this.report = options.report ?? '';
+                this.onlyCharts = !!options.onlyCharts;
+                this.setReportOptions(options);
+                this.charts = [...(options.charts?.value ?? [])];
                 (options.fields ?? []).forEach(field => {
                     this.fields[field.name] = Array.isArray(field.value) ? [...field.value] : field.value;
                 });
@@ -253,6 +323,33 @@ export class DashletOptionsModalComponent implements OnInit, OnDestroy {
         this.columns = columns;
     }
 
+    /** Reports matching the search, the chosen one always listed. */
+    filteredReports(): DashletOptionChoice[] {
+        const search = this.reportSearch.trim().toLowerCase();
+        return (this.options?.reports ?? []).filter(option =>
+            !search || option.value === this.report || option.label.toLowerCase().includes(search)
+        );
+    }
+
+    /** Another report: its charts (none chosen) and parameters. */
+    chooseReport(reportId: string): void {
+        this.report = reportId || '';
+        this.setReportOptions({});
+        this.charts = [];
+        if (!this.report) {
+            return;
+        }
+
+        this.edit.run<DashletReportOptions>({action: 'reportOptions', id: this.id, reportId: this.report}).subscribe(result => {
+            if (result?.error) {
+                this.error = this.label('LBL_DASHBOARD_DASHLET_ERROR');
+            } else if (result && reportId === this.report) {
+                this.setReportOptions(result);
+            }
+            this.cdr.detectChanges();
+        });
+    }
+
     save(): void {
         if (!this.options || this.saving || !this.title.trim()) {
             return;
@@ -269,7 +366,11 @@ export class DashletOptionsModalComponent implements OnInit, OnDestroy {
                 autoRefresh: this.autoRefresh,
                 myItemsOnly: this.myItemsOnly,
                 columns: this.columns,
-                fields: this.fields
+                fields: this.fields,
+                report: this.report,
+                onlyCharts: this.onlyCharts,
+                charts: this.charts,
+                parameters: this.parameterValues
             }
         }).subscribe(done => {
             this.saving = false;
@@ -279,6 +380,16 @@ export class DashletOptionsModalComponent implements OnInit, OnDestroy {
             }
             this.error = this.label('LBL_DASHBOARD_SAVE_ERROR');
             this.cdr.detectChanges();
+        });
+    }
+
+    protected setReportOptions(options: DashletReportOptions): void {
+        this.chartOptions = options.charts?.options ?? [];
+        this.parameters = options.parameters ?? [];
+        this.parameterValues = {};
+        this.parameters.forEach(parameter => {
+            const value = parameter.value ?? '';
+            this.parameterValues[parameter.key] = Array.isArray(value) ? [...value] : value;
         });
     }
 

@@ -65,14 +65,68 @@ $viewdefs['AOR_Reports']['DetailView'] = array(
         'includes' => array(
             array('file' => 'modules/AOR_Reports/AOR_Report.js'),
         ),
+        // A single panel, shown as a panel. Expanded: in SuiteCRM 8 the panel has no title
+        // to expand it.
+        'useTabs' => false,
         'tabDefs' =>
             array(
                 'DEFAULT' =>
                     array(
                         'newTab' => false,
-                        'panelDefault' => 'collapsed',
+                        'panelDefault' => 'expanded',
                     ),
             ),
+    ),
+
+    // SuiteCRM 8 report page: the actions of the legacy page, and the report (charts,
+    // parameters and tables) under the details. Reports are created, edited and duplicated in
+    // the report editor (routes reports/edit and reports/edit/:record).
+    'recordActions' => array(
+        'actions' => array(
+            'report-edit' => array(
+                'key' => 'report-edit',
+                'labelKey' => 'LBL_EDIT_BUTTON',
+                'priority' => 100,
+                'modes' => array('detail'),
+                'acl' => array('edit'),
+            ),
+            'report-duplicate' => array(
+                'key' => 'report-duplicate',
+                'labelKey' => 'LBL_DUPLICATE_BUTTON',
+                'priority' => 110,
+                'modes' => array('detail'),
+                'acl' => array('edit'),
+            ),
+            'report-export' => array(
+                'key' => 'report-export',
+                'labelKey' => 'LBL_EXPORT',
+                'priority' => 120,
+                'modes' => array('detail'),
+                'acl' => array('export'),
+            ),
+            'report-pdf' => array(
+                'key' => 'report-pdf',
+                'labelKey' => 'LBL_DOWNLOAD_PDF',
+                'priority' => 130,
+                'modes' => array('detail'),
+                'acl' => array('export'),
+            ),
+            'report-target-list' => array(
+                'key' => 'report-target-list',
+                'labelKey' => 'LBL_ADD_TO_PROSPECT_LIST',
+                'priority' => 140,
+                'modes' => array('detail'),
+                'acl' => array('view'),
+            ),
+        ),
+        'exclude' => array('edit', 'duplicate'),
+    ),
+    'bottomWidgets' => array(
+        array(
+            'type' => 'report-viewer',
+            'modes' => array('detail'),
+            'options' => array(),
+        ),
     ),
 
     'panels' => array(

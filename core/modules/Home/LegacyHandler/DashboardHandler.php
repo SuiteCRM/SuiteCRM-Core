@@ -31,6 +31,7 @@ use App\Data\LegacyHandler\PresetDataHandlers\RecordIdsDataHandler;
 use App\Engine\LegacyHandler\LegacyHandler;
 use App\Engine\LegacyHandler\LegacyScopeState;
 use App\FieldDefinitions\Service\FieldDefinitionsProviderInterface;
+use App\Module\Reports\LegacyHandler\ReportDataTrait;
 use App\Module\Service\ModuleNameMapperInterface;
 use App\ViewDefinitions\LegacyHandler\FieldDefinitionsInjectorTrait;
 use App\ViewDefinitions\Service\FieldAliasMapper;
@@ -46,14 +47,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * own legacy process(): same records, filters, "my items", invitees, sort and pages as the
  * legacy dashlet. Their records are then loaded in the SuiteCRM 8 list format, with the
  * dashlet's columns, so the page renders them with the standard field components. The chart
- * dashlets come with their figures, drawn by the page (see loadChart()), the Activity Stream
- * with its posts, the iFrame ones with their page. The other dashlets (reports, tools...) are
- * shown by the legacy page modules/Home/Dashlet.php.
+ * dashlets come with their figures, drawn by the page (see loadChart()), the report dashlets
+ * with their table (loadReport()), the Activity Stream with its posts, the iFrame ones with
+ * their page. The other dashlets (grouped reports or reports with charts, tools...) are shown
+ * by the legacy page modules/Home/Dashlet.php.
  */
 class DashboardHandler extends LegacyHandler
 {
     use FieldDefinitionsInjectorTrait;
     use DashboardPreferencesTrait;
+    use ReportDataTrait;
 
     public const HANDLER_KEY = 'dashboard';
 
@@ -263,9 +266,9 @@ class DashboardHandler extends LegacyHandler
      * columns and records. Null when the legacy dashboard does not show it
      * (module not available to the user, dashlet file removed...).
      *
-     * $defer (dashboard load): the Activity Stream dashlets come without their content
-     * (`deferred`), which they load themselves (action `dashlet`), so that a slow or failing
-     * one does not hold or fail the tab.
+     * $defer (dashboard load): the report and Activity Stream dashlets come without their
+     * content (`deferred`), which they load themselves (action `dashlet`), so that a slow or
+     * failing one does not hold or fail the tab.
      */
     protected function describeDashlet(string $id, array $definition, bool $withData, int $offset, bool $defer = false): ?array
     {
@@ -292,6 +295,30 @@ class DashboardHandler extends LegacyHandler
                 return array_merge($data, ['chart' => $this->loadChart($dashlet, self::CHARTS[$className])]);
             } catch (\Throwable $e) {
                 $this->logger->warning('Dashboard: chart dashlet ' . $id . ' (' . $className . '): ' . $e->getMessage());
+
+                return array_merge($data, ['error' => 'load']);
+            }
+        }
+
+        // Reports without groups or charts, as a table (the others stay in a frame).
+        if ($dashlet instanceof \AORReportsDashlet) {
+            $mode = $this->getReportMode($dashlet);
+            if ($mode === 'legacy') {
+                return $data;
+            }
+
+            $data['type'] = 'report';
+            if (!$withData || $mode === 'none') {
+                return array_merge($data, ['report' => null]);
+            }
+            if ($defer) {
+                return array_merge($data, ['report' => null, 'deferred' => true]);
+            }
+
+            try {
+                return array_merge($data, ['report' => $this->loadReport($dashlet, $offset)]);
+            } catch (\Throwable $e) {
+                $this->logger->warning('Dashboard: report dashlet ' . $id . ': ' . $e->getMessage());
 
                 return array_merge($data, ['error' => 'load']);
             }
@@ -608,6 +635,53 @@ class DashboardHandler extends LegacyHandler
             'Budget' => $fromCampaign($campaign->budget),
             'Expected Revenue' => $fromCampaign($campaign->expected_revenue),
         ]);
+    }
+
+    /**
+     * How a report dashlet is shown: 'none' (no report chosen yet), 'native'
+     * (a table), or 'legacy' (in a frame: grouped reports, with one pager per
+     * group, and reports with charts).
+     */
+    protected function getReportMode(\AORReportsDashlet $dashlet): string
+    {
+        $report = $dashlet->report;
+        if (!$report instanceof \AOR_Report || empty($report->id)) {
+            return 'none';
+        }
+        if (!empty($dashlet->onlyCharts)) {
+            return 'legacy';
+        }
+
+        $db = \DBManagerFactory::getInstance();
+        $reportId = $db->quoted($report->id);
+        $grouped = (int)$db->getOne("SELECT COUNT(*) FROM aor_fields WHERE aor_report_id = $reportId AND group_display = 1 AND deleted = 0");
+        $charts = (int)$db->getOne("SELECT COUNT(*) FROM aor_charts WHERE aor_report_id = $reportId AND deleted = 0");
+
+        return $grouped || $charts ? 'legacy' : 'native';
+    }
+
+    /**
+     * One page of the report of a dashlet, as the legacy dashlet shows it (report
+     * query with the parameters of the dashlet, page totals): columns, rows,
+     * totals and pages (ReportDataTrait).
+     */
+    protected function loadReport(\AORReportsDashlet $dashlet, int $offset): array
+    {
+        $report = $dashlet->report;
+        if (!$report->ACLAccess('view')) {
+            throw new \RuntimeException('No access to the report ' . $report->id);
+        }
+
+        // The user parameters of the dashlet are set on the report by the dashlet. What legacy
+        // code prints would end up in the response.
+        ob_start();
+        try {
+            $table = $this->withLegacyClassNames(fn() => $this->readReportTable($report, $offset, ''));
+        } finally {
+            ob_end_clean();
+        }
+
+        return array_merge(['id' => $report->id, 'name' => html_entity_decode((string)$report->name, ENT_QUOTES)], $table);
     }
 
     /**

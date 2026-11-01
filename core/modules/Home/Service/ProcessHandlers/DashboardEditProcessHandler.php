@@ -44,7 +44,8 @@ use Psr\Log\LoggerInterface;
  * - addTab: title, columns → page; renameTab: page, title; removeTab: page;
  * - columns: page, columns (1 to 3);
  * - options: id → options form of the dashlet;
- * - saveOptions: id, values.
+ * - saveOptions: id, values;
+ * - reportOptions: reportId → charts and parameters of a report (report dashlet options).
  * The other actions return {done: bool}.
  */
 class DashboardEditProcessHandler implements ProcessHandlerInterface
@@ -53,6 +54,7 @@ class DashboardEditProcessHandler implements ProcessHandlerInterface
 
     protected const ACTIONS = [
         'catalog', 'add', 'remove', 'layout', 'addTab', 'renameTab', 'removeTab', 'columns', 'options', 'saveOptions',
+        'reportOptions',
     ];
 
     public function __construct(
@@ -141,6 +143,7 @@ class DashboardEditProcessHandler implements ProcessHandlerInterface
             'columns' => ['done' => $this->editor->setTabColumns($page, (int)($options['columns'] ?? 0))],
             'options' => $this->editor->getDashletOptions($id),
             'saveOptions' => ['done' => $this->editor->saveDashletOptions($id, is_array($options['values'] ?? null) ? $options['values'] : [])],
+            'reportOptions' => $this->editor->getReportOptions((string)($options['reportId'] ?? '')),
         };
     }
 }

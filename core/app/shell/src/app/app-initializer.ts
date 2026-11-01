@@ -36,6 +36,7 @@ import {
     ClassicViewUiComponent,
     CreateRecordComponent,
     DashboardComponent,
+    ReportEditorComponent,
     ExtensionLoader,
     InstallAuthGuard,
     InstallViewComponent,
@@ -183,6 +184,24 @@ export class AppInit {
                             module: 'home'
                         }
                     });
+
+                    // Reports are created, edited and duplicated in the report editor:
+                    // reports/edit (new report, or ?record=<id>&isDuplicate=true) and
+                    // reports/edit/:record.
+                    ['reports/edit', 'reports/edit/:record'].forEach(path => routes.push({
+                        path,
+                        component: ReportEditorComponent,
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'reports'
+                        }
+                    }));
 
                     routes.push({
                         path: 'users/2fa-config',

@@ -112,9 +112,14 @@ class AOR_Report extends Basic
         $condition = BeanFactory::newBean('AOR_Conditions');
         $condition->save_lines($_POST, $this, 'aor_conditions_');
 
-        require_once('modules/AOR_Charts/AOR_Chart.php');
-        $chart = BeanFactory::newBean('AOR_Charts');
-        $chart->save_lines($_POST, $this, 'aor_chart_');
+        // The charts are posted with the fields by the report editor. A save without them
+        // (inline edit, mass update, API) keeps the charts: save_lines() deletes the charts it
+        // is not given.
+        if (isset($_POST['aor_fields_field'])) {
+            require_once('modules/AOR_Charts/AOR_Chart.php');
+            $chart = BeanFactory::newBean('AOR_Charts');
+            $chart->save_lines($_POST, $this, 'aor_chart_');
+        }
 
         return $return_id;
     }

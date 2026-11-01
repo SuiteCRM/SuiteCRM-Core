@@ -4517,3 +4517,4 @@ $app_strings['LBL_DASHBOARD_REMOVE_DASHLET_CONFIRM'] = 'Do you want to remove th
 $app_strings['LBL_DASHBOARD_REMOVE_TAB_CONFIRM'] = 'Do you want to remove this tab and its dashlets?';
 $app_strings['LBL_DASHBOARD_SAVE_ERROR'] = 'The changes to the dashboard could not be saved.';
 $app_strings['LBL_DASHBOARD_DELETE_POST_CONFIRM'] = 'Do you want to delete this post?';
+$app_strings['LBL_REPORT_EDITOR_CHANGE_MODULE'] = 'Changing the report module removes the fields, conditions and charts of the report. Continue?';

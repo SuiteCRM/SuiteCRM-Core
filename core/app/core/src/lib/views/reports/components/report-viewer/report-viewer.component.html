@@ -1,0 +1,74 @@
+<div class="report-viewer">
+    <p *ngIf="error" class="report-message report-error">{{ label('LBL_REPORT_VIEWER_ERROR') }}</p>
+    <p *ngIf="!error && !report && loading" class="report-message">{{ label('LBL_REPORT_VIEWER_LOADING') }}</p>
+
+    <ng-container *ngIf="report">
+        <!-- Charts: graphs_per_row charts a row, as the legacy page. -->
+        <div *ngIf="report.charts.length" class="report-charts" [class.is-loading]="loading"
+             [style.grid-template-columns]="'repeat(' + report.graphsPerRow + ', minmax(0, 1fr))'">
+            <scrm-report-chart *ngFor="let chart of report.charts" [chart]="chart"></scrm-report-chart>
+        </div>
+
+        <section *ngIf="report.parameters.length" class="report-panel">
+            <h3 class="report-panel-title">
+                <button type="button" [attr.aria-expanded]="showParameters" (click)="showParameters = !showParameters">
+                    <span class="report-caret" [class.is-open]="showParameters" aria-hidden="true">›</span>
+                    {{ label('LBL_PARAMETERS') }}
+                </button>
+            </h3>
+            <form *ngIf="showParameters" class="report-parameters" (ngSubmit)="update()">
+                <div *ngFor="let parameter of report.parameters; trackBy: trackParameter" class="report-parameter">
+                    <label [attr.for]="'report-parameter-' + parameter.key">{{ parameter.label }}</label>
+                    <ng-container [ngSwitch]="parameter.kind">
+                        <select *ngSwitchCase="'select'" class="form-control form-control-sm"
+                                [id]="'report-parameter-' + parameter.key" [name]="'parameter-' + parameter.key"
+                                [(ngModel)]="values[parameter.key]">
+                            <option *ngFor="let option of parameter.options" [ngValue]="option.value">{{ option.label }}</option>
+                        </select>
+                        <select *ngSwitchCase="'multi'" multiple class="form-control form-control-sm report-multi"
+                                [id]="'report-parameter-' + parameter.key" [name]="'parameter-' + parameter.key"
+                                [(ngModel)]="values[parameter.key]">
+                            <option *ngFor="let option of parameter.options" [ngValue]="option.value">{{ option.label }}</option>
+                        </select>
+                        <input *ngSwitchCase="'date'" type="date" class="form-control form-control-sm"
+                               [id]="'report-parameter-' + parameter.key" [name]="'parameter-' + parameter.key"
+                               [(ngModel)]="values[parameter.key]">
+                        <span *ngSwitchCase="'fixed'" class="report-fixed" [id]="'report-parameter-' + parameter.key">
+                            {{ parameter.display }}
+                        </span>
+                        <input *ngSwitchDefault type="text" class="form-control form-control-sm"
+                               [id]="'report-parameter-' + parameter.key" [name]="'parameter-' + parameter.key"
+                               [(ngModel)]="values[parameter.key]">
+                    </ng-container>
+                </div>
+                <div class="report-parameters-actions">
+                    <button type="submit" class="btn btn-sm btn-main" [disabled]="loading">{{ label('LBL_UPDATE_PARAMETERS') }}</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="report-panel">
+            <h3 class="report-panel-title">
+                <button type="button" [attr.aria-expanded]="showReport" (click)="showReport = !showReport">
+                    <span class="report-caret" [class.is-open]="showReport" aria-hidden="true">›</span>
+                    {{ label('LBL_REPORT') }}
+                </button>
+            </h3>
+            <div *ngIf="showReport" class="report-body" [class.is-loading]="loading">
+                <scrm-report-table *ngIf="report.table" [table]="report.table" [loading]="paging === report.table"
+                                  (page)="page(report.table, $event)"></scrm-report-table>
+                <p *ngIf="!report.table && !report.groups.length" class="report-message">{{ label('LBL_REPORT_VIEWER_NO_DATA') }}</p>
+                <section *ngFor="let group of report.groups; let index = index" class="report-group">
+                    <h4 class="report-group-title">
+                        <button type="button" [attr.aria-expanded]="!collapsed[index]" (click)="toggleGroup(index)">
+                            <span class="report-caret" [class.is-open]="!collapsed[index]" aria-hidden="true">›</span>
+                            {{ group.label }}
+                        </button>
+                    </h4>
+                    <scrm-report-table *ngIf="!collapsed[index]" [table]="group" [loading]="paging === group"
+                                      (page)="page(group, $event)"></scrm-report-table>
+                </section>
+            </div>
+        </section>
+    </ng-container>
+</div>

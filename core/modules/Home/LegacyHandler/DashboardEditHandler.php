@@ -47,6 +47,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class DashboardEditHandler extends LegacyHandler
 {
     use DashboardPreferencesTrait;
+    use ReportDashletOptionsTrait;
 
     public const HANDLER_KEY = 'dashboard-edit';
 
@@ -334,8 +335,10 @@ class DashboardEditHandler extends LegacyHandler
      * - list: title, rows, auto refresh, "my items", columns and filters;
      * - chart: title, auto refresh and the fields of the chart (dates, users,
      *   lead sources...);
-     * - legacy: the other dashlets (reports, Activity Stream, iFrame...),
-     *   configured with their legacy form.
+     * - report: title, report, "only show charts", charts and parameters of the
+     *   report (ReportDashletOptionsTrait);
+     * - legacy: the other dashlets (Activity Stream, iFrame...), configured with
+     *   their legacy form.
      * The filters and chart fields are the inputs of the legacy form
      * (multiple choice, single choice, text, date), with their legacy names.
      */
@@ -360,6 +363,9 @@ class DashboardEditHandler extends LegacyHandler
             if ($type === 'legacy') {
                 return $options;
             }
+            if ($type === 'report') {
+                return $options + $this->describeReportOptions($dashlet);
+            }
 
             // Fills the labels and inputs of the fields (currentSearchFields).
             $this->withLegacyClassNames(fn() => $dashlet->displayOptions());
@@ -382,7 +388,15 @@ class DashboardEditHandler extends LegacyHandler
     }
 
     /**
-     * Saves the options of a list or chart dashlet, through the dashlet's own
+     * Charts and parameters of the report chosen in the options of a report dashlet.
+     */
+    public function getReportOptions(string $reportId): array
+    {
+        return $this->inLegacy(fn() => $this->describeReport($reportId) ?: ['error' => 'not-found']);
+    }
+
+    /**
+     * Saves the options of a list, chart or report dashlet, through the dashlet's own
      * saveOptions(), with the values of the legacy form.
      *
      * @param array{title?: string, rows?: string, autoRefresh?: string, myItemsOnly?: bool, columns?: string[], fields?: array} $values
@@ -401,8 +415,12 @@ class DashboardEditHandler extends LegacyHandler
                 return false;
             }
 
-            $this->withLegacyClassNames(fn() => $dashlet->displayOptions());
-            $request = $this->buildOptionsRequest($dashlet, $type, $values);
+            if ($type === 'report') {
+                $request = $this->buildReportOptionsRequest($values);
+            } else {
+                $this->withLegacyClassNames(fn() => $dashlet->displayOptions());
+                $request = $this->buildOptionsRequest($dashlet, $type, $values);
+            }
             if ($request === null) {
                 return false;
             }
@@ -418,6 +436,9 @@ class DashboardEditHandler extends LegacyHandler
     {
         if ($this->isListDashlet($dashlet)) {
             return 'list';
+        }
+        if ($dashlet instanceof \AORReportsDashlet) {
+            return 'report';
         }
         return $dashlet instanceof \DashletGenericChart ? 'chart' : 'legacy';
     }

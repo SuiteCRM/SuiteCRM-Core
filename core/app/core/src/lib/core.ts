@@ -847,6 +847,7 @@ export * from './views/dashboard/components/feed-dashlet/feed-dashlet.component'
 export * from './views/dashboard/components/frame-dashlet/frame-dashlet.component';
 export * from './views/dashboard/components/legacy-dashlet/legacy-dashlet.component';
 export * from './views/dashboard/components/list-dashlet/list-dashlet.component';
+export * from './views/dashboard/components/report-dashlet/report-dashlet.component';
 export * from './views/install/actions/install-action-manager.service';
 export * from './views/install/actions/install-view.action';
 export * from './views/install/actions/install/install.action';
@@ -941,3 +942,12 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './views/reports/report.model';
+export * from './views/reports/report-editor.model';
+export * from './views/reports/actions/report.actions';
+export * from './views/reports/services/report-rows.service';
+export * from './views/reports/services/report-viewer.state';
+export * from './views/reports/components/report-chart/report-chart.component';
+export * from './views/reports/components/report-editor/report-editor.component';
+export * from './views/reports/components/report-table/report-table.component';
+export * from './views/reports/components/report-viewer/report-viewer.component';

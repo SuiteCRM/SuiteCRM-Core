@@ -88,6 +88,9 @@
     .dashboard-sort.is-sorted .dashboard-sort-icon { color: inherit; }
     .dashboard-table .dashboard-icon-btn { width: 36px; height: 36px; }
     .dashboard-table tfoot td { border-top: 2px solid $slade-grey; font-weight: 700; }
+    // Reports (up to 30 columns): natural width, the card scrolls sideways; words are not cut.
+    .dashboard-report { width: max-content; min-width: 100%; }
+    .dashboard-report td { min-width: 110px; word-break: normal; overflow-wrap: break-word; }
 
     .dashboard-accept { display: inline-flex; gap: 4px; }
     .dashboard-chip { min-height: 32px; padding: 0 10px; border: 1px solid $lilac-grey; border-radius: 16px; background: $white; color: $median-grey; font-size: 12px; cursor: pointer; }
@@ -206,4 +209,6 @@
     .dashboard-multi-list { max-height: 180px; margin: 0; padding: 4px 8px; overflow-y: auto; list-style: none; }
     .dashboard-multi-list label { display: flex; align-items: center; gap: 8px; min-height: 32px; margin: 0; font-weight: 400; cursor: pointer; }
     .dashboard-options-frame { display: block; width: 100%; height: min(70vh, 640px); border: 0; }
+    .dashboard-report-search { margin: 0 0 6px; }
+    .dashboard-report-list { height: auto; }
 }

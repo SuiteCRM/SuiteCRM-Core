@@ -26,6 +26,7 @@
 
 import {ColumnDefinition} from '../../common/metadata/list.metadata.model';
 import {Record} from '../../common/record/record.model';
+import {ReportTable} from '../reports/report.model';
 
 /** A column of a list dashlet (see DashboardHandler::buildColumns). */
 export interface DashletColumn extends ColumnDefinition {
@@ -64,6 +65,12 @@ export interface DashletChart {
     link?: { params: { [key: string]: string | string[] }, group: string, item: string };
 }
 
+/** A report dashlet (see DashboardHandler::loadReport); null when no report is chosen yet. */
+export interface DashletReport extends ReportTable {
+    id: string;
+    name: string;
+}
+
 /** A post or reply of an Activity Stream dashlet (see DashboardHandler::describeFeed). */
 export interface DashletFeedItem {
     id: string;
@@ -82,11 +89,11 @@ export interface DashletFeed {
     offsets: DashletOffsets;
 }
 
-/** A dashlet of the `dashboard` process; list, chart and feed dashlets come with their data. */
+/** A dashlet of the `dashboard` process; list, chart, report and feed dashlets come with their data. */
 export interface DashletData {
     id: string;
     title: string;
-    type: 'list' | 'chart' | 'feed' | 'frame' | 'legacy';
+    type: 'list' | 'chart' | 'report' | 'feed' | 'frame' | 'legacy';
     module?: string;
     legacyModule?: string;
     columns?: DashletColumn[];
@@ -94,13 +101,14 @@ export interface DashletData {
     offsets?: DashletOffsets;
     sort?: DashletSort;
     chart?: DashletChart;
+    report?: DashletReport | null;
     feed?: DashletFeed;
     // iFrame and SuiteCRM News: the page shown (empty: not an http(s) URL).
     frame?: { url: string, height: number };
     // The dashlet has options (legacy isConfigurable).
     configurable?: boolean;
     error?: string;
-    // Activity Stream: comes with the dashboard without its content, which it loads.
+    // Report and Activity Stream: come with the dashboard without their content, which they load.
     deferred?: boolean;
 }
 
@@ -132,19 +140,40 @@ export interface DashletOptionField {
     value: string | string[];
 }
 
+/** A parameter of the report of a report dashlet (condition of the report marked as parameter). */
+export interface DashletReportParameter {
+    key: string;
+    label: string;
+    kind: 'select' | 'multi' | 'date' | 'text' | 'fixed';
+    options: DashletOptionChoice[];
+    value: string | string[];
+    // Text of a parameter that cannot be changed (relative date).
+    display?: string;
+}
+
+/** Charts and parameters of a report (`dashboard-edit` process, reportOptions action). */
+export interface DashletReportOptions {
+    charts?: { value: string[], options: DashletOptionChoice[] };
+    parameters?: DashletReportParameter[];
+    error?: string;
+}
+
 /**
  * Options form of a dashlet (`dashboard-edit` process, options action):
- * list and chart dashlets natively, the others with their legacy form.
+ * list, chart and report dashlets natively, the others with their legacy form.
  */
-export interface DashletOptions {
+export interface DashletOptions extends DashletReportOptions {
     id: string;
-    type: 'list' | 'chart' | 'legacy' | 'none';
+    type: 'list' | 'chart' | 'report' | 'legacy' | 'none';
     title: string;
     rows?: { value: string, options: string[] };
     autoRefresh?: { value: string, options: DashletOptionChoice[] } | null;
     myItemsOnly?: boolean | null;
     columns?: { value: string[], options: DashletOptionChoice[] };
     fields?: DashletOptionField[];
+    report?: string;
+    reports?: DashletOptionChoice[];
+    onlyCharts?: boolean;
 }
 
 export interface DashboardColumn {

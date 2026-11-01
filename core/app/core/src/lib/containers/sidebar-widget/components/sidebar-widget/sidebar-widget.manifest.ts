@@ -37,6 +37,7 @@ import {RecordTableWidgetComponent} from "../record-table-widget/record-table-wi
 import {RecordTableWidgetModule} from "../record-table-widget/record-table-widget.module";
 import {BannerGridSidebarWidgetModule} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.module";
 import {BannerGridSidebarWidgetComponent} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.component";
+import {ReportViewerComponent} from "../../../../views/reports/components/report-viewer/report-viewer.component";
 
 export const sidebarWidgetModules = [
     HistorySidebarWidgetModule,
@@ -52,5 +53,6 @@ export const componentTypeMap = {
     statistics: StatisticsSidebarWidgetComponent,
     'record-thread': RecordThreadSidebarWidgetComponent,
     'record-table': RecordTableWidgetComponent,
-    'banner-grid': BannerGridSidebarWidgetComponent
+    'banner-grid': BannerGridSidebarWidgetComponent,
+    'report-viewer': ReportViewerComponent
 };

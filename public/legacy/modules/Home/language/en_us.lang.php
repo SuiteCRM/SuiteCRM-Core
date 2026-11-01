@@ -315,4 +315,11 @@ $mod_strings = array(
     'LBL_DASHBOARD_REPLY' => 'Reply',
     'LBL_DASHBOARD_SEND' => 'Send',
     'LBL_DASHBOARD_DELETE' => 'Delete',
+    'LBL_DASHBOARD_CHOOSE_REPORT' => 'Choose a report in the options of this dashlet.',
+    'LBL_DASHBOARD_REPORT' => 'Report',
+    'LBL_DASHBOARD_NO_REPORT' => '(no report)',
+    'LBL_DASHBOARD_ONLY_CHARTS' => 'Only show charts',
+    'LBL_DASHBOARD_CHARTS' => 'Charts',
+    'LBL_DASHBOARD_NO_CHARTS' => 'This report has no charts.',
+    'LBL_DASHBOARD_PARAMETERS' => 'Parameters',
 );

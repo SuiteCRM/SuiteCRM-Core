@@ -102,6 +102,7 @@
                     </header>
                     <scrm-list-dashlet *ngIf="dashlet(id).type === 'list'" [dashlet]="dashlet(id)"></scrm-list-dashlet>
                     <scrm-chart-dashlet *ngIf="dashlet(id).type === 'chart'" [dashlet]="dashlet(id)"></scrm-chart-dashlet>
+                    <scrm-report-dashlet *ngIf="dashlet(id).type === 'report'" [dashlet]="dashlet(id)"></scrm-report-dashlet>
                     <scrm-feed-dashlet *ngIf="dashlet(id).type === 'feed'" [dashlet]="dashlet(id)"></scrm-feed-dashlet>
                     <scrm-frame-dashlet *ngIf="dashlet(id).type === 'frame'" [dashlet]="dashlet(id)"></scrm-frame-dashlet>
                     <scrm-legacy-dashlet *ngIf="dashlet(id).type === 'legacy'" [id]="id"

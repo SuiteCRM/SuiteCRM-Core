@@ -99,7 +99,7 @@ parameters:
     users:
       index: true
       list: true
-      record: false
+      record: true
     employees:
       index: true
       list: true

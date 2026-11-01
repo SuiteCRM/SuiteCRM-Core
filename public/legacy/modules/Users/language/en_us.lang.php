@@ -707,4 +707,14 @@ $mod_strings = array(
     'LBL_2FA_CONFIG' => 'Two Factor Configuration',
     'LBL_DISABLE_2FA' => 'Disable 2FA',
 
+    'LBL_POPUP_REMINDER' => 'Popup reminder',
+    'LBL_POPUP_REMINDER_TIME' => 'Popup reminder time',
+    'LBL_EMAIL_REMINDER' => 'Email reminder',
+    'LBL_EMAIL_REMINDER_TIME' => 'Email reminder time',
+    'LBL_EMAIL_OPTIONS' => 'Email Options',
+    'LBL_SECURITYGROUPS_SUBPANEL_TITLE' => 'Security Groups Management',
+    'ERR_PASSWORD_REQUIRED' => 'Enter a password: the user does not log in with an external authentication.',
+    'ERR_PASSWORD_CHANGE' => 'The password could not be changed: %s',
+    'ERR_PASSWORD_NOT_ALLOWED' => 'You can only change your own password.',
+
 ); // END STRINGS DEFS

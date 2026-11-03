@@ -1,0 +1,92 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// Change log modal: the table of the legacy popup, scrolled with its header kept.
+.change-log-modal {
+  .change-log-modal-body {
+    padding: 1rem;
+  }
+
+  .change-log-modal-name {
+    margin: 0 0 4px;
+    font-weight: 600;
+  }
+
+  .change-log-modal-fields {
+    margin: 0 0 10px;
+    font-size: 13px;
+  }
+
+  .change-log-modal-search {
+    max-width: 260px;
+    margin-bottom: 8px;
+  }
+
+  .change-log-modal-muted {
+    color: $midnight-grey;
+  }
+
+  .change-log-modal-scroll {
+    max-height: 60vh;
+    overflow: auto;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+  }
+
+  .change-log-modal-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+
+    th, td {
+      padding: 5px 8px;
+      vertical-align: top;
+      text-align: left;
+      border-bottom: 1px solid $light-grey;
+      background: $white;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-weight: 700;
+      white-space: nowrap;
+      background: $off-white;
+    }
+
+    .change-log-modal-value {
+      width: 30%;
+      white-space: pre-line;
+      overflow-wrap: anywhere;
+    }
+
+    .change-log-modal-date {
+      white-space: nowrap;
+    }
+  }
+}

@@ -136,10 +136,14 @@ class ChangeLogAction implements ProcessHandlerInterface
 
         $legacyUrl = $baseUrl . "?" . http_build_query($queryParams);
 
+        // The module and the record for the change log modal (process record-change-log), and
+        // the url of the legacy popup.
         $responseData = [
             'handler' => 'audit',
             'params' => [
                 'url' => $legacyUrl,
+                'module' => $options['module'],
+                'id' => $recordId,
                 'queryParams' => [
                 ]
             ]

@@ -1,0 +1,76 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<scrm-modal [closable]="true"
+            [close]="closeButton"
+            titleKey="LBL_CHANGE_LOG"
+            bodyKlass="change-log-modal-body"
+            footerKlass="border-0"
+            klass="change-log-modal">
+
+    <div modal-body>
+        <p *ngIf="error" class="text-danger mb-0" role="alert">{{ label('LBL_ACTION_ERROR') }}</p>
+        <p *ngIf="!data && !error" class="change-log-modal-muted mb-0">…</p>
+
+        <ng-container *ngIf="data">
+            <p class="change-log-modal-name">{{ data.module }}: {{ data.name }}</p>
+            <p class="change-log-modal-fields">
+                <strong>{{ label('LBL_AUDITED_FIELDS') }}:</strong> {{ data.fields.join(', ') }}
+            </p>
+
+            <input *ngIf="data.changes.length" type="search" class="form-control form-control-sm change-log-modal-search"
+                   [placeholder]="label('LBL_SEARCH')" [attr.aria-label]="label('LBL_SEARCH')" [(ngModel)]="search">
+
+            <div class="change-log-modal-scroll">
+                <table class="change-log-modal-table">
+                    <thead>
+                    <tr>
+                        <th scope="col">{{ label('LBL_FIELD_NAME') }}</th>
+                        <th scope="col">{{ label('LBL_OLD_NAME') }}</th>
+                        <th scope="col">{{ label('LBL_NEW_VALUE') }}</th>
+                        <th scope="col">{{ label('LBL_CREATED_BY') }}</th>
+                        <th scope="col">{{ label('LBL_LIST_DATE') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let change of changes(); trackBy: trackChange">
+                        <td>{{ change.field }}</td>
+                        <td class="change-log-modal-value">{{ change.before }}</td>
+                        <td class="change-log-modal-value">{{ change.after }}</td>
+                        <td>{{ change.user }}</td>
+                        <td class="change-log-modal-date">{{ change.date }}</td>
+                    </tr>
+                    <tr *ngIf="!changes().length">
+                        <td colspan="5" class="change-log-modal-muted">{{ label('LBL_NO_DATA') }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </ng-container>
+    </div>
+
+</scrm-modal>

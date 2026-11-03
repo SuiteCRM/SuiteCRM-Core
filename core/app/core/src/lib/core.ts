@@ -929,3 +929,6 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './views/admin-settings/components/admin-settings/admin-settings.model';
+export * from './views/admin-settings/components/admin-settings/admin-settings.component';
+export * from './views/admin-settings/components/admin-settings/admin-settings.module';

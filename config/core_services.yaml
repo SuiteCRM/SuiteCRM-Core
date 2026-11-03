@@ -101,6 +101,8 @@ services:
 
 
   _instanceof:
+    App\Module\Administration\LegacyHandler\AdminSettings\AdminSettingsPage:
+      tags: [ 'admin.settings.page' ]
     App\Process\Service\ProcessHandlerInterface:
       tags: [ 'app.process.handler' ]
     App\UserPreferences\LegacyHandler\UserPreferencesMapperInterface:
@@ -480,6 +482,10 @@ services:
       - '@entity.fieldType.mapper.registry'
       - '@entity.record.mapper.registry'
       - '@App\FieldDefinitions\Service\FieldDefinitionsProviderInterface'
+
+  App\Module\Administration\Service\AdminSettingsProcessHandler:
+    arguments:
+      $pages: !tagged_iterator admin.settings.page
 
   App\Data\Service\Record\Duplicate\DuplicateFieldMapperRegistry:
     arguments:

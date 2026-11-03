@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    AdminSettingsComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -184,6 +185,35 @@ export class AppInit {
                             }
                         }
                     });
+
+                    // Settings pages of the administration (admin panel links), before the generic
+                    // classic view routes: one view, the page key in the route data.
+                    const adminSettingsPages: { [path: string]: string } = {
+                        'administration/AOSAdmin': 'aos',
+                        'administration/AOPAdmin': 'aop',
+                        'administration/Locale': 'locale',
+                        'administration/Languages': 'languages',
+                        'administration/ThemeSettings': 'themes',
+                        'administration/SearchSettings': 'search',
+                        'administration/ElasticSearchSettings': 'elasticsearch',
+                        'administration/PasswordManager': 'password',
+                        'administration/ConfigureTabs': 'tabs',
+                    };
+                    Object.entries(adminSettingsPages).forEach(([path, page]) => routes.push({
+                        path,
+                        component: AdminSettingsComponent,
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration',
+                            adminSettingsPage: page
+                        }
+                    }));
                     routes.push(loggedOutConfig);
 
                     Object.keys(configRoutes).forEach(routeName => {

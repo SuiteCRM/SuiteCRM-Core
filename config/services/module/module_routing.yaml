@@ -211,7 +211,7 @@ parameters:
     scheduled-reports:
       index: true
       list: true
-      record: false
+      record: true
     workflow:
       index: true
       list: true

@@ -1,0 +1,82 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<ng-container *ngIf="!editing; else edit">{{ readable() }}</ng-container>
+
+<ng-template #edit>
+    <div class="cron-schedule">
+        <div *ngIf="!advanced" class="cron-schedule-basic">
+            <select class="form-control form-control-sm cron-schedule-type" [attr.aria-label]="field?.label"
+                    [(ngModel)]="type" (ngModelChange)="update()" [ngModelOptions]="{standalone: true}">
+                <option *ngFor="let item of types" [ngValue]="item">{{ typeLabel(item) }}</option>
+            </select>
+
+            <div *ngIf="type === 'weekly'" class="cron-schedule-picks" role="group" [attr.aria-label]="appString('LBL_CRON_DOW')">
+                <span class="cron-schedule-word">{{ appString('LBL_CRON_ON_THE_WEEKDAY') }}</span>
+                <button *ngFor="let weekday of weekdays" type="button" class="btn btn-sm cron-schedule-pick"
+                        [class.is-selected]="selectedWeekdays.includes('' + weekday)"
+                        [attr.aria-pressed]="selectedWeekdays.includes('' + weekday)"
+                        (click)="toggle(selectedWeekdays, '' + weekday)">{{ weekdayLabel(weekday) }}</button>
+            </div>
+
+            <div *ngIf="type === 'monthly'" class="cron-schedule-picks" role="group" [attr.aria-label]="appString('LBL_CRON_DAY')">
+                <span class="cron-schedule-word">{{ appString('LBL_CRON_ON_THE_MONTHDAY') }}</span>
+                <button *ngFor="let day of days" type="button" class="btn btn-sm cron-schedule-pick cron-schedule-day"
+                        [class.is-selected]="selectedDays.includes(day)" [attr.aria-pressed]="selectedDays.includes(day)"
+                        (click)="toggle(selectedDays, day)">{{ day }}</button>
+            </div>
+
+            <div class="cron-schedule-time">
+                <span class="cron-schedule-word">{{ appString('LBL_CRON_AT') }}</span>
+                <select class="form-control form-control-sm" [attr.aria-label]="appString('LBL_CRON_HOUR')"
+                        [(ngModel)]="hour" (ngModelChange)="update()" [ngModelOptions]="{standalone: true}">
+                    <option value=""></option>
+                    <option *ngFor="let item of hours" [value]="item">{{ item }}</option>
+                </select>
+                <span>:</span>
+                <select class="form-control form-control-sm" [attr.aria-label]="appString('LBL_CRON_MIN')"
+                        [(ngModel)]="minute" (ngModelChange)="update()" [ngModelOptions]="{standalone: true}">
+                    <option value=""></option>
+                    <option *ngFor="let item of minutes" [value]="item">{{ item }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div *ngIf="advanced" class="cron-schedule-raw">
+            <label *ngFor="let part of rawParts; let index = index">
+                <span>{{ appString(part) }}</span>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="raw[index]" (ngModelChange)="update()"
+                       [ngModelOptions]="{standalone: true}">
+            </label>
+        </div>
+
+        <label class="cron-schedule-advanced">
+            <input type="checkbox" [ngModel]="advanced" (ngModelChange)="setAdvanced($event)" [ngModelOptions]="{standalone: true}">
+            {{ appString('LBL_CRON_RAW') }}
+        </label>
+    </div>
+</ng-template>

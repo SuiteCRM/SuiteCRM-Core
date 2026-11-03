@@ -929,3 +929,7 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './fields/cron-schedule/cron-schedule.component';
+export * from './fields/cron-schedule/cron-schedule.module';
+export * from './fields/report-recipients/report-recipients.component';
+export * from './fields/report-recipients/report-recipients.module';

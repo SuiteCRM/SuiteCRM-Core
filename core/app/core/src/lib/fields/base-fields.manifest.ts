@@ -140,6 +140,8 @@ import {TextTemplateDetailFieldModule} from "./texttemplate/templates/detail/tex
 import {TextTemplateDetailFieldComponent} from "./texttemplate/templates/detail/texttemplate.component";
 import {ImageListFieldComponent} from "./image/templates/list/image.component";
 import {ImageListFieldModule} from "./image/templates/list/image.module";
+import {AclMatrixFieldComponent} from './acl-matrix/acl-matrix.component';
+import {AclMatrixFieldModule} from './acl-matrix/acl-matrix.module';
 
 export const baseFieldModules = [
     VarcharDetailFieldModule,
@@ -180,6 +182,7 @@ export const baseFieldModules = [
     ImageEditFieldModule,
     ImageDetailFieldModule,
     ImageListFieldModule,
+    AclMatrixFieldModule,
     MultiEnumDetailFieldModule,
     MultiEnumEditFieldModule,
     MultiEnumFilterFieldModule,
@@ -243,6 +246,7 @@ export const baseFieldComponents = [
     ImageEditFieldComponent,
     ImageDetailFieldComponent,
     ImageListFieldComponent,
+    AclMatrixFieldComponent,
     MultiEnumDetailFieldComponent,
     MultiEnumEditFieldComponent,
     MultiEnumFilterFieldComponent,
@@ -333,6 +337,8 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'image.edit': ImageEditFieldComponent,
     'image.detail': ImageDetailFieldComponent,
     'image.list': ImageListFieldComponent,
+    'acl-matrix.detail': AclMatrixFieldComponent,
+    'acl-matrix.edit': AclMatrixFieldComponent,
     'multienum.list': MultiEnumDetailFieldComponent,
     'multienum.detail': MultiEnumDetailFieldComponent,
     'multienum.edit': MultiEnumEditFieldComponent,

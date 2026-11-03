@@ -669,4 +669,10 @@ $mod_strings = array(
 
     'LBL_ALL_MODULES' => 'All Modules',
     'LBL_RELATED_FIELD_ID_NAME_LABEL' => '{0} (related {1} ID)',
+    'LBL_DROPDOWN_EDITOR_NO_MATCH' => 'No dropdown list matches the search.',
+    'LBL_DROPDOWN_EDITOR_EXISTS' => 'A dropdown list with this name already exists.',
+    'LBL_DROPDOWN_EDITOR_NOT_FOUND' => 'This dropdown list does not exist anymore.',
+    'LBL_DROPDOWN_EDITOR_SAVED' => 'The dropdown list "{name}" has been saved.',
+    'LBL_DROPDOWN_EDITOR_MOVE_UP' => 'Move up',
+    'LBL_DROPDOWN_EDITOR_MOVE_DOWN' => 'Move down',
 );

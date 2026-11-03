@@ -1,0 +1,107 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="dropdown-list-editor">
+    <div class="modal-header">
+        <h4 class="modal-title">{{ label('LBL_DROPDOWNEDITOR') }}<ng-container *ngIf="name">: <span class="dropdown-editor-mono">{{ name }}</span></ng-container></h4>
+        <button type="button" class="btn-close close" aria-label="×" (click)="modal.dismiss()"><span aria-hidden="true">&times;</span></button>
+    </div>
+
+    <div class="modal-body">
+        <div class="dropdown-list-editor-head">
+            <label *ngIf="isNew" class="dropdown-editor-field">
+                <span>{{ label('LBL_DROPDOWN_TITLE_NAME') }} <span class="required">*</span></span>
+                <input type="text" class="form-control form-control-sm dropdown-editor-mono" maxlength="100" [(ngModel)]="newName">
+            </label>
+            <label *ngIf="(lists?.languages?.length ?? 0) > 1" class="dropdown-editor-field">
+                <span>{{ label('LBL_DROPDOWN_LANGUAGE') }}</span>
+                <select class="form-control form-control-sm" [(ngModel)]="lang" (ngModelChange)="isNew ? null : load()" [disabled]="loading">
+                    <option *ngFor="let lang of lists.languages" [value]="lang.value">{{ lang.label }}</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="dropdown-editor-items-head">
+            <strong>{{ label('LBL_DROPDOWN_ITEMS') }}</strong>
+            <span class="dropdown-editor-items-tools">
+                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading || items.length < 2" (click)="sort(false)">{{ label('LBL_BTN_SORT_ASCENDING') }}</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading || items.length < 2" (click)="sort(true)">{{ label('LBL_BTN_SORT_DESCENDING') }}</button>
+            </span>
+        </div>
+
+        <div class="dropdown-editor-items-scroll">
+            <table class="dropdown-editor-items">
+                <thead>
+                <tr>
+                    <td></td>
+                    <th scope="col">{{ label('LBL_DROPDOWN_ITEM_NAME') }}</th>
+                    <th scope="col">{{ label('LBL_DROPDOWN_ITEM_LABEL') }}</th>
+                    <td></td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let item of items; let index = index; let last = last; trackBy: trackIndex">
+                    <td class="dropdown-editor-order">
+                        <button type="button" class="btn btn-sm btn-link" [disabled]="loading || !index" [title]="label('LBL_DROPDOWN_EDITOR_MOVE_UP')"
+                                [attr.aria-label]="label('LBL_DROPDOWN_EDITOR_MOVE_UP')" (click)="move(index, -1)">▲</button>
+                        <button type="button" class="btn btn-sm btn-link" [disabled]="loading || last" [title]="label('LBL_DROPDOWN_EDITOR_MOVE_DOWN')"
+                                [attr.aria-label]="label('LBL_DROPDOWN_EDITOR_MOVE_DOWN')" (click)="move(index, 1)">▼</button>
+                    </td>
+                    <td class="dropdown-editor-mono" [class.dropdown-editor-blank]="item.key === ''">{{ keyLabel(item.key) }}</td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm" [attr.aria-label]="label('LBL_DROPDOWN_ITEM_LABEL') + ' ' + keyLabel(item.key)"
+                               [(ngModel)]="item.label" [disabled]="loading">
+                    </td>
+                    <td class="dropdown-editor-remove">
+                        <button type="button" class="btn btn-sm btn-link text-danger" [disabled]="loading" [title]="label('LBL_MB_DELETE')"
+                                [attr.aria-label]="label('LBL_MB_DELETE') + ' ' + keyLabel(item.key)" (click)="remove(index)">&times;</button>
+                    </td>
+                </tr>
+                <tr *ngIf="!items.length && !loading">
+                    <td colspan="4" class="dropdown-editor-muted">{{ label('LBL_NONE') }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <form class="dropdown-editor-add" (ngSubmit)="add()">
+            <input type="text" name="newKey" class="form-control form-control-sm dropdown-editor-mono" maxlength="100"
+                   [placeholder]="label('LBL_DROPDOWN_ITEM_NAME')" [attr.aria-label]="label('LBL_DROPDOWN_ITEM_NAME')" [(ngModel)]="newKey">
+            <input type="text" name="newLabel" class="form-control form-control-sm"
+                   [placeholder]="label('LBL_DROPDOWN_ITEM_LABEL')" [attr.aria-label]="label('LBL_DROPDOWN_ITEM_LABEL')" [(ngModel)]="newLabel">
+            <button type="submit" class="btn btn-sm btn-outline-secondary" [disabled]="loading || !newKey.trim()">+</button>
+        </form>
+
+        <p *ngIf="confirming" class="alert alert-warning dropdown-editor-confirm mb-0" role="alert">{{ label('LBL_CONFIRM_SAVE_DROPDOWN') }}</p>
+        <p *ngIf="error" class="text-danger dropdown-editor-error mb-0" role="alert">{{ error }}</p>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" (click)="modal.dismiss()">{{ label('LBL_BTN_CANCEL') }}</button>
+        <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="save()">{{ confirming ? label('LBL_PROCEED') : label('LBL_SAVE_BUTTON_LABEL') }}</button>
+    </div>
+</div>

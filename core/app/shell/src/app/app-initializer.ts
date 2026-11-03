@@ -24,8 +24,8 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Injectable, Injector} from '@angular/core';
-import {Route, Router} from '@angular/router';
+import {inject, Injectable, Injector} from '@angular/core';
+import {CanMatchFn, Route, Router} from '@angular/router';
 import {
     AppStateStore,
     AuthGuard,
@@ -49,9 +49,18 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    DropdownEditorComponent
 } from 'core';
 import {take} from 'rxjs/operators';
+
+/**
+ * The Dropdown Editor route of the admin panel (module-builder/index?type=dropdowns) only: the other
+ * ModuleBuilder pages, Studio included, keep their route.
+ */
+const dropdownEditorMatch: CanMatchFn = () => {
+    return inject(Router).getCurrentNavigation()?.extractedUrl?.queryParamMap?.get('type') === 'dropdowns';
+};
 
 @Injectable()
 export class AppInit {
@@ -182,6 +191,23 @@ export class AppInit {
                                 preferences: false,
                                 languageStrings: ['appStrings']
                             }
+                        }
+                    });
+
+                    // Dropdown Editor view (admin panel link), before the generic classic view routes.
+                    routes.push({
+                        path: 'module-builder/index',
+                        component: DropdownEditorComponent,
+                        canMatch: [dropdownEditorMatch],
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration'
                         }
                     });
                     routes.push(loggedOutConfig);

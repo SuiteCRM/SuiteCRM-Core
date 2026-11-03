@@ -929,3 +929,7 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './views/dropdown-editor/components/dropdown-editor/dropdown-editor.model';
+export * from './views/dropdown-editor/components/dropdown-editor/dropdown-editor.component';
+export * from './views/dropdown-editor/components/dropdown-editor/dropdown-list-editor.component';
+export * from './views/dropdown-editor/components/dropdown-editor/dropdown-editor.module';

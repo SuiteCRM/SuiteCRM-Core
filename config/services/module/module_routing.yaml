@@ -103,7 +103,7 @@ parameters:
     employees:
       index: true
       list: true
-      record: false
+      record: true
     template-section-line:
       index: true
       list: true

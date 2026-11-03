@@ -1,0 +1,135 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+.security-suite-settings {
+  padding: 24px 24px 48px;
+  color: $median-grey;
+
+  .security-suite-settings-title {
+    margin: 0 0 12px;
+    font-size: 22px;
+    font-weight: 400;
+  }
+
+  .security-suite-settings-muted {
+    color: $midnight-grey;
+  }
+
+  .security-suite-settings-panel {
+    max-width: 960px;
+    margin: 0 0 12px;
+    padding: 12px 16px 16px;
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+
+    legend {
+      width: 100%;
+      margin: 0 0 8px;
+      color: $dusky-blue;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+  }
+
+  .security-suite-settings-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+
+    input[type=checkbox] {
+      margin-top: 4px;
+    }
+
+    label {
+      margin: 0;
+      font-weight: 600;
+    }
+  }
+
+  .security-suite-settings-buttons {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 16px;
+  }
+
+  .security-suite-settings-defaults {
+    margin-top: 16px;
+  }
+
+  .security-suite-settings-subtitle {
+    margin: 0 0 10px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .security-suite-settings-table {
+    width: 100%;
+    margin: 0 0 12px;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 8px 10px;
+      border-top: 1px solid $border-color;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      border-top: 0;
+      color: $dusky-blue;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+  }
+
+  .security-suite-settings-remove {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .security-suite-settings-add {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+
+    label {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    select {
+      width: auto;
+      min-width: 180px;
+      max-width: 100%;
+    }
+  }
+}

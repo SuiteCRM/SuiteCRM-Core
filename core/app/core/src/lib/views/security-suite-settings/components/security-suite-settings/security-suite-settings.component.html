@@ -1,0 +1,98 @@
+<! --
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+-->
+<div class="security-suite-settings">
+    <h2 class="security-suite-settings-title">{{ label('LBL_MODULE_NAME') }}: {{ label('LBL_CONFIGURE_SETTINGS') }}</h2>
+
+    <p *ngIf="loading && !data" class="security-suite-settings-muted">…</p>
+
+    <ng-container *ngIf="data">
+        <form class="security-suite-settings-form" (ngSubmit)="save()">
+            <fieldset class="security-suite-settings-panel">
+                <div *ngFor="let option of rights" class="security-suite-settings-option">
+                    <input type="checkbox" [id]="option[0]" [name]="option[0]" [(ngModel)]="settings[option[0]]">
+                    <div>
+                        <label [for]="option[0]">{{ label(option[1]) }}</label>
+                        <small class="form-text text-muted">{{ label(option[1] + '_DESC') }}</small>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="security-suite-settings-panel">
+                <legend>{{ label('LBL_INHERIT_TITLE') }}</legend>
+                <div *ngFor="let option of inheritance" class="security-suite-settings-option">
+                    <input type="checkbox" [id]="option[0]" [name]="option[0]" [(ngModel)]="settings[option[0]]">
+                    <div>
+                        <label [for]="option[0]">{{ label(option[1]) }}</label>
+                        <small class="form-text text-muted">{{ label(option[1] + '_DESC') }}</small>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="security-suite-settings-buttons">
+                <button type="submit" class="btn btn-sm btn-main" [disabled]="loading">{{ label('LBL_SAVE_BUTTON_LABEL') }}</button>
+                <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/administration']">{{ label('LBL_CANCEL_BUTTON_LABEL') }}</a>
+            </div>
+        </form>
+
+        <section class="security-suite-settings-panel security-suite-settings-defaults">
+            <h3 class="security-suite-settings-subtitle">{{ label('LBL_DEFAULT_GROUP_TITLE') }}</h3>
+            <table *ngIf="data.defaults.length" class="security-suite-settings-table">
+                <thead>
+                <tr>
+                    <th scope="col">{{ label('LBL_GROUP') }}</th>
+                    <th scope="col">{{ label('LBL_MODULE') }}</th>
+                    <th scope="col"><span class="sr-only">{{ label('LBL_REMOVE_BUTTON_LABEL') }}</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let item of data.defaults">
+                    <td>{{ item.group }}</td>
+                    <td>{{ item.moduleLabel }}</td>
+                    <td class="security-suite-settings-remove">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading"
+                                (click)="removeDefault(item.id)">{{ label('LBL_REMOVE_BUTTON_LABEL') }}</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <form class="security-suite-settings-add" (ngSubmit)="addDefault()">
+                <label for="security-suite-settings-group">{{ label('LBL_GROUP') }}</label>
+                <select id="security-suite-settings-group" name="group" class="form-control form-control-sm" [(ngModel)]="group">
+                    <option value=""></option>
+                    <option *ngFor="let item of data.groups; trackBy: trackOption" [value]="item.id">{{ item.name }}</option>
+                </select>
+                <label for="security-suite-settings-module">{{ label('LBL_MODULE') }}</label>
+                <select id="security-suite-settings-module" name="module" class="form-control form-control-sm" [(ngModel)]="module">
+                    <option *ngFor="let item of data.modules; trackBy: trackOption" [value]="item.value">{{ item.label }}</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-main" [disabled]="loading || !group">{{ label('LBL_ADD_BUTTON_LABEL') }}</button>
+            </form>
+        </section>
+    </ng-container>
+</div>

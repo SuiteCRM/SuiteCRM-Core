@@ -929,3 +929,5 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './views/security-suite-settings/components/security-suite-settings/security-suite-settings.component';
+export * from './views/security-suite-settings/components/security-suite-settings/security-suite-settings.module';

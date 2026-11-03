@@ -79,6 +79,11 @@
     overflow-x: auto;
   }
 
+  // The product list of a line opens over the lines below: the scroll would cut it at the last line.
+  .lines-scroll-searching {
+    overflow: visible;
+  }
+
   .lines-table {
     width: 100%;
     border-collapse: collapse;

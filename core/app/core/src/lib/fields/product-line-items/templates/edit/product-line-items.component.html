@@ -36,7 +36,7 @@
             </button>
         </div>
 
-        <div *ngIf="products(group.lines).length" class="lines-scroll">
+        <div *ngIf="products(group.lines).length" class="lines-scroll" [class.lines-scroll-searching]="isSearching(group)">
             <table class="lines-table">
                 <thead>
                 <tr>

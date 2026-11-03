@@ -26,8 +26,8 @@
 
 
 import {ChangeDetectorRef, Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {Subject, Subscription} from 'rxjs';
-import {debounceTime, distinctUntilChanged, switchMap, take} from 'rxjs/operators';
+import {of, Subject, Subscription} from 'rxjs';
+import {catchError, debounceTime, switchMap, take} from 'rxjs/operators';
 import {BaseProductLineItemsComponent} from '../../../base/base-product-line-items.component';
 import {DataTypeFormatter} from '../../../../services/formatters/data-type.formatter.service';
 import {FieldLogicManager} from '../../../field-logic/field-logic.manager';
@@ -107,23 +107,22 @@ export class ProductLineItemsEditFieldComponent extends BaseProductLineItemsComp
             this.addGroup();
         }
 
+        // Every search is sent, even the same text again: the list is emptied when it closes, so
+        // a search left out (field focused again) would wait for results forever. A failed search
+        // shows no product and leaves the next ones running.
         this.subscriptions.push(this.searchQuery.pipe(
             debounceTime(300),
-            distinctUntilChanged((a, b) => a.line === b.line && a.query === b.query),
             switchMap(search => this.processService.submit(
                 ProductLineItemsEditFieldComponent.PROCESS_TYPE,
                 {action: 'products', query: search.query}
-            ).pipe(take(1)))
-        ).subscribe({
-            next: (process: Process) => {
-                this.searching = false;
-                this.foundProducts = (process?.data as any)?.products ?? [];
-                this.changeDetector.markForCheck();
-            },
-            error: () => {
-                this.searching = false;
-                this.foundProducts = [];
-            }
+            ).pipe(
+                take(1),
+                catchError(() => of(null))
+            ))
+        ).subscribe((process: Process) => {
+            this.searching = false;
+            this.foundProducts = (process?.data as any)?.products ?? [];
+            this.changeDetector.markForCheck();
         }));
 
         // The currency and shipping fields have their own rows, possibly built after
@@ -217,6 +216,13 @@ export class ProductLineItemsEditFieldComponent extends BaseProductLineItemsComp
         if (this.searching) {
             this.searchQuery.next(this.search);
         }
+    }
+
+    /**
+     * A product search open on a line of the group.
+     */
+    isSearching(group: ProductLineItemGroup): boolean {
+        return !!this.search && group.lines.includes(this.search.line);
     }
 
     closeSearch(line: ProductLineItem): void {

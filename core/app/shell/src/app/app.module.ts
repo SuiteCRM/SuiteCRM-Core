@@ -55,6 +55,7 @@ import {
     ListContainerModule,
     ListHeaderModule,
     ListModule,
+    AdminToolsModule,
     ConfirmationListModalModule,
     MessageModalModule,
     MessageUiModule,
@@ -111,7 +112,8 @@ export const initializeApp = (appInitService: AppInit) => (): Promise<any> => ap
         RecordListModalModule,
         RecordModalComponent,
         ApolloModule,
-        SidebarComponent
+        SidebarComponent,
+        AdminToolsModule
     ],
     providers: [
         {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},

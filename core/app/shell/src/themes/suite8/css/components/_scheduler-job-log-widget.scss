@@ -1,0 +1,81 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// Job log of a scheduler (record view bottom widget scheduler-job-log).
+.scheduler-job-log {
+    padding: 12px 16px;
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    color: $median-grey;
+
+    .scheduler-job-log-head { margin: 0 0 10px; }
+    .scheduler-job-log-title { margin: 0; font-size: 15px; font-weight: 700; }
+    .scheduler-job-log-total { margin-left: 4px; color: $midnight-grey; font-weight: 400; }
+    .scheduler-job-log-muted { color: $midnight-grey; }
+
+    .scheduler-job-log-scroll { overflow-x: auto; }
+
+    .scheduler-job-log-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+
+        th, td {
+            padding: 6px 8px;
+            text-align: left;
+            vertical-align: top;
+            border-bottom: 1px solid $light-grey;
+        }
+
+        th { font-weight: 700; white-space: nowrap; }
+        .scheduler-job-log-date { white-space: nowrap; }
+        .scheduler-job-log-failed td { background: $bright-grey; }
+    }
+
+    .scheduler-job-log-sort {
+        padding: 0;
+        border: 0;
+        background: none;
+        color: inherit;
+        font-weight: 700;
+    }
+
+    .scheduler-job-log-message {
+        margin-top: 2px;
+        color: $coral-pink;
+        font-size: 12px;
+        white-space: pre-line;
+        overflow-wrap: anywhere;
+    }
+
+    .scheduler-job-log-pager {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+    }
+}

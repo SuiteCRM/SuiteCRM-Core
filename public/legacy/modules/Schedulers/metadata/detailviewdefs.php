@@ -54,9 +54,33 @@ $viewdefs['Schedulers']['DetailView'] = array(
                                          ),
                            ),
 
+    // The job log of the scheduler in the record view, instead of the Job Log subpanel.
+    'bottomWidgets' => array(
+        array(
+            'type' => 'scheduler-job-log',
+            'modes' => array('detail'),
+            'options' => array(),
+        ),
+    ),
+
+    // The fields of the legacy edit view. The custom code is the legacy detail view's (job and
+    // interval in words, Always, Never); the record view edits these fields
+    // (SchedulerViewDefinitionMapper).
     'panels' => array(
         'default' => array(
             array('name', 'status'),
+            array(
+                array(
+                    'name' => 'job_function',
+                    'label' => 'LBL_JOB',
+                    'customCode' => '{$fields.job.value}'),
+                'job_url'),
+            array(
+                array(
+                    'name' => 'job_interval',
+                    'label' => 'LBL_INTERVAL',
+                    'customCode' => '{$JOB_INTERVAL}'),
+                'catch_up'),
             array('date_time_start',
                 array(
                     'name' => 'time_from',
@@ -69,11 +93,7 @@ $viewdefs['Schedulers']['DetailView'] = array(
                 array(
                     'name' => 'last_run',
                     'customCode' => '{$fields.last_run.value|default:$MOD.LBL_NEVER}'),
-                array(
-                    'name' => 'job_interval',
-                    'customCode' => '{$JOB_INTERVAL}'),
-                ),
-            array('catch_up', 'job'),
+                ''),
             array(
                 array(
                     'name' => 'date_entered',

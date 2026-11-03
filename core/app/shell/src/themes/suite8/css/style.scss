@@ -126,6 +126,7 @@
 @import 'layout/admin';
 @import 'layout/scrollbar';
 @import 'layout/two-factor';
+@import 'components/scheduler-job-log-widget';
 
 @import 'fields/email';
 @import 'fields/composite-mobile';
@@ -139,4 +140,5 @@
 @import 'fields/multi-flex-relate';
 @import 'fields/parent-field';
 @import 'fields/file';
+@import 'fields/scheduler-interval';
 

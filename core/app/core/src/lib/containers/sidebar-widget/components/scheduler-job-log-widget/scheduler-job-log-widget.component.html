@@ -1,0 +1,81 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<section class="scheduler-job-log">
+    <header class="scheduler-job-log-head">
+        <h3 class="scheduler-job-log-title">
+            {{ label('LBL_JOBS_SUBPANEL_TITLE') }}
+            <span *ngIf="data" class="scheduler-job-log-total">{{ data.total }}</span>
+        </h3>
+    </header>
+
+    <p *ngIf="error" class="text-danger mb-0" role="alert">{{ label('LBL_ACTION_ERROR') }}</p>
+    <p *ngIf="!data && !error" class="scheduler-job-log-muted mb-0">…</p>
+
+    <ng-container *ngIf="data">
+        <div class="scheduler-job-log-scroll">
+            <table class="scheduler-job-log-table">
+                <thead>
+                <tr>
+                    <th *ngFor="let column of columns" scope="col">
+                        <button *ngIf="column.sortable; else plain" type="button" class="scheduler-job-log-sort" [disabled]="loading"
+                                [attr.aria-sort]="data.sort === column.key ? (data.direction === 'asc' ? 'ascending' : 'descending') : null"
+                                (click)="sortBy(column.key)">
+                            {{ label(column.label) }}
+                            <span *ngIf="data.sort === column.key" aria-hidden="true">{{ data.direction === 'asc' ? '▲' : '▼' }}</span>
+                        </button>
+                        <ng-template #plain>{{ label(column.label) }}</ng-template>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let row of data.rows; trackBy: trackRow" [class.scheduler-job-log-failed]="row.resolutionKey === 'failure' || row.resolutionKey === 'failed'">
+                    <td>
+                        {{ row.name }}
+                        <div *ngIf="row.message" class="scheduler-job-log-message">{{ row.message }}</div>
+                    </td>
+                    <td>{{ row.status }}</td>
+                    <td>{{ row.resolution }}</td>
+                    <td class="scheduler-job-log-date">{{ row.executeTime }}</td>
+                    <td class="scheduler-job-log-date">{{ row.dateModified }}</td>
+                </tr>
+                <tr *ngIf="!data.rows.length">
+                    <td colspan="5" class="scheduler-job-log-muted">{{ label('LBL_NO_DATA') }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div *ngIf="data.total > data.pageSize" class="scheduler-job-log-pager">
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading || !data.offset"
+                    [attr.aria-label]="label('LNK_LIST_PREVIOUS')" (click)="page(data.offset - data.pageSize)">«</button>
+            <span>{{ data.offset + 1 }}–{{ pageEnd }} {{ language.getAppString('LBL_LIST_OF') }} {{ data.total }}</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading || pageEnd >= data.total"
+                    [attr.aria-label]="label('LNK_LIST_NEXT')" (click)="page(data.offset + data.pageSize)">»</button>
+        </div>
+    </ng-container>
+</section>

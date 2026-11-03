@@ -231,7 +231,7 @@ parameters:
     schedulers:
       index: true
       list: true
-      record: false
+      record: true
     oauth-keys:
       index: false
       list: false

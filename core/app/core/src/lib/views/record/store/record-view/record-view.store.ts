@@ -387,7 +387,8 @@ export class RecordViewStore extends ViewStore implements StateStore, BaseRecord
     }
 
     public reloadSubpanels(): void {
-        const subpanels = this.getSubpanels()
+        // A record view without subpanels has none set up.
+        const subpanels = this.getSubpanels() ?? {};
         Object.keys(subpanels).forEach(key => {
             const sub = subpanels[key];
             sub?.loadAllStatistics(false).pipe(take(1)).subscribe();

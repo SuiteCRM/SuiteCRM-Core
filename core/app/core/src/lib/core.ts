@@ -929,3 +929,9 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './fields/field-logic/pdf-template-variables/pdf-template-variables.action';
+export * from './components/pdf-template-sample-modal/pdf-template-sample-modal.component';
+export * from './components/pdf-template-sample-modal/pdf-template-sample-modal.module';
+export * from './views/record/actions/pdf-template-sample/pdf-template-sample.action';
+export * from './views/pdf-settings/components/pdf-settings/pdf-settings.component';
+export * from './views/pdf-settings/components/pdf-settings/pdf-settings.module';

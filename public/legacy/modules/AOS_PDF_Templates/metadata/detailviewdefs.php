@@ -44,6 +44,22 @@ $viewdefs [$module_name] =
                     ),
                 ),
             ),
+            // "Load Sample" of the create and edit views of the record view (the sample field of the
+            // legacy editor).
+            'recordActions' =>
+                array(
+                    'actions' =>
+                        array(
+                            'pdf-load-sample' =>
+                                array(
+                                    'key' => 'pdf-load-sample',
+                                    'labelKey' => 'LBL_SAMPLE',
+                                    'priority' => 100,
+                                    'modes' => array('edit', 'create'),
+                                    'acl' => array('edit'),
+                                ),
+                        ),
+                ),
             'panels' =>
             array(
                 'default' =>

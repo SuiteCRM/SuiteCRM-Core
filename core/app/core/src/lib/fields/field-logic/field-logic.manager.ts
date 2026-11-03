@@ -44,6 +44,7 @@ import {DisplayTypeBackendAction} from './display-type-backend/display-type-back
 import {UpdateEmailSignatureAction} from "./update-email-signature/update-email-signature.action";
 import {UpdateTemplateVariablesAction} from "./update-template-variables/update-template-variables.action";
 import {SetEmptyAction} from "./set-empty/set-empty.action";
+import {PdfTemplateVariablesAction} from './pdf-template-variables/pdf-template-variables.action';
 
 @Injectable({
     providedIn: 'root'
@@ -72,7 +73,8 @@ export class FieldLogicManager extends BaseActionManager<FieldLogicActionData> {
         displayTypeBackend: DisplayTypeBackendAction,
         updateEmailSignature: UpdateEmailSignatureAction,
         updateTemplateVariables: UpdateTemplateVariablesAction,
-        setEmpty: SetEmptyAction
+        setEmpty: SetEmptyAction,
+        pdfTemplateVariables: PdfTemplateVariablesAction
     ) {
         super();
         displayType.modes.forEach(mode => this.actions[mode][displayType.key] = displayType);
@@ -88,6 +90,7 @@ export class FieldLogicManager extends BaseActionManager<FieldLogicActionData> {
         updateEmailSignature.modes.forEach(mode => this.actions[mode][updateEmailSignature.key] = updateEmailSignature);
         updateTemplateVariables.modes.forEach(mode => this.actions[mode][updateTemplateVariables.key] = updateTemplateVariables);
         setEmpty.modes.forEach(mode => this.actions[mode][setEmpty.key] = setEmpty);
+        pdfTemplateVariables.modes.forEach(mode => this.actions[mode][pdfTemplateVariables.key] = pdfTemplateVariables);
     }
 
     registerAction(handler: FieldLogicActionHandler): void {

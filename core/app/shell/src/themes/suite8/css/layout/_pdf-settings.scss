@@ -1,0 +1,89 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+.pdf-settings {
+  padding: 24px 24px 48px;
+  color: $median-grey;
+
+  .pdf-settings-title {
+    margin: 0 0 8px;
+    font-size: 22px;
+    font-weight: 400;
+  }
+
+  .pdf-settings-intro {
+    max-width: 960px;
+    margin: 0 0 12px;
+    color: $dusky-blue;
+  }
+
+  .pdf-settings-error {
+    color: $coral-pink;
+  }
+
+  .pdf-settings-muted {
+    color: $midnight-grey;
+  }
+
+  .pdf-settings-panel {
+    max-width: 960px;
+    margin: 0 0 12px;
+    padding: 12px 16px 16px;
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+
+    legend {
+      width: 100%;
+      margin: 0 0 12px;
+      color: $dusky-blue;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+  }
+
+  .pdf-settings-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 8px 24px;
+
+    label {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    @media (max-width: 576px) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .pdf-settings-buttons {
+    display: flex;
+    gap: 8px;
+  }
+}

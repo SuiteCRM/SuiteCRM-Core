@@ -26,7 +26,8 @@
 
 // Dropdown Editor view and list editor.
 .dropdown-editor {
-  padding: 24px 24px 48px;
+  // Below the fixed navbar, like the list view (padding-top: 3em).
+  padding: calc(3rem + 16px) 24px 48px;
   color: $median-grey;
 
   .dropdown-editor-title { margin: 0 0 12px; font-size: 22px; font-weight: 400; }

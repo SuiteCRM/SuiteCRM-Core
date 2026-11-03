@@ -25,7 +25,8 @@
  */
 
 .security-suite-settings {
-  padding: 24px 24px 48px;
+  // Below the fixed navbar, like the list view (padding-top: 3em).
+  padding: calc(3rem + 16px) 24px 48px;
   color: $median-grey;
 
   .security-suite-settings-title {

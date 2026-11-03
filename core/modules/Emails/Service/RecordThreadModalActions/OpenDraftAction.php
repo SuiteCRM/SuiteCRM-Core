@@ -33,6 +33,7 @@ use App\Authentication\LegacyHandler\UserHandler;
 use App\Data\Entity\Record;
 use App\Data\Service\RecordProviderInterface;
 use App\Languages\LegacyHandler\AppListStringsProviderInterface;
+use App\Module\Emails\LegacyHandler\EmailViewHandler;
 use App\Process\Entity\Process;
 use App\Process\Service\ProcessHandlerInterface;
 
@@ -45,6 +46,7 @@ class OpenDraftAction implements ProcessHandlerInterface
         protected RecordProviderInterface $recordProvider,
         protected AppListStringsProviderInterface $appListStringsProvider,
         protected UserHandler $userHandler,
+        protected EmailViewHandler $emailViewHandler,
     )
     {
     }
@@ -214,7 +216,7 @@ class OpenDraftAction implements ProcessHandlerInterface
      */
     protected function getMapFields(Record $record = null): array
     {
-        $attributes = $record?->getAttributes() ?? [];
+        $attributes = $this->getDraftAttributes($record);
         $name = $this->getName($attributes);
         $bodyHtml = $attributes['description_html'] ?? '';
         $outboundEmailId = $attributes['outbound_email_id'] ?? '';
@@ -248,6 +250,34 @@ class OpenDraftAction implements ProcessHandlerInterface
         }
 
         return $mapFields;
+    }
+
+    /**
+     * Attributes of the draft, with the recipients and sending account of a draft written in the
+     * legacy mail client: it keeps them in its email addresses and emails_text, where a draft
+     * written in SuiteCRM 8 has them in addrs_metadata and outbound_email_id.
+     */
+    protected function getDraftAttributes(?Record $record): array
+    {
+        $attributes = $record?->getAttributes() ?? [];
+        $id = $record?->getId() ?? '';
+        if ($id === '') {
+            return $attributes;
+        }
+
+        $draft = $this->emailViewHandler->getDraftValues($id);
+        foreach (['to_addrs_names', 'cc_addrs_names', 'bcc_addrs_names'] as $key) {
+            if (empty($attributes[$key])) {
+                $attributes[$key] = $draft[$key];
+            }
+        }
+
+        if (empty($attributes['outbound_email_id']) && $draft['outbound_email'] !== null) {
+            $attributes['outbound_email_id'] = $draft['outbound_email']['id'];
+            $attributes['outbound_email_name'] = $draft['outbound_email'];
+        }
+
+        return $attributes;
     }
 
     /**

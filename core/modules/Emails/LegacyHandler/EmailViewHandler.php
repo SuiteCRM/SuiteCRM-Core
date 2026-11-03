@@ -148,6 +148,48 @@ class EmailViewHandler extends LegacyHandler
         ];
     }
 
+    /**
+     * Recipients (to_addrs_names, cc_addrs_names, bcc_addrs_names, as compose modal recipients)
+     * and sending account (outbound_email: id and from_addr, or null) of a draft written in the
+     * legacy mail client. The account is the user's or the system one sending from the sender
+     * address of the draft.
+     */
+    public function getDraftValues(string $emailId): array
+    {
+        $this->init();
+        $this->startLegacyApp();
+
+        global $current_user;
+
+        $addresses = $this->getAddresses($emailId, $this->getText($emailId));
+        $values = [
+            'to_addrs_names' => array_map([$this, 'recipient'], $addresses['to']),
+            'cc_addrs_names' => array_map([$this, 'recipient'], $addresses['cc']),
+            'bcc_addrs_names' => array_map([$this, 'recipient'], $addresses['bcc']),
+            'outbound_email' => null,
+        ];
+
+        $from = $addresses['from'][0] ?? '';
+        if ($from !== '') {
+            $db = \DBManagerFactory::getInstance();
+            $account = $db->fetchOne(
+                'SELECT id, smtp_from_name, smtp_from_addr FROM outbound_email WHERE deleted = 0'
+                . ' AND smtp_from_addr = ' . $db->quoted($from)
+                . " AND (type = 'system' OR user_id = " . $db->quoted((string)$current_user->id) . ')'
+                . " ORDER BY CASE WHEN type = 'system' THEN 1 ELSE 0 END"
+            );
+            if (!empty($account['id'])) {
+                // As the default account of the compose modal (InitOutboundEmailDefault).
+                $fromAddr = html_entity_decode($account['smtp_from_name'] . ' ' . $account['smtp_from_addr'], ENT_QUOTES);
+                $values['outbound_email'] = ['id' => (string)$account['id'], 'from_addr' => trim($fromAddr)];
+            }
+        }
+
+        $this->close();
+
+        return $values;
+    }
+
     protected function getText(string $emailId): array
     {
         $db = \DBManagerFactory::getInstance();

@@ -6,3 +6,9 @@ parameters:
       - Leads
       - Prospects
       - Users
+    # The modules of the variables of the legacy template editor: Contact also stands for Lead and
+    # Target, the templates use the contact variables for the three.
+    EmailTemplates:
+      - Accounts
+      - Contacts
+      - Users

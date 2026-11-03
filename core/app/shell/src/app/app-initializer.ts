@@ -24,8 +24,8 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Injectable, Injector} from '@angular/core';
-import {Route, Router} from '@angular/router';
+import {inject, Injectable, Injector} from '@angular/core';
+import {CanMatchFn, Route, Router} from '@angular/router';
 import {
     AppStateStore,
     AuthGuard,
@@ -49,9 +49,18 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    ModuleLoaderComponent
 } from 'core';
 import {take} from 'rxjs/operators';
+
+/**
+ * The Module Loader route of the admin panel (administration/UpgradeWizard?view=module) only: the
+ * other views of the legacy Upgrade Wizard keep their route.
+ */
+const moduleLoaderMatch: CanMatchFn = () => {
+    return inject(Router).getCurrentNavigation()?.extractedUrl?.queryParamMap?.get('view') === 'module';
+};
 
 @Injectable()
 export class AppInit {
@@ -182,6 +191,23 @@ export class AppInit {
                                 preferences: false,
                                 languageStrings: ['appStrings']
                             }
+                        }
+                    });
+
+                    // Module Loader view (admin panel link), before the generic classic view routes.
+                    routes.push({
+                        path: 'administration/UpgradeWizard',
+                        component: ModuleLoaderComponent,
+                        canMatch: [moduleLoaderMatch],
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration'
                         }
                     });
                     routes.push(loggedOutConfig);

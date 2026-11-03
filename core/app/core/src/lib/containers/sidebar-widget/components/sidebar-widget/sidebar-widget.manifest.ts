@@ -37,13 +37,16 @@ import {RecordTableWidgetComponent} from "../record-table-widget/record-table-wi
 import {RecordTableWidgetModule} from "../record-table-widget/record-table-widget.module";
 import {BannerGridSidebarWidgetModule} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.module";
 import {BannerGridSidebarWidgetComponent} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.component";
+import {EventDelegatesWidgetModule} from '../event-delegates-widget/event-delegates-widget.module';
+import {EventDelegatesWidgetComponent} from '../event-delegates-widget/event-delegates-widget.component';
 
 export const sidebarWidgetModules = [
     HistorySidebarWidgetModule,
     ChartSidebarWidgetModule,
     StatisticsSidebarWidgetModule,
     RecordTableWidgetModule,
-    BannerGridSidebarWidgetModule
+    BannerGridSidebarWidgetModule,
+    EventDelegatesWidgetModule
 ];
 
 export const componentTypeMap = {
@@ -52,5 +55,6 @@ export const componentTypeMap = {
     statistics: StatisticsSidebarWidgetComponent,
     'record-thread': RecordThreadSidebarWidgetComponent,
     'record-table': RecordTableWidgetComponent,
-    'banner-grid': BannerGridSidebarWidgetComponent
+    'banner-grid': BannerGridSidebarWidgetComponent,
+    'event-delegates': EventDelegatesWidgetComponent
 };

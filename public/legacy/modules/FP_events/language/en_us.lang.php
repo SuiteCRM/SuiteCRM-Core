@@ -129,5 +129,23 @@ $mod_strings = array(
     // Email links
     'LBL_ACCEPT_LINK' => 'Accept',
     'LBL_DECLINE_LINK' => 'Decline',
-    
+
+    // Delegates widget of the record view
+    'LBL_DELEGATES_SEARCH' => 'Name, account or email',
+    'LBL_DELEGATES_ALL' => 'All',
+    'LBL_DELEGATES_ACCOUNT' => 'Account',
+    'LBL_DELEGATES_EMAIL' => 'Email',
+    'LBL_DELEGATES_EMPTY' => 'No delegates yet.',
+    'LBL_DELEGATES_NO_MATCH' => 'No delegate matches the filters.',
+    'LBL_DELEGATES_SELECTED' => 'selected',
+    'LBL_DELEGATES_SELECT_PAGE' => 'Select the delegates of the page',
+    'LBL_DELEGATES_SELECT_MATCHING' => 'Select all the matching delegates',
+    'LBL_DELEGATES_MARK_AS' => 'Mark as',
+    'LBL_DELEGATES_REMOVE' => 'Remove from the event',
+    'LBL_DELEGATES_REMOVE_CONFIRM' => 'Remove this delegate from the event? The record itself is not deleted.',
+    'LBL_DELEGATES_INVITE_CONFIRM' => 'Send the invitation of the event to the delegates not invited yet?',
+    'LBL_DELEGATES_SENT' => 'invitations sent.',
+    'LBL_DELEGATES_PREVIOUS' => 'Previous',
+    'LBL_DELEGATES_NEXT' => 'Next',
+    'LBL_DELEGATES_ERROR' => 'The delegates could not be loaded or changed. Please try again.',
 );

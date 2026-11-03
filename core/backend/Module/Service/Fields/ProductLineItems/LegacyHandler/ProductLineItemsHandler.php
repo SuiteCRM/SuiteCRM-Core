@@ -60,7 +60,12 @@ class ProductLineItemsHandler extends LegacyHandler
         'product_total_price',
     ];
 
-    public const PRODUCT_SEARCH_LIMIT = 15;
+    public const PRODUCT_SEARCH_LIMIT = 50;
+
+    /**
+     * The products listed in the empty product field (all of them in practice).
+     */
+    public const PRODUCT_LIST_LIMIT = 500;
 
     public function getHandlerKey(): string
     {
@@ -126,21 +131,20 @@ class ProductLineItemsHandler extends LegacyHandler
 
     /**
      * Products whose name or part number contains $query, with their prices in
-     * their own currency (the field converts them to the record currency).
+     * their own currency (the field converts them to the record currency); all the
+     * products for an empty query, as the legacy product field lists them before
+     * anything is typed.
      */
-    public function searchProducts(string $query, int $limit = self::PRODUCT_SEARCH_LIMIT): array
+    public function searchProducts(string $query): array
     {
         $query = trim($query);
-        if ($query === '') {
-            return [];
-        }
 
         $this->init();
         $this->startLegacyApp();
 
         $products = [];
         if (\ACLController::checkAccess('AOS_Products', 'list', true)) {
-            $products = $this->readProducts($query, $limit);
+            $products = $this->readProducts($query, $query === '' ? self::PRODUCT_LIST_LIMIT : self::PRODUCT_SEARCH_LIMIT);
         }
 
         $this->close();
@@ -278,10 +282,13 @@ class ProductLineItemsHandler extends LegacyHandler
     protected function readProducts(string $query, int $limit): array
     {
         $db = \DBManagerFactory::getInstance();
-        $like = $db->quoted('%' . addcslashes($query, '%_\\') . '%');
+        $where = 'deleted = 0';
+        if ($query !== '') {
+            $like = $db->quoted('%' . addcslashes($query, '%_\\') . '%');
+            $where .= ' AND (name LIKE ' . $like . ' OR part_number LIKE ' . $like . ')';
+        }
         $sql = 'SELECT id, name, part_number, price, cost, currency_id, description FROM aos_products '
-            . 'WHERE deleted = 0 AND (name LIKE ' . $like . ' OR part_number LIKE ' . $like . ') '
-            . 'ORDER BY name';
+            . 'WHERE ' . $where . ' ORDER BY name';
 
         $result = $db->limitQuery($sql, 0, $limit);
         $products = [];

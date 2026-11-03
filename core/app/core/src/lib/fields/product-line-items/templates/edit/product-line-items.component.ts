@@ -52,7 +52,8 @@ interface ProductSearch {
 
 /**
  * Line items edited as in the legacy edit view (modules/AOS_Products_Quotes/line_items.js):
- * groups, product lines (the product searched by name or part number, its price
+ * groups, product lines (the product chosen in the list of the products shown in
+ * the empty field and narrowed by name or part number as it is typed, its price
  * converted to the record currency) and service lines added and removed;
  * quantity, list price, discount (percentage or amount) and tax edited; line,
  * group and record totals (the total, discount, subtotal, tax and grand total
@@ -70,6 +71,10 @@ export class ProductLineItemsEditFieldComponent extends BaseProductLineItemsComp
     search: ProductSearch = null;
     foundProducts: ProductLineItemProduct[] = [];
     searching = false;
+    /**
+     * The last product search failed (an error, not "no product").
+     */
+    searchFailed = false;
     vatOptions: { value: string; label: string }[] = [];
     discountOptions: { value: string; label: string }[] = [];
 
@@ -78,6 +83,10 @@ export class ProductLineItemsEditFieldComponent extends BaseProductLineItemsComp
     protected currencyId = '-99';
     protected shipping = '';
     protected searchQuery = new Subject<ProductSearch>();
+    /**
+     * All the products (the list of the empty field), read once.
+     */
+    protected productList: ProductLineItemProduct[] = null;
     protected subscriptions: Subscription[] = [];
 
     protected processService = inject(ProcessService);
@@ -109,7 +118,7 @@ export class ProductLineItemsEditFieldComponent extends BaseProductLineItemsComp
 
         // Every search is sent, even the same text again: the list is emptied when it closes, so
         // a search left out (field focused again) would wait for results forever. A failed search
-        // shows no product and leaves the next ones running.
+        // shows an error and leaves the next ones running.
         this.subscriptions.push(this.searchQuery.pipe(
             debounceTime(300),
             switchMap(search => this.processService.submit(
@@ -121,7 +130,11 @@ export class ProductLineItemsEditFieldComponent extends BaseProductLineItemsComp
             ))
         ).subscribe((process: Process) => {
             this.searching = false;
+            this.searchFailed = process?.status !== 'success';
             this.foundProducts = (process?.data as any)?.products ?? [];
+            if (!this.searchFailed && this.search && this.search.query === '') {
+                this.productList = this.foundProducts;
+            }
             this.changeDetector.markForCheck();
         }));
 
@@ -201,21 +214,30 @@ export class ProductLineItemsEditFieldComponent extends BaseProductLineItemsComp
     }
 
     /**
-     * Typing in the product name: the product is dropped until one is picked in the list.
+     * The products of the line, as the legacy product field: all of them in the empty field,
+     * those whose name or part number contains the text typed (the product is dropped until
+     * one is picked in the list).
      */
     searchProducts(line: ProductLineItem, query: string): void {
-        line.name = query;
-        if (line.product_id) {
-            line.product_id = '';
-            this.update();
+        if (line.name !== query) {
+            line.name = query;
+            if (line.product_id) {
+                line.product_id = '';
+                this.update();
+            }
+        }
+
+        this.search = {line, query: query.trim()};
+        this.searchFailed = false;
+        if (this.search.query === '' && this.productList) {
+            this.foundProducts = this.productList;
+            this.searching = false;
+            return;
         }
 
         this.foundProducts = [];
-        this.search = {line, query: query.trim()};
-        this.searching = this.search.query.length > 0;
-        if (this.searching) {
-            this.searchQuery.next(this.search);
-        }
+        this.searching = true;
+        this.searchQuery.next(this.search);
     }
 
     /**

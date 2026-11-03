@@ -67,9 +67,10 @@
                                    (focus)="line.product_id ? null : searchProducts(line, $any($event.target).value)"
                                    (blur)="closeSearch(line)"
                                    (keydown.escape)="closeSearch(line)">
-                            <ul *ngIf="search?.line === line && search.query" class="product-results" role="listbox">
+                            <ul *ngIf="search?.line === line" class="product-results" role="listbox">
                                 <li *ngIf="searching && !foundProducts.length" class="muted">…</li>
-                                <li *ngIf="!searching && !foundProducts.length" class="muted">
+                                <li *ngIf="!searching && searchFailed" class="hint">{{ label('LBL_ACTION_ERROR') }}</li>
+                                <li *ngIf="!searching && !searchFailed && !foundProducts.length" class="muted">
                                     {{ label('LBL_PRODUCT_LINE_ITEMS_NO_PRODUCT') }}
                                 </li>
                                 <li *ngFor="let product of foundProducts" role="option" class="product-result"

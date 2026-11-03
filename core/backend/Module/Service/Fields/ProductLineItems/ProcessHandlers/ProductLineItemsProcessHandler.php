@@ -34,7 +34,8 @@ use App\Process\Service\ProcessHandlerInterface;
 
 /**
  * Process of the product-line-items field:
- *  - action `products` (query): the products to add, by name or part number;
+ *  - action `products` (query): the products to add, by name or part number (all of them
+ *    for an empty query, as the legacy product field lists them);
  *  - action `settings`: the line item settings, for a record being created.
  */
 class ProductLineItemsProcessHandler implements ProcessHandlerInterface

@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    SavedSearchComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -182,6 +183,21 @@ export class AppInit {
                                 preferences: false,
                                 languageStrings: ['appStrings']
                             }
+                        }
+                    });
+                    // A saved filter (name link of the saved filters list), before the generic classic
+                    // view routes: the saved-search record layout is the Save form of the filter panel.
+                    routes.push({
+                        path: 'saved-search/record/:record',
+                        component: SavedSearchComponent,
+                        canActivate: [AuthGuard],
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'saved-search'
                         }
                     });
                     routes.push(loggedOutConfig);

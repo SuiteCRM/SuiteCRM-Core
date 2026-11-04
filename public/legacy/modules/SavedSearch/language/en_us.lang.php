@@ -60,6 +60,15 @@ $mod_strings = array(
 
     'LBL_CREATED_BY' => 'Created By',
     'LBL_QUICK_FILTER' => 'Quick Filter',
+    'LBL_SAVED_FILTER' => 'Saved Filter',
+    'LBL_CRITERIA' => 'Criteria',
+    'LBL_NO_CRITERIA' => 'No criteria',
+    'LBL_CRITERIA_HELP' => 'The criteria, the order and the module are changed in the Filter of the list of the module.',
+    'LBL_ORDER' => 'Order',
+    'LBL_OPERATOR_NOT_EQUAL' => 'not',
+    'LBL_OPERATOR_AFTER' => 'after',
+    'LBL_OPERATOR_BEFORE' => 'before',
+    'LBL_OPERATOR_BETWEEN' => 'between',
 
 
 );

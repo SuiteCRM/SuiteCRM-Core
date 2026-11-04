@@ -33,7 +33,7 @@ use App\Process\Service\ProcessHandlerInterface;
 use InvalidArgumentException;
 
 /**
- * `Calendar-account-editor` process of the calendar account editor and of Sync Now
+ * Process `calendar-account-editor` of the calendar account editor and of Sync Now
  * (CalendarAccountEditor); the access to an account is the one of the legacy pages
  * (CalendarAccount::ACLAccess()).
  *

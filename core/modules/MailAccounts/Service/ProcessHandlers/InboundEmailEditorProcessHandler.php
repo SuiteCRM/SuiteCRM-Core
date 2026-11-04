@@ -33,7 +33,7 @@ use App\Process\Service\ProcessHandlerInterface;
 use InvalidArgumentException;
 
 /**
- * `Inbound-email-editor` process of the inbound email account editor (InboundEmailEditor);
+ * Process `inbound-email-editor` of the inbound email account editor (InboundEmailEditor);
  * the access to an account is the one of the legacy pages (InboundEmail::ACLAccess(): a personal
  * account by its owner or an admin, a group or bounce account by an admin).
  *

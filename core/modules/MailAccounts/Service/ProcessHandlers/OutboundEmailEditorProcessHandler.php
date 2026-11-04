@@ -33,7 +33,7 @@ use App\Process\Service\ProcessHandlerInterface;
 use InvalidArgumentException;
 
 /**
- * `Outbound-email-editor` process of the outbound email account editor
+ * Process `outbound-email-editor` of the outbound email account editor
  * (OutboundEmailEditor); the access to an account is the one of the legacy pages
  * (OutboundEmailAccounts::ACLAccess(): a personal account by its owner or an admin, the other
  * accounts by an admin).

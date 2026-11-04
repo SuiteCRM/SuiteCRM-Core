@@ -29,7 +29,7 @@ namespace App\Module\MailAccounts\Service\ProcessHandlers;
 
 use App\Module\MailAccounts\LegacyHandler\ExternalOAuthConnectionEditor;
 /**
- * `Oauth-connection-editor` process of the external OAuth connection editor.
+ * Process `oauth-connection-editor` of the external OAuth connection editor.
  */
 class ExternalOAuthConnectionEditorProcessHandler extends ExternalOAuthEditorProcessHandler
 {

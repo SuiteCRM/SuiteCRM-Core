@@ -102,3 +102,35 @@ $viewdefs ['OutboundEmailAccounts'] = [
         ],
     ],
 ];
+
+$viewdefs['OutboundEmailAccounts']['DetailView']['templateMeta']['tabDefs']['LBL_CONNECTION_CONFIGURATION']['displayLogic'] = [
+    'hide-by-type' => [
+        'key' => 'displayType',
+        'modes' => ['detail'],
+        'params' => [
+            'fieldDependencies' => ['type'],
+            'activeOnFields' => ['type' => ['system-override']],
+        ],
+    ],
+];
+
+$viewdefs['OutboundEmailAccounts']['DetailView']['recordActions'] = [
+    'actions' => [
+        'outbound-email-edit' => [
+            'key' => 'outbound-email-edit',
+            'labelKey' => 'LBL_EDIT_BUTTON',
+            'priority' => 100,
+            'modes' => ['detail'],
+            'acl' => ['edit'],
+        ],
+        'outbound-email-set-default' => [
+            'key' => 'outbound-email-set-default',
+            'labelKey' => 'LBL_SET_AS_DEFAULT_BUTTON',
+            'priority' => 110,
+            'modes' => ['detail'],
+            'acl' => ['view'],
+        ],
+    ],
+    // SuiteCRM 8 record view: edited in the account editor; no Duplicate in the legacy detail view.
+    'exclude' => ['edit', 'duplicate'],
+];

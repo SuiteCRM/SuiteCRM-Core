@@ -106,3 +106,27 @@ $viewdefs[$module_name]['DetailView'] = [
         ],
     ]
 ];
+
+// Panels, as the legacy detail view (no tabs set in the module layout).
+$viewdefs['CalendarAccount']['DetailView']['templateMeta']['useTabs'] = false;
+
+$viewdefs['CalendarAccount']['DetailView']['recordActions'] = [
+    'actions' => [
+        'calendar-account-edit' => [
+            'key' => 'calendar-account-edit',
+            'labelKey' => 'LBL_EDIT_BUTTON',
+            'priority' => 100,
+            'modes' => ['detail'],
+            'acl' => ['edit'],
+        ],
+        'calendar-account-sync' => [
+            'key' => 'calendar-account-sync',
+            'labelKey' => 'LBL_SYNC_NOW',
+            'priority' => 110,
+            'modes' => ['detail'],
+            'acl' => ['view'],
+        ],
+    ],
+    // SuiteCRM 8 record view: edited in the account editor; no Duplicate in the legacy detail view.
+    'exclude' => ['edit', 'duplicate'],
+];

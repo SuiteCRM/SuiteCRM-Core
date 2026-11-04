@@ -4511,3 +4511,13 @@ $app_strings['LBL_NOT_AUTHORIZED'] = 'Not authorized';
 $app_strings['LBL_AUTOFILL_MISSING_RELATE_MODULE'] = 'Autofill failed: related module is not configured.';
 $app_strings['LBL_AUTOFILL_MISSING_RELATE_ID'] = 'Autofill failed: no related record selected.';
 $app_strings['LBL_AUTOFILL_MISSING_UPDATE_FIELDS'] = 'Autofill failed: no fields configured for update.';
+
+// Account editors of SuiteCRM 8 (inbound, outbound, external OAuth and calendar accounts).
+$app_strings['LBL_ACCOUNT_EDITOR_ERROR'] = 'This record cannot be edited.';
+$app_strings['LBL_ACCOUNT_EDITOR_REQUIRED'] = 'Fill in the required fields.';
+$app_strings['LBL_ACCOUNT_EDITOR_SAVE_ERROR'] = 'The record was not saved.';
+$app_strings['LBL_ACCOUNT_EDITOR_SELECT_PROVIDER'] = 'Select the provider first.';
+$app_strings['LBL_ACCOUNT_EDITOR_ADD'] = 'Add';
+$app_strings['LBL_ACCOUNT_EDITOR_NO_FOLDER'] = 'No folder found.';
+$app_strings['LBL_ACCOUNT_EDITOR_NEW_SYSTEM'] = 'New System Account';
+$app_strings['LBL_ACCOUNT_EDITOR_TESTING'] = 'Testing the connection...';

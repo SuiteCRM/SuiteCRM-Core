@@ -1,0 +1,209 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// The account editor (inbound and outbound email accounts, external OAuth providers and
+// connections, calendar accounts).
+.mail-account-editor {
+    // Below the fixed navbar, like the list views.
+    padding: calc(3rem + 16px) 24px 48px;
+}
+
+.mail-account-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.mail-account-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 400;
+}
+
+.mail-account-module {
+    margin-left: 8px;
+    color: #6a6676;
+    font-size: 16px;
+}
+
+.mail-account-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.mail-account-message {
+    margin: 4px 0;
+    color: #6a6676;
+}
+
+.mail-account-error {
+    color: #b42318;
+}
+
+.mail-account-success {
+    color: #067647;
+}
+
+.mail-account-panel {
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #e3e0e8;
+    border-radius: 4px;
+}
+
+.mail-account-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    h3 {
+        margin: 4px 0;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+}
+
+.mail-account-test {
+    margin: 0 0 12px;
+    white-space: pre-line;
+
+    pre {
+        max-height: 300px;
+        margin: 6px 0 0;
+        padding: 8px;
+        overflow: auto;
+        color: #1d1b20;
+        background: #faf9fb;
+        border: 1px solid #e3e0e8;
+        white-space: pre-wrap;
+    }
+}
+
+.mail-account-test-address {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 50%;
+    margin-bottom: 12px;
+}
+
+.mail-account-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 24px;
+    align-items: start;
+}
+
+.mail-account-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.mail-account-wide {
+    grid-column: 1 / -1;
+}
+
+.mail-account-label {
+    color: #6a6676;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.mail-account-required {
+    color: #b42318;
+}
+
+.mail-account-readonly {
+    min-height: 31px;
+    padding: 4px 0;
+}
+
+.mail-account-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 13px;
+}
+
+.mail-account-picker,
+.mail-account-assign {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+
+    .form-control {
+        min-width: 0;
+    }
+
+    .btn {
+        white-space: nowrap;
+    }
+}
+
+.mail-account-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+
+    .mail-account-picker {
+        width: 100%;
+    }
+}
+
+.mail-account-folders {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 6px;
+    padding: 8px 12px;
+    background: #faf9fb;
+    border: 1px solid #e3e0e8;
+    border-radius: 4px;
+
+    .mail-account-buttons {
+        margin-top: 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    .mail-account-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .mail-account-test-address {
+        max-width: none;
+    }
+}

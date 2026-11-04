@@ -146,3 +146,20 @@ $viewdefs[$module_name]['DetailView'] = [
         ],
     ],
 ];
+
+// Panels, as the legacy detail view (no tabs set in the module layout).
+$viewdefs['ExternalOAuthProvider']['DetailView']['templateMeta']['useTabs'] = false;
+
+$viewdefs['ExternalOAuthProvider']['DetailView']['recordActions'] = [
+    'actions' => [
+        'oauth-provider-edit' => [
+            'key' => 'oauth-provider-edit',
+            'labelKey' => 'LBL_EDIT_BUTTON',
+            'priority' => 100,
+            'modes' => ['detail'],
+            'acl' => ['edit'],
+        ],
+    ],
+    // SuiteCRM 8 record view: edited in the account editor; no Duplicate in the legacy detail view.
+    'exclude' => ['edit', 'duplicate'],
+];

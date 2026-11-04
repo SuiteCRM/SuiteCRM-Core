@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    MailAccountEditorComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -183,6 +184,33 @@ export class AppInit {
                                 languageStrings: ['appStrings']
                             }
                         }
+                    });
+                    // The account editor (process of the module): a new account (<module>/edit, with
+                    // ?type=... as the legacy menu) and an account (<module>/edit/<id>), before the
+                    // generic routes.
+                    const accountEditors: { [module: string]: string } = {
+                        'inbound-email': 'inbound-email-editor',
+                        'outbound-email-accounts': 'outbound-email-editor',
+                        'external-oauth-provider': 'oauth-provider-editor',
+                        'external-oauth-connection': 'oauth-connection-editor',
+                        'calendar-account': 'calendar-account-editor'
+                    };
+                    Object.entries(accountEditors).forEach(([module, process]) => {
+                        [`${module}/edit`, `${module}/edit/:record`].forEach(path => routes.push({
+                            path,
+                            component: MailAccountEditorComponent,
+                            canActivate: [AuthGuard],
+                            runGuardsAndResolvers: 'always',
+                            resolve: {
+                                metadata: BaseModuleResolver
+                            },
+                            data: {
+                                reuseRoute: false,
+                                checkSession: true,
+                                module,
+                                process
+                            }
+                        }));
                     });
                     routes.push(loggedOutConfig);
 

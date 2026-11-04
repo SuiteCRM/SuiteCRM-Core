@@ -131,6 +131,7 @@ $dictionary['CampaignLog'] = array('audited'=>false,
         ),
         'recipient_name' => array(
             'name' => 'recipient_name',
+            'vname' => 'LBL_LIST_RECIPIENT_NAME',
             'type' => 'varchar',
             'len' => '255',
             'source'=>'non-db',
@@ -143,12 +144,14 @@ $dictionary['CampaignLog'] = array('audited'=>false,
         ),
         'recipient_email' => array(
             'name' => 'recipient_email',
+            'vname' => 'LBL_LIST_RECIPIENT_EMAIL',
             'type' => 'varchar',
             'len' => '255',
             'source'=>'non-db',
         ),
         'is_test_entry' => [
             'name' => 'is_test_entry',
+            'vname' => 'LBL_TEST_ENTRY',
             'type' => 'bool',
             'reportable'=>false,
             'massupdate' => false,
@@ -237,6 +240,19 @@ $dictionary['CampaignLog'] = array('audited'=>false,
                 'group' => 'parent_name',
                 'source' => 'non-db',
                 'options' => 'parent_type_display',
+            ),
+
+        'related_record_name' =>
+            array(
+                'name' => 'related_record_name',
+                'vname' => 'LBL_RELATED_RECORD',
+                'type' => 'varchar',
+                'source' => 'non-db',
+                'inline_edit' => false,
+                'massupdate' => false,
+                'importable' => false,
+                'reportable' => false,
+                'comment' => 'Name of the related record (CampaignLog::get_related_name), for the SuiteCRM 8 views',
             ),
 
         'related_id' =>

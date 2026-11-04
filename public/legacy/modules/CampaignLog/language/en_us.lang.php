@@ -99,4 +99,6 @@ $mod_strings = array(
 
     'LBL_MARKETING_ID' => 'Marketing Id',
     'LBL_RELATED_NAME' => 'Related Name',
+    'LBL_RELATED_RECORD' => 'Related Record',
+    'LBL_TEST_ENTRY' => 'Test Entry',
 );

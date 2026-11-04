@@ -56,6 +56,10 @@ parameters:
       index: true
       list: true
       record: true
+    campaign-log:
+      index: true
+      list: true
+      record: true
     prospects:
       index: true
       list: true

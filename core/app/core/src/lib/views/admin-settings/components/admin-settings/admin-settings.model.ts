@@ -85,6 +85,8 @@ export interface AdminSettingField {
 export interface AdminSettingAction {
     name: string;
     label: string;
+    // Asked before running the action, as the legacy page.
+    confirm?: string;
 }
 
 export interface AdminSettingSection {
@@ -98,6 +100,10 @@ export interface AdminSettingSection {
 export interface AdminSettingsPageData {
     title: string;
     leave: boolean;
+    // The page Cancel and the save go back to (the administration by default).
+    back?: string;
+    // A page to read only: no save.
+    readonly?: boolean;
     sections: AdminSettingSection[];
     values: { [name: string]: AdminSettingValue };
 }
@@ -106,4 +112,8 @@ export interface AdminSettingActionResult {
     status: string;
     message?: string;
     html?: string;
+    // The page is loaded again (the action changed what it shows).
+    reload?: boolean;
+    // Values of the page set by the action (not saved yet).
+    values?: { [name: string]: AdminSettingValue };
 }

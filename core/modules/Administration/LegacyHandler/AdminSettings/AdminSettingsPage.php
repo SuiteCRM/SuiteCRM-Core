@@ -108,10 +108,10 @@ abstract class AdminSettingsPage extends LegacyHandler
 
     /**
      * A section of the page: title (label key), fields, and optionally intro (label key) and
-     * actions (name => label key).
+     * actions (name => label key, or [label key, confirmation label key]).
      *
      * @param array<int, array> $fields
-     * @param array<string, string> $actions
+     * @param array<string, string|array{0: string, 1: string}> $actions
      */
     protected function section(string $title, array $fields, string $module = 'Administration', ?string $intro = null, array $actions = []): array
     {
@@ -120,7 +120,11 @@ abstract class AdminSettingsPage extends LegacyHandler
             $section['intro'] = $this->text($intro, $module, false);
         }
         foreach ($actions as $name => $label) {
-            $section['actions'][] = ['name' => $name, 'label' => $this->text($label, $module)];
+            $action = ['name' => $name, 'label' => $this->text(is_array($label) ? $label[0] : $label, $module)];
+            if (is_array($label)) {
+                $action['confirm'] = $this->text($label[1], $module, false);
+            }
+            $section['actions'][] = $action;
         }
 
         return $section;

@@ -59,8 +59,8 @@
 
     <ng-template #buttons>
         <div class="admin-settings-buttons admin-settings-toolbar">
-            <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="save()">{{ appLabel('LBL_SAVE_BUTTON_LABEL') }}</button>
-            <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/administration']">{{ appLabel('LBL_CANCEL_BUTTON_LABEL') }}</a>
+            <button *ngIf="!data?.readonly" type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="save()">{{ appLabel('LBL_SAVE_BUTTON_LABEL') }}</button>
+            <a class="btn btn-sm btn-outline-secondary" [routerLink]="[back()]">{{ appLabel('LBL_CANCEL_BUTTON_LABEL') }}</a>
         </div>
     </ng-template>
 

@@ -96,6 +96,11 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
         this.sub?.unsubscribe();
     }
 
+    /** The page Cancel and the save go back to. */
+    back(): string {
+        return '/' + (this.data?.back || 'administration');
+    }
+
     appLabel(key: string): string {
         return this.language.getAppString(key) || key;
     }
@@ -259,6 +264,10 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
      * Runs the action of a button of a section, with the values of the page, and shows its result.
      */
     runAction(index: number, name: string): void {
+        const action = this.data?.sections[index]?.actions?.find(item => item.name === name);
+        if (action?.confirm && !window.confirm(action.confirm)) {
+            return;
+        }
         this.loading = true;
         delete this.results[index];
         this.cdr.detectChanges();
@@ -274,6 +283,10 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
                         this.results[index] = result;
                         if (result.message) {
                             result.status === 'success' ? this.message.addSuccessMessage(result.message) : this.message.addDangerMessage(result.message);
+                        }
+                        Object.assign(this.values, result.values ?? {});
+                        if (result.reload) {
+                            this.submit({action: 'load'});
                         }
                     }
                     this.cdr.detectChanges();
@@ -322,7 +335,7 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
                 if (process?.status !== 'success') {
                     this.message.addDangerMessage(process?.messages?.[0] || this.appLabel('LBL_ACTION_ERROR'));
                 } else if (options.action === 'save' && data?.leave) {
-                    this.router.navigate(['/administration']);
+                    this.router.navigate([this.back()]);
                     return;
                 } else if (options.action === 'save') {
                     this.message.addSuccessMessage(this.appLabel('LBL_SAVED'));

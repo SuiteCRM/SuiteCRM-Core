@@ -198,6 +198,18 @@ export class AppInit {
                         'administration/ElasticSearchSettings': 'elasticsearch',
                         'administration/PasswordManager': 'password',
                         'administration/ConfigureTabs': 'tabs',
+                        'administration/BusinessHours': 'business-hours',
+                        'administration/CalendarSyncSettings': 'calendar-sync',
+                        // Google Maps Settings (jjwg_Maps config page).
+                        'maps/config': 'maps',
+                        'emailman/config': 'email-settings',
+                        'emailman/campaignconfig': 'campaign-email-settings',
+                        // Connector Settings and its pages.
+                        'connectors/ConnectorSettings': 'connectors',
+                        'connectors/ModifyProperties': 'connector-properties',
+                        'connectors/ModifyDisplay': 'connector-display',
+                        'connectors/ModifyMapping': 'connector-mapping',
+                        'connectors/ModifySearch': 'connector-search',
                     };
                     Object.entries(adminSettingsPages).forEach(([path, page]) => routes.push({
                         path,

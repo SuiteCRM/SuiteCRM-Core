@@ -114,6 +114,7 @@ $dictionary['Release'] = array('table' => 'releases'
     'vname' => 'LBL_LIST_ORDER',
     'type' => 'int',
     'len' => '4',
+    'required' => true,
     'importable' => 'required',
   ),
   'status' =>
@@ -123,6 +124,8 @@ $dictionary['Release'] = array('table' => 'releases'
     'type' => 'enum',
     'options' => 'release_status_dom',
     'len' => 100,
+    'required' => true,
+    'default' => 'Active',
     'importable' => 'required',
   ),
   'bugs_found_in_release_link' => array(

@@ -57,5 +57,14 @@ $viewdefs [$module_name] = array(
                 ),
             ),
         ),
+        // SuiteCRM 8 record view: the answers by question under the details (the record view drops
+        // the HTML field of the legacy page: SurveyResponseViewDefinitionMapper).
+        'bottomWidgets' => array(
+            0 => array(
+                'type'    => 'survey-response-answers',
+                'modes'   => array('detail'),
+                'options' => array(),
+            ),
+        ),
     ),
 );

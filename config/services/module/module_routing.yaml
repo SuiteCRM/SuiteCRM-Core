@@ -111,23 +111,23 @@ parameters:
     surveys:
       index: true
       list: true
-      record: false
+      record: true
     survey-responses:
       index: true
       list: true
-      record: false
+      record: true
     survey-question-responses:
       index: true
       list: true
-      record: false
+      record: true
     survey-questions:
       index: true
       list: true
-      record: false
+      record: true
     survey-question-options:
       index: true
       list: true
-      record: false
+      record: true
     project-templates:
       index: true
       list: true

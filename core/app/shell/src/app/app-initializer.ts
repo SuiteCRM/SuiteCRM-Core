@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    SurveyReportComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -184,6 +185,21 @@ export class AppInit {
                             }
                         }
                     });
+                    // The report of a survey (View Survey Reports of its record view, and the legacy
+                    // reports action), before the generic classic view routes.
+                    ['surveys/reports', 'surveys/reports/:record'].forEach(path => routes.push({
+                        path,
+                        component: SurveyReportComponent,
+                        canActivate: [AuthGuard],
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'surveys'
+                        }
+                    }));
                     routes.push(loggedOutConfig);
 
                     Object.keys(configRoutes).forEach(routeName => {

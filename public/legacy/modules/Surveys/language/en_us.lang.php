@@ -107,4 +107,15 @@ $mod_strings = array(
     'LBL_STARS' => 'Stars',
     'LBL_SURVEY_CLOSE_RESPONSE' => 'Thanks for your interest but this survey is now closed.',
     'LBL_SURVEY_THANKS' => 'Thanks for completing this survey.',
+
+    // Questions and report of the surveys in SuiteCRM 8.
+    'LBL_SURVEY_VIEW_EDIT_QUESTIONS' => 'Edit Questions',
+    'LBL_SURVEY_VIEW_NO_QUESTION' => 'No question yet.',
+    'LBL_SURVEY_VIEW_RESPONSES' => 'Responses',
+    'LBL_SURVEY_VIEW_NOT_PUBLIC' => 'The survey has a URL once its status is Public.',
+    'LBL_SURVEY_VIEW_QUESTION_REQUIRED' => 'Each question needs a text, and its options a name.',
+    'LBL_SURVEY_VIEW_MOVE_UP' => 'Move up',
+    'LBL_SURVEY_VIEW_MOVE_DOWN' => 'Move down',
+    'LBL_SURVEY_VIEW_NO_ANSWER' => 'No answer yet.',
+    'LBL_OPTIONS' => 'Options',
 );

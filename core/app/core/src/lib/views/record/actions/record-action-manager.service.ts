@@ -39,6 +39,7 @@ import {RecordSaveContinueAction} from "./save-continue/record-save-continue.act
 import {RecordSaveScheduleAction} from "./save-schedule/record-save-schedule.action";
 import {ModalEditAction} from "./modal-edit/modal-edit.action";
 import {ModalCreateAction} from "./modal-create/modal-create.action";
+import {SurveyReportsAction} from './survey-reports/survey-reports.action';
 
 @Injectable({
     providedIn: 'root',
@@ -58,6 +59,7 @@ export class RecordActionManager extends BaseActionManager<RecordActionData> {
         protected async: AsyncProcessRecordAction,
         protected recordModalEdit: ModalEditAction,
         protected recordModalCreate: ModalCreateAction,
+        protected surveyReports: SurveyReportsAction,
     ) {
         super();
         edit.modes.forEach(mode => this.actions[mode][edit.key] = edit);
@@ -72,5 +74,6 @@ export class RecordActionManager extends BaseActionManager<RecordActionData> {
         async.modes.forEach(mode => this.actions[mode][async.key] = async);
         recordModalEdit.modes.forEach(mode => this.actions[mode][recordModalEdit.key] = recordModalEdit);
         recordModalCreate.modes.forEach(mode => this.actions[mode][recordModalCreate.key] = recordModalCreate);
+        surveyReports.modes.forEach(mode => this.actions[mode][surveyReports.key] = surveyReports);
     }
 }

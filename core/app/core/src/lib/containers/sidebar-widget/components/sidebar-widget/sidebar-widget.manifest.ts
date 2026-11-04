@@ -37,6 +37,8 @@ import {RecordTableWidgetComponent} from "../record-table-widget/record-table-wi
 import {RecordTableWidgetModule} from "../record-table-widget/record-table-widget.module";
 import {BannerGridSidebarWidgetModule} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.module";
 import {BannerGridSidebarWidgetComponent} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.component";
+import {SurveyQuestionsWidgetComponent} from '../survey-widgets/survey-questions-widget.component';
+import {SurveyResponseAnswersWidgetComponent} from '../survey-widgets/survey-response-answers-widget.component';
 
 export const sidebarWidgetModules = [
     HistorySidebarWidgetModule,
@@ -52,5 +54,7 @@ export const componentTypeMap = {
     statistics: StatisticsSidebarWidgetComponent,
     'record-thread': RecordThreadSidebarWidgetComponent,
     'record-table': RecordTableWidgetComponent,
-    'banner-grid': BannerGridSidebarWidgetComponent
+    'banner-grid': BannerGridSidebarWidgetComponent,
+    'survey-questions': SurveyQuestionsWidgetComponent,
+    'survey-response-answers': SurveyResponseAnswersWidgetComponent
 };

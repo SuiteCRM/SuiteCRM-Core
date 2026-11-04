@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    CurrenciesComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -184,6 +185,21 @@ export class AppInit {
                             }
                         }
                     });
+                    // Currencies of the administration (admin panel link), before the generic classic
+                    // view routes.
+                    ['currencies', 'currencies/index'].forEach(path => routes.push({
+                        path,
+                        component: CurrenciesComponent,
+                        canActivate: [AuthGuard],
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration'
+                        }
+                    }));
                     routes.push(loggedOutConfig);
 
                     Object.keys(configRoutes).forEach(routeName => {

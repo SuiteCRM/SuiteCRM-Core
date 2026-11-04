@@ -174,6 +174,10 @@ class ModuleRegistryHandler extends LegacyHandler implements ModuleRegistryInter
     /**
      * Apply User action filter on current module list
      *
+     * As in the legacy application, admins reach every module (ACLController::filterModuleList(),
+     * SugarBean::ACLAccess()), and the role access set for a module whose bean does not implement
+     * ACL (Employees) does not remove it.
+     *
      * @param array $modules
      * @return array
      */
@@ -181,17 +185,21 @@ class ModuleRegistryHandler extends LegacyHandler implements ModuleRegistryInter
     {
         global $current_user;
 
+        if ($current_user->isAdmin()) {
+            return $modules;
+        }
+
         $actions = ACLAction::getUserActions($current_user->id);
         foreach ($actions as $key => $value) {
             if (!isset($value['module'])) {
                 continue;
             }
 
-            if ($value['module']['access']['aclaccess'] < ACL_ALLOW_ENABLED) {
-                unset($modules[$key]);
-            }
+            $access = $value['module']['access']['aclaccess'];
+            $disabled = $access < ACL_ALLOW_ENABLED || $access === ACL_ALLOW_DISABLED;
 
-            if ($value['module']['access']['aclaccess'] === ACL_ALLOW_DISABLED) {
+            // Checked last: it instantiates the bean of the module.
+            if ($disabled && ACLController::moduleSupportsACL($key)) {
                 unset($modules[$key]);
             }
         }

@@ -1,0 +1,632 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// The tables, toolbars and texts of the Studio editors.
+.studio-view {
+    color: #2f2c3a;
+}
+
+.studio-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+.studio-search { max-width: 320px; }
+.studio-count { margin-left: 4px; color: #6a6676; font-weight: 400; }
+.studio-mono { font-family: SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+.studio-muted { color: #888; font-style: italic; }
+.studio-error { color: #b42318; }
+.studio-scroll { overflow-x: auto; }
+
+.studio-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #e3e0e8;
+
+    th, td {
+        padding: 8px 10px;
+        border-top: 1px solid #ebe8f0;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    th {
+        border-top: 0;
+        background: #f6f5f9;
+        color: #4b4758;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    tbody tr:hover { background: #faf9fb; }
+}
+
+.studio-pill {
+    display: inline-block;
+    margin: 1px 4px 1px 0;
+    padding: 2px 9px;
+    border-radius: 11px;
+    background: #6b7280;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.6;
+    white-space: nowrap;
+}
+
+// Studio page, laid out as the legacy Studio: the tree of the modules, the screen with
+// its tab title, path and icons, and the help, in three panels that can be hidden; the tables of
+// the duplicates pages for the labels and fields, and the legacy Studio in a frame for the
+// components not in the page yet.
+.studio-view {
+    // Below the fixed navbar, like the list view (padding-top: 3em).
+    padding: calc(3rem + 8px) 16px 32px;
+
+    .studio-layout {
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr) 240px;
+        gap: 8px;
+        align-items: start;
+
+        &.is-tree-hidden { grid-template-columns: 36px minmax(0, 1fr) 240px; }
+        &.is-help-hidden { grid-template-columns: 240px minmax(0, 1fr) 36px; }
+        &.is-tree-hidden.is-help-hidden { grid-template-columns: 36px minmax(0, 1fr) 36px; }
+        &.is-legacy { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .studio-panel {
+        min-width: 0;
+        background: #fff;
+        border: 1px solid #e3e0e8;
+        border-radius: 6px;
+    }
+
+    .studio-west, .studio-east {
+        position: sticky;
+        top: 64px;
+        max-height: calc(100vh - 80px);
+        overflow: auto;
+    }
+
+    .studio-panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        padding: 8px 10px;
+        border-bottom: 1px solid #e3e0e8;
+    }
+
+    .studio-panel-title { margin: 0; font-size: 13px; font-weight: 700; }
+
+    .studio-collapse {
+        padding: 0 4px;
+        border: 0;
+        background: none;
+        color: #2f2c3a;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    // The tree: folders that open, as the legacy Studio tree.
+    .studio-tree {
+        margin: 0;
+        padding: 6px 8px 10px;
+        font-size: 13px;
+
+        ul { margin: 0; padding-left: 16px; }
+        li { list-style: none; }
+    }
+
+    .studio-tree-row {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 4px;
+        border-radius: 3px;
+        line-height: 1.35;
+
+        a { overflow-wrap: anywhere; }
+        &.is-current { background: #f2eff6; font-weight: 700; }
+    }
+
+    .studio-tree-toggle {
+        flex: 0 0 auto;
+        width: 13px;
+        height: 13px;
+        padding: 0;
+        border: 1px solid #8d8a96;
+        background: #fff;
+        color: #2f2c3a;
+        font-size: 11px;
+        line-height: 10px;
+        text-align: center;
+    }
+
+    .studio-tree-leaf {
+        flex: 0 0 auto;
+        width: 13px;
+        border-bottom: 1px dotted #8d8a96;
+    }
+
+    .studio-tree-folder {
+        flex: 0 0 auto;
+        display: inline-flex;
+        svg { width: 15px; height: 15px; fill: #c9a227; }
+    }
+
+    .studio-tree-loading { margin: 0 0 0 22px; color: #6a6676; }
+
+    // The screen: its tab title, path, buttons and icons.
+    .studio-center { padding: 0 16px 16px; }
+
+    .studio-tabbar { border-bottom: 1px solid #c9c6d1; margin-bottom: 8px; }
+
+    .studio-tab {
+        display: inline-block;
+        margin: 12px 0 -1px;
+        padding: 6px 10px;
+        border-radius: 3px 3px 0 0;
+        background: #7c8189;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .studio-crumbs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        margin: 0 0 14px;
+    }
+
+    .is-legacy .studio-crumbs { margin-top: 12px; }
+
+    .studio-crumbs-sep { color: #6a6676; }
+
+    .studio-icon-btn {
+        display: inline-flex;
+        padding: 0;
+        border: 0;
+        background: none;
+        svg { width: 16px; height: 16px; fill: #2f2c3a; }
+    }
+
+    .studio-actions { margin-bottom: 10px; }
+    .studio-question { margin: 0 0 14px; text-align: center; font-weight: 700; }
+
+    .studio-tiles {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 18px 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .studio-tile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 4px;
+        border-radius: 4px;
+        text-align: center;
+        text-decoration: none;
+        overflow-wrap: anywhere;
+
+        &:hover, &:focus { background: #faf9fb; text-decoration: underline; }
+    }
+
+    .studio-tile-icon {
+        display: inline-flex;
+        svg { width: 30px; height: 30px; fill: currentColor; }
+        // The icons drawn with lines (Cases, Leads).
+        svg g[fill=none] { stroke: currentColor; }
+    }
+
+    // The help: the legacy help strings (their HTML).
+    .studio-help { padding: 10px; font-size: 13px; line-height: 1.5; }
+
+    .studio-frame {
+        display: block;
+        width: 100%;
+        height: calc(100vh - 220px);
+        min-height: 480px;
+        border: 1px solid #e3e0e8;
+        border-radius: 6px;
+        background: #fff;
+    }
+
+    .studio-inline { margin: 0; font-weight: 600; }
+    .studio-select { width: auto; max-width: 100%; }
+
+    .studio-table {
+        th[scope=row] { width: 40%; font-weight: 400; vertical-align: middle; overflow-wrap: anywhere; }
+        th[scope=row] label { margin: 0; }
+        tr.is-changed th[scope=row] { font-weight: 700; }
+    }
+
+    .studio-sort {
+        padding: 0;
+        color: inherit;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .studio-custom { margin-left: 6px; }
+
+    // The list layout editor: its columns of fields (legacy listView.tpl), dragged from a
+    // column to another.
+    .studio-history { max-width: 420px; margin-bottom: 12px; }
+    .studio-history-action { width: 1%; text-align: right; }
+    .studio-restored { margin: 0 0 10px; color: #8b6914; font-weight: 600; }
+
+    .studio-subpanel-title {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        max-width: 420px;
+        margin-bottom: 12px;
+
+        label { margin: 0; font-weight: 600; white-space: nowrap; }
+    }
+
+    .studio-columns {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        align-items: start;
+    }
+
+    .studio-column {
+        min-width: 0;
+        padding: 8px;
+        border: 1px solid #c9c6d1;
+        border-radius: 4px;
+        background: #faf9fb;
+    }
+
+    .studio-column-title { margin: 0 0 8px; font-size: 14px; font-weight: 700; }
+
+    .studio-column-list {
+        min-height: 60px;
+        max-height: calc(100vh - 300px);
+        margin: 0;
+        padding: 0;
+        overflow-y: auto;
+        list-style: none;
+    }
+
+    .studio-field {
+        margin-bottom: 6px;
+        padding: 4px 6px;
+        border: 1px solid #8d8a96;
+        border-radius: 3px;
+        background: #fff;
+        cursor: move;
+
+        &.is-editing { border-color: #0e7c86; box-shadow: 0 0 0 1px #0e7c86; }
+    }
+
+    .studio-field-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 4px;
+
+        strong { overflow-wrap: anywhere; }
+    }
+
+    .studio-field-edit { padding: 0 4px; line-height: 1.2; }
+
+    .studio-field-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 4px;
+        color: #6a6676;
+        font-size: 12px;
+
+        .studio-mono { font-size: 12px; overflow-wrap: anywhere; }
+    }
+
+    .studio-field-props {
+        display: grid;
+        gap: 6px;
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px dotted #c9c6d1;
+        cursor: default;
+    }
+
+    .studio-prop {
+        display: grid;
+        gap: 2px;
+        margin: 0;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .studio-prop-moves {
+        display: flex;
+        gap: 4px;
+
+        select { flex: 1 1 auto; min-width: 0; }
+    }
+
+    // The grid layout editor (legacy layoutView.tpl): the toolbox, the panels and their rows of
+    // slots, a field on a slot (dragged from a slot to another).
+    .studio-notice {
+        margin: 0 0 10px;
+        padding: 8px 10px;
+        border-left: 3px solid #b42318;
+        background: #fdf2f1;
+    }
+
+    .studio-check { display: inline-flex; gap: 4px; align-items: center; font-weight: 400; }
+
+    .studio-grid {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 10px;
+        align-items: start;
+    }
+
+    .studio-toolbox {
+        position: sticky;
+        top: 64px;
+        padding: 8px;
+        border: 1px solid #c9c6d1;
+        border-radius: 4px;
+        background: #faf9fb;
+    }
+
+    .studio-toolbox-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+    .studio-filler-source { margin-bottom: 8px; }
+
+    .studio-available {
+        min-height: 60px;
+        max-height: calc(100vh - 340px);
+        overflow-y: auto;
+    }
+
+    .studio-grid-field {
+        margin-bottom: 4px;
+        padding: 3px 6px;
+        border: 1px solid #8d8a96;
+        border-radius: 3px;
+        background: #fff;
+        cursor: move;
+
+        &.is-filler { border-style: dashed; color: #6a6676; text-align: center; }
+        &.is-editing { border-color: #0e7c86; box-shadow: 0 0 0 1px #0e7c86; }
+    }
+
+    .studio-field-buttons { display: inline-flex; flex: 0 0 auto; }
+
+    .studio-panels { min-width: 0; }
+
+    .studio-panel-box {
+        margin-bottom: 10px;
+        padding: 8px;
+        border: 1px solid #c9c6d1;
+        border-radius: 4px;
+        background: #f2f1f5;
+    }
+
+    .studio-panel-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 10px;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+
+    .studio-panel-name { font-size: 14px; }
+    .studio-panel-id { color: #6a6676; font-size: 12px; }
+    .studio-panel-tools { display: inline-flex; gap: 4px; margin-left: auto; }
+    .studio-panel-props { margin: 0 0 8px; }
+
+    .studio-grid-row {
+        display: flex;
+        gap: 4px;
+        align-items: stretch;
+        margin-bottom: 4px;
+    }
+
+    .studio-grid-slots { flex: 1 1 auto; display: grid; gap: 4px; min-width: 0; }
+
+    .studio-slot {
+        min-width: 0;
+        min-height: 46px;
+        border-radius: 3px;
+
+        .studio-grid-field { height: 100%; margin: 0; }
+        &.is-filler {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed #b9b6c1;
+            background: #fff;
+        }
+        &.cdk-drop-list-dragging, &.cdk-drop-list-receiving { outline: 2px dashed #0e7c86; }
+    }
+
+    .studio-filler { color: #8d8a96; font-size: 12px; }
+    .studio-row-tools { display: flex; flex-direction: column; justify-content: center; }
+    .studio-row-tools .btn { padding: 0 4px; line-height: 1.1; }
+
+    // A phone or a small screen: the screen first, then the tree and the help.
+    @media (max-width: 991px) {
+        .studio-layout,
+        .studio-layout.is-tree-hidden,
+        .studio-layout.is-help-hidden,
+        .studio-layout.is-tree-hidden.is-help-hidden { grid-template-columns: minmax(0, 1fr); }
+
+        .studio-center { order: -1; }
+        .studio-west, .studio-east { position: static; max-height: none; }
+        .studio-tree { max-height: 320px; overflow: auto; }
+        .studio-center { padding: 0 10px 12px; }
+        .studio-grid { grid-template-columns: minmax(0, 1fr); }
+        .studio-toolbox { position: static; }
+        .studio-available { max-height: 240px; }
+    }
+
+    @media (max-width: 575px) {
+        padding: calc(3rem + 8px) 8px 24px;
+    }
+}
+
+// The field dragged (out of the page, at the end of the body).
+.cdk-drag-preview.studio-field {
+    padding: 4px 6px;
+    border: 1px solid #0e7c86;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+    list-style: none;
+}
+
+.studio-field.cdk-drag-placeholder, .studio-grid-field.cdk-drag-placeholder { opacity: .4; }
+
+.cdk-drag-preview.studio-grid-field {
+    padding: 3px 6px;
+    border: 1px solid #0e7c86;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+
+    .studio-field-head { display: flex; justify-content: space-between; gap: 4px; }
+    .studio-field-meta { color: #6a6676; font-size: 12px; }
+}
+
+// Reset Module and Export Customizations of Studio (legacy resetModule.tpl,
+// exportcustomizations.tpl), in the Studio page.
+.studio-view {
+    .studio-subtitle { margin: 0 0 10px; font-size: 15px; font-weight: 700; }
+
+    .studio-checks {
+        margin: 0 0 12px;
+        padding: 0;
+        list-style: none;
+
+        li { margin-bottom: 6px; }
+    }
+
+    .studio-result {
+        margin-top: 12px;
+
+        p { margin: 0 0 4px; }
+    }
+
+    .studio-form {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 480px);
+        gap: 8px 12px;
+        align-items: center;
+        margin-bottom: 14px;
+
+        label { margin: 0; font-weight: 600; }
+    }
+
+    .studio-required { color: #b42318; }
+
+    .studio-export-module { width: 1%; white-space: nowrap; font-weight: 600; }
+
+    // The relationship editor (legacy studioRelationship.tpl): the primary module, the type and
+    // the related module side by side, one under the other on a phone.
+    .studio-rel-editor {
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid #c9c6d1;
+    }
+
+    .studio-form-label { font-weight: 600; }
+
+    .studio-rel-sides {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 200px) minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .studio-rel-side {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+        margin: 0;
+        padding: 8px 10px;
+        border: 1px solid #e3e1e8;
+        border-radius: 4px;
+
+        legend { width: auto; margin: 0; padding: 0 4px; font-size: 13px; font-weight: 700; }
+        label { margin: 4px 0 0; font-weight: 600; }
+    }
+
+    @media (max-width: 760px) {
+        .studio-rel-sides { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    // The fields and the field editor next to them (legacy east panel), one under the other on
+    // a narrow screen.
+    .studio-fields-layout.is-editing {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+        gap: 16px;
+        align-items: start;
+    }
+
+    .studio-field-editor {
+        padding: 10px 12px;
+        border: 1px solid #c9c6d1;
+        border-radius: 4px;
+    }
+
+    .studio-field-form { grid-template-columns: max-content minmax(0, 1fr); }
+
+    .studio-field-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 8px;
+        align-items: center;
+        min-width: 0;
+
+        .form-control { width: auto; min-width: 0; max-width: 100%; flex: 1 1 200px; }
+        select[multiple] { min-height: 6em; }
+    }
+
+    .studio-field-break { flex-basis: 100%; height: 0; }
+    .studio-field-check { width: 16px; height: 16px; }
+    .studio-errors { list-style: none; }
+    .studio-pre-line { white-space: pre-line; }
+
+    @media (max-width: 1100px) {
+        .studio-fields-layout.is-editing { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+        .studio-form { grid-template-columns: minmax(0, 1fr); }
+    }
+}

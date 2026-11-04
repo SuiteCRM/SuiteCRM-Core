@@ -55,6 +55,10 @@ $viewdefs[$module_name]['DetailView'] = [
             )
         ]
     ],
+    // The tokens are made by the API, not edited (no Edit or Duplicate, as the legacy detail view).
+    'recordActions' => [
+        'exclude' => ['edit', 'duplicate'],
+    ],
     'panels' => [
         'default' =>
             [

@@ -3980,6 +3980,14 @@ $app_list_strings['oauth2_grant_type_dom'] = array(
     'authorization_code' => 'Authorization Code'
 );
 
+// The grant types of the clients created in the record view, as the New ... Client links of the
+// OAuth2 Clients menu (no implicit client).
+$app_list_strings['oauth2_client_grant_type_dom'] = array(
+    'password' => 'Password Grant',
+    'client_credentials' => 'Client Credentials',
+    'authorization_code' => 'Authorization Code'
+);
+
 $app_list_strings['oauth2_duration_units'] = [
     'minute' => 'minutes',
     'hour' => 'hours',
@@ -4511,3 +4519,6 @@ $app_strings['LBL_NOT_AUTHORIZED'] = 'Not authorized';
 $app_strings['LBL_AUTOFILL_MISSING_RELATE_MODULE'] = 'Autofill failed: related module is not configured.';
 $app_strings['LBL_AUTOFILL_MISSING_RELATE_ID'] = 'Autofill failed: no related record selected.';
 $app_strings['LBL_AUTOFILL_MISSING_UPDATE_FIELDS'] = 'Autofill failed: no fields configured for update.';
+
+$app_strings['LBL_OAUTH2_REVOKE_TOKENS'] = 'Revoke Tokens';
+$app_strings['LBL_OAUTH2_TOKENS_REVOKED'] = 'The tokens were revoked.';

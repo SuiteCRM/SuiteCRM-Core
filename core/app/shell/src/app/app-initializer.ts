@@ -184,6 +184,23 @@ export class AppInit {
                             }
                         }
                     });
+                    // The New ... Client links of the OAuth2 Clients menu (legacy edit view of a grant type):
+                    // the create view of a client of that grant type.
+                    const oauth2ClientTypes: { [action: string]: string } = {
+                        EditViewPassword: 'password',
+                        EditViewCredentials: 'client_credentials',
+                        EditViewAuthorizationCode: 'authorization_code'
+                    };
+                    Object.keys(oauth2ClientTypes).forEach(action => routes.push({
+                        path: 'oauth2-clients/' + action,
+                        redirectTo: () => this.router.createUrlTree(['/', 'oauth2-clients', 'edit'], {
+                            queryParams: {
+                                allowed_grant_type: oauth2ClientTypes[action],
+                                return_module: 'OAuth2Clients',
+                                return_action: 'DetailView'
+                            }
+                        })
+                    }));
                     routes.push(loggedOutConfig);
 
                     Object.keys(configRoutes).forEach(routeName => {

@@ -4,9 +4,9 @@
 
 # SuiteCRM 8.10.2
 
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/SuiteCRM/SuiteCRM/issues)
-[![GitHub contributors](https://img.shields.io/github/contributors/SuiteCRM/suitecrm)](https://github.com/SuiteCRM/SuiteCRM/graphs/contributors)
-[![LICENSE](https://img.shields.io/github/license/suitecrm/suitecrm.svg)](https://github.com/SuiteCRM/suitecrm/blob/hotfix/LICENSE.txt)
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/SuiteCRM/SuiteCRM-Core/issues)
+[![GitHub contributors](https://img.shields.io/github/contributors/SuiteCRM/SuiteCRM-Core)](https://github.com/SuiteCRM/SuiteCRM-Core/graphs/contributors)
+[![LICENSE](https://img.shields.io/github/license/SuiteCRM/SuiteCRM-Core.svg)](https://github.com/SuiteCRM/SuiteCRM-Core/blob/hotfix/LICENSE.txt)
 
 [Website](https://suitecrm.com) |
 [Demo](https://suitecrm.com/suitecrm8/) |
@@ -15,6 +15,7 @@
 [Community Forum](https://community.suitecrm.com/) |
 [Partners](https://suitecrm.com/about/about-us/partners/) |
 [Extensions Directory](https://store.suitecrm.com/?tag=suitecrm) |
+[Translations](https://sourceforge.net/projects/suitecrmtranslations/) |
 [Code of Conduct](https://docs.suitecrm.com/community/code-of-conduct/)
 
 [SuiteCRM](https://suitecrm.com) is the award-winning open-source, enterprise-ready Customer Relationship Management (CRM) software application.
@@ -67,11 +68,15 @@ Or if you want to buy the **core team** a coffee or beer? Then consider a small 
 
 View the [Roadmap](https://suitecrm.com/roadmap/) for details on what is coming in SuiteCRM 8.
 
+### Contributing
+
+Contributions are welcome. Please read our [contributing guide](.github/CONTRIBUTING.md) and the [contributing code documentation](https://docs.suitecrm.com/community/contributing-code/) before you start. Bug fixes can go straight to a pull request on the `hotfix` branch. For a new feature, please open a feature proposal first and wait for a reply. Voting up issues and pull requests also helps us decide what to work on: see [how voting works](https://docs.suitecrm.com/community/raising-issues/issues-voting/).
+
 ### Support
 
 SuiteCRM is an open-source project. If you require help with support then please use our [support forum](https://community.suitecrm.com/). By using the forums the knowledge is shared with everyone in the community. Our developer and community team members answer questions on the forum daily, but it also allows the other members of the community to contribute. If you would like customisations to specifically fit your SuiteCRM needs then please visit the [website](https://suitecrm.com/).
 
-SuiteCRM Ltd also offers a range of complimentary hosting and support services:
+SuiteCRM Ltd also offers a range of complementary hosting and support services:
 
 - [Hosting](https://suitecrm.com/suitecrmhosted/)
 - [Support Plans](https://suitecrm.com/enterprise/support-plans/)
@@ -79,7 +84,7 @@ SuiteCRM Ltd also offers a range of complimentary hosting and support services:
 
 By utilising these services you are also contributing to the future development and progress of the project.
 
-### License [![AGPLv3](https://img.shields.io/github/license/suitecrm/suitecrm.svg)](./LICENSE.txt)
+### License [![AGPLv3](https://img.shields.io/github/license/SuiteCRM/SuiteCRM-Core.svg)](./LICENSE.txt)
 
 SuiteCRM is published under the AGPLv3 license.
 

@@ -91,7 +91,7 @@ parameters:
     business-hours:
       index: true
       list: true
-      record: false
+      record: true
     roles:
       index: true
       list: true

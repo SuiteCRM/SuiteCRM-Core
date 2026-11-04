@@ -1,0 +1,472 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="import-wizard" [attr.aria-busy]="loading">
+    <div class="import-wizard-head">
+        <h2 class="import-wizard-title">
+            {{ page?.title || label('LBL_MODULE_NAME') }}
+            <span *ngIf="moduleName && step !== 'module'" class="import-wizard-module">{{ moduleName }}</span>
+        </h2>
+    </div>
+
+    <p *ngIf="page?.instruction" class="import-wizard-instruction">{{ page.instruction }}</p>
+
+    <div *ngIf="question" class="import-wizard-notice" role="alertdialog" aria-labelledby="import-wizard-question">
+        <p id="import-wizard-question" class="import-wizard-pre-line"><strong>{{ question.text }}</strong></p>
+        <div class="import-wizard-buttons">
+            <button type="button" class="btn btn-sm btn-main" (click)="answer(true)">{{ label('LBL_OK') }}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="answer(false)">{{ label('LBL_CANCEL') }}</button>
+        </div>
+    </div>
+
+    <ul *ngIf="errors.length" class="import-wizard-notice import-wizard-errors" role="alert">
+        <li *ngFor="let item of errors">{{ item }}</li>
+    </ul>
+
+    <p *ngIf="step === 'loading'" class="import-wizard-muted">…</p>
+
+    <!-- An error of the wizard (legacy error page): back to its start. -->
+    <section *ngIf="step === 'error' && error" class="import-wizard-step">
+        <div class="import-wizard-notice import-wizard-errors" role="alert">
+            <p><strong>{{ label('LBL_ERROR') }}</strong></p>
+            <p *ngFor="let item of error.messages" class="import-wizard-pre-line">{{ item }}</p>
+        </div>
+        <div class="import-wizard-buttons">
+            <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="start()">{{ label('LBL_TRY_AGAIN') }}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="exit()">{{ label('LBL_IMPORT_COMPLETE') }}</button>
+        </div>
+    </section>
+
+    <!-- The module to import into (import wizard of the administration). -->
+    <section *ngIf="step === 'module' && modulePage" class="import-wizard-step">
+        <ng-container *ngIf="moduleSelect as select">
+            <label class="import-wizard-label" [for]="select.uid">{{ modulePage.question || label('LBL_STEP_MODULE') }}</label>
+            <select class="form-control form-control-sm import-wizard-select" [id]="select.uid" [(ngModel)]="select.value">
+                <option *ngFor="let option of select.options" [value]="option.value">{{ option.label }}</option>
+            </select>
+        </ng-container>
+        <div class="import-wizard-buttons">
+            <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="moduleNext()">{{ label('LBL_NEXT') }}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="exit()">{{ label('LBL_IMPORT_COMPLETE') }}</button>
+        </div>
+    </section>
+
+    <!-- The file to upload, the type of import and the saved settings (legacy step2). -->
+    <section *ngIf="step === 'upload' && uploadPage" class="import-wizard-step">
+        <p *ngIf="uploadPage.sampleUrl">
+            <a [href]="uploadPage.sampleUrl">{{ uploadPage.sampleLabel || label('LBL_EXAMPLE_FILE') }}</a>
+            <ng-container *ngTemplateOutlet="help; context: {text: uploadPage.sampleHelp}"></ng-container>
+        </p>
+
+        <div class="import-wizard-field">
+            <label class="import-wizard-label" for="import-wizard-file">{{ uploadPage.fileLabel || label('LBL_SELECT_FILE') }}</label>
+            <div class="import-wizard-inline">
+                <input id="import-wizard-file" type="file" class="form-control-file" (change)="fileChosen($event)">
+                <ng-container *ngTemplateOutlet="help; context: {text: uploadPage.fileHelp}"></ng-container>
+            </div>
+            <small *ngIf="file" class="import-wizard-muted">{{ label('LBL_IMPORT_VIEW_FILE_CHOSEN') }} {{ file.name }}</small>
+            <small *ngIf="uploadPage.fileHint" class="import-wizard-muted">{{ uploadPage.fileHint }}</small>
+        </div>
+
+        <h3 class="import-wizard-subtitle">{{ uploadPage.typeTitle || label('LBL_IMPORT_TYPE') }}</h3>
+        <div *ngFor="let choice of uploadPage.types" class="import-wizard-choice">
+            <input type="radio" name="import-wizard-type" [id]="choice.control.uid" [checked]="choice.control.checked"
+                   (change)="check(uploadPage.controls, choice.control)">
+            <label [for]="choice.control.uid">{{ choice.label }}</label>
+            <ng-container *ngTemplateOutlet="help; context: {text: choice.help}"></ng-container>
+        </div>
+
+        <ng-container *ngIf="uploadPage.maps.length">
+            <h3 class="import-wizard-subtitle">
+                {{ uploadPage.mapsTitle || label('LBL_PUBLISHED_SOURCES') }}
+                <ng-container *ngTemplateOutlet="help; context: {text: uploadPage.mapsHelp}"></ng-container>
+            </h3>
+            <div *ngIf="uploadPage.noMap as none" class="import-wizard-choice">
+                <input type="radio" name="import-wizard-source" [id]="none.uid" [checked]="none.checked" (change)="check(uploadPage.controls, none)">
+                <label [for]="none.uid">{{ label('LBL_NONE') }}</label>
+            </div>
+            <div *ngFor="let map of uploadPage.maps" class="import-wizard-choice">
+                <input type="radio" name="import-wizard-source" [id]="map.control.uid" [checked]="map.control.checked"
+                       (change)="check(uploadPage.controls, map.control)">
+                <label [for]="map.control.uid">{{ map.name }}</label>
+                <button *ngIf="map.publish" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading"
+                        (click)="publish(map)">{{ label(map.publish === 'yes' ? 'LBL_PUBLISH' : 'LBL_UNPUBLISH') }}</button>
+                <button *ngIf="map.canDelete" type="button" class="btn btn-sm btn-outline-danger" [disabled]="loading"
+                        (click)="deleteMap(map)">{{ label('LBL_DELETE') }}</button>
+            </div>
+        </ng-container>
+
+        <div class="import-wizard-buttons">
+            <button *ngIf="uploadPage.canGoBack || fromAdmin" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading"
+                    (click)="uploadBack()">{{ label('LBL_BACK') }}</button>
+            <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="uploadNext()">{{ label('LBL_NEXT') }}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="exit()">{{ label('LBL_IMPORT_COMPLETE') }}</button>
+        </div>
+    </section>
+
+    <!-- The properties of the file and its first rows (legacy confirm). -->
+    <section *ngIf="step === 'properties' && propertiesPage" class="import-wizard-step">
+        <p *ngIf="propertiesPage.autoDetectError" class="import-wizard-notice import-wizard-errors">{{ propertiesPage.autoDetectError }}</p>
+        <ul *ngIf="propertiesPage.warnings.length" class="import-wizard-notice">
+            <li *ngFor="let item of propertiesPage.warnings">{{ item }}</li>
+        </ul>
+
+        <ng-container *ngTemplateOutlet="sample; context: {sample: propertiesPage.sample}"></ng-container>
+
+        <p class="import-wizard-inline">
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="showProperties = !showProperties" [attr.aria-expanded]="showProperties">
+                {{ label(showProperties ? 'LBL_HIDE_ADVANCED_OPTIONS' : 'LBL_SHOW_ADVANCED_OPTIONS') }}
+            </button>
+            <ng-container *ngTemplateOutlet="help; context: {text: propertiesPage.propertiesHelp}"></ng-container>
+        </p>
+
+        <div *ngIf="showProperties" class="import-wizard-properties">
+            <ng-container *ngFor="let property of propertiesPage.properties">
+                <label class="import-wizard-label" [for]="property.control.uid">{{ property.label }}</label>
+                <div class="import-wizard-inline">
+                    <ng-container [ngSwitch]="property.control.kind">
+                        <select *ngSwitchCase="'select'" class="form-control form-control-sm import-wizard-select" [id]="property.control.uid"
+                                [(ngModel)]="property.control.value" (ngModelChange)="propertyChanged(property)">
+                            <option *ngFor="let option of property.control.options" [value]="option.value">{{ option.label }}</option>
+                        </select>
+                        <input *ngSwitchCase="'checkbox'" type="checkbox" [id]="property.control.uid" [(ngModel)]="property.control.checked"
+                               (ngModelChange)="propertyChanged(property)">
+                        <input *ngSwitchDefault type="text" class="form-control form-control-sm import-wizard-text" [id]="property.control.uid"
+                               [class.import-wizard-char]="property.control.maxlength === 1"
+                               [attr.maxlength]="property.control.maxlength" [(ngModel)]="property.control.value">
+                    </ng-container>
+                    <input *ngIf="property.other && property.control.value === 'other'" type="text" maxlength="1"
+                           class="form-control form-control-sm import-wizard-char" [attr.aria-label]="property.label"
+                           [(ngModel)]="property.other.value" (change)="propertyChanged(property, true)">
+                    <span *ngIf="property.control.id === 'sigDigits'" class="import-wizard-muted">{{ currencyExample }}</span>
+                    <span *ngIf="property.control.id === 'default_locale_name_format'" class="import-wizard-muted">
+                        {{ nameExample }}<ng-container *ngIf="propertiesPage.nameFormatHelp"> — {{ propertiesPage.nameFormatHelp }}</ng-container>
+                    </span>
+                    <ng-container *ngTemplateOutlet="help; context: {text: property.help}"></ng-container>
+                </div>
+            </ng-container>
+        </div>
+
+        <ng-container *ngIf="propertiesPage.sources.length">
+            <h3 class="import-wizard-subtitle">
+                {{ propertiesPage.sourcesTitle || label('LBL_THIRD_PARTY_CSV_SOURCES') }}
+                <ng-container *ngTemplateOutlet="help; context: {text: propertiesPage.sourcesHelp}"></ng-container>
+            </h3>
+            <div *ngFor="let source of propertiesPage.sources" class="import-wizard-choice">
+                <input type="radio" name="import-wizard-external" [id]="source.control.uid" [checked]="source.control.checked"
+                       (change)="chooseSource(source)">
+                <label [for]="source.control.uid">{{ source.label }}</label>
+                <ng-container *ngTemplateOutlet="help; context: {text: source.help}"></ng-container>
+            </div>
+        </ng-container>
+
+        <div class="import-wizard-buttons">
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="propertiesBack()">{{ label('LBL_BACK') }}</button>
+            <button type="button" class="btn btn-sm btn-main" [disabled]="loading || !!question" (click)="propertiesNext()">{{ label('LBL_NEXT') }}</button>
+        </div>
+    </section>
+
+    <!-- The fields of the module for the columns of the file (legacy step3). -->
+    <section *ngIf="step === 'mapping' && mappingPage" class="import-wizard-step">
+        <ng-container *ngIf="mappingPage.notes.length">
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="showNotes = !showNotes" [attr.aria-expanded]="showNotes">
+                {{ label(showNotes ? 'LBL_HIDE_NOTES' : 'LBL_SHOW_NOTES') }}
+            </button>
+            <ul *ngIf="showNotes" class="import-wizard-notes">
+                <li *ngFor="let note of mappingPage.notes">{{ note }}</li>
+            </ul>
+        </ng-container>
+
+        <div class="import-wizard-scroll">
+            <table class="import-wizard-table">
+                <thead>
+                <tr>
+                    <th *ngIf="mappingPage.hasHeader">
+                        {{ label('LBL_HEADER_ROW') }}
+                        <ng-container *ngTemplateOutlet="help; context: {text: label('LBL_HEADER_ROW_HELP')}"></ng-container>
+                    </th>
+                    <th>
+                        {{ label('LBL_DATABASE_FIELD') }}
+                        <ng-container *ngTemplateOutlet="help; context: {text: label('LBL_DATABASE_FIELD_HELP')}"></ng-container>
+                    </th>
+                    <th>
+                        {{ label('LBL_ROW') }} 1
+                        <ng-container *ngTemplateOutlet="help; context: {text: label('LBL_ROW_HELP')}"></ng-container>
+                    </th>
+                    <th *ngIf="!mappingPage.hasHeader">{{ label('LBL_ROW') }} 2</th>
+                    <th>
+                        <button type="button" class="btn btn-link import-wizard-link" (click)="showDefaults = !showDefaults" [attr.aria-expanded]="showDefaults">
+                            {{ showDefaults ? '▾' : '▸' }} {{ label('LBL_DEFAULT_VALUE') }}
+                        </button>
+                        <ng-container *ngTemplateOutlet="help; context: {text: label('LBL_DEFAULT_VALUE_HELP')}"></ng-container>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let row of mappingPage.rows; trackBy: trackRow">
+                    <td *ngIf="mappingPage.hasHeader" class="import-wizard-header-cell">{{ row.header }}</td>
+                    <td>
+                        <select class="form-control form-control-sm import-wizard-select" [attr.aria-label]="row.header || label('LBL_DATABASE_FIELD')"
+                                [(ngModel)]="row.field.value" (ngModelChange)="fieldChanged(row)">
+                            <option *ngFor="let option of row.field.options" [value]="option.value" [title]="option.title || ''"
+                                    [class.import-wizard-required]="option.required">{{ option.label }}</option>
+                        </select>
+                    </td>
+                    <ng-container *ngIf="!row.removable; else remove">
+                        <td *ngFor="let sample of row.samples" class="import-wizard-sample">{{ sample }}</td>
+                    </ng-container>
+                    <ng-template #remove>
+                        <td [attr.colspan]="mappingPage.hasHeader ? 1 : 2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeRow(row)">{{ label('LBL_REMOVE_ROW') }}</button>
+                        </td>
+                    </ng-template>
+                    <td class="import-wizard-defaults">
+                        <ng-container *ngIf="showDefaults">
+                            <span *ngIf="row.loading" class="import-wizard-muted">…</span>
+                            <ng-container *ngFor="let control of defaultsShown(row)">
+                                <ng-container *ngTemplateOutlet="defaultControl; context: {row: row, control: control}"></ng-container>
+                            </ng-container>
+                        </ng-container>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="import-wizard-inline">
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addRow()">{{ label('LBL_ADD_ROW') }}</button>
+            <ng-container *ngTemplateOutlet="help; context: {text: label('LBL_ADD_FIELD_HELP')}"></ng-container>
+        </p>
+
+        <div class="import-wizard-buttons">
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="mappingBack()">{{ label('LBL_BACK') }}</button>
+            <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="mappingNext()">{{ label('LBL_NEXT') }}</button>
+        </div>
+    </section>
+
+    <!-- The fields to check for duplicates and the settings saved (legacy dupcheck), then the import. -->
+    <section *ngIf="(step === 'duplicates' || step === 'importing') && duplicatesPage" class="import-wizard-step">
+        <div class="import-wizard-dupes">
+            <div class="import-wizard-dupe-list">
+                <h3 class="import-wizard-subtitle">{{ duplicatesPage.enabledTitle || label('LBL_INDEX_USED') }}</h3>
+                <ul>
+                    <li *ngFor="let item of duplicatesPage.enabled">
+                        <span>{{ item.label }}</span>
+                        <button type="button" class="btn btn-link import-wizard-link" [disabled]="step === 'importing'"
+                                [title]="label('LBL_IMPORT_VIEW_MOVE_TO_AVAILABLE')" [attr.aria-label]="label('LBL_IMPORT_VIEW_MOVE_TO_AVAILABLE') + ': ' + item.label"
+                                (click)="moveDuplicate(item, false)">→</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="import-wizard-dupe-list">
+                <h3 class="import-wizard-subtitle">{{ duplicatesPage.disabledTitle || label('LBL_INDEX_NOT_USED') }}</h3>
+                <ul>
+                    <li *ngFor="let item of duplicatesPage.disabled">
+                        <button type="button" class="btn btn-link import-wizard-link" [disabled]="step === 'importing'"
+                                [title]="label('LBL_IMPORT_VIEW_MOVE_TO_CHECK')" [attr.aria-label]="label('LBL_IMPORT_VIEW_MOVE_TO_CHECK') + ': ' + item.label"
+                                (click)="moveDuplicate(item, true)">←</button>
+                        <span>{{ item.label }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <ng-container *ngIf="saveMapControl as save">
+            <label class="import-wizard-label" [for]="save.uid">
+                {{ duplicatesPage.saveLabel || label('LBL_SAVE_MAPPING_AS') }}
+                <ng-container *ngTemplateOutlet="help; context: {text: duplicatesPage.saveHelp}"></ng-container>
+            </label>
+            <input type="text" class="form-control form-control-sm import-wizard-text" [id]="save.uid" maxlength="254"
+                   [disabled]="step === 'importing'" [(ngModel)]="save.value">
+        </ng-container>
+
+        <div *ngIf="step === 'importing'" class="import-wizard-progress" role="status">
+            <p class="import-wizard-muted">{{ progress.started }}</p>
+            <div class="import-wizard-bar"><span [style.width.%]="progress.percent"></span></div>
+            <p>{{ progress.text }}</p>
+        </div>
+
+        <div class="import-wizard-buttons">
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="duplicatesBack()">{{ label('LBL_BACK') }}</button>
+            <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="importNow()">{{ label('LBL_IMPORT_NOW') }}</button>
+        </div>
+    </section>
+
+    <!-- The results of the import (legacy last). -->
+    <section *ngIf="step === 'results' && resultsPage" class="import-wizard-step">
+        <h3 class="import-wizard-subtitle">{{ resultsPage.summaryTitle || label('LBL_SUMMARY') }}</h3>
+        <ul class="import-wizard-summary">
+            <li *ngFor="let line of resultsPage.summary">{{ line }}</li>
+        </ul>
+
+        <div class="import-wizard-buttons">
+            <button *ngIf="resultsPage.canUndo" type="button" class="btn btn-sm btn-outline-danger" [disabled]="loading" (click)="undo()">{{ label('LBL_UNDO_LAST_IMPORT') }}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="start()">{{ label('LBL_IMPORT_MORE') }}</button>
+            <button type="button" class="btn btn-sm btn-main" (click)="exit()">{{ label('LBL_IMPORT_COMPLETE') }}</button>
+        </div>
+
+        <div *ngIf="resultsPage.canAddToProspectList" class="import-wizard-list-search">
+            <label class="import-wizard-label" for="import-wizard-list">{{ label('LBL_ADD_TO_PROSPECT_LIST_BUTTON_LABEL') }}</label>
+            <div class="import-wizard-inline">
+                <input id="import-wizard-list" type="text" class="form-control form-control-sm import-wizard-text" [placeholder]="label('LBL_IMPORT_VIEW_ADD_TO_LIST')"
+                       [(ngModel)]="listTerm" (keydown.enter)="searchLists()">
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="searchLists()">{{ label('LBL_SEARCH') }}</button>
+            </div>
+            <p *ngIf="lists && !lists.length" class="import-wizard-muted">{{ label('LBL_IMPORT_VIEW_NO_LIST') }}</p>
+            <ul *ngIf="lists?.length" class="import-wizard-results-list">
+                <li *ngFor="let list of lists">
+                    <button type="button" class="btn btn-link import-wizard-link" (click)="addToList(list)">{{ list.name }}</button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="import-wizard-tabs" role="tablist">
+            <button *ngFor="let tab of resultsPage.tabs; let index = index" type="button" role="tab" class="import-wizard-tab"
+                    [class.import-wizard-tab-active]="activeTab === index" [attr.aria-selected]="activeTab === index"
+                    (click)="activeTab = index">{{ tab.title }}</button>
+        </div>
+
+        <ng-container *ngFor="let tab of resultsPage.tabs; let index = index">
+            <div *ngIf="activeTab === index" class="import-wizard-tab-panel" role="tabpanel">
+                <ng-container *ngIf="index === 0; else fileTable">
+                    <p *ngIf="!imported.length" class="import-wizard-muted">{{ label('LBL_NO_DATA') }}</p>
+                    <div *ngFor="let group of imported" class="import-wizard-group">
+                        <h4 class="import-wizard-subtitle">{{ group.moduleName }} ({{ group.total }})</h4>
+                        <ul class="import-wizard-results-list">
+                            <li *ngFor="let record of group.records">
+                                <a [routerLink]="recordRoute(group, record.id)" target="_blank" rel="noopener">{{ record.name || record.id }}</a>
+                            </li>
+                        </ul>
+                        <div *ngIf="group.total > group.pageSize" class="import-wizard-pager">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="group.offset === 0"
+                                    (click)="importedPage(group, group.offset - group.pageSize)">{{ label('LBL_IMPORT_VIEW_PREVIOUS') }}</button>
+                            <span class="import-wizard-muted">({{ group.offset + 1 }} - {{ group.offset + group.records.length }} / {{ group.total }})</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="group.offset + group.pageSize >= group.total"
+                                    (click)="importedPage(group, group.offset + group.pageSize)">{{ label('LBL_IMPORT_VIEW_NEXT') }}</button>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-template #fileTable>
+                    <p *ngIf="tab.help" class="import-wizard-muted">{{ tab.help }}</p>
+                    <p *ngFor="let link of tab.links"><a [href]="link.url" target="_blank" rel="noopener">{{ link.label }}</a></p>
+                    <ng-container *ngIf="tab.table as table">
+                        <div class="import-wizard-scroll">
+                            <table class="import-wizard-table">
+                                <thead>
+                                <tr><th *ngFor="let column of table.columns">{{ column }}</th></tr>
+                                </thead>
+                                <tbody>
+                                <tr *ngIf="!table.rows.length"><td [attr.colspan]="table.columns.length || 1" class="import-wizard-muted">{{ label('LBL_NO_DATA') }}</td></tr>
+                                <tr *ngFor="let row of table.rows"><td *ngFor="let cell of row">{{ cell }}</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="import-wizard-pager">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="table.start === null"
+                                    (click)="tableOffset(tab, table.start)">{{ label('LBL_IMPORT_VIEW_FIRST') }}</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="table.previous === null"
+                                    (click)="tableOffset(tab, table.previous)">{{ label('LBL_IMPORT_VIEW_PREVIOUS') }}</button>
+                            <span class="import-wizard-muted">{{ table.range }}</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="table.next === null"
+                                    (click)="tableOffset(tab, table.next)">{{ label('LBL_IMPORT_VIEW_NEXT') }}</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="table.next === null"
+                                    (click)="tableOffset(tab, table.end)">{{ label('LBL_IMPORT_VIEW_LAST') }}</button>
+                        </div>
+                    </ng-container>
+                </ng-template>
+            </div>
+        </ng-container>
+    </section>
+
+    <!-- The import undone (legacy undo). -->
+    <section *ngIf="step === 'undo' && undoPage" class="import-wizard-step">
+        <h3 class="import-wizard-subtitle">{{ undoPage.message }}</h3>
+        <div class="import-wizard-buttons">
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="start()">{{ undoPage.againLabel || label('LBL_IMPORT_MORE') }}</button>
+            <button type="button" class="btn btn-sm btn-main" (click)="exit()">{{ label('LBL_IMPORT_COMPLETE') }}</button>
+        </div>
+    </section>
+</div>
+
+<!-- The help of a legacy help icon. -->
+<ng-template #help let-text="text">
+    <span *ngIf="text" class="import-wizard-help" tabindex="0" role="img" [title]="text" [attr.aria-label]="text">ⓘ</span>
+</ng-template>
+
+<!-- The first rows of the file (legacy confirm table). -->
+<ng-template #sample let-sample="sample">
+    <div class="import-wizard-scroll">
+        <table class="import-wizard-table">
+            <thead *ngIf="sample.rows.length">
+            <tr *ngIf="sample.hasHeader; else noHeader"><th *ngFor="let cell of sample.rows[0]">{{ cell }}</th></tr>
+            <ng-template #noHeader><tr><th [attr.colspan]="sample.rows[1]?.length || 1">{{ sample.missingHeader }}</th></tr></ng-template>
+            </thead>
+            <tbody>
+            <tr *ngFor="let row of sample.rows.slice(1)"><td *ngFor="let cell of row" class="import-wizard-sample">{{ cell }}</td></tr>
+            </tbody>
+        </table>
+    </div>
+</ng-template>
+
+<!-- A control of the default value of a field (legacy SugarField of the import view). -->
+<ng-template #defaultControl let-row="row" let-control="control">
+    <ng-container [ngSwitch]="control.kind">
+        <ng-container *ngSwitchCase="'select'">
+            <select *ngIf="control.multiple; else singleSelect" multiple class="form-control form-control-sm import-wizard-select"
+                    [attr.aria-label]="label('LBL_DEFAULT_VALUE')" [disabled]="control.disabled" [(ngModel)]="control.selected">
+                <option *ngFor="let option of control.options" [value]="option.value">{{ option.label }}</option>
+            </select>
+            <ng-template #singleSelect>
+                <select class="form-control form-control-sm import-wizard-select" [attr.aria-label]="label('LBL_DEFAULT_VALUE')"
+                        [disabled]="control.disabled" [(ngModel)]="control.value" (ngModelChange)="defaultChanged(row, control)">
+                    <option *ngFor="let option of control.options" [value]="option.value">{{ option.label }}</option>
+                </select>
+            </ng-template>
+        </ng-container>
+        <textarea *ngSwitchCase="'textarea'" class="form-control form-control-sm" rows="2" [attr.aria-label]="label('LBL_DEFAULT_VALUE')"
+                  [disabled]="control.disabled" [(ngModel)]="control.value"></textarea>
+        <input *ngSwitchCase="'checkbox'" type="checkbox" [attr.aria-label]="label('LBL_DEFAULT_VALUE')" [disabled]="control.disabled"
+               [(ngModel)]="control.checked">
+        <label *ngSwitchCase="'radio'" class="import-wizard-choice">
+            <input type="radio" [name]="'import-wizard-default-' + row.index + '-' + control.name" [checked]="control.checked"
+                   (change)="check(row.defaults, control)"> {{ control.title || control.value }}
+        </label>
+        <span *ngSwitchDefault class="import-wizard-relate">
+            <input type="text" class="form-control form-control-sm import-wizard-text" [attr.aria-label]="label('LBL_DEFAULT_VALUE')"
+                   [class.import-wizard-short]="!!control.placeholder" [attr.maxlength]="control.maxlength" [placeholder]="control.placeholder || ''" [disabled]="control.disabled"
+                   [readonly]="control.readonly" autocomplete="off" [(ngModel)]="control.value"
+                   (ngModelChange)="hasQuickSearch(control) ? quickSearch(row, control) : defaultChanged(row, control)">
+            <button *ngIf="hasQuickSearch(control) && control.value" type="button" class="btn btn-link import-wizard-link"
+                    [attr.aria-label]="label('LBL_CLEAR_BUTTON_LABEL')" (click)="clearRelate(row, control)">×</button>
+            <ul *ngIf="search && search.control === control && search.results.length" class="import-wizard-search" role="listbox">
+                <li *ngFor="let result of search.results" role="option">
+                    <button type="button" class="btn btn-link import-wizard-link" (click)="chooseResult(result)">{{ resultLabel(result, control) }}</button>
+                </li>
+            </ul>
+        </span>
+    </ng-container>
+</ng-template>

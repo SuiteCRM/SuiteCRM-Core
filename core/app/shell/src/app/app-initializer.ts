@@ -49,7 +49,9 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    ImportViewComponent,
+    ImportVCardComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -184,6 +186,36 @@ export class AppInit {
                             }
                         }
                     });
+                    // Import wizard of the modules (module menus: Import, and the import wizard of the
+                    // administration) and Create From vCard of Contacts and Leads, before the generic
+                    // classic view routes.
+                    ['import', 'import/:action'].forEach(path => routes.push({
+                        path,
+                        component: ImportViewComponent,
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'import'
+                        }
+                    }));
+                    ['contacts', 'leads'].forEach(module => routes.push({
+                        path: module + '/importvcard',
+                        component: ImportVCardComponent,
+                        canActivate: [AuthGuard],
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module
+                        }
+                    }));
                     routes.push(loggedOutConfig);
 
                     Object.keys(configRoutes).forEach(routeName => {

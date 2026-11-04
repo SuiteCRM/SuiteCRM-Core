@@ -1,0 +1,87 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="saved-search-view">
+    <h2 class="saved-search-title">
+        <a class="saved-search-back" [routerLink]="['/saved-search']">{{ label('LBL_SAVED_FILTER') }}</a>
+        <span *ngIf="data"> › {{ data.name }}</span>
+    </h2>
+
+    <p *ngIf="loading && !data" class="saved-search-muted">…</p>
+
+    <form *ngIf="data" (ngSubmit)="save()">
+        <fieldset class="saved-search-panel">
+            <div class="saved-search-row">
+                <label for="saved-search-name">{{ label('LBL_LIST_NAME') }} <span class="saved-search-required">*</span></label>
+                <input id="saved-search-name" name="name" class="form-control form-control-sm" maxlength="150"
+                       [(ngModel)]="name" required>
+
+                <span class="saved-search-label">{{ label('LBL_LIST_MODULE') }}</span>
+                <span>{{ data.moduleLabel }}</span>
+
+                <label for="saved-search-user">{{ label('LBL_LIST_ASSIGNED_USER') }}</label>
+                <select *ngIf="data.canChangeUser" id="saved-search-user" name="userId"
+                        class="custom-select custom-select-sm" [(ngModel)]="userId">
+                    <option *ngIf="!data.userId" [ngValue]="''"></option>
+                    <option *ngFor="let user of data.users; trackBy: trackUser" [ngValue]="user.id">{{ user.name }}</option>
+                </select>
+                <span *ngIf="!data.canChangeUser" id="saved-search-user">{{ data.userName }}</span>
+
+                <label for="saved-search-quick">{{ label('LBL_QUICK_FILTER') }}</label>
+                <span><input type="checkbox" id="saved-search-quick" name="quickFilter" [(ngModel)]="quickFilter"></span>
+
+                <span class="saved-search-label">{{ label('LBL_DATE_ENTERED') }}</span>
+                <span>{{ date(data.dateEntered) }}</span>
+
+                <span class="saved-search-label">{{ label('LBL_DATE_MODIFIED') }}</span>
+                <span>{{ date(data.dateModified) }}</span>
+            </div>
+        </fieldset>
+
+        <fieldset class="saved-search-panel">
+            <legend>{{ label('LBL_CRITERIA') }}</legend>
+            <p class="saved-search-muted">{{ label('LBL_CRITERIA_HELP') }}</p>
+            <p *ngIf="!data.criteria.length" class="saved-search-none">{{ label('LBL_NO_CRITERIA') }}</p>
+            <dl *ngIf="data.criteria.length" class="saved-search-criteria">
+                <ng-container *ngFor="let criterion of data.criteria">
+                    <dt>{{ criterion.label }}<span *ngIf="criterion.operator"> ({{ label(criterion.operator) }})</span></dt>
+                    <dd>{{ criterion.value }}</dd>
+                </ng-container>
+            </dl>
+            <div *ngIf="data.order" class="saved-search-row saved-search-order">
+                <span class="saved-search-label">{{ label('LBL_ORDER') }}</span>
+                <span>{{ data.order }}<span *ngIf="data.sortOrder"> – {{ label(data.sortOrder === 'desc' ? 'LBL_DESCENDING' : 'LBL_ASCENDING') }}</span></span>
+            </div>
+        </fieldset>
+
+        <div class="saved-search-buttons">
+            <button type="submit" class="btn btn-sm btn-main" [disabled]="loading || !changed()">{{ label('LBL_SAVE_BUTTON_LABEL') }}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading || !changed()" (click)="cancel()">{{ label('LBL_CANCEL_BUTTON_LABEL') }}</button>
+            <button type="button" class="btn btn-sm btn-outline-danger" [disabled]="loading" (click)="delete()">{{ label('LBL_DELETE_BUTTON_LABEL') }}</button>
+        </div>
+    </form>
+</div>

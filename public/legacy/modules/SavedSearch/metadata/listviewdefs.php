@@ -49,11 +49,19 @@ $listViewDefs['SavedSearch'] = array(
         'width' => '40%',
         'label' => 'LBL_LIST_NAME',
         'link' => true,
+        'default' => true,
         'customCode' => '<a  href="index.php?action=index&module=SavedSearch&saved_search_select={$ID}">{$NAME}</a>'),
-    'SEARCH_MODULE' => array(
-        'width' => '35%',
-        'label' => 'LBL_LIST_MODULE'),
+    'SEARCH_MODULE_NAME' => array(
+        'width' => '25%',
+        'label' => 'LBL_LIST_MODULE',
+        'sortable' => false,
+        'default' => true),
     'ASSIGNED_USER_NAME' => array(
-        'width' => '10%',
-        'label' => 'LBL_LIST_ASSIGNED_USER')
+        'width' => '20%',
+        'label' => 'LBL_LIST_ASSIGNED_USER',
+        'default' => true),
+    'DATE_MODIFIED' => array(
+        'width' => '15%',
+        'label' => 'LBL_DATE_MODIFIED',
+        'default' => true),
 );

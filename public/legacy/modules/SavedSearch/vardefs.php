@@ -139,6 +139,18 @@ $dictionary['SavedSearch'] = array(
                 'source' => 'non-db',
                 'table' => 'users',
             ),
+        'search_module_name' =>
+            array(
+                'name' => 'search_module_name',
+                'vname' => 'LBL_LIST_MODULE',
+                'type' => 'varchar',
+                'source' => 'non-db',
+                'reportable' => false,
+                'massupdate' => false,
+                'importable' => false,
+                'inline_edit' => false,
+                'comment' => 'Name of the module of the filter, in the list of the saved filters',
+            ),
         'contents' =>
             array(
                 'name' => 'contents',

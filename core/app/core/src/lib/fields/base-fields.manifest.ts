@@ -140,6 +140,7 @@ import {TextTemplateDetailFieldModule} from "./texttemplate/templates/detail/tex
 import {TextTemplateDetailFieldComponent} from "./texttemplate/templates/detail/texttemplate.component";
 import {ImageListFieldComponent} from "./image/templates/list/image.component";
 import {ImageListFieldModule} from "./image/templates/list/image.module";
+import {CoordinateEditFieldComponent, CoordinateFieldComponent} from './coordinate/coordinate.component';
 
 export const baseFieldModules = [
     VarcharDetailFieldModule,
@@ -333,6 +334,9 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'image.edit': ImageEditFieldComponent,
     'image.detail': ImageDetailFieldComponent,
     'image.list': ImageListFieldComponent,
+    'float-coordinate.list': CoordinateFieldComponent,
+    'float-coordinate.detail': CoordinateFieldComponent,
+    'float-coordinate.edit': CoordinateEditFieldComponent,
     'multienum.list': MultiEnumDetailFieldComponent,
     'multienum.detail': MultiEnumDetailFieldComponent,
     'multienum.edit': MultiEnumEditFieldComponent,

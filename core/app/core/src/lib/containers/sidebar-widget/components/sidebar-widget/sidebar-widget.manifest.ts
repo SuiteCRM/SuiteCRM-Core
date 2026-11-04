@@ -37,6 +37,9 @@ import {RecordTableWidgetComponent} from "../record-table-widget/record-table-wi
 import {RecordTableWidgetModule} from "../record-table-widget/record-table-widget.module";
 import {BannerGridSidebarWidgetModule} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.module";
 import {BannerGridSidebarWidgetComponent} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.component";
+import {MapRecordWidgetComponent} from '../maps-widgets/map-record-widget.component';
+import {MarkerMapWidgetComponent} from '../maps-widgets/marker-map-widget.component';
+import {AreaMapWidgetComponent} from '../maps-widgets/area-map-widget.component';
 
 export const sidebarWidgetModules = [
     HistorySidebarWidgetModule,
@@ -52,5 +55,8 @@ export const componentTypeMap = {
     statistics: StatisticsSidebarWidgetComponent,
     'record-thread': RecordThreadSidebarWidgetComponent,
     'record-table': RecordTableWidgetComponent,
-    'banner-grid': BannerGridSidebarWidgetComponent
+    'banner-grid': BannerGridSidebarWidgetComponent,
+    'map-record': MapRecordWidgetComponent,
+    'marker-map': MarkerMapWidgetComponent,
+    'area-map': AreaMapWidgetComponent
 };

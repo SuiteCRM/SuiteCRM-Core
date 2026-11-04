@@ -1,0 +1,93 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="map-display">
+    <p *ngIf="loading && !data" class="map-view-muted">…</p>
+    <p *ngIf="message" class="map-view-message">{{ message }}</p>
+
+    <div class="map-view-layout" [hidden]="!!message || !data">
+        <div #canvas class="map-view-canvas"></div>
+        <div class="map-view-legend" *ngIf="data && (data.center || data.markers.length || data.customMarkers.length || data.customAreas.length)">
+            <strong>{{ label('LBL_MAP_LEGEND') }}</strong>
+            <div *ngIf="data.center" class="map-view-legend-row">
+                <img [src]="centerIcon()" alt=""> {{ data.center.name }}
+            </div>
+            <label *ngFor="let group of data.groups" class="map-view-legend-row">
+                <input type="checkbox" [checked]="!hiddenGroups[group]" (change)="toggleGroup(group, $any($event.target).checked)">
+                <img [src]="groupIcon(group)" alt=""> {{ groupLabel(group) }}
+            </label>
+            <div *ngFor="let marker of data.customMarkers" class="map-view-legend-row">{{ label('LBL_MAP_CUSTOM_MARKER') }}: {{ marker.name }}</div>
+            <div *ngFor="let area of data.customAreas" class="map-view-legend-row">{{ label('LBL_MAP_CUSTOM_AREA') }}: {{ area.name }}</div>
+        </div>
+    </div>
+
+    <ng-container *ngIf="data && !data.error">
+        <p *ngIf="!data.markers.length" class="map-view-muted">{{ label('LBL_MAPS_VIEW_MAP_NO_MARKER') }}</p>
+
+        <div *ngIf="data.markers.length" class="map-records">
+            <div *ngIf="canAddToTargetList()" class="map-view-target">
+                <select class="custom-select custom-select-sm" [(ngModel)]="targetList" [attr.aria-label]="label('LBL_MAPS_VIEW_MAP_TARGET_LIST')">
+                    <option value="">{{ label('LBL_MAPS_VIEW_MAP_TARGET_LIST') }}</option>
+                    <option *ngFor="let list of data.targetLists" [value]="list.id">{{ list.name }}</option>
+                </select>
+                <button type="button" class="btn btn-sm btn-main" [disabled]="!targetList || !selectedIds().length"
+                        (click)="addToTargetList()">{{ label('LBL_ADD_TO_TARGET_LIST') }}</button>
+            </div>
+            <table class="map-view-table">
+                <thead>
+                <tr>
+                    <th *ngIf="canAddToTargetList()">
+                        <input type="checkbox" [attr.aria-label]="label('LBL_MAPS_VIEW_MAP_SELECT_ALL')" (change)="selectAll($any($event.target).checked)">
+                    </th>
+                    <th>{{ label('LBL_MAPS_VIEW_MAP_NAME') }}</th>
+                    <th>{{ label('LBL_MAPS_VIEW_MAP_ADDRESS') }}</th>
+                    <th>{{ label('LBL_MAPS_VIEW_MAP_PHONE') }}</th>
+                    <th>{{ label('LBL_MAP_GROUP') }}</th>
+                    <th>{{ label('LBL_MAPS_VIEW_MAP_USER') }}</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let marker of data.markers" [hidden]="hiddenGroups[marker.group ?? '']">
+                    <td *ngIf="canAddToTargetList()">
+                        <input type="checkbox" [(ngModel)]="selected[marker.id]" [attr.aria-label]="marker.name">
+                    </td>
+                    <td>
+                        <a [href]="recordLink(marker.module, marker.id)">{{ marker.name }}</a>
+                        <div *ngIf="marker.account_name" class="map-view-muted">{{ label('LBL_MAPS_VIEW_MAP_ACCOUNT') }}: {{ marker.account_name }}</div>
+                    </td>
+                    <td>{{ marker.address }}</td>
+                    <td>{{ marker.phone }}</td>
+                    <td>{{ groupLabel(marker.group ?? '') }}</td>
+                    <td>{{ marker.assigned_user_name }}</td>
+                    <td><button *ngIf="!message" type="button" class="btn btn-sm btn-link" (click)="show(marker)">{{ label('LBL_MAPS_VIEW_MAP_SHOW') }}</button></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </ng-container>
+</div>

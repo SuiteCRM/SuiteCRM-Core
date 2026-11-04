@@ -114,6 +114,17 @@ class Studio extends LegacyHandler
     public function getModule(string $module): array
     {
         return $this->inLegacy(function () use ($module): array {
+            if ($this->package !== '') {
+                // A module of a Module Builder package: its components as the legacy Module Builder tree.
+                $nodes = $this->getMbModule($module)->getNodes();
+
+                return [
+                    'module' => $module,
+                    'name' => $module,
+                    'nodes' => $this->nodes($this->mbFolders(is_array($nodes['children'] ?? null) ? $nodes['children'] : [], $module), []),
+                    'labels' => $this->getLabelsOfPage(),
+                ];
+            }
             $studioModule = $this->getStudioModule($module);
             $nodes = $studioModule->getNodes();
 
@@ -135,11 +146,18 @@ class Studio extends LegacyHandler
         return $this->inLegacy(function () use ($module, $language, $all): array {
             global $dictionary;
 
-            $this->getStudioModule($module);
             $languages = get_languages();
             if (!array_key_exists($language, $languages)) {
                 $language = (string)($_SESSION['authenticated_user_language'] ?? '') ?: (string)($GLOBALS['sugar_config']['default_language'] ?? 'en_us');
             }
+            if ($this->package !== '') {
+                // A module of a Module Builder package: all its strings (legacy view.modulelabels).
+                $labels = array_map('strval', $this->getMbModule($module)->getModStrings($language) ?: []);
+                ksort($labels);
+
+                return $this->labelsData($language, $languages, $labels);
+            }
+            $this->getStudioModule($module);
 
             require_once 'modules/ModuleBuilder/parsers/views/ListLayoutMetaDataParser.php';
             require_once 'modules/ModuleBuilder/parsers/views/GridLayoutMetaDataParser.php';
@@ -188,22 +206,33 @@ class Studio extends LegacyHandler
             }
             ksort($labels);
 
-            $types = [];
-            foreach (return_module_language($GLOBALS['current_language'], 'ModuleBuilder')['labelTypes'] ?? [] as $value => $label) {
-                $types[] = ['value' => (string)$value, 'label' => $this->decode((string)$label)];
-            }
-            $options = [];
-            foreach ($languages as $value => $label) {
-                $options[] = ['value' => (string)$value, 'label' => $this->decode((string)$label)];
-            }
-
-            return [
-                'language' => $language,
-                'languages' => $options,
-                'types' => $types,
-                'labels' => array_map(static fn (string $key, string $value): array => ['key' => $key, 'value' => $value], array_keys($labels), $labels),
-            ];
+            return $this->labelsData($language, $languages, $labels);
         });
+    }
+
+    /**
+     * The labels of the label editor in a language, with the languages and the label types.
+     *
+     * @param array<string, string> $languages
+     * @param array<string, string> $labels
+     */
+    protected function labelsData(string $language, array $languages, array $labels): array
+    {
+        $types = [];
+        foreach (return_module_language($GLOBALS['current_language'], 'ModuleBuilder')['labelTypes'] ?? [] as $value => $label) {
+            $types[] = ['value' => (string)$value, 'label' => $this->decode((string)$label)];
+        }
+        $options = [];
+        foreach ($languages as $value => $label) {
+            $options[] = ['value' => (string)$value, 'label' => $this->decode((string)$label)];
+        }
+
+        return [
+            'language' => $language,
+            'languages' => $options,
+            'types' => $types,
+            'labels' => array_map(static fn (string $key, string $value): array => ['key' => $key, 'value' => $value], array_keys($labels), $labels),
+        ];
     }
 
     /**
@@ -215,7 +244,7 @@ class Studio extends LegacyHandler
     public function saveLabels(string $module, string $language, array $labels): void
     {
         $this->inLegacy(function () use ($module, $language, $labels): void {
-            $this->getStudioModule($module);
+            $this->checkModule($module);
             if (!array_key_exists($language, get_languages())) {
                 throw new \InvalidArgumentException('Unknown language ' . $language);
             }
@@ -231,7 +260,7 @@ class Studio extends LegacyHandler
             }
 
             require_once 'modules/ModuleBuilder/parsers/parser.label.php';
-            (new \ParserLabel($module))->handleSave($params, $language);
+            $this->withRequest($this->packageRequest(), fn () => (new \ParserLabel($module, $this->package))->handleSave($params, $language));
             $this->markCaches();
         });
     }
@@ -245,9 +274,12 @@ class Studio extends LegacyHandler
         return $this->inLegacy(function () use ($module): array {
             global $dictionary, $current_language;
 
-            $this->getStudioModule($module);
             $types = return_module_language($current_language, 'ModuleBuilder')['fieldTypes'] ?? [];
             $types['datetime'] = $types['datetimecombo'] ?? 'Datetime';
+            if ($this->package !== '') {
+                return ['fields' => $this->getMbFields($this->getMbModule($module), $types)];
+            }
+            $this->getStudioModule($module);
 
             $objectName = \BeanFactory::getObjectName($module);
             \VardefManager::loadVardef($module, $objectName, true);
@@ -270,6 +302,56 @@ class Studio extends LegacyHandler
 
             return ['fields' => $fields];
         });
+    }
+
+    /**
+     * The fields of a module of a package, as the legacy fields list of Module Builder
+     * (view.modulefields): those of its templates, then its own (custom) fields.
+     *
+     * @param array<string, string> $types the labels of the field types
+     * @return array<int, array{name: string, label: string, type: string, custom: bool}>
+     */
+    protected function getMbFields(\MBModule $mbModule, array $types): array
+    {
+        global $current_language;
+
+        $mbModule->getVardefs(true);
+        $groups = array_reverse($mbModule->mbvardefs->vardefs['fields'] ?? [], true);
+        $own = $groups[$mbModule->name] ?? [];
+        // A field of a template redefined by the module is shown with the template (as the legacy list).
+        foreach ($groups as $group => $fields) {
+            if ($group === $mbModule->name) {
+                continue;
+            }
+            foreach (array_keys($fields) as $name) {
+                if (array_key_exists($name, $own)) {
+                    $groups[$group][$name] = $own[$name];
+                    unset($groups[$mbModule->name][$name]);
+                }
+            }
+        }
+
+        $strings = $mbModule->getModStrings($current_language) ?: $mbModule->getModStrings('en_us') ?: [];
+        $view = $this->getLabelsView();
+        $loaded = [];
+        $list = [];
+        foreach ($groups as $group => $fields) {
+            foreach ($fields as $name => $def) {
+                if (!is_array($def) || isset($loaded[$name]) || !$view->isValidStudioField($def)) {
+                    continue;
+                }
+                $loaded[$name] = true;
+                $type = (string)($def['type'] ?? '');
+                $list[] = [
+                    'name' => (string)$name,
+                    'label' => rtrim($this->decode((string)($strings[$def['vname'] ?? ''] ?? $name)), ': '),
+                    'type' => $this->decode((string)($types[$type] ?? ucfirst($type))),
+                    'custom' => $group === $mbModule->name,
+                ];
+            }
+        }
+
+        return $list;
     }
 
     /**
@@ -302,6 +384,32 @@ class Studio extends LegacyHandler
         }
 
         return $nodes;
+    }
+
+    /**
+     * The folders of a Module Builder module with the wizard view of their screen, as those of
+     * Studio: the legacy tree opens Layouts without a view, and Available Subpanels has no action.
+     *
+     * @param array<string, array> $children
+     * @return array<string, array>
+     */
+    protected function mbFolders(array $children, string $module): array
+    {
+        foreach ($children as &$child) {
+            if (!is_array($child) || !is_array($child['children'] ?? null)) {
+                continue;
+            }
+            parse_str((string)($child['action'] ?? ''), $params);
+            if (($params['view'] ?? '') !== '') {
+                continue;
+            }
+            $view = ($params['action'] ?? '') === 'wizard' ? 'layouts' : 'subpanels';
+            $child['action'] = 'module=ModuleBuilder&MB=true&action=wizard&view=' . $view
+                . '&view_module=' . $module . '&view_package=' . $this->package;
+        }
+        unset($child);
+
+        return $children;
     }
 
     /**

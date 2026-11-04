@@ -48,6 +48,8 @@ import {STUDIO_PROCESS, StudioLabel, StudioLabels, StudioLabelsData} from '../..
 export class StudioLabelsComponent implements OnChanges, OnDestroy {
 
     @Input() module = '';
+    /** The Module Builder package of the module ('' for Studio). */
+    @Input() package = '';
     @Input() labels: StudioLabels = {};
 
     data: StudioLabelsData = null;
@@ -126,7 +128,7 @@ export class StudioLabelsComponent implements OnChanges, OnDestroy {
         this.loading = true;
         this.cdr.detectChanges();
 
-        this.sub = this.processService.submit(STUDIO_PROCESS, {module: this.module, ...options}).pipe(take(1)).subscribe({
+        this.sub = this.processService.submit(STUDIO_PROCESS, {module: this.module, package: this.package, ...options}).pipe(take(1)).subscribe({
             next: (process: Process) => {
                 this.loading = false;
                 if (process?.status === 'success') {

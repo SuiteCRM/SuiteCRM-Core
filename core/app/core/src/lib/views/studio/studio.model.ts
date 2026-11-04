@@ -79,6 +79,8 @@ export const STUDIO_EMPTY = '(empty)';
  */
 export const STUDIO_ICONS: { [key: string]: string } = {
     'editLabels': 'no-fill-pencil',
+    // The labels of a module of a Module Builder package.
+    'modulelabels': 'no-fill-pencil',
     'modulefields': 'list',
     'relationships': 'apps-line',
     'wizard:layouts': 'kanban',

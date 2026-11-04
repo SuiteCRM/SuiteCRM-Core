@@ -62,7 +62,7 @@
         <p *ngIf="!shown.length" class="studio-muted">{{ label('LBL_NONE') }}</p>
     </div>
 
-    <scrm-studio-field-editor *ngIf="edited !== null" [module]="module" [field]="edited" [labels]="labels"
+    <scrm-studio-field-editor *ngIf="edited !== null" [module]="module" [package]="package" [field]="edited" [labels]="labels"
                              (closed)="closeEditor($event)"></scrm-studio-field-editor>
     </div>
 </div>

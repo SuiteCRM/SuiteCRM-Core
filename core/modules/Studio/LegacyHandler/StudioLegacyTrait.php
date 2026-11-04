@@ -31,9 +31,86 @@ namespace App\Module\Studio\LegacyHandler;
  * What the Studio legacy handlers share: the legacy app with the ModuleBuilder strings,
  * the modules of Studio, the legacy ModuleBuilder controller and its requests, the SuiteCRM 8
  * caches to rebuild after a save.
+ *
+ * The same for a module of a Module Builder package (the package of the request): its
+ * MBModule, and the package in the legacy requests (view_package, MB), as Module Builder.
  */
 trait StudioLegacyTrait
 {
+    /** The Module Builder package of the module ('' for a module of Studio). */
+    protected string $package = '';
+
+    /**
+     * The handler for a module of this Module Builder package ('' for Studio).
+     */
+    public function forPackage(string $package): static
+    {
+        if ($package !== '' && preg_match('/^\w+$/', $package) !== 1) {
+            throw new \InvalidArgumentException('Not a package name: ' . $package);
+        }
+        $this->package = $package;
+
+        return $this;
+    }
+
+    /**
+     * A module of the package of the handler (only those: their files are read).
+     */
+    protected function getMbModule(string $module): \MBModule
+    {
+        require_once 'modules/ModuleBuilder/MB/ModuleBuilder.php';
+        $builder = new \ModuleBuilder();
+        if (!in_array($this->package, $builder->getPackageList(), true)) {
+            throw new \InvalidArgumentException('Not a package: ' . $this->package);
+        }
+        $package = $builder->getPackage($this->package);
+        if (preg_match('/^\w+$/', $module) !== 1 || !is_dir($package->getPackageDir() . '/modules/' . $module)) {
+            throw new \InvalidArgumentException('Not a module of the package: ' . $module);
+        }
+
+        return $package->getModule($module);
+    }
+
+    /**
+     * The layouts of a module of the package (legacy Module Builder tree: its layouts, dashlet,
+     * popup and search forms), as the layouts of a Studio module (their legacy action).
+     *
+     * @return array<int, array{action: string}>
+     */
+    protected function getMbLayouts(string $module): array
+    {
+        $layouts = [];
+        $collect = static function (array $nodes) use (&$collect, &$layouts): void {
+            foreach ($nodes as $node) {
+                if (is_array($node)) {
+                    $layouts[] = ['action' => (string)($node['action'] ?? '')];
+                    $collect(is_array($node['children'] ?? null) ? $node['children'] : []);
+                }
+            }
+        };
+        $collect($this->getMbModule($module)->getNodes()['children'] ?? []);
+
+        return $layouts;
+    }
+
+    /**
+     * Checks the module is one of Studio, or of the package of the handler.
+     */
+    protected function checkModule(string $module): void
+    {
+        $this->package !== '' ? $this->getMbModule($module) : $this->getStudioModule($module);
+    }
+
+    /**
+     * The parameters of the legacy requests for the package of the handler (as Module Builder).
+     *
+     * @return array<string, string>
+     */
+    protected function packageRequest(): array
+    {
+        return $this->package !== '' ? ['view_package' => $this->package, 'MB' => '1'] : [];
+    }
+
     /**
      * The modules of Studio (by name).
      *

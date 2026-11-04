@@ -51,6 +51,8 @@ type FieldColumn = 'name' | 'label' | 'type';
 export class StudioFieldsComponent implements OnChanges, OnDestroy {
 
     @Input() module = '';
+    /** The Module Builder package of the module ('' for Studio). */
+    @Input() package = '';
     @Input() labels: StudioLabels = {};
     /** A field to open in the editor (an earlier link to the legacy field editor), '' for a new one. */
     @Input() field: string = null;
@@ -101,7 +103,7 @@ export class StudioFieldsComponent implements OnChanges, OnDestroy {
         this.fields = null;
         this.loading = true;
         this.cdr.detectChanges();
-        this.sub = this.processService.submit(STUDIO_PROCESS, {action: 'fields', module: this.module}).pipe(take(1)).subscribe({
+        this.sub = this.processService.submit(STUDIO_PROCESS, {action: 'fields', module: this.module, package: this.package}).pipe(take(1)).subscribe({
             next: (process: Process) => {
                 this.loading = false;
                 if (process?.status === 'success') {

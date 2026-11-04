@@ -59,6 +59,8 @@ import {
 export class StudioFieldEditorComponent implements OnChanges, OnDestroy {
 
     @Input() module = '';
+    /** The Module Builder package of the module ('' for Studio). */
+    @Input() package = '';
     /** The field edited, none for a new field. */
     @Input() field = '';
     @Input() labels: StudioLabels = {};
@@ -250,7 +252,7 @@ export class StudioFieldEditorComponent implements OnChanges, OnDestroy {
         this.cdr.detectChanges();
         try {
             const output = await this.legacy('legacy/index.php?' + new URLSearchParams({
-                module: 'ModuleBuilder', action: 'modulefield', view_package: '', view_module: this.module, field, type: type || '0', to_pdf: '1'
+                module: 'ModuleBuilder', action: 'modulefield', view_package: this.package, view_module: this.module, field, type: type || '0', to_pdf: '1'
             }));
             if (request !== this.request || this.destroyed) {
                 return;
@@ -283,7 +285,7 @@ export class StudioFieldEditorComponent implements OnChanges, OnDestroy {
         defaults.value = '';
         try {
             const output = await this.legacy('legacy/index.php?' + new URLSearchParams({
-                module: 'ModuleBuilder', action: 'get_app_list_string', key: list, view_package: '', view_module: this.module, to_pdf: '1'
+                module: 'ModuleBuilder', action: 'get_app_list_string', key: list, view_package: this.package, view_module: this.module, to_pdf: '1'
             }));
             const items = JSON.parse(output.slice(Math.max(0, output.indexOf('{'))) || '{}');
             defaults.options = Object.entries(items ?? {}).map(([value, label]) => ({value, label: String(label)}));

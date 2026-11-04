@@ -62,7 +62,7 @@
         <h3 class="studio-subtitle">{{ label('LBL_RELATIONSHIP_EDIT') }}</h3>
 
         <div class="studio-toolbar">
-            <button *ngIf="!rel.readonly" type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="saveAndDeploy()">{{ label('LBL_BTN_SAVEPUBLISH') }}</button>
+            <button *ngIf="!rel.readonly" type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="saveAndDeploy()">{{ label(package ? 'LBL_BTN_SAVE' : 'LBL_BTN_SAVEPUBLISH') }}</button>
             <button *ngIf="canSaveLabels" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="saveLabels()">{{ label('LBL_BTN_SAVE') }}</button>
             <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="close()">{{ label('LBL_BTN_CANCEL') }}</button>
             <button *ngIf="canDelete" type="button" class="btn btn-sm btn-outline-danger" [disabled]="loading" (click)="confirmDelete = true; keepTables = false">{{ label('LBL_BTN_DELETE') }}</button>

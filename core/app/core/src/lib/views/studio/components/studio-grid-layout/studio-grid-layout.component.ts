@@ -76,6 +76,8 @@ export type StudioGridDrag = { kind: 'slot'; ref: StudioSlotRef } | { kind: 'ava
 export class StudioGridLayoutComponent implements OnChanges, OnDestroy {
 
     @Input() module = '';
+    /** The Module Builder package of the module ('' for Studio). */
+    @Input() package = '';
     /** The legacy view of the layout (editview, detailview, quickcreate). */
     @Input() view = '';
     @Input() labels: StudioLabels = {};
@@ -497,7 +499,7 @@ export class StudioGridLayoutComponent implements OnChanges, OnDestroy {
         this.sub?.unsubscribe();
         this.loading = true;
         this.cdr.detectChanges();
-        this.sub = this.processService.submit(STUDIO_PROCESS, {module: this.module, view: this.view, ...options}).pipe(take(1)).subscribe({
+        this.sub = this.processService.submit(STUDIO_PROCESS, {module: this.module, package: this.package, view: this.view, ...options}).pipe(take(1)).subscribe({
             next: (process: Process) => {
                 this.loading = false;
                 if (process?.status === 'success') {

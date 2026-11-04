@@ -27,7 +27,7 @@
 -->
 <div class="studio-labels">
     <div class="studio-toolbar">
-        <button type="button" class="btn btn-sm btn-main" [disabled]="loading || !changed" (click)="save()">{{ label('LBL_BTN_SAVEPUBLISH') }}</button>
+        <button type="button" class="btn btn-sm btn-main" [disabled]="loading || !changed" (click)="save()">{{ label(package ? 'LBL_BTN_SAVE' : 'LBL_BTN_SAVEPUBLISH') }}</button>
         <a class="btn btn-sm btn-outline-secondary" href="#/studio/wizard?wizard=StudioWizard&option=RenameTabs">{{ label('LBL_BTN_RENAME_MODULE') }}</a>
         <ng-container *ngIf="data">
             <label class="studio-inline" for="studio-labels-language">{{ label('LBL_LANGUAGE') }}</label>

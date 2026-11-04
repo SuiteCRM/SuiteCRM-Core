@@ -941,3 +941,4 @@ export * from './views/studio/components/studio-grid-layout/studio-grid-layout.c
 export * from './views/studio/components/studio-relationships/studio-relationships.component';
 export * from './views/studio/components/studio-reset/studio-reset.component';
 export * from './views/studio/components/studio-export/studio-export.component';
+export * from './views/studio/components/module-builder/module-builder.component';

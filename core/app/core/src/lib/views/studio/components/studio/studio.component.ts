@@ -112,6 +112,8 @@ export class StudioComponent implements OnInit, OnDestroy {
     helpHidden = false;
     frameUrl: SafeResourceUrl = null;
 
+    /** The type of the route (Studio, or Module Builder for the page extending this one). */
+    protected routeType = 'studio';
     protected images: ThemeImageMap = {};
     protected pending = new Set<string>();
     protected paramsSub: Subscription;
@@ -340,24 +342,46 @@ export class StudioComponent implements OnInit, OnDestroy {
     }
 
     protected loadModule(module: string): void {
-        if (this.loaded[module] || this.pending.has(module)) {
+        const key = this.loadKey(module);
+        if (this.loaded[key] || this.pending.has(key)) {
             return;
         }
-        this.pending.add(module);
-        this.load({action: 'module', module}, data => {
-            this.loaded[module] = data as StudioModuleData;
+        this.pending.add(key);
+        this.load({action: 'module', ...this.moduleRequest(module)}, data => {
+            this.loaded[key] = data as StudioModuleData;
             this.labels = data.labels ?? this.labels;
             if (module === this.module) {
                 this.expandCurrent();
             }
-        }, () => this.pending.delete(module));
+        }, () => this.pending.delete(key));
+    }
+
+    /**
+     * The key of a module in the modules loaded (with its package in Module Builder).
+     */
+    protected loadKey(module: string): string {
+        return module;
+    }
+
+    /**
+     * The request of the components of a module (with its package in Module Builder).
+     */
+    protected moduleRequest(module: string): { [key: string]: string } {
+        return {module};
+    }
+
+    /**
+     * The components of the module of the screen, once loaded.
+     */
+    protected get moduleData(): StudioModuleData | undefined {
+        return this.loaded[this.loadKey(this.module)];
     }
 
     /**
      * Opens the module of the screen in the tree, and the folders down to its component.
      */
     protected expandCurrent(): void {
-        const data = this.loaded[this.module];
+        const data = this.moduleData;
         if (!data) {
             return;
         }
@@ -402,7 +426,7 @@ export class StudioComponent implements OnInit, OnDestroy {
             };
         }
 
-        const data = this.loaded[this.module];
+        const data = this.moduleData;
         if (!data) {
             return null;
         }
@@ -512,7 +536,7 @@ export class StudioComponent implements OnInit, OnDestroy {
         const params = new URLSearchParams(node.action);
         const module = params.get('view_module') || this.module;
         const action = params.get('action');
-        if (action === 'editLabels') {
+        if (action === 'editLabels' || action === 'modulelabels') {
             return {module, view: 'labels', mb: ''};
         }
         if (action === 'modulefields') {
@@ -602,7 +626,7 @@ export class StudioComponent implements OnInit, OnDestroy {
     }
 
     protected navigate(params: { [key: string]: string | null }, replaceUrl = false): void {
-        this.router.navigate([], {relativeTo: this.route, queryParams: {type: 'studio', ...params}, replaceUrl});
+        this.router.navigate([], {relativeTo: this.route, queryParams: {type: this.routeType, ...params}, replaceUrl});
     }
 
     /**

@@ -50,7 +50,8 @@ import {
     TwoFactorAuthGuard,
     AdminPanelComponent,
     TwoFactorComponent,
-    StudioComponent
+    StudioComponent,
+    ModuleBuilderComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -60,6 +61,13 @@ import {take} from 'rxjs/operators';
  */
 const studioMatch: CanMatchFn = () => {
     return inject(Router).getCurrentNavigation()?.extractedUrl?.queryParamMap?.get('type') === 'studio';
+};
+
+/**
+ * The Module Builder route of the admin panel (module-builder/index?type=mb) only.
+ */
+const moduleBuilderMatch: CanMatchFn = () => {
+    return inject(Router).getCurrentNavigation()?.extractedUrl?.queryParamMap?.get('type') === 'mb';
 };
 
 @Injectable()
@@ -199,6 +207,23 @@ export class AppInit {
                         path: 'module-builder/index',
                         component: StudioComponent,
                         canMatch: [studioMatch],
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration'
+                        }
+                    });
+                    // Module Builder (admin panel link): the Studio page for the modules of its
+                    // packages.
+                    routes.push({
+                        path: 'module-builder/index',
+                        component: ModuleBuilderComponent,
+                        canMatch: [moduleBuilderMatch],
                         canActivate: [AuthGuard],
                         runGuardsAndResolvers: 'always',
                         resolve: {

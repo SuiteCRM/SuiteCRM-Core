@@ -63,14 +63,21 @@ class StudioRelationships extends LegacyHandler
     public function getRelationships(string $module): array
     {
         return $this->inLegacy(function () use ($module): array {
-            $this->getStudioModule($module);
             require_once 'modules/ModuleBuilder/views/view.relationships.php';
-            require_once 'modules/ModuleBuilder/parsers/relationships/DeployedRelationships.php';
+            if ($this->package !== '') {
+                // A module of a package: its relationships not deployed yet (legacy Module Builder).
+                require_once 'modules/ModuleBuilder/parsers/relationships/UndeployedRelationships.php';
+                $parser = new \UndeployedRelationships($this->getMbModule($module)->getModuleDir());
+            } else {
+                $this->getStudioModule($module);
+                require_once 'modules/ModuleBuilder/parsers/relationships/DeployedRelationships.php';
+                $parser = new \DeployedRelationships($module);
+            }
 
-            return $this->withRequest(['view_module' => $module], function () use ($module): array {
+            return $this->withRequest(['view_module' => $module] + $this->packageRequest(), function () use ($module, $parser): array {
                 $view = (new \ReflectionClass(\ViewRelationships::class))->newInstanceWithoutConstructor();
                 $relationships = [];
-                foreach ($view->getAjaxRelationships(new \DeployedRelationships($module)) as $relationship) {
+                foreach ($view->getAjaxRelationships($parser) as $relationship) {
                     $relationships[] = [
                         'name' => (string)$relationship['name'],
                         'lhsModule' => $this->decode((string)$relationship['lhs_module']),
@@ -94,11 +101,11 @@ class StudioRelationships extends LegacyHandler
     public function getRelationship(string $module, array $values): array
     {
         return $this->inLegacy(function () use ($module, $values): array {
-            $this->getStudioModule($module);
+            $this->checkModule($module);
             require_once 'modules/ModuleBuilder/controller.php';
             require_once 'modules/ModuleBuilder/views/view.relationship.php';
 
-            $params = ['module' => 'ModuleBuilder', 'action' => 'relationship', 'view_module' => $module, 'view_package' => '', 'json' => 'false'];
+            $params = ['module' => 'ModuleBuilder', 'action' => 'relationship', 'view_module' => $module, 'view_package' => $this->package, 'json' => 'false'];
             foreach (array_merge(self::EDITOR_KEYS, ['relationship_lang', 'ajaxLoad']) as $key) {
                 if (isset($values[$key]) && $values[$key] !== '') {
                     $params[$key] = in_array($key, ['lhs_label', 'rhs_label'], true) ? securexss($values[$key]) : $values[$key];
@@ -159,7 +166,7 @@ class StudioRelationships extends LegacyHandler
     public function saveRelationshipLabels(string $module, string $name, string $language, string $lhsLabel, string $rhsLabel): void
     {
         $this->inLegacy(function () use ($module, $name, $language, $lhsLabel, $rhsLabel): void {
-            $this->getStudioModule($module);
+            $this->checkModule($module);
             if (!array_key_exists($language, get_languages())) {
                 throw new \InvalidArgumentException('Unknown language ' . $language);
             }
@@ -172,7 +179,7 @@ class StudioRelationships extends LegacyHandler
                 'relationship_lang' => $language,
                 'lhs_label' => securexss($lhsLabel),
                 'rhs_label' => securexss($rhsLabel),
-            ], function (): void {
+            ] + $this->packageRequest(), function (): void {
                 $this->getController()->action_SaveRelationshipLabel();
             });
             $this->markCaches();

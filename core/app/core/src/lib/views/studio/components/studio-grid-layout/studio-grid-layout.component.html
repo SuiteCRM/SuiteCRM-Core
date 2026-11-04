@@ -32,7 +32,7 @@
         <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="disabled" (click)="save(false)"
                 (mouseenter)="hover.emit(helpText('saveBtn'))" (mouseleave)="hover.emit('')"
                 (focus)="hover.emit(helpText('saveBtn'))" (blur)="hover.emit('')">{{ label('LBL_BTN_SAVE') }}</button>
-        <button type="button" class="btn btn-sm btn-main" [disabled]="disabled" (click)="save(true)"
+        <button *ngIf="!package" type="button" class="btn btn-sm btn-main" [disabled]="disabled" (click)="save(true)"
                 (mouseenter)="hover.emit(helpText('publishBtn'))" (mouseleave)="hover.emit('')"
                 (focus)="hover.emit(helpText('publishBtn'))" (blur)="hover.emit('')">{{ label('LBL_BTN_SAVEPUBLISH') }}</button>
         <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="disabled || !data?.history.length"

@@ -29,7 +29,7 @@
     <div class="studio-toolbar">
         <button type="button" class="btn btn-sm btn-main" [disabled]="loading || !data" (click)="save()"
                 (mouseenter)="hover.emit(helpText('savebtn'))" (mouseleave)="hover.emit('')"
-                (focus)="hover.emit(helpText('savebtn'))" (blur)="hover.emit('')">{{ label('LBL_BTN_SAVEPUBLISH') }}</button>
+                (focus)="hover.emit(helpText('savebtn'))" (blur)="hover.emit('')">{{ label(package ? 'LBL_BTN_SAVE' : 'LBL_BTN_SAVEPUBLISH') }}</button>
         <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading || !data?.history.length"
                 [attr.aria-expanded]="historyOpen" (click)="historyOpen = !historyOpen"
                 (mouseenter)="hover.emit(helpText('historyBtn'))" (mouseleave)="hover.emit('')"

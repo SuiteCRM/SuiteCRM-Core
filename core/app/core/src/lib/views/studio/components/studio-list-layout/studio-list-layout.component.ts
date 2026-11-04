@@ -50,6 +50,8 @@ import {STUDIO_PROCESS, StudioHelp, StudioHistoryEntry, StudioLabels, StudioLayo
 export class StudioListLayoutComponent implements OnChanges, OnDestroy {
 
     @Input() module = '';
+    /** The Module Builder package of the module ('' for Studio). */
+    @Input() package = '';
     /** The legacy view of the layout (listview, dashlet, popuplist, basic_search…). */
     @Input() view = '';
     @Input() subpanel = '';
@@ -215,7 +217,7 @@ export class StudioListLayoutComponent implements OnChanges, OnDestroy {
         this.sub?.unsubscribe();
         this.loading = true;
         this.cdr.detectChanges();
-        this.sub = this.processService.submit(STUDIO_PROCESS, {module: this.module, view: this.view, subpanel: this.subpanel, ...options})
+        this.sub = this.processService.submit(STUDIO_PROCESS, {module: this.module, package: this.package, view: this.view, subpanel: this.subpanel, ...options})
             .pipe(take(1)).subscribe({
                 next: (process: Process) => {
                     this.loading = false;

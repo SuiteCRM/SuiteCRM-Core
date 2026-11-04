@@ -105,7 +105,9 @@ class StudioGridLayouts extends LegacyHandler
                 // The strings of the legacy editor: for the fields those of the module, else those of
                 // ModuleBuilder; for the default panel those of ModuleBuilder (its $mod).
                 $strings = $GLOBALS['mod_strings'];
-                $moduleStrings = return_module_language($current_language, $module);
+                $moduleStrings = $this->package !== ''
+                    ? ($this->getMbModule($module)->getModStrings($current_language) ?: [])
+                    : return_module_language($current_language, $module);
                 $GLOBALS['mod_strings'] = sugarArrayMerge($strings, $moduleStrings);
                 try {
                     $data = [
@@ -190,7 +192,8 @@ class StudioGridLayouts extends LegacyHandler
                     throw new \InvalidArgumentException('Not in the history of the layout: ' . $sid);
                 }
                 $controller = $this->getController();
-                $deploy ? $controller->action_saveAndPublishLayout() : $controller->action_saveLayout();
+                // A layout of a package is saved only (deployed with its package).
+                $deploy && $this->package === '' ? $controller->action_saveAndPublishLayout() : $controller->action_saveLayout();
 
                 // The labels of the fields and panels changed (legacy saveProperty).
                 if ($labels !== []) {
@@ -199,7 +202,7 @@ class StudioGridLayouts extends LegacyHandler
                     foreach ($labels as $key => $value) {
                         $request['label_' . $key] = securexss($value);
                     }
-                    (new \ParserLabel($module))->handleSave($request, $current_language);
+                    (new \ParserLabel($module, $this->package))->handleSave($request, $current_language);
                 }
             });
             $this->markCaches();
@@ -237,7 +240,7 @@ class StudioGridLayouts extends LegacyHandler
                 'id' => $panelId,
                 'label' => $panelId === 'default'
                     ? $this->text($defaultLabel)
-                    : $this->text(translate(strtoupper($panelId), $parser->getLanguage())),
+                    : $this->text(translate(strtoupper($panelId), $this->labelModule($parser))),
                 'labelEditable' => $panelId !== 'default',
                 'newTab' => !empty($tabDef['newTab']),
                 'panelDefault' => ($tabDef['panelDefault'] ?? '') === 'collapsed' ? 'collapsed' : 'expanded',
@@ -260,7 +263,7 @@ class StudioGridLayouts extends LegacyHandler
             $labelKey = (string)($field['label'] ?? '');
             $fields[] = [
                 'name' => (string)$field['name'],
-                'label' => $this->text($labelKey !== '' ? translate($labelKey, $parser->getLanguage()) : (string)$field['name']),
+                'label' => $this->text($labelKey !== '' ? translate($labelKey, $this->labelModule($parser)) : (string)$field['name']),
                 'labelKey' => $labelKey,
                 'tabindex' => '',
             ];
@@ -272,6 +275,15 @@ class StudioGridLayouts extends LegacyHandler
     /**
      * A label as the legacy editor shows it (sugar_translate): without its colon nor spaces.
      */
+    /**
+     * The module of the labels of a layout: none for a module of a package (not deployed, its
+     * strings are those of the request), else the module of the parser.
+     */
+    protected function labelModule(\GridLayoutMetaDataParser $parser): string
+    {
+        return $this->package !== '' ? '' : (string)$parser->getLanguage();
+    }
+
     protected function text(mixed $text): string
     {
         return trim(preg_replace('/([:]|\xEF\xBC\x9A)[\s]*$/', '', $this->decode(is_string($text) ? $text : '')));
@@ -317,7 +329,8 @@ class StudioGridLayouts extends LegacyHandler
     protected function validate(string $module, string $view): void
     {
         $views = [];
-        foreach ($this->getStudioModule($module)->getLayouts() as $layout) {
+        $layouts = $this->package !== '' ? $this->getMbLayouts($module) : $this->getStudioModule($module)->getLayouts();
+        foreach ($layouts as $layout) {
             parse_str((string)($layout['action'] ?? ''), $params);
             if (($params['action'] ?? '') === 'editLayout') {
                 $views[] = strtolower((string)($params['view'] ?? ''));
@@ -335,14 +348,14 @@ class StudioGridLayouts extends LegacyHandler
      */
     protected function request(string $module, string $view): array
     {
-        return ['module' => 'ModuleBuilder', 'view' => $view, 'view_module' => $module];
+        return ['module' => 'ModuleBuilder', 'view' => $view, 'view_module' => $module] + $this->packageRequest();
     }
 
     protected function getParser(string $module, string $view): \GridLayoutMetaDataParser
     {
         require_once 'modules/ModuleBuilder/parsers/constants.php';
         require_once 'modules/ModuleBuilder/parsers/ParserFactory.php';
-        $parser = \ParserFactory::getParser($view, $module);
+        $parser = \ParserFactory::getParser($view, $module, $this->package !== '' ? $this->package : null);
         if (!$parser instanceof \GridLayoutMetaDataParser) {
             throw new \InvalidArgumentException('Not a grid layout: ' . $view);
         }

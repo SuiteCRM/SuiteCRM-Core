@@ -56,6 +56,8 @@ type RelationshipColumn = 'name' | 'lhsModule' | 'type' | 'rhsModule';
 export class StudioRelationshipsComponent implements OnChanges, OnDestroy {
 
     @Input() module = '';
+    /** The Module Builder package of the module ('' for Studio). */
+    @Input() package = '';
     @Input() labels: StudioLabels = {};
     /** The help of the editor while it is open, the help of the list otherwise. */
     @Output() editing = new EventEmitter<boolean>();
@@ -93,7 +95,7 @@ export class StudioRelationshipsComponent implements OnChanges, OnDestroy {
         if (changes.module) {
             this.close();
             this.relationships = null;
-            this.submit({action: 'relationships', module: this.module}, data => this.setList(data));
+            this.submit({action: 'relationships', module: this.module, package: this.package}, data => this.setList(data));
         }
     }
 
@@ -214,6 +216,7 @@ export class StudioRelationshipsComponent implements OnChanges, OnDestroy {
         this.submit({
             action: 'saveRelationshipLabels',
             module: this.module,
+            package: this.package,
             name: this.rel.name,
             language: this.language,
             lhsLabel: this.rel.lhsLabel,
@@ -256,7 +259,7 @@ export class StudioRelationshipsComponent implements OnChanges, OnDestroy {
     }
 
     protected load(values: { [key: string]: string }): void {
-        this.submit({action: 'relationship', module: this.module, values}, data => {
+        this.submit({action: 'relationship', module: this.module, package: this.package, values}, data => {
             this.editor = data as StudioRelationshipEditor;
             this.rel = {...this.editor.relationship};
             // The first subpanel when none is set, as the legacy select shows it.
@@ -274,14 +277,15 @@ export class StudioRelationshipsComponent implements OnChanges, OnDestroy {
         this.loading = true;
         this.cdr.detectChanges();
         try {
-            await postStudioAction(params);
+            // A relationship of a module of a package: its package, as Module Builder.
+            await postStudioAction(this.package ? {...params, view_package: this.package} : params);
         } catch (e) {
             this.loading = false;
             this.message.addDangerMessage(this.label('LBL_ACTION_ERROR'));
             this.cdr.detectChanges();
             return;
         }
-        this.submit({action: 'relationships', module: this.module}, data => this.saved(data));
+        this.submit({action: 'relationships', module: this.module, package: this.package}, data => this.saved(data));
     }
 
     protected saved(data: any): void {

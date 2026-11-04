@@ -67,6 +67,9 @@ use Psr\Log\LoggerInterface;
  *   name);
  * - saveRelationshipLabels: module, name, language, lhsLabel, rhsLabel → saved, then the
  *   relationships (Save & Deploy and Delete: the page posts the legacy form to its action).
+ *
+ * With package, the actions of a module (labels, fields, layouts, relationships) are for
+ * a module of that Module Builder package.
  */
 class StudioProcessHandler implements ProcessHandlerInterface
 {
@@ -123,6 +126,11 @@ class StudioProcessHandler implements ProcessHandlerInterface
         if (!in_array($options['action'], self::GLOBAL_ACTIONS, true) && !preg_match('/^\w+$/', (string)($options['module'] ?? ''))) {
             throw new \InvalidArgumentException('Process options are not defined');
         }
+        // A module of a Module Builder package (not for the Studio tools).
+        if (!preg_match('/^\w*$/', (string)($options['package'] ?? ''))
+            || ((string)($options['package'] ?? '') !== '' && in_array($options['action'], ['modules', 'resetActions', 'exportModules', 'exportCustomizations'], true))) {
+            throw new \InvalidArgumentException('Process options are not defined');
+        }
         if (in_array($options['action'], ['listLayout', 'saveListLayout', 'gridLayout', 'saveGridLayout'], true) && (
             !preg_match('/^\w+$/', (string)($options['view'] ?? ''))
             || !preg_match('/^\w*$/', (string)($options['subpanel'] ?? ''))
@@ -137,6 +145,11 @@ class StudioProcessHandler implements ProcessHandlerInterface
         $options = $process->getOptions();
         $module = (string)($options['module'] ?? '');
         $language = (string)($options['language'] ?? '');
+        // The services for a module of this Module Builder package ('' for Studio).
+        $package = (string)($options['package'] ?? '');
+        foreach ([$this->studio, $this->listLayouts, $this->gridLayouts, $this->relationships] as $service) {
+            $service->forPackage($package);
+        }
 
         try {
             $data = match ($options['action']) {

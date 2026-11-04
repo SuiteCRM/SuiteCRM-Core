@@ -104,7 +104,8 @@ class StudioListLayouts extends LegacyHandler
                     'columns' => $columns,
                     'widths' => substr($lowerView, -6) !== 'search',
                     'minimum' => $lowerView === 'listview',
-                    'subpanelTitle' => $subpanel !== '' ? $this->subpanelTitle($module, $subpanel) : null,
+                    // The title of a subpanel of Studio (the subpanels of a package have their own).
+                    'subpanelTitle' => $subpanel !== '' && $this->package === '' ? $this->subpanelTitle($module, $subpanel) : null,
                     'history' => $this->history($history),
                     'restoreDefault' => in_array($lowerView, self::RESTORE_DEFAULT, true) && $history->getCount() > 0
                         ? (string)$history->getLast() : '',
@@ -145,7 +146,7 @@ class StudioListLayouts extends LegacyHandler
                     $params[strtolower($name) . 'width'] = 'width=' . ($widths[$name] ?? '');
                 }
             }
-            if ($subpanel !== '' && $subpanelTitle !== null) {
+            if ($subpanel !== '' && $subpanelTitle !== null && $this->package === '') {
                 $params['subpanel_title'] = securexss($subpanelTitle);
                 $params['subpanel_title_key'] = $this->subpanelTitle($module, $subpanel)['key'];
                 $params['selected_lang'] = $current_language;
@@ -166,7 +167,7 @@ class StudioListLayouts extends LegacyHandler
                     foreach ($labels as $key => $value) {
                         $request['label_' . $key] = securexss($value);
                     }
-                    (new \ParserLabel($module))->handleSave($request, $current_language);
+                    (new \ParserLabel($module, $this->package))->handleSave($request, $current_language);
                 }
             });
             $this->markCaches();
@@ -181,7 +182,8 @@ class StudioListLayouts extends LegacyHandler
      */
     protected function columns(\ListLayoutMetaDataParser $parser, string $subpanel): array
     {
-        $language = $parser->getLanguage();
+        // A module of a package: its strings are in the global ones (set by its legacy parser).
+        $language = $this->package !== '' ? '' : $parser->getLanguage();
         $columns = [];
         foreach ($parser->columns as $column => $function) {
             $fields = [];
@@ -258,11 +260,16 @@ class StudioListLayouts extends LegacyHandler
      */
     protected function validate(string $module, string $view, string $subpanel): void
     {
-        $this->getStudioModule($module);
+        $this->checkModule($module);
         if (!isset(self::VIEWS[strtolower($view)])) {
             throw new \InvalidArgumentException('Not a list layout: ' . $view);
         }
-        if ($subpanel !== '') {
+        if ($subpanel !== '' && $this->package !== '') {
+            // A subpanel the module of the package provides (legacy Module Builder tree).
+            if (strtolower($view) !== 'listview' || !isset($this->getMbModule($module)->getProvidedSubpanels()[$subpanel])) {
+                throw new \InvalidArgumentException('Not a subpanel of the module: ' . $subpanel);
+            }
+        } elseif ($subpanel !== '') {
             require_once 'include/SubPanel/SubPanel.php';
             if (strtolower($view) !== 'listview' || !isset(\SubPanel::getModuleSubpanels($module)[strtolower($subpanel)])) {
                 throw new \InvalidArgumentException('Not a subpanel of the module: ' . $subpanel);
@@ -277,7 +284,7 @@ class StudioListLayouts extends LegacyHandler
      */
     protected function request(string $module, string $view, string $subpanel): array
     {
-        $params = ['module' => 'ModuleBuilder', 'view' => $view, 'view_module' => $module];
+        $params = ['module' => 'ModuleBuilder', 'view' => $view, 'view_module' => $module] + $this->packageRequest();
         if ($subpanel !== '') {
             $params['subpanel'] = $subpanel;
         }
@@ -290,6 +297,6 @@ class StudioListLayouts extends LegacyHandler
         require_once 'modules/ModuleBuilder/parsers/constants.php';
         require_once 'modules/ModuleBuilder/parsers/ParserFactory.php';
 
-        return \ParserFactory::getParser($view, $module, null, $subpanel !== '' ? $subpanel : null);
+        return \ParserFactory::getParser($view, $module, $this->package !== '' ? $this->package : null, $subpanel !== '' ? $subpanel : null);
     }
 }

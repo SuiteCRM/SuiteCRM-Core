@@ -1,0 +1,177 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="project-gantt">
+    <p *ngIf="loading && !data" class="project-gantt-muted">…</p>
+    <ng-container *ngIf="data">
+        <div class="project-gantt-toolbar" *ngIf="data.canEdit">
+            <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="add()">{{ label('LBL_ADD_NEW_TASK') }}</button>
+        </div>
+        <p *ngIf="!data.tasks.length" class="project-gantt-muted">{{ label('LBL_GANTT_NO_TASK') }}</p>
+        <p *ngIf="template && data.tasks.length" class="project-gantt-muted">{{ label('LBL_GANTT_TEMPLATE_DAYS') }}</p>
+
+        <div *ngIf="data.tasks.length" class="project-gantt-body" [class.is-loading]="loading">
+            <table class="project-gantt-table">
+                <thead>
+                <tr class="project-gantt-head">
+                    <th>{{ label('LBL_TASK_ID') }}</th>
+                    <th>{{ label('LBL_TASK_NAME') }}</th>
+                    <th>{{ label('LBL_PREDECESSORS') }}</th>
+                    <th>{{ label('LBL_START') }}</th>
+                    <th>{{ label('LBL_FINISH') }}</th>
+                    <th>{{ label('LBL_DURATION') }}</th>
+                    <th>{{ label('LBL_ASSIGNED_USER_ID') }}</th>
+                    <th>{{ label('LBL_PERCENT_COMPLETE') }}</th>
+                    <th>{{ label('LBL_MILESTONE_FLAG') }}</th>
+                    <th *ngIf="!template">{{ label('LBL_ACTUAL_DURATION') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let task of data.tasks; trackBy: trackTask" [style.height.px]="rowHeight"
+                    [attr.draggable]="data.canEdit" [title]="data.canEdit ? label('LBL_GANTT_MOVE') : ''"
+                    (dragstart)="dragStart(task)" (dragover)="$event.preventDefault()" (drop)="drop(task)">
+                    <td>{{ task.number || '' }}</td>
+                    <td class="project-gantt-name">
+                        <a *ngIf="data.canEdit" href="" [title]="label('LBL_TASK_TITLE')" (click)="$event.preventDefault(); edit(task)">{{ task.name }}</a>
+                        <span *ngIf="!data.canEdit">{{ task.name }}</span>
+                    </td>
+                    <td>{{ task.predecessor }}</td>
+                    <td>{{ startText(task) }}</td>
+                    <td>{{ finishText(task) }}</td>
+                    <td>{{ task.duration }} {{ task.unit === 'Hours' ? label('LBL_HOURS') : label('LBL_DAYS') }}</td>
+                    <td>{{ resourceName(task.resource) }}</td>
+                    <td>{{ task.percent }}</td>
+                    <td><input type="checkbox" disabled [checked]="task.milestone" [attr.aria-label]="label('LBL_MILESTONE_FLAG')"></td>
+                    <td *ngIf="!template">{{ task.actualDuration }}</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="project-gantt-chart">
+                <div class="project-gantt-chart-inner" [style.width.px]="days.length * dayWidth">
+                    <div class="project-gantt-months">
+                        <div *ngFor="let month of months" [style.width.px]="month.span * dayWidth">{{ month.label }}</div>
+                    </div>
+                    <div class="project-gantt-days">
+                        <div *ngFor="let day of days" [style.width.px]="dayWidth" [class.is-weekend]="day.weekend">
+                            <span>{{ day.day }}</span><span>{{ day.letter }}</span>
+                        </div>
+                    </div>
+                    <div class="project-gantt-rows" [style.height.px]="data.tasks.length * rowHeight">
+                        <div class="project-gantt-grid">
+                            <div *ngFor="let day of days" [style.width.px]="dayWidth" [class.is-weekend]="day.weekend"></div>
+                        </div>
+                        <div *ngFor="let task of data.tasks; let row = index; trackBy: trackTask" class="project-gantt-row"
+                             [style.top.px]="row * rowHeight" [style.height.px]="rowHeight">
+                            <ng-container *ngIf="hasBar(task)">
+                                <div *ngIf="task.milestone" class="project-gantt-milestone" [style.left.px]="offset(task)"
+                                     [title]="task.name" (click)="edit(task)"></div>
+                                <div *ngIf="!task.milestone" class="project-gantt-bar" [style.left.px]="offset(task)"
+                                     [style.width.px]="width(task)" [title]="task.name + ' (' + task.percent + '%)'" (click)="edit(task)">
+                                    <div class="project-gantt-percent" [style.width.%]="task.percent"></div>
+                                    <span>{{ task.name }}</span>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <svg class="project-gantt-arrows" [attr.width]="days.length * dayWidth" [attr.height]="data.tasks.length * rowHeight">
+                            <defs>
+                                <marker id="project-gantt-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                                    <path d="M0,0 L8,4 L0,8 z"></path>
+                                </marker>
+                            </defs>
+                            <path *ngFor="let arrow of arrows()" [attr.d]="arrow" marker-end="url(#project-gantt-arrow)"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="form" class="project-gantt-form-backdrop" (click)="form = null"></div>
+        <form *ngIf="form" class="project-gantt-form" (ngSubmit)="save()">
+            <h3>{{ form.taskId ? label('LBL_TASK_TITLE') : label('LBL_ADD_NEW_TASK') }}</h3>
+            <p class="project-gantt-muted">{{ label('LBL_EDIT_TASK_PROPERTIES') }}</p>
+            <div class="project-gantt-form-row">
+                <label><input type="radio" name="milestone" [value]="false" [(ngModel)]="form.milestone"> {{ label('LBL_SUBTASK') }}</label>
+                <label><input type="radio" name="milestone" [value]="true" [(ngModel)]="form.milestone"> {{ label('LBL_MILESTONE_FLAG') }}</label>
+            </div>
+            <label for="project-gantt-name">{{ label('LBL_TASK_NAME') }} *</label>
+            <input id="project-gantt-name" name="name" class="form-control form-control-sm" maxlength="50" required [(ngModel)]="form.name">
+            <label for="project-gantt-predecessor">{{ label('LBL_PREDECESSORS') }}</label>
+            <select id="project-gantt-predecessor" name="predecessor" class="custom-select custom-select-sm" [(ngModel)]="form.predecessor"
+                    (ngModelChange)="predecessorChanged()">
+                <option value="">{{ label('LBL_GANTT_NONE') }}</option>
+                <ng-container *ngFor="let task of data.tasks">
+                    <option *ngIf="task.id !== form.taskId && task.number" [value]="'' + task.number">{{ task.number }} - {{ task.name }}</option>
+                </ng-container>
+            </select>
+            <label for="project-gantt-relation">{{ label('LBL_RELATIONSHIP_TYPE') }}</label>
+            <select id="project-gantt-relation" name="relationType" class="custom-select custom-select-sm" [(ngModel)]="form.relationType"
+                    (ngModelChange)="predecessorChanged()">
+                <option *ngFor="let type of data.relationTypes" [value]="type.value">{{ type.label }}</option>
+            </select>
+            <ng-container *ngIf="!template">
+                <label for="project-gantt-lag">{{ label('LBL_LAG') }} ({{ label('LBL_DAYS') }})</label>
+                <input id="project-gantt-lag" name="lag" type="number" class="form-control form-control-sm" [(ngModel)]="form.lag"
+                       (ngModelChange)="predecessorChanged()">
+                <label for="project-gantt-start">{{ label('LBL_START') }} *</label>
+                <input id="project-gantt-start" name="start" type="date" class="form-control form-control-sm" required [(ngModel)]="form.start">
+            </ng-container>
+            <ng-container *ngIf="!form.milestone">
+                <label for="project-gantt-duration">{{ label('LBL_DURATION') }}</label>
+                <span class="project-gantt-inline">
+                    <input id="project-gantt-duration" name="duration" type="number" min="1" class="form-control form-control-sm" [(ngModel)]="form.duration">
+                    <select *ngIf="!template" name="unit" class="custom-select custom-select-sm" [(ngModel)]="form.unit"
+                            [attr.aria-label]="label('LBL_DURATION')">
+                        <option value="Days">{{ label('LBL_DAYS') }}</option>
+                        <option value="Hours">{{ label('LBL_HOURS') }}</option>
+                    </select>
+                    <span *ngIf="template">{{ label('LBL_DAYS') }}</span>
+                </span>
+            </ng-container>
+            <label for="project-gantt-resource">{{ label('LBL_ASSIGNED_USER_ID') }}</label>
+            <select id="project-gantt-resource" name="resource" class="custom-select custom-select-sm" [(ngModel)]="form.resource">
+                <option value="">{{ template ? label('LBL_UNASSIGNED') : '' }}</option>
+                <option *ngFor="let resource of data.resources" [value]="resource.id"
+                        [title]="label(resource.type === 'contact' ? 'LBL_RESOURCE_TYPE_TITLE_CONTACT' : 'LBL_RESOURCE_TYPE_TITLE_USER')">{{ resource.name }}</option>
+            </select>
+            <label for="project-gantt-percent">{{ label('LBL_PERCENT_COMPLETE') }}</label>
+            <input id="project-gantt-percent" name="percent" type="number" min="0" max="100" class="form-control form-control-sm" [(ngModel)]="form.percent">
+            <ng-container *ngIf="!template">
+                <label for="project-gantt-actual">{{ label('LBL_ACTUAL_DURATION') }}</label>
+                <input id="project-gantt-actual" name="actualDuration" type="number" min="0" class="form-control form-control-sm"
+                       [(ngModel)]="form.actualDuration">
+            </ng-container>
+            <label for="project-gantt-note">{{ label('LBL_GANTT_NOTES') }}</label>
+            <textarea id="project-gantt-note" name="note" rows="3" class="form-control form-control-sm" [(ngModel)]="form.note"></textarea>
+            <div class="project-gantt-form-buttons">
+                <button type="submit" class="btn btn-sm btn-main" [disabled]="loading">{{ label('LBL_SAVE_BUTTON_LABEL') }}</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="form = null">{{ label('LBL_CANCEL_BUTTON_LABEL') }}</button>
+                <button *ngIf="form.taskId" type="button" class="btn btn-sm btn-outline-danger" [disabled]="loading" (click)="delete()">{{ label('LBL_DELETE_TASK') }}</button>
+            </div>
+        </form>
+    </ng-container>
+</div>

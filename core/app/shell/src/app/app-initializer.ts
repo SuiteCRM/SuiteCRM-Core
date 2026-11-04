@@ -184,6 +184,14 @@ export class AppInit {
                             }
                         }
                     });
+                    // The legacy View Gantt links of the projects and project templates: their record
+                    // view, which shows the Gantt chart under the details.
+                    [['project', 'project_id'], ['project-templates', 'record']].forEach(([module, param]) => routes.push({
+                        path: module + '/view_GanttChart',
+                        redirectTo: (route) => this.router.createUrlTree(
+                            ['/', module, 'record', route.queryParams?.record ?? route.queryParams?.[param] ?? '']
+                        )
+                    }));
                     routes.push(loggedOutConfig);
 
                     Object.keys(configRoutes).forEach(routeName => {

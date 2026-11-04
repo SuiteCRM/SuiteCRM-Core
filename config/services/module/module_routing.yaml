@@ -79,11 +79,11 @@ parameters:
     project:
       index: true
       list: true
-      record: false
+      record: true
     project-task:
       index: true
       list: true
-      record: false
+      record: true
     bugs:
       index: true
       list: true
@@ -131,7 +131,7 @@ parameters:
     project-templates:
       index: true
       list: true
-      record: false
+      record: true
     task-templates:
       index: true
       list: true

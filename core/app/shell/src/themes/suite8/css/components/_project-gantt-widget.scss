@@ -1,0 +1,117 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// Gantt chart of a project: the task table and the chart side by side, rows of the same
+// height; the task form in a dialog.
+.project-gantt {
+    padding: 8px 0;
+    font-size: 12px;
+
+    .project-gantt-muted { color: $dusky-blue; }
+    .project-gantt-toolbar { margin: 0 0 8px; }
+
+    .project-gantt-body { display: flex; align-items: flex-start; gap: 0; border: 1px solid $border-color; background: $white; }
+    .project-gantt-body.is-loading { opacity: .6; pointer-events: none; }
+
+    .project-gantt-table {
+        flex: 0 0 auto;
+        border-collapse: collapse;
+        border-right: 2px solid $border-color;
+
+        th { height: 44px; padding: 0 6px; background: $off-white-lighter; color: $dusky-blue; font-size: 11px; font-weight: 600; white-space: nowrap; }
+        td { padding: 0 6px; border-top: 1px solid $light-grey; white-space: nowrap; }
+        tr[draggable="true"] { cursor: move; }
+        .project-gantt-name { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+    }
+
+    .project-gantt-chart { flex: 1 1 auto; overflow-x: auto; }
+    .project-gantt-chart-inner { position: relative; }
+    .project-gantt-months, .project-gantt-days { display: flex; height: 22px; background: $off-white-lighter; }
+    .project-gantt-months > div { overflow: hidden; padding: 3px 4px; border-left: 1px solid $border-color; font-weight: 600; white-space: nowrap; }
+    .project-gantt-days > div { display: flex; flex-direction: column; align-items: center; border-left: 1px solid $light-grey; font-size: 9px; line-height: 10px; }
+    .project-gantt-days > div.is-weekend, .project-gantt-grid > div.is-weekend { background: $bright-blue; }
+
+    .project-gantt-rows { position: relative; }
+    .project-gantt-grid { position: absolute; inset: 0; display: flex; }
+    .project-gantt-grid > div { border-left: 1px solid $bright-blue; }
+    .project-gantt-row { position: absolute; left: 0; right: 0; border-top: 1px solid $light-grey; }
+
+    .project-gantt-bar {
+        position: absolute;
+        top: 8px;
+        height: 18px;
+        overflow: hidden;
+        background: $powdered-blue;
+        border-radius: 3px;
+        cursor: pointer;
+
+        span { position: relative; padding: 0 4px; line-height: 18px; color: $median-grey; white-space: nowrap; }
+    }
+
+    .project-gantt-percent { position: absolute; top: 0; bottom: 0; left: 0; background: $astral-blue; }
+
+    .project-gantt-milestone {
+        position: absolute;
+        top: 10px;
+        width: 14px;
+        height: 14px;
+        margin-left: 5px;
+        background: $danger;
+        transform: rotate(45deg);
+        cursor: pointer;
+    }
+
+    .project-gantt-arrows { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; }
+    .project-gantt-arrows path { fill: none; stroke: $dusky-blue; stroke-width: 1.2; }
+    .project-gantt-arrows marker path { fill: $dusky-blue; stroke: none; }
+
+    .project-gantt-form-backdrop { position: fixed; inset: 0; z-index: 1040; background: rgba(0, 0, 0, .3); }
+    .project-gantt-form {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        z-index: 1050;
+        display: grid;
+        grid-template-columns: minmax(120px, 1fr) minmax(0, 2fr);
+        gap: 6px 12px;
+        align-items: center;
+        width: min(560px, calc(100vw - 32px));
+        max-height: calc(100vh - 64px);
+        overflow-y: auto;
+        padding: 16px;
+        background: $white;
+        border-radius: 4px;
+        transform: translate(-50%, -50%);
+        font-size: 13px;
+
+        h3, p, .project-gantt-form-row, .project-gantt-form-buttons { grid-column: 1 / -1; margin: 0; }
+        h3 { font-size: 16px; }
+        label { margin: 0; }
+        .project-gantt-form-row { display: flex; gap: 16px; }
+        .project-gantt-inline { display: flex; gap: 8px; align-items: center; }
+        .project-gantt-form-buttons { display: flex; gap: 8px; margin-top: 8px; }
+    }
+}

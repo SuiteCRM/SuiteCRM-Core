@@ -65,6 +65,30 @@ array(
       ),
       'syncDetailEditViews' => true,
     ),
+    // SuiteCRM 8 record view: the Gantt chart of the template under the details, and Create
+    // Project of the legacy view.
+    'bottomWidgets' =>
+    array(
+      0 =>
+      array(
+        'type' => 'project-template-gantt',
+        'modes' => array('detail'),
+        'options' => array(),
+      ),
+    ),
+    'recordActions' =>
+    array(
+      'actions' =>
+      array(
+        'project-template-create-project' =>
+        array(
+          'key' => 'project-template-create-project',
+          'labelKey' => 'LBL_CREATE_PROJECT',
+          'modes' => array('detail'),
+          'acl' => array('edit'),
+        ),
+      ),
+    ),
     'panels' =>
     array(
       'default' =>
@@ -89,7 +113,7 @@ array(
             'label' => 'LBL_PRIORITY',
           ),
         ),
-        3 =>
+        2 =>
         array(
           0 =>
           array(

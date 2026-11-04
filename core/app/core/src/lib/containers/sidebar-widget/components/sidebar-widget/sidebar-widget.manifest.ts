@@ -37,13 +37,19 @@ import {RecordTableWidgetComponent} from "../record-table-widget/record-table-wi
 import {RecordTableWidgetModule} from "../record-table-widget/record-table-widget.module";
 import {BannerGridSidebarWidgetModule} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.module";
 import {BannerGridSidebarWidgetComponent} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.component";
+import {ProjectGanttWidgetModule} from '../project-gantt-widget/project-gantt-widget.module';
+import {
+    ProjectGanttWidgetComponent,
+    ProjectTemplateGanttWidgetComponent
+} from '../project-gantt-widget/project-gantt-widget.component';
 
 export const sidebarWidgetModules = [
     HistorySidebarWidgetModule,
     ChartSidebarWidgetModule,
     StatisticsSidebarWidgetModule,
     RecordTableWidgetModule,
-    BannerGridSidebarWidgetModule
+    BannerGridSidebarWidgetModule,
+    ProjectGanttWidgetModule
 ];
 
 export const componentTypeMap = {
@@ -52,5 +58,7 @@ export const componentTypeMap = {
     statistics: StatisticsSidebarWidgetComponent,
     'record-thread': RecordThreadSidebarWidgetComponent,
     'record-table': RecordTableWidgetComponent,
-    'banner-grid': BannerGridSidebarWidgetComponent
+    'banner-grid': BannerGridSidebarWidgetComponent,
+    'project-gantt': ProjectGanttWidgetComponent,
+    'project-template-gantt': ProjectTemplateGanttWidgetComponent
 };

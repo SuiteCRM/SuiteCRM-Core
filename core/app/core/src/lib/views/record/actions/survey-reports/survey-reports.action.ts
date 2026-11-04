@@ -32,7 +32,7 @@ import {ViewMode} from '../../../../common/views/view.model';
 /**
  * View Survey Reports of the survey record view (modules/Surveys/metadata/
  * detailviewdefs.php): the report page of the survey (route surveys/reports/:record, see
- * extension.module.ts), as the button of the legacy detail view.
+ * app-initializer.ts), as the button of the legacy detail view.
  */
 @Injectable({providedIn: 'root'})
 export class SurveyReportsAction extends RecordActionHandler {

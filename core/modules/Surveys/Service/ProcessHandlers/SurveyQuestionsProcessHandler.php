@@ -34,7 +34,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 /**
- * `Survey-questions` process of the survey pages of SuiteCRM 8 (SurveyQuestionsHandler), with the
+ * Process `survey-questions` of the survey pages of SuiteCRM 8 (SurveyQuestionsHandler), with the
  * access of the legacy pages.
  *
  * Options, by action:

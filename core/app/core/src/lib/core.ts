@@ -929,3 +929,7 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './views/system-settings/components/system-settings/system-settings.component';
+export * from './views/system-settings/components/system-settings/system-settings.module';
+export * from './views/system-settings/components/history-subpanel-settings/history-subpanel-settings.component';
+export * from './views/system-settings/components/history-subpanel-settings/history-subpanel-settings.module';

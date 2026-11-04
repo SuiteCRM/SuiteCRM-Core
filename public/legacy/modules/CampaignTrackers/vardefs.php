@@ -60,6 +60,7 @@ $dictionary['CampaignTracker'] = array(
             'vname' => 'LBL_TRACKER_NAME',
             'type' => 'varchar',
             'len' => '255',
+            'required' => true,
             'comment' => 'The name of the campaign tracker'
         ),
         'tracker_url' => array(
@@ -68,7 +69,23 @@ $dictionary['CampaignTracker'] = array(
             'type' => 'varchar',
             'len' => '255',
             'default' => 'http://',
-            'comment' => 'The URL that represents the landing page when the tracker URL in the campaign email is clicked'
+            'comment' => 'The URL that represents the landing page when the tracker URL in the campaign email is clicked',
+            // Required unless the tracker is an opt-out one, which leads to the opt-out entry point
+            // (CampaignTrackerSaveHandler), as in the legacy edit view.
+            'logic' => array(
+                'required' => array(
+                    'key' => 'required',
+                    'modes' => array('edit', 'create'),
+                    'params' => array(
+                        'fieldDependencies' => array('is_optout'),
+                        'activeOnFields' => array(
+                            'is_optout' => array(
+                                array('operator' => 'not-equal', 'values' => array('true')),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
         ),
         'tracker_key' => array(
             'name' => 'tracker_key',
@@ -122,7 +139,7 @@ $dictionary['CampaignTracker'] = array(
             'name' => 'is_optout',
             'vname' => 'LBL_OPTOUT',
             'type' => 'bool',
-            'required' => true,
+            'required' => false,
             'default' => '0',
             'reportable' => false,
             'comment' => 'Indicator whether tracker URL represents an opt-out link'
@@ -142,6 +159,31 @@ $dictionary['CampaignTracker'] = array(
             'relationship' => 'campaign_campaigntrakers',
             'source' => 'non-db',
             'vname' => 'LBL_CAMPAIGN',
+        ),
+        'campaign_name' => array(
+            'name' => 'campaign_name',
+            'vname' => 'LBL_CAMPAIGN',
+            'type' => 'relate',
+            'source' => 'non-db',
+            'link' => 'campaign',
+            'module' => 'Campaigns',
+            'id_name' => 'campaign_id',
+            'rname' => 'name',
+            'table' => 'campaigns',
+            'massupdate' => false,
+            'importable' => false,
+            'comment' => 'The name of the campaign, set by the bean',
+        ),
+        'message_url' => array(
+            'name' => 'message_url',
+            'vname' => 'LBL_MESSAGE_URL',
+            'type' => 'varchar',
+            'source' => 'non-db',
+            'inline_edit' => false,
+            'massupdate' => false,
+            'importable' => false,
+            'reportable' => false,
+            'comment' => 'The URL to put in the campaign message, set by the bean',
         ),
     ),
 

@@ -1,0 +1,174 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="mail-account-editor">
+    <div class="mail-account-head">
+        <h2 class="mail-account-title">
+            {{ account?.title }}
+            <span class="mail-account-module">{{ l('LBL_MODULE_NAME') }}</span>
+        </h2>
+        <div class="mail-account-buttons">
+            <button type="button" class="btn btn-sm btn-outline-main" (click)="cancel()">{{ app('LBL_CANCEL_BUTTON_LABEL') }}</button>
+            <button type="button" class="btn btn-sm btn-main" [disabled]="!account || saving" (click)="save()">{{ app('LBL_SAVE_BUTTON_LABEL') }}</button>
+        </div>
+    </div>
+
+    <p *ngIf="error" class="mail-account-message mail-account-error">{{ l('LBL_ACCOUNT_EDITOR_ERROR') }}</p>
+    <p *ngIf="loading" class="mail-account-message">{{ app('LBL_LOADING') }}</p>
+
+    <ng-container *ngIf="account">
+        <ng-container *ngFor="let panel of account.panels">
+            <section *ngIf="isShown(panel)" class="mail-account-panel">
+                <div *ngIf="panel.label || panel.test || panel.authorize" class="mail-account-panel-head">
+                    <h3>{{ panel.label }}</h3>
+                    <button *ngIf="panel.authorize" type="button" class="btn btn-sm btn-outline-main"
+                            (click)="authorize(panel)">{{ panel.authorize.label }}</button>
+                    <button *ngIf="panel.test && !panel.test.address" type="button" class="btn btn-sm btn-outline-main"
+                            [disabled]="testing" (click)="test(panel)">{{ panel.test.label }}</button>
+                </div>
+                <div *ngIf="panel.test?.address" class="mail-account-test-address">
+                    <strong>{{ panel.test.label }}</strong>
+                    <label class="mail-account-item">
+                        <span class="mail-account-label">{{ panel.test.address }}</span>
+                        <span class="mail-account-picker">
+                            <input type="email" class="form-control form-control-sm" [(ngModel)]="values['testAddress']">
+                            <button type="button" class="btn btn-sm btn-outline-main" [disabled]="testing"
+                                    (click)="test(panel)">{{ panel.test.send }}</button>
+                        </span>
+                    </label>
+                </div>
+                <div *ngIf="panel.test && (testing || testResult)" class="mail-account-test" role="status"
+                     [class.mail-account-success]="testResult?.success" [class.mail-account-error]="testResult && !testResult.success">
+                    {{ testing ? panel.test.wait : testResult.message }}
+                    <details *ngIf="!testing && testResult?.log">
+                        <summary>{{ l('LBL_EMAIL_TEST_SEE_FULL_SMTP_LOG') }}</summary>
+                        <pre>{{ testResult.log }}</pre>
+                    </details>
+                </div>
+
+                <div class="mail-account-grid">
+                    <div *ngFor="let field of visibleFields(panel)" class="mail-account-item" [class.mail-account-wide]="folderChoice?.field === field">
+                        <span class="mail-account-label">{{ field.label }} <span *ngIf="field.required" class="mail-account-required">*</span></span>
+
+                        <ng-container [ngSwitch]="kind(field)">
+                            <span *ngSwitchCase="'readonly'" class="mail-account-readonly">{{ optionLabel(field) }}</span>
+
+                            <label *ngSwitchCase="'bool'" class="mail-account-check">
+                                <input type="checkbox" [ngModel]="values[field.name]" (ngModelChange)="changeValue(field, $event)"
+                                       [attr.aria-label]="field.label">
+                            </label>
+
+                            <select *ngSwitchCase="'enum'" class="form-control form-control-sm" [ngModel]="values[field.name]"
+                                    (ngModelChange)="changeValue(field, $event)" [attr.aria-label]="field.label">
+                                <option *ngFor="let option of field.options" [value]="option.value">{{ option.label }}</option>
+                            </select>
+
+                            <input *ngSwitchCase="'password'" type="password" class="form-control form-control-sm" autocomplete="new-password"
+                                   [(ngModel)]="values[field.name]" [attr.aria-label]="field.label"
+                                   [placeholder]="field.isSet ? app('LBL_PASSWORD_SET_NEW_VALUE_TO_RESET') : ''">
+
+                            <div *ngSwitchCase="'stringmap'" class="mail-account-entries">
+                                <div *ngFor="let entry of entries(field); let index = index" class="mail-account-picker">
+                                    <input *ngIf="field.showKeys" type="text" class="form-control form-control-sm" [(ngModel)]="entry.key"
+                                           [placeholder]="l('LBL_KEY')" [attr.aria-label]="field.label + ' ' + l('LBL_KEY')">
+                                    <input type="text" class="form-control form-control-sm" [(ngModel)]="entry.value"
+                                           [placeholder]="field.showKeys ? l('LBL_VALUE') : ''" [attr.aria-label]="field.label">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" [attr.aria-label]="app('LBL_DELETE')"
+                                            [title]="app('LBL_DELETE')" (click)="removeEntry(field, index)">−</button>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-main" (click)="addEntry(field)">{{ l('LBL_ACCOUNT_EDITOR_ADD') }}</button>
+                            </div>
+
+                            <textarea *ngSwitchCase="'textarea'" class="form-control form-control-sm" rows="5"
+                                      [(ngModel)]="values[field.name]" [attr.aria-label]="field.label"></textarea>
+
+                            <input *ngSwitchCase="'int'" type="text" inputmode="numeric" class="form-control form-control-sm"
+                                   [(ngModel)]="values[field.name]" [attr.aria-label]="field.label">
+
+                            <div *ngSwitchCase="'relate'" class="mail-account-picker">
+                                <input type="text" class="form-control form-control-sm" readonly [value]="values[field.name]"
+                                       [attr.aria-label]="field.label">
+                                <button type="button" class="btn btn-sm btn-outline-main" (click)="selectRecord(field)">{{ l('LBL_SELECT_BUTTON_LABEL') }}</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="!values[field.idField]"
+                                        [attr.aria-label]="app('LBL_CLEAR_BUTTON_LABEL')" [title]="app('LBL_CLEAR_BUTTON_LABEL')"
+                                        (click)="clearRecord(field)">×</button>
+                            </div>
+
+                            <ng-container *ngSwitchCase="'primary'">
+                                <select *ngIf="folderList(field).length; else noFolder" class="form-control form-control-sm"
+                                        [(ngModel)]="values[field.name]" [attr.aria-label]="field.label">
+                                    <option *ngFor="let folder of folderList(field)" [value]="folder">{{ folder }}</option>
+                                </select>
+                                <ng-template #noFolder><span class="mail-account-readonly"></span></ng-template>
+                            </ng-container>
+
+                            <ng-container *ngSwitchCase="'assign'">
+                                <div class="mail-account-assign">
+                                    <select class="form-control form-control-sm" [(ngModel)]="values[field.name][0]" [attr.aria-label]="field.label">
+                                        <option *ngFor="let option of field.options" [value]="option.value">{{ option.label }}</option>
+                                    </select>
+                                    <select *ngIf="values[field.name][0] === 'security_group'" class="form-control form-control-sm"
+                                            [(ngModel)]="values[field.name][1]" [attr.aria-label]="l('LBL_SECURITYGROUP')">
+                                        <option *ngFor="let option of field.groups" [value]="option.value">{{ option.label }}</option>
+                                    </select>
+                                    <select *ngIf="values[field.name][0] === 'role' || values[field.name][0] === 'security_group'"
+                                            class="form-control form-control-sm" [(ngModel)]="values[field.name][2]" [attr.aria-label]="l('LBL_ROLE')">
+                                        <option *ngFor="let option of field.roles" [value]="option.value">{{ option.label }}</option>
+                                    </select>
+                                </div>
+                            </ng-container>
+
+                            <ng-container *ngSwitchCase="'folders'">
+                                <div class="mail-account-picker">
+                                    <input type="text" class="form-control form-control-sm" [readonly]="field.type === 'folders'"
+                                           [(ngModel)]="values[field.name]" [attr.aria-label]="field.label">
+                                    <button type="button" class="btn btn-sm btn-outline-main" (click)="chooseFolders(field)">{{ l('LBL_SELECT_BUTTON_LABEL') }}</button>
+                                </div>
+                                <div *ngIf="folderChoice?.field === field" class="mail-account-folders">
+                                    <strong>{{ field.title }}</strong>
+                                    <p *ngIf="!folderChoice.folders.length" class="mail-account-message">{{ l('LBL_ACCOUNT_EDITOR_NO_FOLDER') }}</p>
+                                    <label *ngFor="let folder of folderChoice.folders" class="mail-account-check">
+                                        <input [type]="field.type === 'folder' ? 'radio' : 'checkbox'" [name]="'mail-account-' + field.name"
+                                               [checked]="folderChoice.selected.has(folder)" (change)="toggleFolder(folder)">
+                                        {{ folder }}
+                                    </label>
+                                    <div class="mail-account-buttons">
+                                        <button type="button" class="btn btn-sm btn-main" (click)="applyFolders()">{{ app('LBL_DONE_BUTTON_LABEL') }}</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="folderChoice = null">{{ app('LBL_CANCEL_BUTTON_LABEL') }}</button>
+                                    </div>
+                                </div>
+                            </ng-container>
+
+                            <input *ngSwitchDefault type="text" class="form-control form-control-sm" [(ngModel)]="values[field.name]"
+                                   [attr.aria-label]="field.label">
+                        </ng-container>
+                    </div>
+                </div>
+            </section>
+        </ng-container>
+    </ng-container>
+</div>

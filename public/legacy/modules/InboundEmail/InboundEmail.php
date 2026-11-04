@@ -571,6 +571,11 @@ class InboundEmail extends SugarBean
     {
         parent::mark_deleted($id);
 
+        // The folder subscriptions of the account, as the legacy Delete action removes them (also
+        // when the account is deleted from the SuiteCRM 8 views).
+        require_once 'include/SugarFolders/SugarFolders.php';
+        (new SugarFolder())->clearSubscriptionsForFolder($id);
+
         //bug52021  we need to keep the reference to the folders table in order for emails module to function properly
         $this->deleteCache();
     }

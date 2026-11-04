@@ -222,3 +222,44 @@ $viewdefs ['InboundEmail'] = [
         ],
     ],
 ];
+
+$hiddenOn = [
+    'LBL_OUTBOUND_CONFIGURATION' => ['bounce'],
+    'LBL_AUTO_REPLY_CONFIGURATION' => ['personal', 'bounce'],
+    'LBL_GROUP_CONFIGURATION' => ['personal', 'bounce'],
+    'LBL_CASE_CONFIGURATION' => ['personal', 'bounce'],
+];
+foreach ($hiddenOn as $panel => $types) {
+    $viewdefs['InboundEmail']['DetailView']['templateMeta']['tabDefs'][$panel]['displayLogic'] = [
+        'hide-by-type' => [
+            'key' => 'displayType',
+            'modes' => ['detail'],
+            'params' => [
+                'fieldDependencies' => ['type'],
+                'activeOnFields' => ['type' => $types],
+            ],
+        ],
+    ];
+}
+unset($hiddenOn, $panel, $types);
+
+$viewdefs['InboundEmail']['DetailView']['recordActions'] = [
+    'actions' => [
+        'inbound-email-edit' => [
+            'key' => 'inbound-email-edit',
+            'labelKey' => 'LBL_EDIT_BUTTON',
+            'priority' => 100,
+            'modes' => ['detail'],
+            'acl' => ['edit'],
+        ],
+        'inbound-email-set-default' => [
+            'key' => 'inbound-email-set-default',
+            'labelKey' => 'LBL_SET_AS_DEFAULT_BUTTON',
+            'priority' => 110,
+            'modes' => ['detail'],
+            'acl' => ['view'],
+        ],
+    ],
+    // SuiteCRM 8 record view: edited in the account editor; no Duplicate in the legacy detail view.
+    'exclude' => ['edit', 'duplicate'],
+];

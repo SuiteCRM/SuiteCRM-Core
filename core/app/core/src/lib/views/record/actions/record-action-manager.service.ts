@@ -39,6 +39,16 @@ import {RecordSaveContinueAction} from "./save-continue/record-save-continue.act
 import {RecordSaveScheduleAction} from "./save-schedule/record-save-schedule.action";
 import {ModalEditAction} from "./modal-edit/modal-edit.action";
 import {ModalCreateAction} from "./modal-create/modal-create.action";
+import {
+    CalendarAccountEditAction,
+    CalendarAccountSyncAction,
+    InboundEmailEditAction,
+    InboundEmailSetDefaultAction,
+    OAuthConnectionEditAction,
+    OAuthProviderEditAction,
+    OutboundEmailEditAction,
+    OutboundEmailSetDefaultAction
+} from './mail-account-edit/mail-account-edit.action';
 
 @Injectable({
     providedIn: 'root',
@@ -58,6 +68,14 @@ export class RecordActionManager extends BaseActionManager<RecordActionData> {
         protected async: AsyncProcessRecordAction,
         protected recordModalEdit: ModalEditAction,
         protected recordModalCreate: ModalCreateAction,
+        protected inboundEmailEdit: InboundEmailEditAction,
+        protected inboundEmailSetDefault: InboundEmailSetDefaultAction,
+        protected outboundEmailEdit: OutboundEmailEditAction,
+        protected outboundEmailSetDefault: OutboundEmailSetDefaultAction,
+        protected oauthProviderEdit: OAuthProviderEditAction,
+        protected oauthConnectionEdit: OAuthConnectionEditAction,
+        protected calendarAccountEdit: CalendarAccountEditAction,
+        protected calendarAccountSync: CalendarAccountSyncAction,
     ) {
         super();
         edit.modes.forEach(mode => this.actions[mode][edit.key] = edit);
@@ -72,5 +90,9 @@ export class RecordActionManager extends BaseActionManager<RecordActionData> {
         async.modes.forEach(mode => this.actions[mode][async.key] = async);
         recordModalEdit.modes.forEach(mode => this.actions[mode][recordModalEdit.key] = recordModalEdit);
         recordModalCreate.modes.forEach(mode => this.actions[mode][recordModalCreate.key] = recordModalCreate);
+        [
+            inboundEmailEdit, inboundEmailSetDefault, outboundEmailEdit, outboundEmailSetDefault,
+            oauthProviderEdit, oauthConnectionEdit, calendarAccountEdit, calendarAccountSync
+        ].forEach(action => action.modes.forEach(mode => this.actions[mode][action.key] = action));
     }
 }

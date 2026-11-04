@@ -929,3 +929,6 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './views/mail-account-editor/mail-account-editor.types';
+export * from './views/mail-account-editor/components/mail-account-editor/mail-account-editor.component';
+export * from './views/record/actions/mail-account-edit/mail-account-edit.action';

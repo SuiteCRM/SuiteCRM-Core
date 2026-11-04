@@ -239,19 +239,19 @@ parameters:
     outbound-email-accounts:
       index: true
       list: true
-      record: false
+      record: true
     inbound-email:
       index: true
       list: true
-      record: false
+      record: true
     external-oauth-provider:
       index: true
       list: true
-      record: false
+      record: true
     external-oauth-connection:
       index: true
       list: true
-      record: false
+      record: true
     emails:
       index: false
       list: false
@@ -275,4 +275,4 @@ parameters:
     calendar-account:
       index: true
       list: true
-      record: false
+      record: true

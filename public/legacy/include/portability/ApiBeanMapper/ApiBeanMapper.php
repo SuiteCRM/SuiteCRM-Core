@@ -51,6 +51,8 @@ require_once __DIR__ . '/ModuleMappers/Alerts/AlertsMappers.php';
 require_once __DIR__ . '/ModuleMappers/Emails/EmailMappers.php';
 require_once __DIR__ . '/ModuleMappers/EmailMan/EmailManMappers.php';
 require_once __DIR__ . '/ModuleMappers/Tasks/TasksMappers.php';
+require_once __DIR__ . '/ModuleMappers/InboundEmail/InboundEmailMappers.php';
+require_once __DIR__ . '/ModuleMappers/ExternalOAuthProvider/ExternalOAuthProviderMappers.php';
 require_once __DIR__ . '/../Bean/Field/Validation/FieldValidatorRegistry.php';
 
 class ApiBeanMapper
@@ -108,6 +110,8 @@ class ApiBeanMapper
         $this->moduleMappers[EmailMappers::getModule()] = new EmailMappers();
         $this->moduleMappers[EmailManMappers::getModule()] = new EmailManMappers();
         $this->moduleMappers[TasksMappers::getModule()] = new TasksMappers();
+        $this->moduleMappers[InboundEmailMappers::getModule()] = new InboundEmailMappers();
+        $this->moduleMappers[ExternalOAuthProviderMappers::getModule()] = new ExternalOAuthProviderMappers();
         $this->linkMappers[DefaultLinkMapper::getRelateModule()] = [];
         $this->linkMappers[DefaultLinkMapper::getRelateModule()]['all'] = new DefaultLinkMapper();
         global $api_bean_mappers;

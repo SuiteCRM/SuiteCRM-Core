@@ -33,7 +33,7 @@ use App\Process\Service\ProcessHandlerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * `Maps-admin` process of the geocoding page of the Google Maps administration
+ * Process `maps-admin` of the geocoding page of the Google Maps administration
  * (MapsAdminHandler). Admins only, as the legacy pages.
  *
  * Options, by action:

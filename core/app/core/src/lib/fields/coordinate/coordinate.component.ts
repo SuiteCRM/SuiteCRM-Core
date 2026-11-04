@@ -51,8 +51,8 @@ function userCoordinate(value: unknown, numberFormatter: NumberFormatter): strin
  * as the legacy pages) and the decimal symbol of the user: the core number format keeps 3 decimals
  * (about 100 m).
  *
- * Registered on the coordinates of address-cache and markers in detail and list modes
- * (FieldRegistry.registerField, see extension.module.ts).
+ * Used for the float fields with the display type coordinate (the latitude and longitude of the
+ * address cache and of the markers) in detail and list modes, see base-fields.manifest.ts.
  */
 @Component({
     selector: 'scrm-coordinate-field',

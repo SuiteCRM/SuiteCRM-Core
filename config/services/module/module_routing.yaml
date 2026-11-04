@@ -199,11 +199,11 @@ parameters:
     case-events:
       index: true
       list: true
-      record: false
+      record: true
     case-updates:
       index: true
       list: true
-      record: false
+      record: true
     reports:
       index: true
       list: true

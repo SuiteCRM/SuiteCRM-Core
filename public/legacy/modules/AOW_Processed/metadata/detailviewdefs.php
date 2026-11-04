@@ -25,39 +25,37 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-
-$viewdefs['AOW_Processed']['DetailView'] = array(
-'templateMeta' => array('form' => array('buttons'=>array('EDIT', 'DUPLICATE', 'DELETE', 'FIND_DUPLICATES',
-                                                         )),
-                        'maxColumns' => '2',
-                        'widths' => array(
-                                        array('label' => '10', 'field' => '30'),
-                                        array('label' => '10', 'field' => '30')
-                                        ),
-                        ),
-
-'panels' =>array(
-
-  array(
-    'name',
-    'assigned_user_name',
-  ),
-
-  array(
-    array(
-      'name' => 'date_entered',
-      'customCode' => '{$fields.date_entered.value} {$APP.LBL_BY} {$fields.created_by_name.value}',
-      'label' => 'LBL_DATE_ENTERED',
-    ),
-    array(
-      'name' => 'date_modified',
-      'customCode' => '{$fields.date_modified.value} {$APP.LBL_BY} {$fields.modified_by_name.value}',
-      'label' => 'LBL_DATE_MODIFIED',
-    ),
-  ),
-
-  array(
-    'description',
-  ),
-)
-);
+/*
+ * A processed record of a workflow (process audit): the workflow, the record it ran on, the status
+ * and the dates (the module had only the name, which the workflows do not set). Read-only in the
+ * SuiteCRM 8 record view: the workflows write it; deleting it lets a workflow without repeated runs
+ * run again on the record.
+ */
+$viewdefs['AOW_Processed']['DetailView'] = [
+    // Title of the record: the workflow and the record it ran on (the module has no name).
+    'summaryTemplates' => [
+        'edit' => 'LBL_SUMMARY_WORKFLOW_PROCESSED',
+        'detail' => 'LBL_SUMMARY_WORKFLOW_PROCESSED',
+    ],
+    'templateMeta' => [
+        'form' => [
+            'buttons' => ['DELETE'],
+        ],
+        'maxColumns' => '2',
+        'widths' => [
+            ['label' => '10', 'field' => '30'],
+            ['label' => '10', 'field' => '30'],
+        ],
+    ],
+    'recordActions' => [
+        'exclude' => ['edit', 'duplicate'],
+    ],
+    'panels' => [
+        'default' => [
+            [['name' => 'aow_workflow', 'readonly' => true], ['name' => 'status', 'readonly' => true]],
+            // The record it ran on (its label is its module).
+            [['name' => 'parent_name', 'readonly' => true]],
+            [['name' => 'date_entered', 'readonly' => true], ['name' => 'date_modified', 'readonly' => true]],
+        ],
+    ],
+];

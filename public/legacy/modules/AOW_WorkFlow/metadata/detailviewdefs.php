@@ -75,6 +75,41 @@ $viewdefs ['AOW_WorkFlow'] =
                     ),
                 ),
             ),
+            // SuiteCRM 8 record view: the conditions and actions under the details (the record view
+            // drops the legacy line panels: WorkflowViewDefinitionMapper). The workflow is edited in
+            // the workflow editor (route workflow/edit): Edit and Duplicate open it.
+            'bottomWidgets' =>
+                array(
+                    0 =>
+                        array(
+                            'type' => 'workflow-lines',
+                            'modes' => array('detail'),
+                            'options' => array(),
+                        ),
+                ),
+            'recordActions' =>
+                array(
+                    'actions' =>
+                        array(
+                            'workflow-edit' =>
+                                array(
+                                    'key' => 'workflow-edit',
+                                    'labelKey' => 'LBL_EDIT_BUTTON',
+                                    'priority' => 100,
+                                    'modes' => array('detail'),
+                                    'acl' => array('edit'),
+                                ),
+                            'workflow-duplicate' =>
+                                array(
+                                    'key' => 'workflow-duplicate',
+                                    'labelKey' => 'LBL_DUPLICATE_BUTTON',
+                                    'priority' => 110,
+                                    'modes' => array('detail'),
+                                    'acl' => array('edit'),
+                                ),
+                        ),
+                    'exclude' => array('edit', 'duplicate'),
+                ),
             'panels' =>
             array(
                 'default' =>

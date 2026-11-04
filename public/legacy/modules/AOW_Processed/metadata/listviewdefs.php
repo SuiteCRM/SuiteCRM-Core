@@ -38,6 +38,7 @@ array(
   'STATUS' =>
   array(
     'type' => 'enum',
+    'link' => true,
     'default' => true,
     'studio' => 'visible',
     'label' => 'LBL_STATUS',

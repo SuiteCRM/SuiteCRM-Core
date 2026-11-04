@@ -79,4 +79,17 @@ $mod_strings = array(
     'LBL_RUN_WHEN' => 'Run',
     'LBL_RUN_ON_IMPORT' => 'Run on Import',
     'LBL_ACTION_NAME_NOT_ALLOWED' => 'Action name not allowed.',
+
+    // Workflow editor and workflow lines of SuiteCRM 8.
+    'LBL_WORKFLOW_EDITOR_LOADING' => 'Loading the workflow…',
+    'LBL_WORKFLOW_EDITOR_ERROR' => 'The workflow cannot be edited.',
+    'LBL_WORKFLOW_EDITOR_REQUIRED' => 'The name and the module of the workflow are required.',
+    'LBL_WORKFLOW_EDITOR_INCOMPLETE' => 'Complete the conditions and actions: a field for each line, an action type, the record type of Create Record, the template and the recipients of Send Email.',
+    'LBL_WORKFLOW_EDITOR_SAVE_ERROR' => 'The workflow could not be saved. Check the conditions and actions.',
+    'LBL_WORKFLOW_EDITOR_SELECT' => 'Select',
+    'LBL_WORKFLOW_EDITOR_NO_MODULE' => 'The module of this workflow is not available: its conditions and actions cannot be edited.',
+    'LBL_WORKFLOW_EDITOR_ADD_RECIPIENT' => 'Add a recipient',
+    'LBL_WORKFLOW_EDITOR_KEPT_ACTION' => 'This action is not offered by the editor: it is kept as it is.',
+    'LBL_WORKFLOW_EDITOR_RELATIONSHIP' => 'Relationship',
+    'LBL_WORKFLOW_EDITOR_NONE' => 'None',
 );

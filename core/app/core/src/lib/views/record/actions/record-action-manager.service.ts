@@ -39,6 +39,7 @@ import {RecordSaveContinueAction} from "./save-continue/record-save-continue.act
 import {RecordSaveScheduleAction} from "./save-schedule/record-save-schedule.action";
 import {ModalEditAction} from "./modal-edit/modal-edit.action";
 import {ModalCreateAction} from "./modal-create/modal-create.action";
+import {WorkflowDuplicateAction, WorkflowEditAction} from './workflow-edit/workflow-edit.action';
 
 @Injectable({
     providedIn: 'root',
@@ -58,6 +59,8 @@ export class RecordActionManager extends BaseActionManager<RecordActionData> {
         protected async: AsyncProcessRecordAction,
         protected recordModalEdit: ModalEditAction,
         protected recordModalCreate: ModalCreateAction,
+        protected workflowEdit: WorkflowEditAction,
+        protected workflowDuplicate: WorkflowDuplicateAction,
     ) {
         super();
         edit.modes.forEach(mode => this.actions[mode][edit.key] = edit);
@@ -72,5 +75,8 @@ export class RecordActionManager extends BaseActionManager<RecordActionData> {
         async.modes.forEach(mode => this.actions[mode][async.key] = async);
         recordModalEdit.modes.forEach(mode => this.actions[mode][recordModalEdit.key] = recordModalEdit);
         recordModalCreate.modes.forEach(mode => this.actions[mode][recordModalCreate.key] = recordModalCreate);
+        [workflowEdit, workflowDuplicate].forEach(
+            action => action.modes.forEach(mode => this.actions[mode][action.key] = action)
+        );
     }
 }

@@ -215,11 +215,11 @@ parameters:
     workflow:
       index: true
       list: true
-      record: false
+      record: true
     workflow-processed:
-      index: false
-      list: false
-      record: false
+      index: true
+      list: true
+      record: true
     security-groups:
       index: false
       list: false

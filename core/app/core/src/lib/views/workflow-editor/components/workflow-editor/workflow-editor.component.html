@@ -1,0 +1,563 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="workflow-editor">
+    <div class="workflow-head">
+        <h2 class="workflow-title">
+            {{ workflow?.name || app('LBL_CREATE_BUTTON_LABEL') }}
+            <span class="workflow-module">{{ text('LBL_MODULE_NAME') }}</span>
+        </h2>
+        <div class="workflow-buttons">
+            <button type="button" class="btn btn-sm btn-outline-main" (click)="cancel()">{{ app('LBL_CANCEL_BUTTON_LABEL') }}</button>
+            <button type="button" class="btn btn-sm btn-main" [disabled]="!workflow || saving" (click)="save()">{{ app('LBL_SAVE_BUTTON_LABEL') }}</button>
+        </div>
+    </div>
+
+    <p *ngIf="error" class="workflow-message workflow-error">{{ text('LBL_WORKFLOW_EDITOR_ERROR') }}</p>
+    <p *ngIf="loading" class="workflow-message">{{ text('LBL_WORKFLOW_EDITOR_LOADING') }}</p>
+
+    <ng-container *ngIf="workflow">
+        <!-- Details of the workflow. -->
+        <section class="workflow-panel workflow-details">
+            <label class="workflow-item">
+                <span>{{ l('AOW_WorkFlow.LBL_NAME') }} <span class="workflow-required">*</span></span>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="workflow.name">
+            </label>
+            <div class="workflow-item">
+                <span>{{ l('AOW_WorkFlow.LBL_ASSIGNED_TO_NAME') }}</span>
+                <div class="workflow-picker">
+                    <input type="text" class="form-control form-control-sm" readonly [value]="workflow.assignedUserName"
+                           [attr.aria-label]="l('AOW_WorkFlow.LBL_ASSIGNED_TO_NAME')">
+                    <button type="button" class="btn btn-sm btn-outline-main" (click)="selectUser()">{{ text('LBL_WORKFLOW_EDITOR_SELECT') }}</button>
+                </div>
+            </div>
+            <label class="workflow-item">
+                <span>{{ l('AOW_WorkFlow.LBL_FLOW_MODULE') }} <span class="workflow-required">*</span></span>
+                <select class="form-control form-control-sm" [ngModel]="workflow.flowModule" (ngModelChange)="changeModule($event)">
+                    <option value="" disabled></option>
+                    <option *ngFor="let option of workflow.options.modules" [value]="option.value">{{ option.label }}</option>
+                </select>
+            </label>
+            <label class="workflow-item">
+                <span>{{ l('AOW_WorkFlow.LBL_STATUS') }}</span>
+                <select class="form-control form-control-sm" [(ngModel)]="workflow.status">
+                    <option *ngFor="let option of workflow.options.statuses" [value]="option.value">{{ option.label }}</option>
+                </select>
+            </label>
+            <label class="workflow-item">
+                <span>{{ l('AOW_WorkFlow.LBL_RUN_WHEN') }}</span>
+                <select class="form-control form-control-sm" [(ngModel)]="workflow.runWhen">
+                    <option *ngFor="let option of workflow.options.runWhen" [value]="option.value">{{ option.label }}</option>
+                </select>
+            </label>
+            <label class="workflow-item">
+                <span>{{ l('AOW_WorkFlow.LBL_FLOW_RUN_ON') }}</span>
+                <select class="form-control form-control-sm" [(ngModel)]="workflow.flowRunOn">
+                    <option *ngFor="let option of workflow.options.runOn" [value]="option.value">{{ option.label }}</option>
+                </select>
+            </label>
+            <label class="workflow-check">
+                <input type="checkbox" [(ngModel)]="workflow.multipleRuns"> {{ l('AOW_WorkFlow.LBL_MULTIPLE_RUNS') }}
+            </label>
+            <label class="workflow-check">
+                <input type="checkbox" [(ngModel)]="workflow.runOnImport"> {{ l('AOW_WorkFlow.LBL_RUN_ON_IMPORT') }}
+            </label>
+            <label class="workflow-item workflow-wide">
+                <span>{{ l('AOW_WorkFlow.LBL_DESCRIPTION') }}</span>
+                <textarea class="form-control form-control-sm" rows="3" [(ngModel)]="workflow.description"></textarea>
+            </label>
+        </section>
+
+        <p *ngIf="workflow.flowModule && !module?.name" class="workflow-message workflow-error">{{ text('LBL_WORKFLOW_EDITOR_NO_MODULE') }}</p>
+
+        <ng-container *ngIf="module?.name">
+            <!-- Conditions. -->
+            <section class="workflow-panel">
+                <h3>{{ l('AOW_WorkFlow.LBL_CONDITION_LINES') }}</h3>
+                <div class="workflow-table-wrap">
+                    <table *ngIf="conditions.length" class="workflow-table">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>{{ l('AOW_Conditions.LBL_MODULE_PATH') }}</th>
+                            <th>{{ l('AOW_Conditions.LBL_FIELD') }}</th>
+                            <th>{{ l('AOW_Conditions.LBL_OPERATOR') }}</th>
+                            <th>{{ l('AOW_Conditions.LBL_VALUE_TYPE') }}</th>
+                            <th>{{ l('AOW_Conditions.LBL_VALUE') }}</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr *ngFor="let line of conditions; let index = index; trackBy: trackLine">
+                            <td class="workflow-number">{{ index + 1 }}</td>
+                            <td>
+                                <select class="form-control form-control-sm" [(ngModel)]="line.path" (ngModelChange)="changePath(line)"
+                                        [attr.aria-label]="l('AOW_Conditions.LBL_MODULE_PATH')">
+                                    <option *ngFor="let option of module.relationships" [value]="option.value">{{ option.label }}</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-control form-control-sm" [(ngModel)]="line.field" (ngModelChange)="changeConditionField(line)"
+                                        [attr.aria-label]="l('AOW_Conditions.LBL_FIELD')">
+                                    <option value=""></option>
+                                    <option *ngFor="let option of fieldsOf(line.path)" [value]="option.value">{{ option.label }}</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select *ngIf="line.info" class="form-control form-control-sm" [(ngModel)]="line.operator"
+                                        [attr.aria-label]="l('AOW_Conditions.LBL_OPERATOR')">
+                                    <option *ngFor="let option of line.info.operators" [value]="option.value">{{ option.label }}</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select *ngIf="line.info" class="form-control form-control-sm" [(ngModel)]="line.valueType"
+                                        (ngModelChange)="resetValue(line)" [attr.aria-label]="l('AOW_Conditions.LBL_VALUE_TYPE')">
+                                    <option *ngFor="let option of line.info.valueTypes" [value]="option.value">{{ option.label }}</option>
+                                </select>
+                            </td>
+                            <td class="workflow-value">
+                                <ng-container *ngIf="line.info">
+                                    <ng-container *ngTemplateOutlet="valueTemplate; context: {$implicit: line}"></ng-container>
+                                </ng-container>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-danger" [attr.aria-label]="app('LBL_REMOVE')"
+                                        (click)="removeCondition(line)">−</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-main" (click)="addCondition()">{{ l('AOW_WorkFlow.LBL_ADD_CONDITION') }}</button>
+            </section>
+
+            <!-- Actions. -->
+            <section class="workflow-panel">
+                <h3>{{ l('AOW_WorkFlow.LBL_ACTION_LINES') }}</h3>
+                <div *ngFor="let action of actions; let index = index; trackBy: trackLine" class="workflow-action">
+                    <div class="workflow-action-head">
+                        <span class="workflow-number">{{ index + 1 }}</span>
+                        <label class="workflow-item">
+                            <span>{{ l('AOW_Actions.LBL_NAME') }}</span>
+                            <input type="text" class="form-control form-control-sm" [(ngModel)]="action.name">
+                        </label>
+                        <label class="workflow-item">
+                            <span>{{ l('AOW_Actions.LBL_ACTION') }} <span class="workflow-required">*</span></span>
+                            <select *ngIf="action.supported" class="form-control form-control-sm" [(ngModel)]="action.action"
+                                    (ngModelChange)="changeActionType(action)">
+                                <option value="" disabled>{{ l('AOW_Actions.LBL_SELECT_ACTION') }}</option>
+                                <option *ngFor="let option of workflow.options.actions" [value]="option.value">{{ option.label }}</option>
+                            </select>
+                            <input *ngIf="!action.supported" type="text" class="form-control form-control-sm" readonly [value]="action.action">
+                        </label>
+                        <button type="button" class="btn btn-sm btn-outline-danger" [attr.aria-label]="app('LBL_REMOVE')"
+                                (click)="removeAction(action)">−</button>
+                    </div>
+
+                    <ng-container [ngSwitch]="action.action">
+                        <!-- Send Email. -->
+                        <div *ngSwitchCase="'SendEmail'" class="workflow-params">
+                            <div class="workflow-grid">
+                                <label class="workflow-check">
+                                    <input type="checkbox" [(ngModel)]="action.params.individualEmail"> {{ l('AOW_Actions.LBL_INDIVIDUAL_EMAILS') }}
+                                </label>
+                                <div class="workflow-item">
+                                    <span>{{ l('AOW_Actions.LBL_EMAIL_TEMPLATE') }} <span class="workflow-required">*</span></span>
+                                    <div class="workflow-picker">
+                                        <select class="form-control form-control-sm" [(ngModel)]="action.params.emailTemplate"
+                                                [attr.aria-label]="l('AOW_Actions.LBL_EMAIL_TEMPLATE')">
+                                            <option value=""></option>
+                                            <option *ngFor="let option of workflow.options.emailTemplates" [value]="option.value">{{ option.label }}</option>
+                                        </select>
+                                        <a class="btn btn-sm btn-outline-main" [href]="templateUrl(action.params.emailTemplate)" target="_blank"
+                                           rel="noopener">{{ action.params.emailTemplate ? l('AOW_Actions.LBL_EDIT_EMAIL_TEMPLATE') : l('AOW_Actions.LBL_CREATE_EMAIL_TEMPLATE') }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="workflow-sub">{{ l('AOW_Actions.LBL_EMAIL') }} <span class="workflow-required">*</span></span>
+                            <table *ngIf="action.params.recipients.length" class="workflow-table">
+                                <tbody>
+                                <tr *ngFor="let recipient of action.params.recipients; trackBy: trackLine">
+                                    <td class="workflow-narrow">
+                                        <select class="form-control form-control-sm" [(ngModel)]="recipient.to" [attr.aria-label]="l('AOW_Actions.LBL_EMAIL')">
+                                            <option *ngFor="let option of workflow.options.emailTo" [value]="option.value">{{ option.label }}</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-control form-control-sm" [(ngModel)]="recipient.type" (ngModelChange)="changeRecipientType(recipient)"
+                                                [attr.aria-label]="l('AOW_Actions.LBL_EMAIL')">
+                                            <option *ngFor="let option of module.emailTypes" [value]="option.value">{{ option.label }}</option>
+                                        </select>
+                                    </td>
+                                    <td class="workflow-value" [ngSwitch]="recipient.type">
+                                        <input *ngSwitchCase="'Email Address'" type="text" class="form-control form-control-sm" [(ngModel)]="recipient.value"
+                                               [attr.aria-label]="l('AOW_Actions.LBL_EMAIL')">
+                                        <select *ngSwitchCase="'Related Field'" class="form-control form-control-sm" [(ngModel)]="recipient.value"
+                                                [attr.aria-label]="l('AOW_Actions.LBL_EMAIL')">
+                                            <option *ngFor="let option of module.emailFields" [value]="option.value">{{ option.label }}</option>
+                                        </select>
+                                        <div *ngSwitchCase="'Specify User'" class="workflow-picker">
+                                            <input type="text" class="form-control form-control-sm" readonly [value]="recipient.valueLabel || recipient.value"
+                                                   [attr.aria-label]="l('AOW_Actions.LBL_EMAIL')">
+                                            <button type="button" class="btn btn-sm btn-outline-main"
+                                                    (click)="selectRecord(recipient, 'users')">{{ text('LBL_WORKFLOW_EDITOR_SELECT') }}</button>
+                                        </div>
+                                        <ng-container *ngSwitchCase="'Users'">
+                                            <ng-container *ngTemplateOutlet="assignTemplate; context: {$implicit: recipient}"></ng-container>
+                                        </ng-container>
+                                    </td>
+                                    <td class="workflow-narrow">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" [attr.aria-label]="app('LBL_REMOVE')"
+                                                (click)="removeRecipient(action, recipient)">−</button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-sm btn-outline-main" [attr.aria-label]="text('LBL_WORKFLOW_EDITOR_ADD_RECIPIENT')"
+                                    [title]="text('LBL_WORKFLOW_EDITOR_ADD_RECIPIENT')" (click)="addRecipient(action)">+</button>
+                        </div>
+
+                        <!-- Calculate Fields. -->
+                        <div *ngSwitchCase="'ComputeField'" class="workflow-params">
+                            <fieldset>
+                                <legend>{{ l('AOW_Actions.LBL_COMPUTEFIELD_PARAMETERS') }}</legend>
+                                <table *ngIf="action.params.parameters.length" class="workflow-table">
+                                    <thead>
+                                    <tr>
+                                        <th>{{ l('AOW_Actions.LBL_COMPUTEFIELD_FIELD_NAME') }}</th>
+                                        <th>{{ l('AOW_Actions.LBL_COMPUTEFIELD_VALUE_TYPE') }}</th>
+                                        <th>{{ l('AOW_Actions.LBL_COMPUTEFIELD_IDENTIFIER') }}</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr *ngFor="let line of action.params.parameters; let position = index; trackBy: trackLine">
+                                        <td>
+                                            <select class="form-control form-control-sm" [(ngModel)]="line.field" (ngModelChange)="line.type = 'raw'"
+                                                    [attr.aria-label]="l('AOW_Actions.LBL_COMPUTEFIELD_FIELD_NAME')">
+                                                <option *ngFor="let option of module.fields" [value]="option.value">{{ option.label }}</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select *ngIf="isListField(module.fields, line.field)" class="form-control form-control-sm" [(ngModel)]="line.type"
+                                                    [attr.aria-label]="l('AOW_Actions.LBL_COMPUTEFIELD_VALUE_TYPE')">
+                                                <option *ngFor="let option of workflow.options.computeTypes" [value]="option.value">{{ option.label }}</option>
+                                            </select>
+                                        </td>
+                                        <td class="workflow-code">{{ '{P' + position + '}' }}</td>
+                                        <td class="workflow-narrow">
+                                            <button type="button" class="btn btn-sm btn-outline-danger" [attr.aria-label]="app('LBL_REMOVE')"
+                                                    (click)="removeCompute(action.params.parameters, line)">−</button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <button type="button" class="btn btn-sm btn-outline-main" (click)="addParameter(action)">{{ l('AOW_Actions.LBL_COMPUTEFIELD_ADD_PARAMETER') }}</button>
+                            </fieldset>
+                            <fieldset *ngIf="module.computeRelations.length">
+                                <legend>{{ l('AOW_Actions.LBL_COMPUTEFIELD_RELATION_PARAMETERS') }}</legend>
+                                <table *ngIf="action.params.relationParameters.length" class="workflow-table">
+                                    <thead>
+                                    <tr>
+                                        <th>{{ l('AOW_Actions.LBL_COMPUTEFIELD_RELATION') }}</th>
+                                        <th>{{ l('AOW_Actions.LBL_COMPUTEFIELD_FIELD_NAME') }}</th>
+                                        <th>{{ l('AOW_Actions.LBL_COMPUTEFIELD_VALUE_TYPE') }}</th>
+                                        <th>{{ l('AOW_Actions.LBL_COMPUTEFIELD_IDENTIFIER') }}</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr *ngFor="let line of action.params.relationParameters; let position = index; trackBy: trackLine">
+                                        <td>
+                                            <select class="form-control form-control-sm" [(ngModel)]="line.relation" (ngModelChange)="changeComputeRelation(line)"
+                                                    [attr.aria-label]="l('AOW_Actions.LBL_COMPUTEFIELD_RELATION')">
+                                                <option *ngFor="let option of module.computeRelations" [value]="option.value">{{ option.label }}</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control form-control-sm" [(ngModel)]="line.field" (ngModelChange)="line.type = 'raw'"
+                                                    [attr.aria-label]="l('AOW_Actions.LBL_COMPUTEFIELD_FIELD_NAME')">
+                                                <option *ngFor="let option of relationFields(line.relation)" [value]="option.value">{{ option.label }}</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select *ngIf="isListField(relationFields(line.relation), line.field)" class="form-control form-control-sm"
+                                                    [(ngModel)]="line.type" [attr.aria-label]="l('AOW_Actions.LBL_COMPUTEFIELD_VALUE_TYPE')">
+                                                <option *ngFor="let option of workflow.options.computeTypes" [value]="option.value">{{ option.label }}</option>
+                                            </select>
+                                        </td>
+                                        <td class="workflow-code">{{ '{R' + position + '}' }}</td>
+                                        <td class="workflow-narrow">
+                                            <button type="button" class="btn btn-sm btn-outline-danger" [attr.aria-label]="app('LBL_REMOVE')"
+                                                    (click)="removeCompute(action.params.relationParameters, line)">−</button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <button type="button" class="btn btn-sm btn-outline-main"
+                                        (click)="addRelationParameter(action)">{{ l('AOW_Actions.LBL_COMPUTEFIELD_ADD_RELATION_PARAMETER') }}</button>
+                            </fieldset>
+                            <fieldset>
+                                <legend>{{ l('AOW_Actions.LBL_COMPUTEFIELD_FORMULAS') }}</legend>
+                                <table *ngIf="action.params.formulas.length" class="workflow-table">
+                                    <thead>
+                                    <tr>
+                                        <th>{{ l('AOW_Actions.LBL_COMPUTEFIELD_FIELD_NAME') }}</th>
+                                        <th>{{ l('AOW_Actions.LBL_COMPUTEFIELD_FORMULA') }}</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr *ngFor="let line of action.params.formulas; trackBy: trackLine">
+                                        <td>
+                                            <select class="form-control form-control-sm" [(ngModel)]="line.field"
+                                                    [attr.aria-label]="l('AOW_Actions.LBL_COMPUTEFIELD_FIELD_NAME')">
+                                                <option *ngFor="let option of module.fields" [value]="option.value">{{ option.label }}</option>
+                                            </select>
+                                        </td>
+                                        <td class="workflow-value">
+                                            <input type="text" class="form-control form-control-sm" [(ngModel)]="line.formula"
+                                                   [attr.aria-label]="l('AOW_Actions.LBL_COMPUTEFIELD_FORMULA')">
+                                        </td>
+                                        <td class="workflow-narrow">
+                                            <button type="button" class="btn btn-sm btn-outline-danger" [attr.aria-label]="app('LBL_REMOVE')"
+                                                    (click)="removeCompute(action.params.formulas, line)">−</button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <button type="button" class="btn btn-sm btn-outline-main" (click)="addFormula(action)">{{ l('AOW_Actions.LBL_COMPUTEFIELD_ADD_FORMULA') }}</button>
+                            </fieldset>
+                        </div>
+
+                        <!-- Create Record and Modify Record. -->
+                        <div *ngSwitchDefault class="workflow-params">
+                            <p *ngIf="!action.supported" class="workflow-help">{{ text('LBL_WORKFLOW_EDITOR_KEPT_ACTION') }}</p>
+                            <ng-container *ngIf="action.action === 'CreateRecord' || action.action === 'ModifyRecord'">
+                                <div class="workflow-grid">
+                                    <label *ngIf="action.action === 'CreateRecord'" class="workflow-item">
+                                        <span>{{ l('AOW_Actions.LBL_RECORD_TYPE') }} <span class="workflow-required">*</span></span>
+                                        <select class="form-control form-control-sm" [(ngModel)]="action.params.recordType" (ngModelChange)="changeRecordType(action)">
+                                            <option value="" disabled></option>
+                                            <option *ngFor="let option of workflow.options.modules" [value]="option.value">{{ option.label }}</option>
+                                        </select>
+                                    </label>
+                                    <label *ngIf="action.action === 'ModifyRecord'" class="workflow-item">
+                                        <span>{{ l('AOW_Actions.LBL_RECORD_TYPE') }} <span class="workflow-required">*</span></span>
+                                        <select class="form-control form-control-sm" [(ngModel)]="action.params.relType" (ngModelChange)="changeRecordType(action)">
+                                            <option *ngFor="let option of module.relationships" [value]="option.value">{{ option.label }}</option>
+                                        </select>
+                                    </label>
+                                    <ng-container *ngIf="action.action === 'CreateRecord'">
+                                        <label class="workflow-check">
+                                            <input type="checkbox" [(ngModel)]="action.params.relateToWorkflow"> {{ l('AOW_Actions.LBL_RELATE_WORKFLOW') }}
+                                        </label>
+                                        <label class="workflow-check">
+                                            <input type="checkbox" [(ngModel)]="action.params.copyEmailAddresses"> {{ l('AOW_Actions.LBL_COPY_EMAIL_ADDRESSES_WORKFLOW') }}
+                                        </label>
+                                    </ng-container>
+                                </div>
+
+                                <ng-container *ngIf="action.params.target as target">
+                                    <table *ngIf="action.params.fields.length" class="workflow-table">
+                                        <thead>
+                                        <tr>
+                                            <th>{{ l('AOW_Conditions.LBL_FIELD') }}</th>
+                                            <th>{{ l('AOW_Conditions.LBL_VALUE_TYPE') }}</th>
+                                            <th>{{ l('AOW_Conditions.LBL_VALUE') }}</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr *ngFor="let line of action.params.fields; trackBy: trackLine">
+                                            <td>
+                                                <select class="form-control form-control-sm" [(ngModel)]="line.field" (ngModelChange)="changeActionField(action, line)"
+                                                        [attr.aria-label]="l('AOW_Conditions.LBL_FIELD')">
+                                                    <option value=""></option>
+                                                    <option *ngFor="let option of target.fields" [value]="option.value">{{ option.label }}</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select *ngIf="line.info" class="form-control form-control-sm" [(ngModel)]="line.valueType"
+                                                        (ngModelChange)="resetValue(line)" [attr.aria-label]="l('AOW_Conditions.LBL_VALUE_TYPE')">
+                                                    <option *ngFor="let option of line.info.valueTypes" [value]="option.value">{{ option.label }}</option>
+                                                </select>
+                                            </td>
+                                            <td class="workflow-value">
+                                                <ng-container *ngIf="line.info">
+                                                    <ng-container *ngTemplateOutlet="valueTemplate; context: {$implicit: line}"></ng-container>
+                                                </ng-container>
+                                            </td>
+                                            <td class="workflow-narrow">
+                                                <button type="button" class="btn btn-sm btn-outline-danger" [attr.aria-label]="app('LBL_REMOVE')"
+                                                        (click)="removeField(action, line)">−</button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-sm btn-outline-main" (click)="addField(action)">{{ l('AOW_Actions.LBL_ADD_FIELD') }}</button>
+
+                                    <table *ngIf="action.params.relationships.length" class="workflow-table">
+                                        <thead>
+                                        <tr>
+                                            <th>{{ text('LBL_WORKFLOW_EDITOR_RELATIONSHIP') }}</th>
+                                            <th>{{ l('AOW_Conditions.LBL_VALUE_TYPE') }}</th>
+                                            <th>{{ l('AOW_Conditions.LBL_VALUE') }}</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr *ngFor="let line of action.params.relationships; trackBy: trackLine">
+                                            <td>
+                                                <select class="form-control form-control-sm" [(ngModel)]="line.rel" (ngModelChange)="changeRelation(action, line)"
+                                                        [attr.aria-label]="text('LBL_WORKFLOW_EDITOR_RELATIONSHIP')">
+                                                    <option value=""></option>
+                                                    <option *ngFor="let option of target.relationships" [value]="option.value">{{ option.label }}</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select *ngIf="line.info" class="form-control form-control-sm" [(ngModel)]="line.valueType"
+                                                        (ngModelChange)="resetValue(line)" [attr.aria-label]="l('AOW_Conditions.LBL_VALUE_TYPE')">
+                                                    <option *ngFor="let option of line.info.valueTypes" [value]="option.value">{{ option.label }}</option>
+                                                </select>
+                                            </td>
+                                            <td class="workflow-value">
+                                                <ng-container *ngIf="line.info">
+                                                    <ng-container *ngTemplateOutlet="valueTemplate; context: {$implicit: line}"></ng-container>
+                                                </ng-container>
+                                            </td>
+                                            <td class="workflow-narrow">
+                                                <button type="button" class="btn btn-sm btn-outline-danger" [attr.aria-label]="app('LBL_REMOVE')"
+                                                        (click)="removeRelation(action, line)">−</button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-sm btn-outline-main" (click)="addRelation(action)">{{ l('AOW_Actions.LBL_ADD_RELATIONSHIP') }}</button>
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-main" (click)="addAction()">{{ l('AOW_WorkFlow.LBL_ADD_ACTION') }}</button>
+            </section>
+        </ng-container>
+    </ng-container>
+
+    <!-- The value of a line, as offered for its type and field. -->
+    <ng-template #valueTemplate let-line>
+        <ng-container [ngSwitch]="line.valueType">
+            <select *ngSwitchCase="'Field'" class="form-control form-control-sm" [(ngModel)]="line.value"
+                    [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                <option value="">{{ app('LBL_NONE') }}</option>
+                <option *ngFor="let option of line.info.fields" [value]="option.value">{{ option.label }}</option>
+            </select>
+            <div *ngSwitchCase="'Date'" class="workflow-inline">
+                <select class="form-control form-control-sm" [(ngModel)]="line.value[0]" [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                    <option *ngFor="let option of line.info.dateBases" [value]="option.value">{{ option.label }}</option>
+                </select>
+                <select class="form-control form-control-sm" [(ngModel)]="line.value[1]" [attr.aria-label]="l('AOW_Conditions.LBL_OPERATOR')">
+                    <option *ngFor="let option of workflow.options.dateOperators" [value]="option.value">{{ option.label }}</option>
+                </select>
+                <ng-container *ngIf="isPlusMinus(line.value)">
+                    <input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="line.value[2]"
+                           [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                    <select class="form-control form-control-sm" [(ngModel)]="line.value[3]" [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                        <option *ngFor="let option of workflow.options.dateUnits" [value]="option.value">{{ option.label }}</option>
+                    </select>
+                </ng-container>
+            </div>
+            <select *ngSwitchCase="'Multi'" multiple class="form-control form-control-sm workflow-multi" [(ngModel)]="line.value"
+                    [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                <option *ngFor="let option of line.info.options" [ngValue]="option.value">{{ option.label }}</option>
+            </select>
+            <span *ngSwitchCase="'Any_Change'"></span>
+            <div *ngSwitchCase="'SecurityGroup'" class="workflow-picker">
+                <input type="text" class="form-control form-control-sm" readonly [value]="line.valueLabel || line.value"
+                       [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                <button type="button" class="btn btn-sm btn-outline-main" (click)="selectRecord(line, 'security-groups')">{{ text('LBL_WORKFLOW_EDITOR_SELECT') }}</button>
+            </div>
+            <ng-container *ngSwitchCase="'Round_Robin'">
+                <ng-container *ngTemplateOutlet="assignTemplate; context: {$implicit: line}"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Least_Busy'">
+                <ng-container *ngTemplateOutlet="assignTemplate; context: {$implicit: line}"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Random'">
+                <ng-container *ngTemplateOutlet="assignTemplate; context: {$implicit: line}"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchDefault [ngSwitch]="line.info.input">
+                <select *ngSwitchCase="'select'" class="form-control form-control-sm" [(ngModel)]="line.value"
+                        [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                    <option *ngFor="let option of line.info.options" [value]="option.value">{{ option.label }}</option>
+                </select>
+                <select *ngSwitchCase="'multi'" multiple class="form-control form-control-sm workflow-multi" [(ngModel)]="line.value"
+                        [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                    <option *ngFor="let option of line.info.options" [ngValue]="option.value">{{ option.label }}</option>
+                </select>
+                <input *ngSwitchCase="'bool'" type="checkbox" [ngModel]="line.value === '1'"
+                       (ngModelChange)="line.value = $event ? '1' : '0'" [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                <input *ngSwitchCase="'date'" type="date" class="form-control form-control-sm" [(ngModel)]="line.value"
+                       [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                <input *ngSwitchCase="'datetime'" type="datetime-local" class="form-control form-control-sm" [(ngModel)]="line.value"
+                       [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                <input *ngSwitchCase="'number'" type="number" class="form-control form-control-sm" [(ngModel)]="line.value"
+                       [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                <textarea *ngSwitchCase="'textarea'" rows="2" class="form-control form-control-sm" [(ngModel)]="line.value"
+                          [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')"></textarea>
+                <div *ngSwitchCase="'relate'" class="workflow-picker">
+                    <input type="text" class="form-control form-control-sm" readonly [value]="line.valueLabel || line.value"
+                           [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                    <button type="button" class="btn btn-sm btn-outline-main" (click)="selectRecord(line, line.info.module)">{{ text('LBL_WORKFLOW_EDITOR_SELECT') }}</button>
+                    <button *ngIf="line.value" type="button" class="btn btn-sm btn-outline-secondary" [attr.aria-label]="app('LBL_CLEAR_BUTTON_LABEL')"
+                            (click)="line.value = ''; line.valueLabel = ''">×</button>
+                </div>
+                <input *ngSwitchDefault type="text" class="form-control form-control-sm" [(ngModel)]="line.value"
+                       [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+            </ng-container>
+        </ng-container>
+    </ng-template>
+
+    <!-- The users to assign or to email: all users, those of a role, or of a security group (and a role). -->
+    <ng-template #assignTemplate let-line>
+        <div class="workflow-inline">
+            <select class="form-control form-control-sm" [(ngModel)]="line.value[0]" [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                <option *ngFor="let option of workflow.options.assignOptions" [value]="option.value">{{ option.label }}</option>
+            </select>
+            <select *ngIf="line.value[0] === 'security_group'" class="form-control form-control-sm" [(ngModel)]="line.value[1]"
+                    [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                <option value=""></option>
+                <option *ngFor="let option of workflow.options.securityGroups" [value]="option.value">{{ option.label }}</option>
+            </select>
+            <select *ngIf="line.value[0] === 'role' || line.value[0] === 'security_group'" class="form-control form-control-sm"
+                    [(ngModel)]="line.value[2]" [attr.aria-label]="l('AOW_Conditions.LBL_VALUE')">
+                <option value=""></option>
+                <option *ngFor="let option of workflow.options.roles" [value]="option.value">{{ option.label }}</option>
+            </select>
+        </div>
+    </ng-template>
+</div>

@@ -24,7 +24,8 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-// View of a saved filter: its settings and its criteria in panels of label / value rows.
+// View of a saved filter: its settings and its criteria in panels of label / value rows, across
+// the width of the screen.
 .saved-search-view {
     // Below the fixed navbar, like the list view (padding-top: 3em).
     padding: calc(3rem + 16px) 24px 48px;
@@ -36,7 +37,6 @@
     .saved-search-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
 
     .saved-search-panel {
-        max-width: 960px;
         margin: 0 0 12px;
         padding: 12px 16px 16px;
         background: $white;
@@ -62,6 +62,9 @@
         margin-bottom: 4px;
 
         label { margin: 0; font-weight: 600; }
+
+        // The panels take the width of the screen: the inputs keep a readable width.
+        > .form-control, > select, > .custom-select { max-width: 480px; }
 
         @media (max-width: 576px) {
             grid-template-columns: minmax(0, 1fr);

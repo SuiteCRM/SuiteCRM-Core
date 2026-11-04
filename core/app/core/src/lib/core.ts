@@ -929,3 +929,7 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './views/import/components/import/import.component';
+export * from './views/import/components/import/import.module';
+export * from './views/import/components/import-vcard/import-vcard.component';
+export * from './views/import/components/import-vcard/import-vcard.module';

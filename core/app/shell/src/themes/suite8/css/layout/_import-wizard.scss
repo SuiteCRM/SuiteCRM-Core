@@ -1,0 +1,379 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// Import view of the modules and Create From vCard.
+.import-wizard {
+    // Below the fixed navbar, like the list view (padding-top: 3em).
+    padding: calc(3rem + 16px) 24px 48px;
+}
+
+.import-wizard-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.import-wizard-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 400;
+}
+
+.import-wizard-module {
+    margin-left: 8px;
+    color: $dusky-blue;
+    font-size: 16px;
+}
+
+.import-wizard-instruction,
+.import-wizard-muted {
+    color: $dusky-blue;
+}
+
+.import-wizard-step {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: $white;
+    border: 1px solid $slade-grey;
+    border-radius: 4px;
+
+    > * {
+        max-width: 100%;
+    }
+
+    p {
+        margin: 0;
+    }
+}
+
+.import-wizard-subtitle {
+    margin: 8px 0 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.import-wizard-label {
+    margin: 0;
+    font-weight: 600;
+}
+
+.import-wizard-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.import-wizard-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.import-wizard-choice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    label {
+        margin: 0;
+    }
+}
+
+.import-wizard-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.import-wizard-select {
+    width: auto;
+    min-width: 200px;
+    max-width: 100%;
+}
+
+select[multiple].import-wizard-select {
+    min-height: 96px;
+}
+
+.import-wizard-text {
+    width: 260px;
+    max-width: 100%;
+}
+
+.import-wizard-char {
+    width: 4em;
+}
+
+// A date or a time (its format shown in it).
+.import-wizard-short {
+    width: 9em;
+}
+
+.import-wizard .form-control-file {
+    width: auto;
+}
+
+.import-wizard-help {
+    color: $dusky-blue;
+    cursor: help;
+}
+
+.import-wizard-pre-line {
+    white-space: pre-line;
+}
+
+.import-wizard-notice {
+    margin: 0 0 12px;
+    padding: 10px 14px;
+    background: $light-yellow;
+    border: 1px solid $mellow-yellow;
+    border-radius: 4px;
+
+    p {
+        margin: 0 0 8px;
+    }
+}
+
+ul.import-wizard-notice {
+    padding-left: 32px;
+}
+
+.import-wizard-errors {
+    color: $amaranth;
+    background: $bright-grey;
+    border-color: $salmon-pink;
+}
+
+.import-wizard-link {
+    padding: 0 4px;
+    vertical-align: baseline;
+}
+
+.import-wizard-scroll {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid $slade-grey;
+    border-radius: 4px;
+}
+
+.import-wizard-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+        padding: 6px 10px;
+        border-bottom: 1px solid $bright-blue;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    th {
+        background: $off-white-lighter;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+}
+
+.import-wizard-sample {
+    max-width: 280px;
+    overflow-wrap: anywhere;
+}
+
+.import-wizard-header-cell {
+    font-weight: 600;
+}
+
+.import-wizard-required {
+    font-weight: 600;
+}
+
+.import-wizard-defaults {
+    min-width: 220px;
+
+    > * {
+        margin: 2px 4px 2px 0;
+    }
+}
+
+.import-wizard-relate {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.import-wizard-search {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 20;
+    min-width: 100%;
+    max-height: 240px;
+    margin: 2px 0 0;
+    padding: 4px 0;
+    overflow-y: auto;
+    list-style: none;
+    background: $white;
+    border: 1px solid $lilac-grey;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
+
+    .import-wizard-link {
+        width: 100%;
+        padding: 4px 10px;
+        text-align: left;
+        white-space: nowrap;
+    }
+}
+
+.import-wizard-notes {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.import-wizard-properties {
+    display: grid;
+    grid-template-columns: minmax(160px, max-content) 1fr;
+    align-items: center;
+    gap: 8px 16px;
+}
+
+.import-wizard-dupes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.import-wizard-dupe-list {
+    min-width: 260px;
+    padding: 8px 12px;
+    border: 1px solid $slade-grey;
+    border-radius: 4px;
+
+    ul {
+        min-height: 120px;
+        margin: 8px 0 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 2px 0;
+    }
+}
+
+.import-wizard-progress {
+    width: 100%;
+    max-width: 520px;
+}
+
+.import-wizard-bar {
+    height: 8px;
+    margin: 6px 0;
+    overflow: hidden;
+    background: $bright-blue;
+    border-radius: 4px;
+
+    span {
+        display: block;
+        height: 100%;
+        background: $midnight-blue;
+        transition: width .3s;
+    }
+}
+
+.import-wizard-summary {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.import-wizard-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    width: 100%;
+    border-bottom: 1px solid $slade-grey;
+}
+
+.import-wizard-tab {
+    padding: 6px 14px;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    color: $midnight-blue;
+}
+
+.import-wizard-tab-active {
+    border-bottom-color: $midnight-blue;
+    font-weight: 600;
+}
+
+.import-wizard-tab-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.import-wizard-results-list {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.import-wizard-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.import-wizard-list-search {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+@media (max-width: 640px) {
+    .import-wizard {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .import-wizard-properties {
+        grid-template-columns: 1fr;
+    }
+}

@@ -235,6 +235,18 @@ $mod_strings = array(
     'LBL_ERROR_HELP' => 'Here are the rows in the import file that were not imported due to errors. To re-import these rows, download the list, make changes and click <b>Import Again</b>',
     'LBL_EXTERNAL_ASSIGNED_TOOLTIP' => 'To assign the new records to a user other than yourself, use the Default Value column to select a different user.',
     'LBL_EXTERNAL_TEAM_TOOLTIP' => 'To assign the new records to teams other than your default team(s), use the Default Value column to select different teams.',
+
+    // Import view of SuiteCRM 8.
+    'LBL_IMPORT_VIEW_FILE_CHOSEN' => 'File chosen:',
+    'LBL_IMPORT_VIEW_ADD_TO_LIST' => 'Target list:',
+    'LBL_IMPORT_VIEW_ADDED_TO_LIST' => '{0} targets added to the target list {1}.',
+    'LBL_IMPORT_VIEW_NO_LIST' => 'No target list found.',
+    'LBL_IMPORT_VIEW_MOVE_TO_CHECK' => 'Check this field',
+    'LBL_IMPORT_VIEW_MOVE_TO_AVAILABLE' => 'Do not check this field',
+    'LBL_IMPORT_VIEW_PREVIOUS' => 'Previous',
+    'LBL_IMPORT_VIEW_NEXT' => 'Next',
+    'LBL_IMPORT_VIEW_FIRST' => 'Start',
+    'LBL_IMPORT_VIEW_LAST' => 'End',
 );
 
 global $timedate;

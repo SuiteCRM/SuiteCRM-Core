@@ -33,7 +33,7 @@ use App\Process\Service\ProcessHandlerInterface;
 use InvalidArgumentException;
 
 /**
- * `Workflow-editor` process of the workflow editor (WorkflowEditorHandler), with the access
+ * Process `workflow-editor` of the workflow editor (WorkflowEditorHandler), with the access
  * of the legacy edit view (edit access to workflows, and to the workflow edited).
  *
  * Options, by action:

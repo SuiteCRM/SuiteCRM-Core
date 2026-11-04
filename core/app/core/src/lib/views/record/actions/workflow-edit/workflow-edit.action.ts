@@ -31,7 +31,7 @@ import {ViewMode} from '../../../../common/views/view.model';
 
 /**
  * Edit and Duplicate of the workflow record view (modules/AOW_WorkFlow/metadata/
- * detailviewdefs.php): the workflow editor (routes workflow/edit, see extension.module.ts), which
+ * detailviewdefs.php): the workflow editor (routes workflow/edit, see app-initializer.ts), which
  * edits the conditions and actions with the details, as the legacy edit view.
  */
 abstract class WorkflowAction extends RecordActionHandler {

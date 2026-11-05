@@ -57,6 +57,42 @@ $viewdefs [$module_name] = array(
                 4 => array(
                     0 => 'survey_questions_display',
                 ),
+                5 => array(
+                    0 => 'submit_text',
+                    1 => 'satisfied_text',
+                ),
+                6 => array(
+                    0 => 'neither_text',
+                    1 => 'dissatisfied_text',
+                ),
+            ),
+        ),
+        // SuiteCRM 8 record view: the URL and the questions of the survey under the details (the
+        // record view drops the HTML fields of the legacy page: SurveyViewDefinitionMapper), View
+        // Survey Reports, and Duplicate with the questions.
+        'bottomWidgets' => array(
+            0 => array(
+                'type'    => 'survey-questions',
+                'modes'   => array('detail'),
+                'options' => array(),
+            ),
+        ),
+        'recordActions' => array(
+            'exclude' => array('duplicate'),
+            'actions' => array(
+                'survey-reports' => array(
+                    'key'      => 'survey-reports',
+                    'labelKey' => 'LBL_VIEW_SURVEY_REPORTS',
+                    'modes'    => array('detail'),
+                    'acl'      => array('view'),
+                ),
+                'survey-duplicate' => array(
+                    'key'          => 'survey-duplicate',
+                    'labelKey'     => 'LBL_DUPLICATE_BUTTON',
+                    'asyncProcess' => true,
+                    'modes'        => array('detail'),
+                    'acl'          => array('edit'),
+                ),
             ),
         ),
     ),

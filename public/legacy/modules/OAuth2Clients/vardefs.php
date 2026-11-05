@@ -74,6 +74,22 @@ $dictionary['OAuth2Clients'] = [
             'inline_edit' => false,
             'len' => '4000',
         ],
+        'new_secret' => [
+            'name' => 'new_secret',
+            'vname' => 'LBL_SECRET',
+            'type' => 'password',
+            'source' => 'non-db',
+            'displayType' => 'change',
+            'metadata' => [
+                'placeholder' => 'LBL_LEAVE_BLANK',
+                'helpText' => 'LBL_REMEMBER_SECRET',
+            ],
+            'reportable' => false,
+            'importable' => false,
+            'massupdate' => false,
+            'inline_edit' => false,
+            'studio' => false,
+        ],
         'redirect_url' => [
             'name' => 'redirect_url',
             'vname' => 'LBL_REDIRECT_URL',

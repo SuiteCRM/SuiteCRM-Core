@@ -236,6 +236,14 @@ parameters:
       index: false
       list: false
       record: false
+    oauth2-clients:
+      index: true
+      list: true
+      record: true
+    oauth2-tokens:
+      index: true
+      list: true
+      record: true
     outbound-email-accounts:
       index: true
       list: true

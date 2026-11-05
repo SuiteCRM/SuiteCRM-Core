@@ -140,6 +140,10 @@ import {TextTemplateDetailFieldModule} from "./texttemplate/templates/detail/tex
 import {TextTemplateDetailFieldComponent} from "./texttemplate/templates/detail/texttemplate.component";
 import {ImageListFieldComponent} from "./image/templates/list/image.component";
 import {ImageListFieldModule} from "./image/templates/list/image.module";
+import {PasswordChangeEditFieldComponent} from './password/templates/change/password-change.component';
+import {PasswordChangeEditFieldModule} from './password/templates/change/password-change.module';
+import {EnumCreateOnlyEditFieldComponent} from './enum/templates/create-only/enum-create-only.component';
+import {EnumCreateOnlyEditFieldModule} from './enum/templates/create-only/enum-create-only.module';
 
 export const baseFieldModules = [
     VarcharDetailFieldModule,
@@ -180,6 +184,8 @@ export const baseFieldModules = [
     ImageEditFieldModule,
     ImageDetailFieldModule,
     ImageListFieldModule,
+    PasswordChangeEditFieldModule,
+    EnumCreateOnlyEditFieldModule,
     MultiEnumDetailFieldModule,
     MultiEnumEditFieldModule,
     MultiEnumFilterFieldModule,
@@ -243,6 +249,8 @@ export const baseFieldComponents = [
     ImageEditFieldComponent,
     ImageDetailFieldComponent,
     ImageListFieldComponent,
+    PasswordChangeEditFieldComponent,
+    EnumCreateOnlyEditFieldComponent,
     MultiEnumDetailFieldComponent,
     MultiEnumEditFieldComponent,
     MultiEnumFilterFieldComponent,
@@ -333,6 +341,8 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'image.edit': ImageEditFieldComponent,
     'image.detail': ImageDetailFieldComponent,
     'image.list': ImageListFieldComponent,
+    'password-change.edit': PasswordChangeEditFieldComponent,
+    'enum-create-only.edit': EnumCreateOnlyEditFieldComponent,
     'multienum.list': MultiEnumDetailFieldComponent,
     'multienum.detail': MultiEnumDetailFieldComponent,
     'multienum.edit': MultiEnumEditFieldComponent,

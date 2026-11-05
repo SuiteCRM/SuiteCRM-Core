@@ -67,7 +67,21 @@ $viewdefs[$module_name]['ListView'] = [
         'options' => [
             'hide_edit_link' => true,
         ]
-    ]
+    ],
+    'bulkActions' => [
+        'actions' => [
+            'revoke-tokens' => [
+                'key' => 'revoke-tokens',
+                'labelKey' => 'LBL_OAUTH2_REVOKE_TOKENS',
+                'modes' => ['list'],
+                'acl' => ['view'],
+                'params' => [
+                    'allowAll' => false,
+                ],
+            ],
+        ],
+        'exclude' => ['massupdate', 'merge', 'export', 'records-to-target-list', 'print-as-pdf'],
+    ],
 ];
 
 $listViewDefs[$module_name] = [

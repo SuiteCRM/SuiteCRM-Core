@@ -221,9 +221,9 @@ parameters:
       list: false
       record: false
     security-groups:
-      index: false
-      list: false
-      record: false
+      index: true
+      list: true
+      record: true
     acl-roles:
       index: true
       list: true

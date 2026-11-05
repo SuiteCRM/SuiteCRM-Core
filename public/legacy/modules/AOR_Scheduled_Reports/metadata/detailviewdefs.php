@@ -70,7 +70,10 @@ $viewdefs [$module_name] =
                                 3 =>
                                     array(
                                         0 => 'email_recipients',
-                                        1 => 'description',
+                                    ),
+                                4 =>
+                                    array(
+                                        0 => 'description',
                                     ),
                             ),
                     ),

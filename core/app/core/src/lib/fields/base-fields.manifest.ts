@@ -140,6 +140,10 @@ import {TextTemplateDetailFieldModule} from "./texttemplate/templates/detail/tex
 import {TextTemplateDetailFieldComponent} from "./texttemplate/templates/detail/texttemplate.component";
 import {ImageListFieldComponent} from "./image/templates/list/image.component";
 import {ImageListFieldModule} from "./image/templates/list/image.module";
+import {CronScheduleFieldComponent} from './cron-schedule/cron-schedule.component';
+import {CronScheduleFieldModule} from './cron-schedule/cron-schedule.module';
+import {ReportRecipientsFieldComponent} from './report-recipients/report-recipients.component';
+import {ReportRecipientsFieldModule} from './report-recipients/report-recipients.module';
 
 export const baseFieldModules = [
     VarcharDetailFieldModule,
@@ -180,6 +184,8 @@ export const baseFieldModules = [
     ImageEditFieldModule,
     ImageDetailFieldModule,
     ImageListFieldModule,
+    CronScheduleFieldModule,
+    ReportRecipientsFieldModule,
     MultiEnumDetailFieldModule,
     MultiEnumEditFieldModule,
     MultiEnumFilterFieldModule,
@@ -243,6 +249,8 @@ export const baseFieldComponents = [
     ImageEditFieldComponent,
     ImageDetailFieldComponent,
     ImageListFieldComponent,
+    CronScheduleFieldComponent,
+    ReportRecipientsFieldComponent,
     MultiEnumDetailFieldComponent,
     MultiEnumEditFieldComponent,
     MultiEnumFilterFieldComponent,
@@ -333,6 +341,10 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'image.edit': ImageEditFieldComponent,
     'image.detail': ImageDetailFieldComponent,
     'image.list': ImageListFieldComponent,
+    'cron-schedule.detail': CronScheduleFieldComponent,
+    'cron-schedule.edit': CronScheduleFieldComponent,
+    'report-recipients.detail': ReportRecipientsFieldComponent,
+    'report-recipients.edit': ReportRecipientsFieldComponent,
     'multienum.list': MultiEnumDetailFieldComponent,
     'multienum.detail': MultiEnumDetailFieldComponent,
     'multienum.edit': MultiEnumEditFieldComponent,

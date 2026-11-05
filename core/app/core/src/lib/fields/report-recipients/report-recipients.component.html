@@ -1,0 +1,82 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<ng-container *ngIf="!editing; else edit">
+    <ul *ngIf="recipients.length" class="report-recipients-list">
+        <li *ngFor="let recipient of recipients">{{ describe(recipient) }}</li>
+    </ul>
+</ng-container>
+
+<ng-template #edit>
+    <div class="report-recipients">
+        <div *ngFor="let recipient of recipients; let index = index" class="report-recipient">
+            <select class="form-control form-control-sm report-recipient-type" [attr.aria-label]="field?.label"
+                    [(ngModel)]="recipient.type" (ngModelChange)="update()" [ngModelOptions]="{standalone: true}">
+                <option *ngFor="let type of types" [ngValue]="type">{{ listLabel('aor_email_type_list', type) }}</option>
+            </select>
+
+            <input *ngIf="recipient.type === 'Email Address'" type="email" class="form-control form-control-sm"
+                   [attr.aria-label]="listLabel('aor_email_type_list', recipient.type)"
+                   [(ngModel)]="recipient.email" (ngModelChange)="update()" [ngModelOptions]="{standalone: true}">
+
+            <select *ngIf="recipient.type === 'Specify User'" class="form-control form-control-sm"
+                    [attr.aria-label]="listLabel('aor_email_type_list', recipient.type)"
+                    [(ngModel)]="recipient.userId" (ngModelChange)="update()" [ngModelOptions]="{standalone: true}">
+                <option value=""></option>
+                <option *ngIf="recipient.userId && !users.length" [value]="recipient.userId">{{ recipient.userName }}</option>
+                <option *ngFor="let user of users" [value]="user.id">{{ user.name }}</option>
+            </select>
+
+            <ng-container *ngIf="recipient.type === 'Users'">
+                <select class="form-control form-control-sm" [attr.aria-label]="listLabel('aor_email_type_list', recipient.type)"
+                        [(ngModel)]="recipient.scope" (ngModelChange)="update()" [ngModelOptions]="{standalone: true}">
+                    <option *ngFor="let scope of scopes" [value]="scope">{{ listLabel('aor_assign_options', scope) }}</option>
+                </select>
+                <select *ngIf="recipient.scope === 'security_group'" class="form-control form-control-sm"
+                        [attr.aria-label]="listLabel('aor_assign_options', 'security_group')"
+                        [(ngModel)]="recipient.groupId" (ngModelChange)="update()" [ngModelOptions]="{standalone: true}">
+                    <option value=""></option>
+                    <option *ngIf="recipient.groupId && !groups.length" [value]="recipient.groupId">{{ recipient.groupName }}</option>
+                    <option *ngFor="let group of groups" [value]="group.id">{{ group.name }}</option>
+                </select>
+                <select *ngIf="recipient.scope === 'role' || recipient.scope === 'security_group'" class="form-control form-control-sm"
+                        [attr.aria-label]="listLabel('aor_assign_options', 'role')"
+                        [(ngModel)]="recipient.roleId" (ngModelChange)="update()" [ngModelOptions]="{standalone: true}">
+                    <option value=""></option>
+                    <option *ngIf="recipient.roleId && !roles.length" [value]="recipient.roleId">{{ recipient.roleName }}</option>
+                    <option *ngFor="let role of roles" [value]="role.id">{{ role.name }}</option>
+                </select>
+            </ng-container>
+
+            <button type="button" class="btn btn-sm btn-outline-secondary report-recipient-remove"
+                    [attr.aria-label]="appString('LBL_REMOVE')" [title]="appString('LBL_REMOVE')"
+                    (click)="remove(index)">&times;</button>
+        </div>
+
+        <button type="button" class="btn btn-sm btn-outline-secondary report-recipient-add" (click)="add()">+ {{ appString('LBL_ADD_BUTTON') }}</button>
+    </div>
+</ng-template>

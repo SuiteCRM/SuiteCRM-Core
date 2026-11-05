@@ -1,0 +1,254 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="studio-view">
+    <div class="studio-layout" [class.is-tree-hidden]="treeHidden" [class.is-help-hidden]="helpHidden" [class.is-legacy]="view === 'legacy'">
+
+        <!-- The packages, their modules and the components of a module (legacy Module Builder tree). -->
+        <aside *ngIf="view !== 'legacy'" class="studio-panel studio-west">
+            <div class="studio-panel-head">
+                <h2 *ngIf="!treeHidden" class="studio-panel-title">{{ label('LBL_SECTION_PACKAGES') }}</h2>
+                <button type="button" class="studio-collapse" [attr.aria-expanded]="!treeHidden"
+                        [attr.aria-label]="label(treeHidden ? 'LBL_SHOW' : 'LBL_HIDE') + ' ' + label('LBL_SECTION_PACKAGES')"
+                        (click)="toggleTree()">{{ treeHidden ? '›' : '‹' }}</button>
+            </div>
+            <ul *ngIf="!treeHidden && packages" class="studio-tree" role="tree" [attr.aria-label]="label('LBL_SECTION_PACKAGES')">
+                <li *ngFor="let item of packages" role="treeitem" [attr.aria-expanded]="isExpanded('package|' + item.name)">
+                    <div class="studio-tree-row" [class.is-current]="package === item.name && !module && !view">
+                        <button type="button" class="studio-tree-toggle" [attr.aria-label]="item.name"
+                                (click)="toggle('package|' + item.name)">{{ isExpanded('package|' + item.name) ? '−' : '+' }}</button>
+                        <scrm-image image="folder" class="studio-tree-folder"></scrm-image>
+                        <a href="javascript:void(0)" (click)="openPackage(item.name)">{{ item.name }}</a>
+                    </div>
+                    <ul *ngIf="isExpanded('package|' + item.name)" role="group">
+                        <li *ngFor="let name of item.modules" role="treeitem" [attr.aria-expanded]="isExpanded(item.name + '|' + name)">
+                            <div class="studio-tree-row" [class.is-current]="package === item.name && module === name && !view">
+                                <button *ngIf="package === item.name; else otherPackage" type="button" class="studio-tree-toggle" [attr.aria-label]="name"
+                                        (click)="toggleModule(name)">{{ isExpanded(name) ? '−' : '+' }}</button>
+                                <ng-template #otherPackage><span class="studio-tree-leaf" aria-hidden="true"></span></ng-template>
+                                <scrm-image image="folder" class="studio-tree-folder"></scrm-image>
+                                <a href="javascript:void(0)" (click)="openPackageModule(item.name, name)">{{ name }}</a>
+                            </div>
+                            <ng-container *ngIf="package === item.name && isExpanded(name)">
+                                <p *ngIf="!loaded[item.name + '|' + name]" class="studio-tree-loading">…</p>
+                                <ng-container *ngTemplateOutlet="branch; context: {$implicit: loaded[item.name + '|' + name]?.nodes, module: name}"></ng-container>
+                            </ng-container>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <ng-template #branch let-nodes let-module="module">
+            <ul *ngIf="nodes?.length" role="group">
+                <li *ngFor="let node of nodes; trackBy: trackNode" role="treeitem"
+                    [attr.aria-expanded]="node.children?.length ? isExpanded(folderKey(module, node)) : null">
+                    <div class="studio-tree-row" [class.is-current]="isCurrent(node)">
+                        <button *ngIf="node.children?.length; else leaf" type="button" class="studio-tree-toggle" [attr.aria-label]="node.name"
+                                (click)="toggle(folderKey(module, node))">{{ isExpanded(folderKey(module, node)) ? '−' : '+' }}</button>
+                        <ng-template #leaf><span class="studio-tree-leaf" aria-hidden="true"></span></ng-template>
+                        <scrm-image *ngIf="node.children?.length" image="folder" class="studio-tree-folder"></scrm-image>
+                        <a href="javascript:void(0)" (click)="openNode(node)">{{ node.name }}</a>
+                    </div>
+                    <ng-container *ngIf="node.children?.length && isExpanded(folderKey(module, node))">
+                        <ng-container *ngTemplateOutlet="branch; context: {$implicit: node.children, module: module}"></ng-container>
+                    </ng-container>
+                </li>
+            </ul>
+        </ng-template>
+
+        <!-- The screen (legacy Module Builder center panel). -->
+        <section class="studio-panel studio-center">
+            <div *ngIf="view !== 'legacy'" class="studio-tabbar">
+                <h2 class="studio-tab">{{ screen?.title || label('LBL_MODULEBUILDER') }}</h2>
+            </div>
+            <nav class="studio-crumbs" [attr.aria-label]="label('LBL_MODULEBUILDER')">
+                <button *ngIf="package || view" type="button" class="studio-icon-btn" [attr.aria-label]="label('LBL_BACK')" [title]="label('LBL_BACK')"
+                        (click)="back()"><scrm-image image="arrow_left_filled"></scrm-image></button>
+                <button type="button" class="studio-icon-btn" [attr.aria-label]="label('LBL_HOME')" [title]="label('LBL_HOME')"
+                        (click)="home()"><scrm-image image="home"></scrm-image></button>
+                <span class="studio-crumbs-sep" aria-hidden="true">|</span>
+                <ng-container *ngFor="let crumb of screen?.crumbs; let last = last">
+                    <a *ngIf="crumb.open && !last; else current" href="javascript:void(0)" (click)="crumb.open()">{{ crumb.name }}</a>
+                    <ng-template #current><span [attr.aria-current]="last ? 'page' : null">{{ crumb.name }}</span></ng-template>
+                    <span *ngIf="!last" aria-hidden="true">&gt;</span>
+                </ng-container>
+            </nav>
+
+            <p *ngIf="!screen" class="studio-muted">…</p>
+
+            <!-- The packages. -->
+            <div *ngIf="!package && view !== 'newPackage'" class="studio-actions">
+                <button type="button" class="btn btn-sm btn-main" (click)="newPackage()"
+                        (mouseenter)="hover(mbHelp('package', 'create'))" (mouseleave)="hover(null)">{{ label('LBL_NEW_PACKAGE') }}</button>
+            </div>
+
+            <!-- A package: its properties (legacy MBPackage/package.tpl). -->
+            <form *ngIf="isPackageScreen && packageForm" class="module-builder-form" (ngSubmit)="savePackage()">
+                <div class="studio-actions">
+                    <button type="submit" class="btn btn-sm btn-main" [disabled]="busy"
+                            (mouseenter)="hover(mbHelp('package', 'savebtn'))" (mouseleave)="hover(null)">{{ label('LBL_BTN_SAVE') }}</button>
+                    <ng-container *ngIf="packageForm.original">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="busy" (click)="deployPackage()"
+                                (mouseenter)="hover(mbHelp('package', 'deploybtn'))" (mouseleave)="hover(null)">{{ label('LBL_BTN_DEPLOY') }}</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="busy" (click)="publishPackage()"
+                                (mouseenter)="hover(mbHelp('package', 'publishbtn'))" (mouseleave)="hover(null)">{{ label('LBL_BTN_PUBLISH') }}</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="busy" (click)="exportPackage()"
+                                (mouseenter)="hover(mbHelp('package', 'exportbtn'))" (mouseleave)="hover(null)">{{ label('LBL_BTN_EXP') }}</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="busy" (click)="savePackage(true)"
+                                (mouseenter)="hover(mbHelp('package', 'duplicatebtn'))" (mouseleave)="hover(null)">{{ label('LBL_BTN_DUPLICATE') }}</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" [disabled]="busy" (click)="deletePackage()"
+                                (mouseenter)="hover(mbHelp('package', 'deletebtn'))" (mouseleave)="hover(null)">{{ label('LBL_BTN_DELETE') }}</button>
+                    </ng-container>
+                </div>
+                <div class="module-builder-grid">
+                    <label (mouseenter)="hover(mbHelp('package', 'name'))" (mouseleave)="hover(null)">
+                        <span>{{ label('LBL_PACKAGE_NAME') }} <span class="module-builder-required">*</span></span>
+                        <input type="text" class="form-control form-control-sm" name="name" maxlength="36" [(ngModel)]="packageForm.name">
+                    </label>
+                    <label (mouseenter)="hover(mbHelp('package', 'key'))" (mouseleave)="hover(null)">
+                        <span>{{ label('LBL_KEY') }} <span class="module-builder-required">*</span></span>
+                        <input type="text" class="form-control form-control-sm" name="key" maxlength="5" [(ngModel)]="packageForm.key">
+                    </label>
+                    <label (mouseenter)="hover(mbHelp('package', 'author'))" (mouseleave)="hover(null)">
+                        <span>{{ label('LBL_AUTHOR') }}</span>
+                        <input type="text" class="form-control form-control-sm" name="author" [(ngModel)]="packageForm.author">
+                    </label>
+                    <label *ngIf="packageForm.dateModified">
+                        <span>{{ label('LBL_LAST_MODIFIED') }}</span>
+                        <span class="module-builder-value">{{ packageForm.dateModified }}</span>
+                    </label>
+                    <label class="module-builder-wide" (mouseenter)="hover(mbHelp('package', 'description'))" (mouseleave)="hover(null)">
+                        <span>{{ label('LBL_DESCRIPTION') }}</span>
+                        <textarea class="form-control form-control-sm" name="description" rows="3" [(ngModel)]="packageForm.description"></textarea>
+                    </label>
+                    <label class="module-builder-wide" (mouseenter)="hover(mbHelp('package', 'readme'))" (mouseleave)="hover(null)">
+                        <span>{{ label('LBL_ADD_README') }}</span>
+                        <textarea class="form-control form-control-sm" name="readme" rows="4" [(ngModel)]="packageForm.readme"></textarea>
+                    </label>
+                </div>
+                <ng-container *ngIf="packageForm.original">
+                    <h3 class="module-builder-title">{{ label('LBL_MODULES') }}</h3>
+                    <div class="studio-actions">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="newModule()"
+                                (mouseenter)="hover(mbHelp('package', 'new_module'))" (mouseleave)="hover(null)">{{ label('LBL_NEW_MODULE') }}</button>
+                    </div>
+                </ng-container>
+            </form>
+
+            <!-- A module: its properties (legacy MBModule/module.tpl). -->
+            <form *ngIf="isModuleScreen && moduleForm" class="module-builder-form" (ngSubmit)="saveModule()">
+                <div class="studio-actions">
+                    <button type="submit" class="btn btn-sm btn-main" [disabled]="busy"
+                            (mouseenter)="hover(mbHelp('module', 'savebtn'))" (mouseleave)="hover(null)">{{ label('LBL_BTN_SAVE') }}</button>
+                    <ng-container *ngIf="moduleForm.original">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="busy" (click)="saveModule(true)"
+                                (mouseenter)="hover(mbHelp('module', 'duplicatebtn'))" (mouseleave)="hover(null)">{{ label('LBL_BTN_DUPLICATE') }}</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" [disabled]="busy" (click)="deleteModule()"
+                                (mouseenter)="hover(mbHelp('module', 'deletebtn'))" (mouseleave)="hover(null)">{{ label('LBL_BTN_DELETE') }}</button>
+                    </ng-container>
+                </div>
+                <div class="module-builder-grid">
+                    <label>
+                        <span>{{ label('LBL_PACKAGE') }}</span>
+                        <span class="module-builder-value">{{ package }}</span>
+                    </label>
+                    <label (mouseenter)="hover(mbHelp('module', 'name'))" (mouseleave)="hover(null)">
+                        <span>{{ label('LBL_MODULE_NAME') }} <span class="module-builder-required">*</span></span>
+                        <input type="text" class="form-control form-control-sm" name="name" maxlength="36" [(ngModel)]="moduleForm.name">
+                    </label>
+                    <label (mouseenter)="hover(mbHelp('module', 'label'))" (mouseleave)="hover(null)">
+                        <span>{{ label('LBL_LABEL') }} <span class="module-builder-required">*</span></span>
+                        <input type="text" class="form-control form-control-sm" name="label" maxlength="36" [(ngModel)]="moduleForm.label">
+                    </label>
+                    <label class="module-builder-check" (mouseenter)="hover(mbHelp('module', 'importable'))" (mouseleave)="hover(null)">
+                        <input type="checkbox" name="importable" [(ngModel)]="moduleForm.importable"> {{ label('LBL_MB_IMPORTABLE') }}
+                    </label>
+                    <label class="module-builder-check" (mouseenter)="hover(mbHelp('module', 'has_tab'))" (mouseleave)="hover(null)">
+                        <input type="checkbox" name="hasTab" [(ngModel)]="moduleForm.hasTab"> {{ label('LBL_NAV_TAB') }}
+                    </label>
+                    <div class="module-builder-wide">
+                        <span class="module-builder-label">{{ label('LBL_TYPE') }} <span class="module-builder-required">*</span></span>
+                        <!-- The type of a new module (its template), the types of a module saved. -->
+                        <div *ngIf="!moduleForm.original; else moduleTypes" class="module-builder-types" role="radiogroup" [attr.aria-label]="label('LBL_TYPE')">
+                            <label *ngFor="let type of types" class="module-builder-type" [class.is-selected]="moduleForm.type === type.value"
+                                   (mouseenter)="hover(mbHelp('module', 'type_' + type.value))" (mouseleave)="hover(null)">
+                                <input type="radio" name="type" [value]="type.value" [(ngModel)]="moduleForm.type">
+                                <scrm-image [image]="type.value === 'basic' ? 'basic' : 'folder'"></scrm-image>
+                                <span>{{ type.label }}</span>
+                            </label>
+                        </div>
+                        <ng-template #moduleTypes><span class="module-builder-value">{{ moduleTypeNames }}</span></ng-template>
+                    </div>
+                </div>
+            </form>
+
+            <ng-container *ngIf="screen?.tiles">
+                <p *ngIf="screen.question" class="studio-question">{{ screen.question }}</p>
+                <h3 *ngIf="module && !view" class="module-builder-title">{{ label('LBL_SECTION_MODULE') }}</h3>
+                <ul class="studio-tiles">
+                    <li *ngFor="let tile of screen.tiles; trackBy: trackTile">
+                        <a href="javascript:void(0)" class="studio-tile" (click)="tile.open()"
+                           (mouseenter)="hover(tile.help)" (mouseleave)="hover(null)" (focus)="hover(tile.help)" (blur)="hover(null)">
+                            <scrm-image [image]="tile.icon" class="studio-tile-icon"></scrm-image>
+                            <span>{{ tile.name }}</span>
+                        </a>
+                    </li>
+                </ul>
+            </ng-container>
+
+            <scrm-studio-labels *ngIf="view === 'labels' && module" [module]="module" [package]="package" [labels]="labels"></scrm-studio-labels>
+
+            <scrm-studio-fields *ngIf="view === 'fields' && module" [module]="module" [package]="package" [labels]="labels" [field]="field"
+                               (open)="open($event)" (editing)="setFieldEditing($event)"></scrm-studio-fields>
+
+            <scrm-studio-list-layout *ngIf="view === 'layout' && module && layout && !isGridLayout" [module]="module" [package]="package"
+                                    [view]="layout" [subpanel]="subpanel" [labels]="labels" [help]="help" [helpGroup]="layoutHelpGroup"
+                                    (hover)="hover($event)"></scrm-studio-list-layout>
+
+            <scrm-studio-grid-layout *ngIf="view === 'layout' && module && layout && isGridLayout" [module]="module" [package]="package"
+                                    [view]="layout" [labels]="labels" [help]="help" (hover)="hover($event)"></scrm-studio-grid-layout>
+
+            <scrm-studio-relationships *ngIf="view === 'relationships' && module" [module]="module" [package]="package" [labels]="labels"
+                                      (editing)="setRelationshipEditing($event)"></scrm-studio-relationships>
+
+            <!-- The legacy Module Builder, at a component not in the page yet. -->
+            <iframe *ngIf="view === 'legacy' && frameUrl" class="studio-frame" [src]="frameUrl" [title]="label('LBL_MODULEBUILDER')"></iframe>
+        </section>
+
+        <!-- The help of the screen, or of the button pointed (legacy Module Builder help panel). -->
+        <aside *ngIf="view !== 'legacy'" class="studio-panel studio-east">
+            <div class="studio-panel-head">
+                <button type="button" class="studio-collapse" [attr.aria-expanded]="!helpHidden"
+                        [attr.aria-label]="label(helpHidden ? 'LBL_SHOW' : 'LBL_HIDE') + ' ' + label('LBL_SECTION_HELP')"
+                        (click)="toggleHelp()">{{ helpHidden ? '‹' : '›' }}</button>
+                <h2 *ngIf="!helpHidden" class="studio-panel-title">{{ label('LBL_SECTION_HELP') }}</h2>
+            </div>
+            <div *ngIf="!helpHidden" class="studio-help" aria-live="polite" [innerHTML]="shownHelp"></div>
+        </aside>
+    </div>
+</div>

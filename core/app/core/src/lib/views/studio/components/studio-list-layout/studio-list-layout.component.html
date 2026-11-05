@@ -1,0 +1,111 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="studio-list-layout">
+    <div class="studio-toolbar">
+        <button type="button" class="btn btn-sm btn-main" [disabled]="loading || !data" (click)="save()"
+                (mouseenter)="hover.emit(helpText('savebtn'))" (mouseleave)="hover.emit('')"
+                (focus)="hover.emit(helpText('savebtn'))" (blur)="hover.emit('')">{{ label(package ? 'LBL_BTN_SAVE' : 'LBL_BTN_SAVEPUBLISH') }}</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading || !data?.history.length"
+                [attr.aria-expanded]="historyOpen" (click)="historyOpen = !historyOpen"
+                (mouseenter)="hover.emit(helpText('historyBtn'))" (mouseleave)="hover.emit('')"
+                (focus)="hover.emit(helpText('historyBtn'))" (blur)="hover.emit('')">{{ label('LBL_HISTORY') }}</button>
+        <button *ngIf="data?.restoreDefault" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading"
+                (click)="restore(data.restoreDefault)"
+                (mouseenter)="hover.emit(helpText('historyDefault'))" (mouseleave)="hover.emit('')"
+                (focus)="hover.emit(helpText('historyDefault'))" (blur)="hover.emit('')">{{ label('LBL_RESTORE_DEFAULT') }}</button>
+        <span *ngIf="loading" class="studio-muted">…</span>
+    </div>
+
+    <!-- The history of the layout (legacy View History). -->
+    <div *ngIf="historyOpen && data?.history.length" class="studio-history">
+        <table class="studio-data-table">
+            <tbody>
+            <tr *ngFor="let entry of data.history">
+                <td>{{ entry.date }}</td>
+                <td class="studio-history-action">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="restore(entry.sid)">{{ label('LBL_MB_RESTORE') }}</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p *ngIf="restored" class="studio-restored" role="status">{{ restored.date }} — {{ label('LBL_STUDIO_VIEW_RESTORED') }}</p>
+    <p *ngIf="error" class="studio-error" role="alert">{{ error }}</p>
+
+    <div *ngIf="data?.subpanelTitle" class="studio-subpanel-title">
+        <label for="studio-subpanel-title">{{ label('LBL_SUBPANEL_TITLE') }}</label>
+        <input id="studio-subpanel-title" type="text" class="form-control form-control-sm" [(ngModel)]="subpanelTitle">
+    </div>
+
+    <div *ngIf="data" class="studio-columns" cdkDropListGroup>
+        <section *ngFor="let column of columns" class="studio-column"
+                 (mouseenter)="hover.emit(columnHelp(column))" (mouseleave)="hover.emit('')">
+            <h3 class="studio-column-title">{{ column.label }} <span class="studio-count">{{ column.fields.length }}</span></h3>
+            <ul class="studio-column-list" cdkDropList [cdkDropListData]="column.fields" (cdkDropListDropped)="drop($event)"
+                [attr.aria-label]="column.label">
+                <li *ngFor="let field of column.fields; trackBy: trackField" class="studio-field" cdkDrag [cdkDragData]="field"
+                    [class.is-editing]="editing === field">
+                    <div class="studio-field-head">
+                        <strong>{{ field.label }}</strong>
+                        <button type="button" class="btn btn-sm btn-link studio-field-edit" [attr.aria-expanded]="editing === field"
+                                [attr.aria-label]="label('LBL_EDIT') + ' ' + field.label" [title]="label('LBL_EDIT')"
+                                (mousedown)="$event.stopPropagation()" (click)="edit(field)">✎</button>
+                    </div>
+                    <div class="studio-field-meta">
+                        <span class="studio-mono">[{{ field.name }}]</span>
+                        <span *ngIf="data.widths">{{ field.width }} %</span>
+                    </div>
+
+                    <!-- The properties of the field (legacy property editor), and its moves. -->
+                    <div *ngIf="editing === field" class="studio-field-props" (mousedown)="$event.stopPropagation()">
+                        <label *ngIf="field.labelEditable" class="studio-prop">
+                            <span>{{ label('LBL_LABEL_TITLE') }}</span>
+                            <input type="text" class="form-control form-control-sm" [ngModel]="field.label" (ngModelChange)="changeLabel(field, $event)">
+                        </label>
+                        <label *ngIf="data.widths" class="studio-prop">
+                            <span>{{ label('LBL_WIDTH') }} (%)</span>
+                            <input type="number" min="1" max="100" class="form-control form-control-sm" [ngModel]="field.width"
+                                   (ngModelChange)="changeWidth(field, $event)">
+                        </label>
+                        <div class="studio-prop-moves">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" [title]="label('LBL_STUDIO_VIEW_MOVE_UP')"
+                                    [attr.aria-label]="label('LBL_STUDIO_VIEW_MOVE_UP')" (click)="move(field, -1)">▲</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" [title]="label('LBL_STUDIO_VIEW_MOVE_DOWN')"
+                                    [attr.aria-label]="label('LBL_STUDIO_VIEW_MOVE_DOWN')" (click)="move(field, 1)">▼</button>
+                            <select class="form-control form-control-sm" [attr.aria-label]="label('LBL_STUDIO_VIEW_MOVE_TO')"
+                                    [ngModel]="column.key" (ngModelChange)="moveTo(field, $event)">
+                                <option *ngFor="let other of columns" [value]="other.key">{{ other.label }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>

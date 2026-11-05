@@ -1,0 +1,68 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="studio-fields">
+    <div class="studio-toolbar">
+        <button type="button" class="btn btn-sm btn-main" (click)="edit('')">{{ label('LBL_BTN_ADDFIELD') }}</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="editLabels()">{{ label('LBL_BTN_EDLABELS') }}</button>
+        <input type="search" class="form-control form-control-sm studio-search" [placeholder]="label('LBL_SEARCH')"
+               [attr.aria-label]="label('LBL_SEARCH')" [(ngModel)]="search">
+    </div>
+
+    <p *ngIf="loading" class="studio-muted">…</p>
+
+    <div class="studio-fields-layout" [class.is-editing]="edited !== null">
+    <div *ngIf="fields" class="studio-scroll">
+        <table class="studio-data-table studio-table">
+            <thead>
+            <tr>
+                <th *ngFor="let column of columns" scope="col" [attr.aria-sort]="sortState(column.key)">
+                    <button type="button" class="btn btn-link studio-sort" (click)="sortBy(column.key)">
+                        {{ label(column.label) }}
+                        <span *ngIf="sort === column.key" aria-hidden="true">{{ descending ? '▾' : '▴' }}</span>
+                    </button>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let field of shown; trackBy: trackName" [class.is-changed]="edited === field.name">
+                <td>
+                    <a href="javascript:void(0)" class="studio-mono" (click)="edit(field.name)">{{ field.name }}</a>
+                    <span *ngIf="field.custom" class="studio-pill studio-custom">{{ label('LBL_HCUSTOM') }}</span>
+                </td>
+                <td>{{ field.label }}</td>
+                <td>{{ field.type }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <p *ngIf="!shown.length" class="studio-muted">{{ label('LBL_NONE') }}</p>
+    </div>
+
+    <scrm-studio-field-editor *ngIf="edited !== null" [module]="module" [package]="package" [field]="edited" [labels]="labels"
+                             (closed)="closeEditor($event)"></scrm-studio-field-editor>
+    </div>
+</div>

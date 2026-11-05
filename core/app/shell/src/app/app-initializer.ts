@@ -24,8 +24,8 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Injectable, Injector} from '@angular/core';
-import {Route, Router} from '@angular/router';
+import {inject, Injectable, Injector} from '@angular/core';
+import {CanMatchFn, Route, Router} from '@angular/router';
 import {
     AppStateStore,
     AuthGuard,
@@ -49,9 +49,26 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    StudioComponent,
+    ModuleBuilderComponent
 } from 'core';
 import {take} from 'rxjs/operators';
+
+/**
+ * The Studio route of the admin panel (module-builder/index?type=studio) only: the other
+ * ModuleBuilder pages keep their route.
+ */
+const studioMatch: CanMatchFn = () => {
+    return inject(Router).getCurrentNavigation()?.extractedUrl?.queryParamMap?.get('type') === 'studio';
+};
+
+/**
+ * The Module Builder route of the admin panel (module-builder/index?type=mb) only.
+ */
+const moduleBuilderMatch: CanMatchFn = () => {
+    return inject(Router).getCurrentNavigation()?.extractedUrl?.queryParamMap?.get('type') === 'mb';
+};
 
 @Injectable()
 export class AppInit {
@@ -182,6 +199,40 @@ export class AppInit {
                                 preferences: false,
                                 languageStrings: ['appStrings']
                             }
+                        }
+                    });
+                    // Studio (admin panel link), before the generic classic view routes; the
+                    // components not in the page yet open in the legacy Studio.
+                    routes.push({
+                        path: 'module-builder/index',
+                        component: StudioComponent,
+                        canMatch: [studioMatch],
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration'
+                        }
+                    });
+                    // Module Builder (admin panel link): the Studio page for the modules of its
+                    // packages.
+                    routes.push({
+                        path: 'module-builder/index',
+                        component: ModuleBuilderComponent,
+                        canMatch: [moduleBuilderMatch],
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration'
                         }
                     });
                     routes.push(loggedOutConfig);

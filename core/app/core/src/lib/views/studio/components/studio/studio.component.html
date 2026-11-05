@@ -1,0 +1,144 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="studio-view">
+    <div class="studio-layout" [class.is-tree-hidden]="treeHidden" [class.is-help-hidden]="helpHidden" [class.is-legacy]="view === 'legacy'">
+
+        <!-- The modules and their components (legacy Studio tree). -->
+        <aside *ngIf="view !== 'legacy'" class="studio-panel studio-west">
+            <div class="studio-panel-head">
+                <h2 *ngIf="!treeHidden" class="studio-panel-title">{{ label('LBL_SECTION_MODULES') }}</h2>
+                <button type="button" class="studio-collapse" [attr.aria-expanded]="!treeHidden"
+                        [attr.aria-label]="label(treeHidden ? 'LBL_SHOW' : 'LBL_HIDE') + ' ' + label('LBL_SECTION_MODULES')"
+                        (click)="toggleTree()">{{ treeHidden ? '›' : '‹' }}</button>
+            </div>
+            <ul *ngIf="!treeHidden && modules" class="studio-tree" role="tree" [attr.aria-label]="label('LBL_SECTION_MODULES')">
+                <li *ngFor="let item of modules; trackBy: trackModule" role="treeitem" [attr.aria-expanded]="isExpanded(item.module)">
+                    <div class="studio-tree-row" [class.is-current]="module === item.module && !view">
+                        <button type="button" class="studio-tree-toggle" [attr.aria-label]="item.name" (click)="toggleModule(item.module)">{{ isExpanded(item.module) ? '−' : '+' }}</button>
+                        <scrm-image image="folder" class="studio-tree-folder"></scrm-image>
+                        <a href="javascript:void(0)" (click)="openModule(item.module)">{{ item.name }}</a>
+                    </div>
+                    <ng-container *ngIf="isExpanded(item.module)">
+                        <p *ngIf="!loaded[item.module]" class="studio-tree-loading">…</p>
+                        <ng-container *ngTemplateOutlet="branch; context: {$implicit: loaded[item.module]?.nodes, module: item.module}"></ng-container>
+                    </ng-container>
+                </li>
+            </ul>
+        </aside>
+
+        <ng-template #branch let-nodes let-module="module">
+            <ul *ngIf="nodes?.length" role="group">
+                <li *ngFor="let node of nodes; trackBy: trackNode" role="treeitem"
+                    [attr.aria-expanded]="node.children?.length ? isExpanded(folderKey(module, node)) : null">
+                    <div class="studio-tree-row" [class.is-current]="isCurrent(node)">
+                        <button *ngIf="node.children?.length; else leaf" type="button" class="studio-tree-toggle" [attr.aria-label]="node.name"
+                                (click)="toggle(folderKey(module, node))">{{ isExpanded(folderKey(module, node)) ? '−' : '+' }}</button>
+                        <ng-template #leaf><span class="studio-tree-leaf" aria-hidden="true"></span></ng-template>
+                        <scrm-image *ngIf="node.children?.length" image="folder" class="studio-tree-folder"></scrm-image>
+                        <a href="javascript:void(0)" (click)="openNode(node)">{{ node.name }}</a>
+                    </div>
+                    <ng-container *ngIf="node.children?.length && isExpanded(folderKey(module, node))">
+                        <ng-container *ngTemplateOutlet="branch; context: {$implicit: node.children, module: module}"></ng-container>
+                    </ng-container>
+                </li>
+            </ul>
+        </ng-template>
+
+        <!-- The screen (legacy Studio center panel). -->
+        <section class="studio-panel studio-center">
+            <!-- The legacy Studio has its own tab title. -->
+            <div *ngIf="view !== 'legacy'" class="studio-tabbar">
+                <h2 class="studio-tab">{{ screen?.title || label('LBL_STUDIO') }}</h2>
+            </div>
+            <nav class="studio-crumbs" [attr.aria-label]="label('LBL_STUDIO')">
+                <button *ngIf="module || view" type="button" class="studio-icon-btn" [attr.aria-label]="label('LBL_BACK')" [title]="label('LBL_BACK')"
+                        (click)="back()"><scrm-image image="arrow_left_filled"></scrm-image></button>
+                <button type="button" class="studio-icon-btn" [attr.aria-label]="label('LBL_HOME')" [title]="label('LBL_HOME')"
+                        (click)="home()"><scrm-image image="home"></scrm-image></button>
+                <span class="studio-crumbs-sep" aria-hidden="true">|</span>
+                <ng-container *ngFor="let crumb of screen?.crumbs; let last = last">
+                    <a *ngIf="crumb.open && !last; else current" href="javascript:void(0)" (click)="crumb.open()">{{ crumb.name }}</a>
+                    <ng-template #current><span [attr.aria-current]="last ? 'page' : null">{{ crumb.name }}</span></ng-template>
+                    <span *ngIf="!last" aria-hidden="true">&gt;</span>
+                </ng-container>
+            </nav>
+
+            <p *ngIf="!screen" class="studio-muted">…</p>
+
+            <ng-container *ngIf="screen?.tiles">
+                <div *ngIf="!module || !view" class="studio-actions">
+                    <button *ngIf="!module" type="button" class="btn btn-sm btn-outline-secondary" (click)="exportCustomizations()"
+                            (mouseenter)="hover(exportHelp())" (mouseleave)="hover(null)" (focus)="hover(exportHelp())" (blur)="hover(null)">{{ label('LBL_BTN_EXPORT') }}</button>
+                    <button *ngIf="module" type="button" class="btn btn-sm btn-outline-secondary" (click)="resetModule()">{{ label('LBL_RESET_MODULE') }}</button>
+                </div>
+                <p class="studio-question">{{ screen.question }}</p>
+                <ul class="studio-tiles">
+                    <li *ngFor="let tile of screen.tiles; trackBy: trackTile">
+                        <a href="javascript:void(0)" class="studio-tile" (click)="tile.open()"
+                           (mouseenter)="hover(tile.help)" (mouseleave)="hover(null)" (focus)="hover(tile.help)" (blur)="hover(null)">
+                            <scrm-image [image]="tile.icon" class="studio-tile-icon"></scrm-image>
+                            <span>{{ tile.name }}</span>
+                        </a>
+                    </li>
+                </ul>
+            </ng-container>
+
+            <scrm-studio-labels *ngIf="view === 'labels' && module" [module]="module" [labels]="labels"></scrm-studio-labels>
+
+            <scrm-studio-fields *ngIf="view === 'fields' && module" [module]="module" [labels]="labels" [field]="field"
+                               (open)="open($event)" (editing)="setFieldEditing($event)"></scrm-studio-fields>
+
+            <scrm-studio-list-layout *ngIf="view === 'layout' && module && layout && !isGridLayout" [module]="module" [view]="layout" [subpanel]="subpanel"
+                                    [labels]="labels" [help]="help" [helpGroup]="layoutHelpGroup" (hover)="hover($event)"></scrm-studio-list-layout>
+
+            <scrm-studio-grid-layout *ngIf="view === 'layout' && module && layout && isGridLayout" [module]="module" [view]="layout"
+                                    [labels]="labels" [help]="help" (hover)="hover($event)"></scrm-studio-grid-layout>
+
+            <scrm-studio-relationships *ngIf="view === 'relationships' && module" [module]="module" [labels]="labels"
+                                      (editing)="setRelationshipEditing($event)"></scrm-studio-relationships>
+
+            <scrm-studio-reset *ngIf="view === 'reset' && module" [module]="module" [labels]="labels"></scrm-studio-reset>
+
+            <scrm-studio-export *ngIf="view === 'export' && !module" [labels]="labels"></scrm-studio-export>
+
+            <!-- The legacy Studio, at a component not in the page yet. -->
+            <iframe *ngIf="view === 'legacy' && frameUrl" class="studio-frame" [src]="frameUrl" [title]="label('LBL_STUDIO')"></iframe>
+        </section>
+
+        <!-- The help of the screen, or of the button pointed (legacy Studio help panel). -->
+        <aside *ngIf="view !== 'legacy'" class="studio-panel studio-east">
+            <div class="studio-panel-head">
+                <button type="button" class="studio-collapse" [attr.aria-expanded]="!helpHidden"
+                        [attr.aria-label]="label(helpHidden ? 'LBL_SHOW' : 'LBL_HIDE') + ' ' + label('LBL_SECTION_HELP')"
+                        (click)="toggleHelp()">{{ helpHidden ? '‹' : '›' }}</button>
+                <h2 *ngIf="!helpHidden" class="studio-panel-title">{{ label('LBL_SECTION_HELP') }}</h2>
+            </div>
+            <div *ngIf="!helpHidden" class="studio-help" aria-live="polite" [innerHTML]="shownHelp"></div>
+        </aside>
+    </div>
+</div>

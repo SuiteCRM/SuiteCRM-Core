@@ -1,0 +1,201 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="studio-grid-layout">
+    <p *ngIf="data?.disabled" class="studio-notice" role="status" [innerHTML]="label('LBL_SYNC_TO_DETAILVIEW_NOTICE')"></p>
+
+    <div class="studio-toolbar">
+        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="disabled" (click)="save(false)"
+                (mouseenter)="hover.emit(helpText('saveBtn'))" (mouseleave)="hover.emit('')"
+                (focus)="hover.emit(helpText('saveBtn'))" (blur)="hover.emit('')">{{ label('LBL_BTN_SAVE') }}</button>
+        <button *ngIf="!package" type="button" class="btn btn-sm btn-main" [disabled]="disabled" (click)="save(true)"
+                (mouseenter)="hover.emit(helpText('publishBtn'))" (mouseleave)="hover.emit('')"
+                (focus)="hover.emit(helpText('publishBtn'))" (blur)="hover.emit('')">{{ label('LBL_BTN_SAVEPUBLISH') }}</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="disabled || !data?.history.length"
+                [attr.aria-expanded]="historyOpen" (click)="historyOpen = !historyOpen"
+                (mouseenter)="hover.emit(helpText('historyBtn'))" (mouseleave)="hover.emit('')"
+                (focus)="hover.emit(helpText('historyBtn'))" (blur)="hover.emit('')">{{ label('LBL_HISTORY') }}</button>
+        <button *ngIf="data?.restoreDefault" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="disabled"
+                (click)="restore(data.restoreDefault)"
+                (mouseenter)="hover.emit(helpText('historyDefault'))" (mouseleave)="hover.emit('')"
+                (focus)="hover.emit(helpText('historyDefault'))" (blur)="hover.emit('')">{{ label('LBL_RESTORE_DEFAULT') }}</button>
+        <button *ngIf="data?.copyFromEditView" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="disabled"
+                (click)="copyFromEditView()">{{ label('LBL_COPY_FROM_EDITVIEW') }}</button>
+        <label *ngIf="data?.type === 'editview'" class="studio-inline studio-check" [title]="label('LBL_SYNC_TO_DETAILVIEW_HELP')">
+            <input type="checkbox" [disabled]="disabled" [(ngModel)]="sync"> {{ label('LBL_SYNC_TO_DETAILVIEW') }}
+        </label>
+        <span *ngIf="loading" class="studio-muted">…</span>
+    </div>
+
+    <!-- The history of the layout (legacy View History). -->
+    <div *ngIf="historyOpen && data?.history.length" class="studio-history">
+        <table class="studio-data-table">
+            <tbody>
+            <tr *ngFor="let entry of data.history">
+                <td>{{ entry.date }}</td>
+                <td class="studio-history-action">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="restore(entry.sid)">{{ label('LBL_MB_RESTORE') }}</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p *ngIf="restored" class="studio-restored" role="status">{{ restored.date }} — {{ label('LBL_STUDIO_VIEW_RESTORED') }}</p>
+    <p *ngIf="copied" class="studio-restored" role="status">{{ label('LBL_STUDIO_VIEW_COPIED') }}</p>
+    <p *ngIf="error" class="studio-error" role="alert">{{ error }}</p>
+
+    <div *ngIf="data" class="studio-grid">
+        <!-- The toolbox: new panel and row, filler, the fields not on the layout (dropping a field here removes it). -->
+        <aside class="studio-toolbox" (mouseenter)="hover.emit(helpText('toolbox'))" (mouseleave)="hover.emit('')">
+            <h3 class="studio-column-title">{{ label('LBL_TOOLBOX') }}</h3>
+            <div class="studio-toolbox-actions">
+                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="disabled" (click)="addPanel()">{{ label('LBL_NEW_PANEL') }}</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="disabled || !panels.length"
+                        (click)="addRow(panels.length - 1)">{{ label('LBL_NEW_ROW') }}</button>
+            </div>
+            <div id="studio-filler" cdkDropList [cdkDropListConnectedTo]="dropIds" [cdkDropListDisabled]="disabled"
+                 [cdkDropListEnterPredicate]="never" class="studio-filler-source">
+                <div cdkDrag [cdkDragData]="{kind: 'filler'}" class="studio-grid-field is-filler">{{ label('LBL_FILLER') }}</div>
+            </div>
+            <div id="studio-available" cdkDropList [cdkDropListConnectedTo]="dropIds" [cdkDropListDisabled]="disabled"
+                 cdkDropListSortingDisabled (cdkDropListDropped)="dropOnAvailable($event)" class="studio-available"
+                 [attr.aria-label]="label('LBL_TOOLBOX')">
+                <div *ngFor="let field of available; trackBy: trackField" cdkDrag [cdkDragData]="{kind: 'available', field: field}"
+                     class="studio-grid-field">
+                    <div class="studio-field-head">
+                        <strong>{{ field.label || field.name }}</strong>
+                        <button type="button" class="btn btn-sm btn-link studio-field-edit" [disabled]="disabled"
+                                [title]="label('LBL_ADD_BUTTON')" [attr.aria-label]="label('LBL_ADD_BUTTON') + ' ' + (field.label || field.name)"
+                                (mousedown)="$event.stopPropagation()" (click)="addField(field)">+</button>
+                    </div>
+                    <div class="studio-field-meta"><span class="studio-mono">{{ field.name }}</span></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- The panels of the layout. -->
+        <div class="studio-panels" (mouseenter)="hover.emit(helpText('panels'))" (mouseleave)="hover.emit('')">
+            <h3 class="studio-column-title">{{ label('LBL_CURRENT_LAYOUT') }}</h3>
+            <section *ngFor="let panel of panels; let p = index; let lastPanel = last; trackBy: trackIndex" class="studio-panel-box">
+                <div class="studio-panel-bar">
+                    <strong class="studio-panel-name">{{ panel.label }}</strong>
+                    <span class="studio-mono studio-panel-id">{{ panel.id }}</span>
+                    <button *ngIf="panel.labelEditable" type="button" class="btn btn-sm btn-link studio-field-edit" [disabled]="disabled"
+                            [attr.aria-expanded]="editingPanel === panel" [title]="label('LBL_EDIT')"
+                            [attr.aria-label]="label('LBL_EDIT') + ' ' + panel.label" (click)="editPanel(panel)">✎</button>
+                    <label class="studio-inline">
+                        {{ label('LBL_TABDEF_TYPE') }}
+                        <select class="form-control form-control-sm studio-select" [title]="label('LBL_TABDEF_TYPE_OPTION_HELP')"
+                                [disabled]="disabled || (p === 0 && firstLocked())" [ngModel]="panel.newTab" (ngModelChange)="setTab(p, $event)">
+                            <option [ngValue]="false">{{ label('LBL_TABDEF_TYPE_OPTION_PANEL') }}</option>
+                            <option [ngValue]="true">{{ label('LBL_TABDEF_TYPE_OPTION_TAB') }}</option>
+                        </select>
+                    </label>
+                    <label *ngIf="!panel.newTab" class="studio-inline studio-check">
+                        <input type="checkbox" [disabled]="disabled" [checked]="panel.panelDefault === 'collapsed'" (change)="toggleCollapsed(panel)">
+                        {{ label('LBL_TABDEF_COLLAPSE') }}
+                    </label>
+                    <span class="studio-panel-tools">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="disabled || p === 0" [title]="label('LBL_STUDIO_VIEW_MOVE_UP')"
+                                [attr.aria-label]="label('LBL_STUDIO_VIEW_MOVE_UP') + ' ' + panel.label" (click)="movePanel(p, -1)">▲</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="disabled || lastPanel" [title]="label('LBL_STUDIO_VIEW_MOVE_DOWN')"
+                                [attr.aria-label]="label('LBL_STUDIO_VIEW_MOVE_DOWN') + ' ' + panel.label" (click)="movePanel(p, 1)">▼</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="disabled" [title]="label('LBL_NEW_ROW')"
+                                [attr.aria-label]="label('LBL_NEW_ROW') + ' ' + panel.label" (click)="addRow(p)">+</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="disabled" [title]="label('LBL_STUDIO_VIEW_REMOVE')"
+                                [attr.aria-label]="label('LBL_STUDIO_VIEW_REMOVE') + ' ' + panel.label" (click)="removePanel(p)">✕</button>
+                    </span>
+                </div>
+                <div *ngIf="editingPanel === panel" class="studio-field-props studio-panel-props">
+                    <label class="studio-prop">
+                        <span>{{ label('LBL_LABEL_TITLE') }}</span>
+                        <input type="text" class="form-control form-control-sm" [ngModel]="panel.label" (ngModelChange)="changePanelLabel(panel, $event)">
+                    </label>
+                </div>
+
+                <div *ngFor="let slots of panel.rows; let r = index; let lastRow = last; trackBy: trackIndex" class="studio-grid-row">
+                    <div class="studio-grid-slots" [style.gridTemplateColumns]="'repeat(' + maxColumns + ', minmax(0, 1fr))'">
+                        <ng-container *ngFor="let slot of slots; let c = index; trackBy: trackIndex">
+                            <div *ngIf="!isSpanned(p, r, c)" class="studio-slot" [class.is-filler]="!isField(slot)"
+                                 [id]="slotId({panel: p, row: r, col: c})" cdkDropList cdkDropListSortingDisabled
+                                 [cdkDropListData]="{panel: p, row: r, col: c}" [cdkDropListConnectedTo]="dropIds"
+                                 [cdkDropListDisabled]="disabled" (cdkDropListDropped)="dropOnSlot($event)"
+                                 [style.gridColumn]="'span ' + span(p, r, c)">
+                                <div *ngIf="isField(slot); else fillerSlot" cdkDrag [cdkDragData]="{kind: 'slot', ref: {panel: p, row: r, col: c}}"
+                                     class="studio-grid-field" [class.is-editing]="editingSlot === slot">
+                                    <div class="studio-field-head">
+                                        <strong>{{ slot.label || slot.name }}</strong>
+                                        <span class="studio-field-buttons" (mousedown)="$event.stopPropagation()">
+                                            <button *ngIf="canExpand(p, r, c)" type="button" class="btn btn-sm btn-link studio-field-edit" [disabled]="disabled"
+                                                    [title]="label(isExpanded(p, r, c) ? 'LBL_STUDIO_VIEW_REDUCE' : 'LBL_STUDIO_VIEW_EXPAND')"
+                                                    [attr.aria-label]="label(isExpanded(p, r, c) ? 'LBL_STUDIO_VIEW_REDUCE' : 'LBL_STUDIO_VIEW_EXPAND') + ' ' + slot.label"
+                                                    (click)="toggleExpand(p, r, c)">{{ isExpanded(p, r, c) ? '⇤' : '⇔' }}</button>
+                                            <button type="button" class="btn btn-sm btn-link studio-field-edit" [disabled]="disabled"
+                                                    [attr.aria-expanded]="editingSlot === slot" [title]="label('LBL_EDIT')"
+                                                    [attr.aria-label]="label('LBL_EDIT') + ' ' + slot.label" (click)="editSlot(slot)">✎</button>
+                                            <button type="button" class="btn btn-sm btn-link studio-field-edit" [disabled]="disabled"
+                                                    [title]="label('LBL_STUDIO_VIEW_REMOVE')" [attr.aria-label]="label('LBL_STUDIO_VIEW_REMOVE') + ' ' + slot.label"
+                                                    (click)="removeField({panel: p, row: r, col: c})">✕</button>
+                                        </span>
+                                    </div>
+                                    <div class="studio-field-meta">
+                                        <span class="studio-mono">{{ slot.name }}</span>
+                                        <span *ngIf="slot.tabindex">#{{ slot.tabindex }}</span>
+                                    </div>
+
+                                    <!-- The properties of the field (legacy property editor). -->
+                                    <div *ngIf="editingSlot === slot" class="studio-field-props" (mousedown)="$event.stopPropagation()"
+                                         (mouseenter)="hover.emit(helpText('property'))">
+                                        <label class="studio-prop">
+                                            <span>{{ label('LBL_LABEL_TITLE') }}</span>
+                                            <input type="text" class="form-control form-control-sm" [ngModel]="slot.label" (ngModelChange)="changeSlotLabel(slot, $event)">
+                                        </label>
+                                        <label class="studio-prop">
+                                            <span>{{ label('LBL_TAB_ORDER') }}</span>
+                                            <input type="number" min="0" class="form-control form-control-sm" [ngModel]="slot.tabindex"
+                                                   (ngModelChange)="changeTabindex(slot, $event)">
+                                        </label>
+                                    </div>
+                                </div>
+                                <ng-template #fillerSlot><span class="studio-filler">{{ label('LBL_FILLER') }}</span></ng-template>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <span class="studio-row-tools">
+                        <button type="button" class="btn btn-sm btn-link" [disabled]="disabled || (p === 0 && r === 0)" [title]="label('LBL_STUDIO_VIEW_MOVE_UP')"
+                                [attr.aria-label]="label('LBL_STUDIO_VIEW_MOVE_UP')" (click)="moveRow(p, r, -1)">▲</button>
+                        <button type="button" class="btn btn-sm btn-link" [disabled]="disabled || (lastPanel && lastRow)" [title]="label('LBL_STUDIO_VIEW_MOVE_DOWN')"
+                                [attr.aria-label]="label('LBL_STUDIO_VIEW_MOVE_DOWN')" (click)="moveRow(p, r, 1)">▼</button>
+                        <button type="button" class="btn btn-sm btn-link" [disabled]="disabled" [title]="label('LBL_STUDIO_VIEW_REMOVE')"
+                                [attr.aria-label]="label('LBL_STUDIO_VIEW_REMOVE')" (click)="removeRow(p, r)">✕</button>
+                    </span>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

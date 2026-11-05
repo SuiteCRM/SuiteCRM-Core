@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    MergeRecordsComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -182,6 +183,23 @@ export class AppInit {
                                 preferences: false,
                                 languageStrings: ['appStrings']
                             }
+                        }
+                    });
+
+                    // Merge records view (list "Merge" bulk action, end of Find Duplicates), before the
+                    // generic classic view routes.
+                    routes.push({
+                        path: 'merge-records/index',
+                        component: MergeRecordsComponent,
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'paramsChange',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'home'
                         }
                     });
                     routes.push(loggedOutConfig);

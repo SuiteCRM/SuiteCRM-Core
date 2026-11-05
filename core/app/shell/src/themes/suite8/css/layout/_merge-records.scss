@@ -1,0 +1,187 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+.merge-records {
+    // Below the fixed navbar, like the list view (padding-top: 3em): the title and the
+    // Cancel / Save Merge buttons were hidden under it.
+    padding: calc(3rem + 16px) 24px 48px;
+}
+
+.merge-records-list {
+    flex: 1;
+    min-width: 180px;
+}
+
+select[multiple].merge-records-list {
+    min-height: 96px;
+}
+
+.merge-records-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.merge-records-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 400;
+}
+
+.merge-records-module {
+    margin-left: 8px;
+    color: #6a6676;
+    font-size: 16px;
+}
+
+.merge-records-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.merge-records-help,
+.merge-records-muted {
+    color: #6a6676;
+}
+
+.merge-records-error {
+    color: #b42318;
+}
+
+.merge-records-scroll {
+    overflow-x: auto;
+    background: #fff;
+    border: 1px solid #e3e0e8;
+    border-radius: 4px;
+}
+
+.merge-records-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #eceaf0;
+        vertical-align: top;
+        text-align: left;
+    }
+
+    thead th {
+        min-width: 200px;
+        background: #f7f6f9;
+    }
+}
+
+.merge-records-field {
+    width: 220px;
+    min-width: 160px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6a6676;
+    text-transform: uppercase;
+}
+
+.merge-records-primary {
+    border-top: 3px solid #6a5acd;
+}
+
+.merge-records-record-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.merge-records-badge {
+    padding: 1px 8px;
+    border-radius: 10px;
+    background: #ece9fb;
+    color: #4b3fb0;
+    font-size: 12px;
+}
+
+.merge-records-link {
+    padding: 0;
+    font-size: 12px;
+}
+
+.merge-records-warning {
+    margin-top: 4px;
+    color: #b42318;
+    font-size: 12px;
+}
+
+.merge-records-choice {
+    cursor: pointer;
+
+    input[type='radio'] {
+        margin-top: 3px;
+        cursor: pointer;
+    }
+
+    &:hover {
+        background: #f7f6f9;
+    }
+}
+
+.merge-records-pick {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    input[type='radio'] {
+        margin-top: 0;
+    }
+}
+
+.merge-records-chosen {
+    background: #eef7f0;
+
+    &:hover {
+        background: #e4f2e8;
+    }
+}
+
+.merge-records-value {
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.merge-records-toggle td {
+    background: #fbfafc;
+}
+
+.merge-records-same {
+    color: #6a6676;
+}
+
+.merge-records-required {
+    color: #b42318;
+}

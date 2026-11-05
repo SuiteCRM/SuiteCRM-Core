@@ -41,8 +41,30 @@ if (!defined('sugarEntry') || !sugarEntry) {
  */
 
 
+// The records chosen in Find Duplicates (Step2: the record and the duplicates checked) are
+// merged in the SuiteCRM 8 merge records view (route merge-records/index): the app is sent
+// there with them, from the frame of the legacy page.
+$mergeIds = array_merge(
+    [(string)($_REQUEST['record'] ?? '')],
+    (array)($_REQUEST['mass'] ?? []),
+    (array)($_REQUEST['merged_ids'] ?? [])
+);
+if (!empty($_REQUEST['uid'])) {
+    $mergeIds = array_merge($mergeIds, explode(',', (string)$_REQUEST['uid']));
+}
+$mergeIds = array_values(array_unique(array_filter(array_map('strval', $mergeIds), static function ($id) {
+    return $id !== '' && preg_match('/^[A-Za-z0-9-]+$/', $id);
+})));
+$mergeModule = preg_replace('/[^A-Za-z0-9_]/', '', (string)($_REQUEST['merge_module'] ?? $_REQUEST['action_module'] ?? ''));
+$mergeQuery = ['action_module' => $mergeModule, 'uid' => implode(',', $mergeIds), 'return_module' => $mergeModule];
+foreach (['return_action', 'return_id'] as $mergeParam) {
+    if (!empty($_REQUEST[$mergeParam])) {
+        $mergeQuery[$mergeParam] = preg_replace('/[^A-Za-z0-9_-]/', '', (string)$_REQUEST[$mergeParam]);
+    }
+}
+echo '<script>(window.top || window).location.hash = ' . json_encode('/merge-records/index?' . http_build_query($mergeQuery)) . ';</script>';
 
-
+return;
 
 require_once('include/JSON.php');
 $timedate = TimeDate::getInstance();

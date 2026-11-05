@@ -929,3 +929,5 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './views/merge-records/components/merge-records/merge-records.component';
+export * from './views/merge-records/components/merge-records/merge-records.module';

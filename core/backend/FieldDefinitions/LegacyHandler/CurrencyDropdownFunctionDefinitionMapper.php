@@ -109,6 +109,12 @@ class CurrencyDropdownFunctionDefinitionMapper implements FieldDefinitionMapperI
 
             $fieldDefinition['metadata'] = $metadata;
 
+            // A dropdown of these currencies, so that the field shows the currency (e.g. "€ (EUR)")
+            // instead of its id where it is not grouped with an amount: list view and subpanel
+            // columns, record view cells, filters.
+            $fieldDefinition['type'] = 'enum';
+            $fieldDefinition['options'] = '__no_options__';
+
             $vardefs[$fieldName] = $fieldDefinition;
         }
 

@@ -109,6 +109,12 @@ trait FieldDefinitionsInjectorTrait
             }
         }
 
+        // The layout may keep the legacy 'id' type of a field shown as a dropdown in SuiteCRM 8
+        // (e.g. a currency_id column added in Studio, see CurrencyDropdownFunctionDefinitionMapper).
+        if (($field['type'] ?? '') === 'id' && ($field['fieldDefinition']['type'] ?? '') === 'enum') {
+            $field['type'] = 'enum';
+        }
+
         return $field;
     }
 

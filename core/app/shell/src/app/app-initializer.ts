@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    PdfSettingsComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -182,6 +183,22 @@ export class AppInit {
                                 preferences: false,
                                 languageStrings: ['appStrings']
                             }
+                        }
+                    });
+
+                    // PDF settings view (admin panel link), before the generic classic view routes.
+                    routes.push({
+                        path: 'administration/PDFSettings',
+                        component: PdfSettingsComponent,
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration'
                         }
                     });
                     routes.push(loggedOutConfig);

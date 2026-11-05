@@ -107,7 +107,7 @@ parameters:
     template-section-line:
       index: true
       list: true
-      record: false
+      record: true
     surveys:
       index: true
       list: true
@@ -163,7 +163,7 @@ parameters:
     pdf-templates:
       index: true
       list: true
-      record: false
+      record: true
     product-categories:
       index: true
       list: true

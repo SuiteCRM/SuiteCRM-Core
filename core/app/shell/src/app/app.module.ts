@@ -55,6 +55,8 @@ import {
     ListContainerModule,
     ListHeaderModule,
     ListModule,
+    PdfSettingsModule,
+    PdfTemplateSampleModalModule,
     ConfirmationListModalModule,
     MessageModalModule,
     MessageUiModule,
@@ -111,7 +113,9 @@ export const initializeApp = (appInitService: AppInit) => (): Promise<any> => ap
         RecordListModalModule,
         RecordModalComponent,
         ApolloModule,
-        SidebarComponent
+        SidebarComponent,
+        PdfSettingsModule,
+        PdfTemplateSampleModalModule
     ],
     providers: [
         {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},

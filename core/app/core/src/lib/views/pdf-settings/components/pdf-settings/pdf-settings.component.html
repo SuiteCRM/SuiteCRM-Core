@@ -1,0 +1,55 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="pdf-settings">
+    <h2 class="pdf-settings-title">{{ label('LBL_PDF_HEADER') }}</h2>
+    <p class="pdf-settings-intro">{{ label('LBL_PDF_HEADER_DESC') }}</p>
+
+    <p *ngIf="error" class="pdf-settings-error" role="alert">{{ label('LBL_AJAX_SUBMIT_FAIL') }}</p>
+    <p *ngIf="loading && !data" class="pdf-settings-muted">…</p>
+
+    <form *ngIf="data" class="pdf-settings-form" (ngSubmit)="save()">
+        <fieldset class="pdf-settings-panel">
+            <legend>{{ label('LBL_PDF_INTERFACE') }}</legend>
+            <div class="pdf-settings-row">
+                <div>
+                    <label for="pdf-settings-engine">{{ label('LBL_PDF_OPTIONS') }}</label>
+                    <small id="pdf-settings-engine-help" class="form-text text-muted">{{ label('LBL_PDF_OPTIONS_HELP') }}</small>
+                </div>
+                <select id="pdf-settings-engine" name="engine" class="form-control form-control-sm" aria-describedby="pdf-settings-engine-help"
+                        [(ngModel)]="engine">
+                    <option *ngFor="let item of data.engines" [value]="item.value">{{ item.label }}</option>
+                </select>
+            </div>
+        </fieldset>
+
+        <div class="pdf-settings-buttons">
+            <button type="submit" class="btn btn-sm btn-main" [disabled]="loading">{{ label('LBL_SAVE_BUTTON_LABEL') }}</button>
+            <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/administration']">{{ label('LBL_CANCEL_BUTTON_LABEL') }}</a>
+        </div>
+    </form>
+</div>

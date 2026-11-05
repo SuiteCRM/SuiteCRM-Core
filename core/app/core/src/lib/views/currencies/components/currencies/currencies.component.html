@@ -1,0 +1,126 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="currencies-view">
+    <h2 class="currencies-view-title">{{ label('LBL_MODULE_NAME') }}</h2>
+
+    <p *ngIf="loading && !data" class="currencies-view-muted">…</p>
+
+    <ng-container *ngIf="data">
+        <div class="currencies-view-panel currencies-view-merge" *ngIf="merging">
+            <p class="currencies-view-muted">{{ label('LBL_MERGE_TXT') }}</p>
+            <div class="currencies-view-buttons">
+                <select class="custom-select custom-select-sm" name="mergeTo" [(ngModel)]="mergeTo" [attr.aria-label]="label('LBL_MERGE')">
+                    <option *ngFor="let currency of data.currencies; trackBy: trackCurrency" [ngValue]="currency.id">
+                        {{ currency.name }} ({{ currency.iso4217 }})
+                    </option>
+                </select>
+                <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="merge()">{{ label('LBL_MERGE') }}</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelMerge()">{{ label('LBL_CANCEL_BUTTON_LABEL') }}</button>
+            </div>
+        </div>
+
+        <div class="currencies-view-buttons currencies-view-actions" *ngIf="!merging">
+            <button type="button" class="btn btn-sm btn-outline-main" (click)="startMerge()">{{ label('LBL_MERGE') }}</button>
+        </div>
+
+        <div class="currencies-view-scroll">
+            <table class="currencies-view-table" [class.is-loading]="loading">
+                <thead>
+                <tr>
+                    <th *ngIf="merging"></th>
+                    <th>{{ label('LBL_LIST_NAME') }}</th>
+                    <th>{{ label('LBL_LIST_ISO4217') }}</th>
+                    <th>{{ label('LBL_LIST_SYMBOL') }}</th>
+                    <th>{{ label('LBL_LIST_RATE') }}</th>
+                    <th>{{ label('LBL_LIST_STATUS') }}</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let currency of data.currencies; trackBy: trackCurrency" [class.is-selected]="form.id === currency.id">
+                    <td *ngIf="merging">
+                        <input *ngIf="!currency.system" type="checkbox" [name]="'merge-' + currency.id" [(ngModel)]="checked[currency.id]"
+                               [attr.aria-label]="currency.name">
+                    </td>
+                    <td>
+                        <a *ngIf="!currency.system" href="" class="currencies-view-name" (click)="$event.preventDefault(); edit(currency)">{{ currency.name }}</a>
+                        <span *ngIf="currency.system" class="currencies-view-name" [title]="label('LBL_CURRENCY_SYSTEM_NOTE')">{{ currency.name }}</span>
+                        <small *ngIf="currency.system" class="currencies-view-muted"> – {{ label('LBL_CURRENCY_SYSTEM_NOTE') }}</small>
+                    </td>
+                    <td>{{ currency.iso4217 }}</td>
+                    <td>{{ currency.symbol }}</td>
+                    <td>{{ currency.conversionRate }}</td>
+                    <td>{{ status(currency.status) }}</td>
+                    <td class="currencies-view-delete">
+                        <button *ngIf="!currency.system" type="button" class="btn btn-sm btn-link" [disabled]="loading"
+                                (click)="delete(currency)">{{ label('LBL_DELETE') }}</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <form (ngSubmit)="save()">
+            <fieldset class="currencies-view-panel">
+                <legend>{{ form.id ? label('LBL_CURRENCY_EDIT') + ' » ' + form.name : label('LBL_CURRENCY_CREATE') }}</legend>
+                <div class="currencies-view-row">
+                    <label for="currency-name">{{ label('LBL_LIST_NAME') }} <span class="currencies-view-required">*</span></label>
+                    <input id="currency-name" name="name" class="form-control form-control-sm" maxlength="50" [(ngModel)]="form.name">
+
+                    <label for="currency-iso">{{ label('LBL_LIST_ISO4217') }} <span class="currencies-view-required">*</span></label>
+                    <span>
+                        <input id="currency-iso" name="iso4217" class="form-control form-control-sm currencies-view-iso" maxlength="3"
+                               [ngModel]="form.iso4217" (ngModelChange)="isoChanged($event)">
+                        <small class="currencies-view-muted">{{ label('LBL_LIST_ISO4217_HELP') }}</small>
+                    </span>
+
+                    <label for="currency-rate">{{ label('LBL_LIST_RATE') }} <span class="currencies-view-required">*</span></label>
+                    <span>
+                        <input id="currency-rate" name="conversion_rate" type="number" step="any" min="0.000001"
+                               class="form-control form-control-sm" [(ngModel)]="form.conversion_rate">
+                        <small class="currencies-view-muted">{{ label('LBL_LIST_RATE_HELP') }}</small>
+                    </span>
+
+                    <label for="currency-symbol">{{ label('LBL_LIST_SYMBOL') }} <span class="currencies-view-required">*</span></label>
+                    <input id="currency-symbol" name="symbol" class="form-control form-control-sm currencies-view-iso" maxlength="50"
+                           [(ngModel)]="form.symbol">
+
+                    <label for="currency-status">{{ label('LBL_LIST_STATUS') }}</label>
+                    <select id="currency-status" name="status" class="custom-select custom-select-sm" [(ngModel)]="form.status">
+                        <option *ngFor="let status of data.statuses" [ngValue]="status.value">{{ status.label }}</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <div class="currencies-view-buttons">
+                <button type="submit" class="btn btn-sm btn-main" [disabled]="loading">{{ label('LBL_SAVE_BUTTON_LABEL') }}</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="newCurrency()">{{ label('LBL_CANCEL_BUTTON_LABEL') }}</button>
+            </div>
+        </form>
+    </ng-container>
+</div>

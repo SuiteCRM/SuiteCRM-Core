@@ -77,4 +77,8 @@ $mod_strings = array(
         ),
     'LBL_CREATED_BY' => 'Created By',
     'LBL_EDIT_LAYOUT' => 'Edit Layout' /*for 508 compliance fix*/,
+    'LBL_CURRENCY_SYSTEM_NOTE' => 'System currency, set in the system settings',
+    'LBL_CURRENCY_CREATE' => 'Create',
+    'LBL_CURRENCY_EDIT' => 'Edit',
+    'LBL_CURRENCY_REQUIRED' => 'The name, the ISO 4217 code, the conversion rate and the symbol are required.',
 );

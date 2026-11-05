@@ -63,6 +63,7 @@ import {
     RecordListModalModule,
     RecordModalComponent,
     RecordModule,
+    CurrenciesModule,
     SidebarComponent,
     ButtonModule,
     TableModule
@@ -111,7 +112,8 @@ export const initializeApp = (appInitService: AppInit) => (): Promise<any> => ap
         RecordListModalModule,
         RecordModalComponent,
         ApolloModule,
-        SidebarComponent
+        SidebarComponent,
+        CurrenciesModule
     ],
     providers: [
         {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},

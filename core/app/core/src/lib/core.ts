@@ -827,6 +827,8 @@ export * from './views/admin/components/admin-card/admin-card.component';
 export * from './views/admin/components/admin-card/admin-card.module';
 export * from './views/admin/components/admin-panel/admin-panel.component';
 export * from './views/admin/components/admin-panel/admin-panel.module';
+export * from './views/search/components/global-search/global-search.component';
+export * from './views/search/components/global-search/global-search.module';
 export * from './views/classic/components/classic-view/classic-view.component';
 export * from './views/classic/components/classic-view/classic-view.module';
 export * from './views/classic/services/classic-view.resolver';

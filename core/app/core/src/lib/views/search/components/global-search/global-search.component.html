@@ -1,0 +1,182 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2026 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="global-search-view">
+    <h2 class="global-search-title"><scrm-label labelKey="LBL_SEARCH"></scrm-label></h2>
+
+    <form class="global-search-form" role="search" (ngSubmit)="submit()">
+        <input type="search" name="searchTerm" class="form-control global-search-input"
+               [(ngModel)]="input"
+               [attr.aria-label]="language.getAppString('LBL_SEARCH')"
+               [placeholder]="language.getAppString('LBL_GLOBAL_SEARCH_PLACEHOLDER')">
+
+        <div class="global-search-modules">
+            <button type="button" class="btn btn-sm btn-outline-main global-search-modules-toggle"
+                    [attr.aria-expanded]="modulesOpen" (click)="toggleModules()">
+                <scrm-label labelKey="LBL_SEARCH_MODULES"></scrm-label>
+                <strong *ngIf="selectedModulesCount === modules.length">
+                    <scrm-label labelKey="LBL_GLOBAL_SEARCH_ALL"></scrm-label>
+                </strong>
+                <strong *ngIf="selectedModulesCount !== modules.length">
+                    <scrm-dynamic-label labelKey="LBL_GLOBAL_SEARCH_SELECTED_MODULES"
+                                        [context]="{selected: '' + selectedModulesCount, total: '' + modules.length}">
+                    </scrm-dynamic-label>
+                </strong>
+            </button>
+            <div *ngIf="modulesOpen" class="global-search-modules-panel" role="group"
+                 (keydown.escape)="toggleModules()">
+                <div class="global-search-modules-header">
+                    <strong><scrm-label labelKey="LBL_GLOBAL_SEARCH_IN"></scrm-label></strong>
+                    <span>
+                        <button type="button" class="btn btn-sm btn-link" (click)="selectAllModules(true)">
+                            <scrm-label labelKey="LBL_GLOBAL_SEARCH_ALL"></scrm-label>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-link" (click)="selectAllModules(false)">
+                            <scrm-label labelKey="LBL_GLOBAL_SEARCH_NONE"></scrm-label>
+                        </button>
+                    </span>
+                </div>
+                <div class="global-search-modules-list">
+                    <label *ngFor="let option of modules">
+                        <input type="checkbox" [(ngModel)]="option.selected" [name]="'module-' + option.module">
+                        {{ option.label }}
+                    </label>
+                </div>
+                <p class="global-search-hint"><scrm-label labelKey="LBL_GLOBAL_SEARCH_MODULES_KEPT"></scrm-label></p>
+                <p *ngIf="modulesWarning" class="global-search-hint global-search-warning">
+                    <scrm-label labelKey="LBL_GLOBAL_SEARCH_SELECT_MODULE"></scrm-label>
+                </p>
+                <div class="global-search-modules-footer">
+                    <button type="button" class="btn btn-sm btn-main" (click)="applyModules()">
+                        <scrm-label labelKey="LBL_GLOBAL_SEARCH_APPLY"></scrm-label>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-sm btn-main global-search-submit">
+            <scrm-label labelKey="LBL_SEARCH"></scrm-label>
+        </button>
+    </form>
+
+    <p *ngIf="loading" class="global-search-message" aria-live="polite">
+        <scrm-label labelKey="LBL_SEARCHING"></scrm-label>
+    </p>
+    <p *ngIf="!loading && error" class="global-search-message global-search-error">
+        <scrm-label labelKey="LBL_GLOBAL_SEARCH_UNAVAILABLE"></scrm-label>
+    </p>
+    <p *ngIf="!loading && !error && !searched" class="global-search-message">
+        <scrm-label labelKey="LBL_GLOBAL_SEARCH_EMPTY"></scrm-label>
+    </p>
+
+    <ng-container *ngIf="!loading && !error && searched">
+        <p *ngIf="!total" class="global-search-message">
+            <scrm-label labelKey="ERR_SEARCH_NO_RESULTS"></scrm-label>
+        </p>
+
+        <ng-container *ngIf="total">
+            <nav class="global-search-tabs">
+                <button type="button" class="btn btn-sm global-search-tab"
+                        [class.btn-main]="module === ''" [class.btn-outline-main]="module !== ''"
+                        [attr.aria-current]="module === '' ? 'page' : null" (click)="openModule('')">
+                    <scrm-label labelKey="LBL_GLOBAL_SEARCH_ALL"></scrm-label>
+                    <span class="global-search-count">{{ total }}</span>
+                </button>
+                <button *ngFor="let tab of tabs" type="button" class="btn btn-sm global-search-tab"
+                        [class.btn-main]="module === tab.module" [class.btn-outline-main]="module !== tab.module"
+                        [attr.aria-current]="module === tab.module ? 'page' : null" (click)="openModule(tab.module)">
+                    {{ tab.label }}
+                    <span class="global-search-count">{{ tab.count }}</span>
+                </button>
+            </nav>
+
+            <p class="global-search-summary">
+                <scrm-dynamic-label [labelKey]="total === 1 ? 'LBL_GLOBAL_SEARCH_RESULT' : 'LBL_GLOBAL_SEARCH_RESULTS'"
+                                    [context]="{total: '' + total, searchTerm: searchTerm}">
+                </scrm-dynamic-label>
+                <span *ngIf="emptyModules" class="global-search-summary-empty">
+                    <scrm-dynamic-label labelKey="LBL_GLOBAL_SEARCH_NO_RESULTS_IN"
+                                        [context]="{modules: emptyModules}">
+                    </scrm-dynamic-label>
+                </span>
+            </p>
+
+            <section *ngFor="let section of sections" class="global-search-section">
+                <div class="global-search-section-header">
+                    <div class="global-search-section-title">
+                        <button *ngIf="module" type="button" class="btn btn-sm btn-link" (click)="openModule('')">
+                            <scrm-label labelKey="LBL_GLOBAL_SEARCH_ALL_RESULTS"></scrm-label>
+                        </button>
+                        <h3>{{ section.label }} <span>· {{ section.count }}</span></h3>
+                    </div>
+                    <button *ngIf="section.more" type="button" class="btn btn-sm btn-link"
+                            (click)="openModule(section.module)">
+                        <scrm-dynamic-label labelKey="LBL_GLOBAL_SEARCH_VIEW_ALL"
+                                            [context]="{count: '' + section.count}">
+                        </scrm-dynamic-label>
+                    </button>
+                </div>
+                <div class="global-search-table-wrapper">
+                    <table class="global-search-table">
+                        <thead>
+                        <tr>
+                            <th *ngFor="let column of section.columns" scope="col">
+                                <scrm-label [labelKey]="column.label" [module]="section.module"></scrm-label>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr *ngFor="let record of section.records">
+                            <td *ngFor="let column of section.columns"
+                                [class]="'global-search-cell column-' + column.name + ' column-type-' + column.type">
+                                <scrm-field [mode]="'list'"
+                                            [type]="column.type"
+                                            [field]="record.fields[column.name]"
+                                            [record]="record">
+                                </scrm-field>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div *ngIf="pager" class="global-search-pager">
+                    <scrm-dynamic-label labelKey="LBL_GLOBAL_SEARCH_RANGE"
+                                        [context]="{from: '' + pager.from, to: '' + pager.to, total: '' + pager.total}">
+                    </scrm-dynamic-label>
+                    <button type="button" class="btn btn-sm btn-outline-main" [disabled]="!pager.previous"
+                            [attr.aria-label]="language.getAppString('LBL_GLOBAL_SEARCH_PREVIOUS_PAGE')"
+                            (click)="changePage(-1)">‹
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-main" [disabled]="!pager.next"
+                            [attr.aria-label]="language.getAppString('LBL_GLOBAL_SEARCH_NEXT_PAGE')"
+                            (click)="changePage(1)">›
+                    </button>
+                </div>
+            </section>
+        </ng-container>
+    </ng-container>
+</div>

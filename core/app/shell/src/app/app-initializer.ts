@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    GlobalSearchComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -359,6 +360,24 @@ export class AppInit {
                                 }
                             });
                         }
+                    });
+
+                    // Global search results (navbar search), before the generic classic view routes.
+                    ['home/search', 'home/unified-search'].forEach(path => {
+                        routes.push({
+                            path,
+                            component: GlobalSearchComponent,
+                            canActivate: [AuthGuard],
+                            runGuardsAndResolvers: 'paramsChange',
+                            resolve: {
+                                metadata: BaseModuleResolver
+                            },
+                            data: {
+                                reuseRoute: true,
+                                checkSession: true,
+                                module: 'home'
+                            }
+                        });
                     });
 
                     routes.push({

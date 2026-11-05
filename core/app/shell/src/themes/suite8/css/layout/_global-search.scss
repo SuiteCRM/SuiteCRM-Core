@@ -1,0 +1,247 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+.global-search-view {
+  padding: 3em 1.5em 3em;
+  font-size: 0.9rem;
+
+  .global-search-title {
+    margin: 0.5em 0 0.75em;
+    color: $main;
+    font-weight: 300;
+    letter-spacing: 1.5px;
+  }
+
+  .global-search-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0.6em;
+    margin-bottom: 1.2em;
+  }
+
+  .global-search-input {
+    flex: 1 1 26em;
+    min-width: 0;
+    height: auto;
+  }
+
+  .global-search-modules {
+    position: relative;
+    display: flex;
+  }
+
+  // Same height as the search input.
+  .global-search-modules-toggle,
+  .global-search-submit {
+    align-self: stretch;
+    padding: 0 1.2em;
+  }
+
+  .global-search-modules-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5em);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+    width: 24em;
+    max-width: calc(100vw - 3em);
+    padding: 1em;
+    border: 1px solid $border-color;
+    border-radius: 0.5em;
+    background: $white;
+    box-shadow: 0 0.6em 1.6em $grey-transparent;
+  }
+
+  .global-search-modules-header,
+  .global-search-modules-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: $main;
+  }
+
+  .global-search-modules-footer {
+    justify-content: flex-end;
+  }
+
+  .global-search-modules-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.2em 0.75em;
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.6em;
+      margin: 0;
+    }
+  }
+
+  .global-search-hint {
+    margin: 0;
+    color: $midnight-grey;
+    font-size: 0.8rem;
+  }
+
+  .global-search-warning {
+    color: $burnt-orange;
+    font-weight: bold;
+  }
+
+  .global-search-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    margin-bottom: 0.6em;
+  }
+
+  .global-search-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    border-radius: 1.5em;
+    padding: 0.35em 0.9em;
+  }
+
+  .global-search-count {
+    min-width: 1.6em;
+    padding: 0.1em 0.5em;
+    border-radius: 1em;
+    background: $midnight-blue-transparent;
+    font-size: 0.75rem;
+    font-weight: bold;
+  }
+
+  .global-search-summary,
+  .global-search-message {
+    margin: 0 0 1em;
+    color: $midnight-grey;
+  }
+
+  .global-search-summary-empty {
+    margin-left: 0.3em;
+  }
+
+  .global-search-modules-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+  }
+
+  .global-search-message {
+    padding: 1.5em;
+    border: 1px dashed $border-color;
+    border-radius: 0.5em;
+    background: $white;
+    text-align: center;
+  }
+
+  .global-search-error {
+    border-color: $burnt-orange;
+    color: $burnt-orange;
+  }
+
+  .global-search-section {
+    margin-bottom: 1em;
+    border: 1px solid $border-color;
+    border-radius: 0.5em;
+    background: $white;
+    overflow: hidden;
+  }
+
+  .global-search-section-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25em 1em;
+    padding: 0.4em 1em;
+    border-bottom: 1px solid $border-color;
+  }
+
+  .global-search-section-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25em 1em;
+
+    h3 {
+      margin: 0;
+      color: $main;
+      font-size: 1rem;
+      font-weight: bold;
+
+      span {
+        color: $midnight-grey;
+        font-weight: normal;
+      }
+    }
+  }
+
+  // Tables grow with their list view columns and scroll in their section.
+  .global-search-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .global-search-table {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: collapse;
+
+    th {
+      padding: 0.5em 1em;
+      background: $off-white-lighter;
+      color: $midnight-grey;
+      font-size: 0.7rem;
+      font-weight: bold;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    td {
+      max-width: 20em;
+      padding: 0.6em 1em;
+      border-top: 1px solid $light-grey;
+      vertical-align: middle;
+      overflow-wrap: break-word;
+    }
+  }
+
+  .global-search-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5em 0.75em;
+    padding: 0.4em 1em;
+    border-top: 1px solid $border-color;
+    color: $midnight-grey;
+  }
+}

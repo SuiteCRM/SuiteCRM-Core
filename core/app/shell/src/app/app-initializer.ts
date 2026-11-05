@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    WorkflowEditorComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -184,6 +185,22 @@ export class AppInit {
                             }
                         }
                     });
+                    // The workflow editor: a new workflow (workflow/edit, or ?record=<id>&isDuplicate=true
+                    // for a copy) and a workflow (workflow/edit/<id>), before the generic routes.
+                    ['workflow/edit', 'workflow/edit/:record'].forEach(path => routes.push({
+                        path,
+                        component: WorkflowEditorComponent,
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'workflow'
+                        }
+                    }));
                     routes.push(loggedOutConfig);
 
                     Object.keys(configRoutes).forEach(routeName => {

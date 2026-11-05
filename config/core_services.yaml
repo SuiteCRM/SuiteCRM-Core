@@ -58,6 +58,7 @@ services:
       $recordViewTopWidgets: '%module.recordview.top_widgets%'
       $recordViewConvertIgnore: '%module.recordview.convert_ignore%'
       $recordViewDuplicateIgnore: '%module.recordview.duplicate_ignore%'
+      $recordViewDuplicateCheck: '%module.recordview.duplicate_check%'
       $recordViewSubpanelButtonLimits: '%module.recordview.subpanel_button_limits%'
       $subpanelViewActionLimits: '%module.subpanelview.actions_limits%'
       $groupedFieldsTypeMap: '%record.fields.grouped_fields_type_map%'
@@ -136,6 +137,8 @@ services:
       tags: [ 'app.install.step' ]
     App\Data\Service\Record\Duplicate\DuplicateFieldMapperInterface:
       tags: [ 'record.duplicate.field.mapper' ]
+    App\Data\Service\Record\DuplicateCheck\DuplicateCheckProviderInterface:
+      tags: [ 'record.duplicate.check.provider' ]
     App\Schedulers\Service\SchedulerInterface:
       tags: [ 'app.scheduler' ]
     App\Install\Service\Cli\CliStepInterface:
@@ -484,6 +487,10 @@ services:
   App\Data\Service\Record\Duplicate\DuplicateFieldMapperRegistry:
     arguments:
       - !tagged { tag: 'record.duplicate.field.mapper' }
+
+  App\Data\Service\Record\DuplicateCheck\DuplicateCheckProviderRegistry:
+    arguments:
+      $providers: !tagged { tag: 'record.duplicate.check.provider' }
 
   App\Data\Service\Record\RecordSaveHandlers\RecordFieldSaveHandlerRegistry:
     arguments:

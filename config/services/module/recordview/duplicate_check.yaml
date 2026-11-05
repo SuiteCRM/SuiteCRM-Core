@@ -1,0 +1,11 @@
+parameters:
+  # Duplicate check on save, as the legacy create screens did (ShowDuplicates).
+  # Each enabled module needs a DuplicateCheckProviderInterface service (see App\Data\Service\Record\DuplicateCheck).
+  # The matching records are listed in a confirmation modal: Cancel goes back to the record, Proceed saves anyway.
+  module.recordview.duplicate_check:
+    # Also check edits changing the matched values (the legacy screens only checked on create)
+    check_on_edit: true
+    modules:
+      - accounts
+      - contacts
+      - leads

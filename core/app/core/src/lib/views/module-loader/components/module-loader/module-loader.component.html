@@ -1,0 +1,143 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="module-loader">
+    <h2 class="module-loader-heading">{{ data ? label('LBL_MODULE_LOADER_TITLE') : '' }}</h2>
+
+    <p *ngIf="loading && !data" class="module-loader-muted">…</p>
+
+    <ng-container *ngIf="data">
+        <p *ngIf="data.uploadWarning" class="module-loader-error">{{ data.uploadWarning }}</p>
+
+        <!-- The action being prepared: its license, readme and options, then its commit. -->
+        <section *ngIf="prepared; else lists" class="module-loader-panel module-loader-prepare">
+            <h3 class="module-loader-title">{{ label(prepared.mode === 'Install' ? 'LBL_UW_BTN_INSTALL' : prepared.mode === 'Uninstall' ? 'LBL_UW_UNINSTALL' : prepared.mode === 'Disable' ? 'LBL_UW_DISABLE' : 'LBL_UW_ENABLE') }}: {{ prepared.name }}</h3>
+
+            <div *ngIf="prepared.requireLicense" class="module-loader-block">
+                <h4>{{ label('LBL_LICENSE') }}</h4>
+                <p>{{ label('LBL_MODULE_LICENSE') }}</p>
+                <textarea class="form-control form-control-sm" rows="8" readonly [value]="prepared.license" [attr.aria-label]="label('LBL_LICENSE')"></textarea>
+                <div class="module-loader-choice">
+                    <input type="checkbox" id="module-loader-license" [(ngModel)]="licenseAccepted">
+                    <label for="module-loader-license">{{ label('LBL_ACCEPT') }}</label>
+                </div>
+            </div>
+
+            <div *ngFor="let readme of prepared.readme" class="module-loader-block">
+                <h4>{{ label('LBL_README') }}</h4>
+                <textarea class="form-control form-control-sm" rows="6" readonly [value]="readme" [attr.aria-label]="label('LBL_README')"></textarea>
+            </div>
+
+            <div *ngFor="let choice of prepared.choices" class="module-loader-block module-loader-options" role="radiogroup">
+                <div *ngFor="let option of choice.options" class="module-loader-choice">
+                    <input type="radio" [id]="'module-loader-' + choice.name + '-' + option.value" [name]="choice.name"
+                           [value]="option.value" [(ngModel)]="choice.value">
+                    <label [for]="'module-loader-' + choice.name + '-' + option.value">{{ option.label }}</label>
+                </div>
+            </div>
+
+            <ul *ngIf="prepared.files.length" class="module-loader-block module-loader-files">
+                <li *ngFor="let file of prepared.files" class="module-loader-choice">
+                    <input type="checkbox" [id]="'module-loader-' + file.name" [(ngModel)]="file.checked" [disabled]="file.disabled">
+                    <label [for]="'module-loader-' + file.name">{{ file.label }}</label>
+                </li>
+            </ul>
+
+            <div class="module-loader-buttons">
+                <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="commit()">{{ label('LBL_ML_COMMIT') }}</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="cancel()">{{ label('LBL_ML_CANCEL') }}</button>
+                <span *ngIf="loading" class="module-loader-muted">…</span>
+            </div>
+        </section>
+
+        <ng-template #lists>
+            <div *ngIf="output || error" class="module-loader-panel module-loader-output" [class.is-error]="!!error">
+                <div [innerHTML]="error || output"></div>
+            </div>
+
+            <section class="module-loader-panel">
+                <div class="module-loader-upload">
+                    <label for="module-loader-file">{{ label('LBL_UW_UPLOAD_MODULE') }}</label>
+                    <input #file type="file" id="module-loader-file" class="form-control form-control-sm" accept=".zip,application/zip"
+                           [disabled]="loading" (change)="selectFile(file)">
+                    <button type="button" class="btn btn-sm btn-main" [disabled]="loading || !upload" (click)="uploadPackage(file)">{{ label('LBL_UW_BTN_UPLOAD') }}</button>
+                    <span *ngIf="loading" class="module-loader-muted">…</span>
+                </div>
+            </section>
+
+            <section class="module-loader-panel">
+                <h3 class="module-loader-title">{{ label('LBL_UW_DESC_MODULES_QUEUED') }}</h3>
+                <ng-container *ngTemplateOutlet="table; context: {$implicit: data.staged, staged: true}"></ng-container>
+            </section>
+
+            <section class="module-loader-panel">
+                <h3 class="module-loader-title">{{ label('LBL_UW_DESC_MODULES_INSTALLED') }}</h3>
+                <ng-container *ngTemplateOutlet="table; context: {$implicit: data.installed, staged: false}"></ng-container>
+            </section>
+        </ng-template>
+    </ng-container>
+
+    <ng-template #table let-packages let-staged="staged">
+        <div class="module-loader-table">
+            <table class="module-loader-packages">
+                <thead>
+                <tr>
+                    <th scope="col">{{ label('LBL_ML_NAME') }}</th>
+                    <th scope="col">{{ label('LBL_ML_TYPE') }}</th>
+                    <th scope="col">{{ label('LBL_ML_VERSION') }}</th>
+                    <th scope="col">{{ label('LBL_ML_PUBLISHED') }}</th>
+                    <th scope="col">{{ label('LBL_ML_DESCRIPTION') }}</th>
+                    <th scope="col">{{ label('LBL_ML_ACTION') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let item of packages; trackBy: trackPackage">
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.type }}</td>
+                    <td>{{ item.version }}</td>
+                    <td>{{ item.published }}</td>
+                    <td>{{ item.description }}</td>
+                    <td class="module-loader-actions">
+                        <ng-container *ngIf="staged">
+                            <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="prepare(item, 'Install')">{{ label('LBL_UW_BTN_INSTALL') }}</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="remove(item)">{{ label('LBL_UW_BTN_DELETE_PACKAGE') }}</button>
+                        </ng-container>
+                        <ng-container *ngIf="!staged">
+                            <button *ngIf="item.uninstallable" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="prepare(item, 'Uninstall')">{{ label('LBL_UW_UNINSTALL') }}</button>
+                            <ng-container *ngIf="item.canDisable">
+                                <button *ngIf="item.enabled" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="prepare(item, 'Disable')">{{ label('LBL_UW_DISABLE') }}</button>
+                                <button *ngIf="!item.enabled" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="prepare(item, 'Enable')">{{ label('LBL_UW_ENABLE') }}</button>
+                            </ng-container>
+                            <span *ngIf="!item.uninstallable && !item.canDisable" class="module-loader-muted">{{ label('LBL_ML_UNINSTALLABLE') }}</span>
+                        </ng-container>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </ng-template>
+</div>

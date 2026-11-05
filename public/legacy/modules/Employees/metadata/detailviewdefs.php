@@ -138,10 +138,19 @@ array(
         0 =>
         array(
           0 => 'employee_status',
+          1 => '',
         ),
         1 =>
         array(
-          0 => 'name',
+          0 => 'first_name',
+          1 =>
+          array(
+            'name' => 'last_name',
+            'displayParams' =>
+            array(
+              'required' => true,
+            ),
+          ),
         ),
         2 =>
         array(
@@ -160,31 +169,37 @@ array(
         ),
         5 =>
         array(
-          0 => 'phone_fax',
+          0 => 'phone_home',
+          1 => 'phone_fax',
         ),
         6 =>
         array(
-          0 => 'phone_home',
+          0 => 'messenger_type',
+          1 => 'messenger_id',
         ),
         7 =>
         array(
-          0 => 'messenger_type',
+          0 => 'description',
         ),
         8 =>
         array(
-          0 => 'messenger_id',
+          0 => 'address_street',
+          1 => 'address_city',
         ),
         9 =>
         array(
-          0 => 'address_country',
+          0 => 'address_state',
+          1 => 'address_postalcode',
         ),
         10 =>
         array(
-          0 => 'description',
+          0 => 'address_country',
+          1 => '',
         ),
         11 =>
         array(
           0 => 'email1',
+          1 => '',
         ),
       ),
     ),

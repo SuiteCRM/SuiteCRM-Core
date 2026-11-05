@@ -1,0 +1,131 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// Tools pages of the administration (Repair, Backups, Diagnostic): the tools in a panel, each with
+// its description, its fields, its output and its next steps; a page of one tool shows its fields
+// in a column.
+.admin-tools {
+    // Below the fixed navbar, like the list view (padding-top: 3em).
+    padding: calc(3rem + 16px) 24px 48px;
+    color: $median-grey;
+
+    .admin-tools-title { margin: 0 0 8px; font-size: 22px; font-weight: 400; }
+    .admin-tools-intro { margin: 0 0 12px; color: $dusky-blue; }
+    .admin-tools-muted { color: $midnight-grey; }
+    .admin-tools-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .admin-tools-panel {
+        margin: 0 0 12px;
+        background: $white;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+    }
+
+    .admin-tools-list { padding: 0; }
+
+    .admin-tools-tool {
+        padding: 10px 16px;
+        border-bottom: 1px solid $light-grey;
+
+        &:last-child { border-bottom: 0; }
+    }
+
+    .admin-tools-tool-head {
+        display: grid;
+        grid-template-columns: minmax(0, 300px) minmax(0, 1fr) auto;
+        align-items: baseline;
+        gap: 4px 16px;
+
+        @media (max-width: 768px) {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    .admin-tools-tool-title {
+        padding: 0;
+        font-weight: 600;
+        text-align: left;
+        white-space: normal;
+    }
+
+    .admin-tools-tool-description { color: $dusky-blue; }
+
+    .admin-tools-list.is-single .admin-tools-tool { padding: 16px; }
+
+    .admin-tools-tool-fields {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 16px;
+        margin-top: 8px;
+
+        &.is-column {
+            flex-direction: column;
+            align-items: flex-start;
+
+            input[type=text] { width: 100%; min-width: 0; max-width: 560px; }
+        }
+    }
+
+    .admin-tools-tool-links { display: flex; flex-wrap: wrap; gap: 12px; margin: 6px 0; }
+
+    .admin-tools-tool-field {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        label { margin: 0; }
+        select, input[type=date], input[type=text] { width: auto; min-width: 200px; max-width: 100%; }
+        select[multiple] { min-height: 90px; }
+    }
+
+    .admin-tools-tool-result {
+        margin-top: 10px;
+        padding: 10px 12px;
+        background: #f8f7fa;
+        border-left: 3px solid #8e8a9b;
+        border-radius: 2px;
+
+        &.is-error { border-left-color: #b42318; }
+    }
+
+    .admin-tools-tool-output {
+        max-height: 360px;
+        overflow: auto;
+        overflow-wrap: anywhere;
+
+        h1, h2, h3, h4 { margin: 8px 0 4px; font-size: 14px; font-weight: 600; }
+        p { margin: 0 0 6px; }
+        table { margin: 4px 0; }
+        td, th { padding: 2px 12px 2px 0; vertical-align: top; }
+    }
+
+    .admin-tools-tool-progress { height: 8px; margin: 8px 0; }
+
+    .admin-tools-tool-sql { margin: 8px 0; font-family: monospace; font-size: 12px; }
+
+    .admin-tools-tool-steps { flex-wrap: wrap; align-items: center; margin-top: 8px; }
+}

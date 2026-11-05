@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    AdminToolsComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -184,6 +185,30 @@ export class AppInit {
                             }
                         }
                     });
+
+                    // Tools pages of the administration (admin panel links: Repair, Backups,
+                    // Diagnostic), before the generic classic view routes: one view, the page key in
+                    // the route data.
+                    const adminToolsPages: { [path: string]: string } = {
+                        'administration/upgrade': 'repair',
+                        'administration/Backups': 'backups',
+                        'administration/Diagnostic': 'diagnostic',
+                    };
+                    Object.entries(adminToolsPages).forEach(([path, page]) => routes.push({
+                        path,
+                        component: AdminToolsComponent,
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration',
+                            adminToolsPage: page
+                        }
+                    }));
                     routes.push(loggedOutConfig);
 
                     Object.keys(configRoutes).forEach(routeName => {

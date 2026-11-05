@@ -1,0 +1,112 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="admin-tools">
+    <h2 class="admin-tools-title">{{ title }}</h2>
+    <p *ngIf="intro" class="admin-tools-intro" [innerHTML]="intro"></p>
+
+    <p *ngIf="loading" class="admin-tools-muted">…</p>
+
+    <div *ngIf="tools.length" class="admin-tools-panel admin-tools-list" [class.is-single]="tools.length === 1">
+        <div *ngFor="let tool of tools; trackBy: trackTool" class="admin-tools-tool">
+            <!-- A page of one tool (Backups, Diagnostic): its fields, then its button. -->
+            <ng-container *ngIf="tools.length === 1; else row">
+                <p class="admin-tools-tool-description" [innerHTML]="tool.description"></p>
+                <div *ngIf="tool.params?.length" class="admin-tools-tool-fields is-column">
+                    <ng-container *ngTemplateOutlet="fields; context: {$implicit: tool.params, values: params[tool.key], id: tool.key}"></ng-container>
+                </div>
+                <div class="admin-tools-buttons admin-tools-tool-steps">
+                    <button type="button" class="btn btn-sm btn-main" [disabled]="!!running" (click)="run(tool)">{{ tool.title }}</button>
+                    <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/administration']">{{ appLabel('LBL_CANCEL_BUTTON_LABEL') }}</a>
+                    <span *ngIf="running === tool.key" class="admin-tools-muted">…</span>
+                </div>
+            </ng-container>
+
+            <ng-template #row>
+                <div class="admin-tools-tool-head">
+                    <button type="button" class="btn btn-link admin-tools-tool-title" [disabled]="!!running" (click)="run(tool)">
+                        {{ tool.title }}
+                    </button>
+                    <span class="admin-tools-tool-description" [innerHTML]="tool.description"></span>
+                    <span *ngIf="running === tool.key" class="admin-tools-muted">…</span>
+                </div>
+
+                <div *ngIf="tool.params?.length" class="admin-tools-tool-fields">
+                    <ng-container *ngTemplateOutlet="fields; context: {$implicit: tool.params, values: params[tool.key], id: tool.key}"></ng-container>
+                </div>
+            </ng-template>
+
+            <div *ngIf="results[tool.key] as result" class="admin-tools-tool-result" [class.is-error]="result.status !== 'success'">
+                <div *ngIf="result.html" class="admin-tools-tool-output" [innerHTML]="result.html"></div>
+                <div *ngIf="result.progress" class="progress admin-tools-tool-progress">
+                    <div class="progress-bar" role="progressbar" [style.width.%]="result.progress.total ? result.progress.done * 100 / result.progress.total : 100"
+                         [attr.aria-valuenow]="result.progress.done" aria-valuemin="0" [attr.aria-valuemax]="result.progress.total"></div>
+                </div>
+                <div *ngIf="result.links?.length" class="admin-tools-tool-links">
+                    <a *ngFor="let link of result.links" [href]="link.href">{{ link.label }}</a>
+                </div>
+                <textarea *ngIf="result.sql" class="form-control form-control-sm admin-tools-tool-sql" rows="12" readonly
+                          [attr.aria-label]="tool.title" [value]="result.sql"></textarea>
+                <div *ngIf="result.next?.length || result.sql" class="admin-tools-buttons admin-tools-tool-steps">
+                    <ng-container *ngFor="let step of result.next">
+                        <ng-container *ngIf="!step.auto">
+                            <div *ngIf="step.fields?.length" class="admin-tools-tool-fields">
+                                <ng-container *ngTemplateOutlet="fields; context: {$implicit: step.fields, values: stepParams(tool, step), id: tool.key + '-' + step.step}"></ng-container>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-main" [disabled]="!!running" (click)="runStep(tool, step)">{{ step.label }}</button>
+                        </ng-container>
+                    </ng-container>
+                    <button *ngIf="result.sql" type="button" class="btn btn-sm btn-outline-secondary" (click)="exportSql(result)">{{ result.exportLabel }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #fields let-list let-values="values" let-id="id">
+        <div *ngFor="let field of list" class="admin-tools-tool-field">
+            <ng-container [ngSwitch]="field.type">
+                <ng-container *ngSwitchCase="'bool'">
+                    <input type="checkbox" [id]="'admin-tools-' + id + '-' + field.name" [(ngModel)]="values[field.name]">
+                    <label [for]="'admin-tools-' + id + '-' + field.name">{{ field.label }}</label>
+                </ng-container>
+                <ng-container *ngSwitchDefault>
+                    <label [for]="'admin-tools-' + id + '-' + field.name">{{ field.label }}</label>
+                    <input *ngIf="field.type === 'date' || field.type === 'text'" [type]="field.type" class="form-control form-control-sm"
+                           [id]="'admin-tools-' + id + '-' + field.name" [(ngModel)]="values[field.name]">
+                    <select *ngIf="field.type === 'select'" class="form-control form-control-sm"
+                            [id]="'admin-tools-' + id + '-' + field.name" [(ngModel)]="values[field.name]">
+                        <option *ngFor="let option of field.options" [value]="option.value">{{ option.label }}</option>
+                    </select>
+                    <select *ngIf="field.type === 'multiselect'" multiple class="form-control form-control-sm"
+                            [id]="'admin-tools-' + id + '-' + field.name" [(ngModel)]="values[field.name]">
+                        <option *ngFor="let option of field.options" [value]="option.value">{{ option.label }}</option>
+                    </select>
+                </ng-container>
+            </ng-container>
+        </div>
+    </ng-template>
+</div>

@@ -1,0 +1,255 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+.resource-calendar {
+    // Below the fixed navbar, like the list view (padding-top: 3em).
+    padding: calc(3rem + 16px) 24px 48px;
+
+    .resource-calendar-title {
+        margin: 0 0 12px;
+        font-size: 22px;
+        font-weight: 400;
+    }
+
+    .resource-calendar-filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 12px 16px;
+        background: #fff;
+        border: 1px solid #e3e0e8;
+        border-radius: 4px;
+    }
+
+    .resource-calendar-filter {
+        flex: 1 1 220px;
+        min-width: 0;
+        max-width: 320px;
+    }
+
+    .resource-calendar-filter-small {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 0 1 200px;
+
+        .btn {
+            align-self: flex-start;
+            margin-top: 6px;
+        }
+    }
+
+    .resource-calendar-filter-label {
+        display: block;
+        margin: 0 0 4px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #4b4758;
+    }
+
+    .resource-calendar-warning {
+        margin: 4px 0 0;
+        color: #b42318;
+        font-size: 13px;
+    }
+
+    .resource-calendar-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 12px 0 4px;
+    }
+
+    .resource-calendar-period {
+        font-weight: 600;
+    }
+
+    .resource-calendar-error {
+        color: #b42318;
+    }
+
+    .resource-calendar-muted {
+        color: #6a6676;
+    }
+
+    .resource-calendar-scroll {
+        // Horizontal only: the collapsed borders overflow by a pixel, which showed a vertical scrollbar.
+        overflow-x: auto;
+        overflow-y: hidden;
+        background: #fff;
+        border: 1px solid #e3e0e8;
+        border-radius: 4px;
+    }
+
+    .resource-calendar-loading {
+        opacity: .6;
+    }
+
+    .resource-calendar-grid {
+        border-collapse: collapse;
+        font-size: 12px;
+
+        th,
+        td {
+            border: 1px solid #eceaf0;
+            padding: 0;
+            text-align: center;
+        }
+
+        thead th {
+            padding: 4px 2px;
+            background: #f6f5f9;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .resource-calendar-group {
+            color: #4b4758;
+        }
+
+        .resource-calendar-column {
+            min-width: 28px;
+            font-weight: 400;
+        }
+
+        .resource-calendar-sub {
+            display: block;
+            color: #6a6676;
+        }
+
+        .resource-calendar-corner,
+        .resource-calendar-resource {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            min-width: 180px;
+            max-width: 240px;
+            padding: 4px 8px;
+            background: #fff;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .resource-calendar-corner {
+            background: #f6f5f9;
+        }
+
+        .resource-calendar-resource {
+            font-weight: 400;
+        }
+
+        .resource-calendar-cell {
+            height: 28px;
+        }
+
+        .resource-calendar-weekend {
+            background: #f3f2f6;
+        }
+
+        .resource-calendar-today {
+            box-shadow: inset 0 0 0 2px #f08377;
+        }
+
+        .resource-calendar-busy {
+            background: #9cd4e0;
+        }
+
+        .resource-calendar-overlap {
+            background: #3c8dbc;
+        }
+
+        .resource-calendar-selected {
+            outline: 2px solid #534d64;
+            outline-offset: -2px;
+        }
+
+        .resource-calendar-block {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-height: 26px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .resource-calendar-empty {
+            padding: 12px;
+            color: #6a6676;
+        }
+    }
+
+    &-monthly .resource-calendar-column,
+    &-quarterly .resource-calendar-column {
+        min-width: 36px;
+    }
+
+    .resource-calendar-details {
+        margin-top: 16px;
+        padding: 12px 16px;
+        background: #fff;
+        border: 1px solid #e3e0e8;
+        border-radius: 4px;
+    }
+
+    .resource-calendar-details-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0 0 8px;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .resource-calendar-details-close {
+        padding: 0 4px;
+        font-size: 20px;
+        line-height: 1;
+    }
+
+    .resource-calendar-tasks {
+        width: 100%;
+        border-collapse: collapse;
+
+        th,
+        td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #eceaf0;
+            text-align: left;
+        }
+
+        th {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #4b4758;
+        }
+    }
+}

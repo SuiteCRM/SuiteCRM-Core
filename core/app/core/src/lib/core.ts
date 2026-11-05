@@ -929,3 +929,5 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './views/resource-calendar/components/resource-calendar/resource-calendar.component';
+export * from './views/resource-calendar/components/resource-calendar/resource-calendar.module';

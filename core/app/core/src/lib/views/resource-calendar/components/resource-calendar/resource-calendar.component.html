@@ -1,0 +1,144 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2026 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="resource-calendar">
+    <h2 class="resource-calendar-title">{{ label('LBL_RESOURCE_CHART') }}</h2>
+
+    <form class="resource-calendar-filters" (ngSubmit)="search()">
+        <div class="resource-calendar-filter">
+            <label class="resource-calendar-filter-label" for="resource-calendar-projects">{{ label('LBL_PROJECTS_SEARCH') }}</label>
+            <p-multiSelect inputId="resource-calendar-projects" name="projects" [options]="data?.options?.projects ?? []"
+                           [(ngModel)]="projects" optionLabel="label" optionValue="value" [filter]="true"
+                           [placeholder]="label('LBL_ALL_PROJECTS')" [selectedItemsLabel]="'{0} ' + label('LBL_ITEMS_SELECTED')"
+                           [maxSelectedLabels]="2" [showClear]="true" styleClass="w-100"></p-multiSelect>
+            <p *ngIf="data && !data.options.projects.length" class="resource-calendar-warning">{{ label('LBL_RESOURCE_CHART_WARNING') }}</p>
+        </div>
+
+        <div class="resource-calendar-filter">
+            <label class="resource-calendar-filter-label" for="resource-calendar-users">{{ label('LBL_USERS_SEARCH') }}</label>
+            <p-multiSelect inputId="resource-calendar-users" name="users" [options]="resourceOptions('users')"
+                           [(ngModel)]="users" optionLabel="label" optionValue="value" [filter]="true"
+                           [placeholder]="label('LBL_ALL_USERS')" [selectedItemsLabel]="'{0} ' + label('LBL_ITEMS_SELECTED')"
+                           [maxSelectedLabels]="2" [showClear]="true" styleClass="w-100"></p-multiSelect>
+            <p *ngIf="data && !data.options.users.length" class="resource-calendar-warning">{{ label('LBL_RESOURCE_CHART_WARNING') }}</p>
+        </div>
+
+        <div class="resource-calendar-filter">
+            <label class="resource-calendar-filter-label" for="resource-calendar-contacts">{{ label('LBL_CONTACTS_SEARCH') }}</label>
+            <p-multiSelect inputId="resource-calendar-contacts" name="contacts" [options]="resourceOptions('contacts')"
+                           [(ngModel)]="contacts" optionLabel="label" optionValue="value" [filter]="true"
+                           [placeholder]="label('LBL_ALL_CONTACTS')" [selectedItemsLabel]="'{0} ' + label('LBL_ITEMS_SELECTED')"
+                           [maxSelectedLabels]="2" [showClear]="true" styleClass="w-100"></p-multiSelect>
+            <p *ngIf="data && !data.options.contacts.length" class="resource-calendar-warning">{{ label('LBL_RESOURCE_CHART_WARNING') }}</p>
+        </div>
+
+        <div class="resource-calendar-filter resource-calendar-filter-small">
+            <label class="resource-calendar-filter-label" for="resource-calendar-type">{{ label('LBL_CHART_TYPE') }}</label>
+            <select id="resource-calendar-type" name="type" class="form-control form-control-sm" [(ngModel)]="type">
+                <option *ngFor="let option of types" [value]="option.value">{{ label(option.label) }}</option>
+            </select>
+
+            <label class="resource-calendar-filter-label" for="resource-calendar-start">{{ label('LBL_DATE_START') }}</label>
+            <input id="resource-calendar-start" name="start" type="date" class="form-control form-control-sm" [(ngModel)]="start">
+
+            <button type="submit" class="btn btn-sm btn-main" [disabled]="loading">{{ label('LBL_RESOURCE_CHART_SEARCH_BUTTON') }}</button>
+        </div>
+    </form>
+
+    <div class="resource-calendar-nav">
+        <button type="button" class="btn btn-sm btn-link" [disabled]="loading || !data" (click)="previous()">‹ {{ label('LBL_RESOURCE_CHART_PREVIOUS_MONTH') }}</button>
+        <span *ngIf="data" class="resource-calendar-period">{{ date(data.start) }} – {{ date(data.end) }}</span>
+        <button type="button" class="btn btn-sm btn-link" [disabled]="loading || !data" (click)="next()">{{ label('LBL_RESOURCE_CHART_NEXT_MONTH') }} ›</button>
+    </div>
+
+    <p *ngIf="error" class="resource-calendar-error" role="alert">{{ label(error) }}</p>
+    <p *ngIf="loading && !data" class="resource-calendar-muted">…</p>
+
+    <div *ngIf="data && !error" class="resource-calendar-scroll" [class.resource-calendar-loading]="loading">
+        <table class="resource-calendar-grid" [ngClass]="'resource-calendar-' + data.type">
+            <thead>
+            <tr *ngFor="let row of data.headers; let r = index">
+                <th class="resource-calendar-corner">{{ rowLabel(r) }}</th>
+                <th *ngFor="let cell of row" [attr.colspan]="cell.span" class="resource-calendar-group">{{ cell.label }}</th>
+            </tr>
+            <tr>
+                <th class="resource-calendar-corner">{{ columnLabel() }}</th>
+                <th *ngFor="let column of data.columns" class="resource-calendar-column" [class.resource-calendar-weekend]="column.weekend"
+                    [class.resource-calendar-today]="column.today">
+                    {{ column.label }}<span *ngIf="column.sub" class="resource-calendar-sub">{{ column.sub }}</span>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let resource of data.resources; let r = index">
+                <th class="resource-calendar-resource">
+                    <a [routerLink]="['/', resource.module, 'record', resource.id]"
+                       [title]="label(resource.module === 'users' ? 'LBL_RESOURCE_TYPE_TITLE_USER' : 'LBL_RESOURCE_TYPE_TITLE_CONTACT')">{{ resource.name }}</a>
+                </th>
+                <td *ngFor="let column of data.columns; let c = index" class="resource-calendar-cell" [ngClass]="cellClass(r, c)"
+                    [class.resource-calendar-weekend]="column.weekend" [class.resource-calendar-today]="column.today"
+                    [class.resource-calendar-selected]="isSelected(r, c)">
+                    <button *ngIf="cells[r][c].length" type="button" class="resource-calendar-block" [title]="cellTitle(r, c)"
+                            [attr.aria-label]="resource.name + ', ' + period(column) + ': ' + cellTitle(r, c)"
+                            (click)="select(r, c)"></button>
+                </td>
+            </tr>
+            <tr *ngIf="!data.resources.length">
+                <td class="resource-calendar-empty" [attr.colspan]="data.columns.length + 1">{{ label('LBL_RESOURCE_CHART_WARNING') }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <section *ngIf="selected" class="resource-calendar-details" aria-live="polite">
+        <h3 class="resource-calendar-details-title">
+            {{ label('LBL_TOOLTIP_TITLE') }} — {{ selected.resource.name }}, {{ period(selected.column) }}
+            <button type="button" class="btn btn-link resource-calendar-details-close" [attr.aria-label]="label('LBL_CLOSE_BUTTON_TITLE')"
+                    (click)="selected = null">×</button>
+        </h3>
+        <table class="resource-calendar-tasks">
+            <thead>
+            <tr>
+                <th>{{ label('LBL_TOOLTIP_PROJECT_NAME') }}</th>
+                <th>{{ label('LBL_TOOLTIP_TASK_NAME') }}</th>
+                <th>{{ label('LBL_DATE_START', 'project-task') }}</th>
+                <th>{{ label('LBL_DATE_FINISH', 'project-task') }}</th>
+                <th>{{ label('LBL_TOOLTIP_TASK_DURATION') }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let task of selected.tasks">
+                <td><a [routerLink]="['/project', 'record', task.projectId]">{{ task.projectName }}</a></td>
+                <td><a [routerLink]="['/project-task', 'record', task.id]">{{ task.name }}</a></td>
+                <td>{{ date(task.start) }}</td>
+                <td>{{ date(task.end) }}</td>
+                <td>{{ task.duration }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>

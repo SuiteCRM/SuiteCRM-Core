@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    ResourceCalendarComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -183,6 +184,25 @@ export class AppInit {
                                 languageStrings: ['appStrings']
                             }
                         }
+                    });
+
+                    // Resource calendar of Projects: Resource Calendar tab and Projects menu (ResourceList),
+                    // before the generic module routes.
+                    ['resource-calendar', 'resource-calendar/index', 'project/resource-list'].forEach(path => {
+                        routes.push({
+                            path,
+                            component: ResourceCalendarComponent,
+                            canActivate: [AuthGuard],
+                            runGuardsAndResolvers: 'always',
+                            resolve: {
+                                metadata: BaseModuleResolver
+                            },
+                            data: {
+                                reuseRoute: false,
+                                checkSession: true,
+                                module: 'project'
+                            }
+                        });
                     });
                     routes.push(loggedOutConfig);
 

@@ -1,0 +1,86 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// Dropdown Editor view and list editor.
+.dropdown-editor {
+  // Below the fixed navbar, like the list view (padding-top: 3em).
+  padding: calc(3rem + 16px) 24px 48px;
+  color: $median-grey;
+
+  .dropdown-editor-title { margin: 0 0 12px; font-size: 22px; font-weight: 400; }
+  .dropdown-editor-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+  .dropdown-editor-search { max-width: 320px; }
+  .dropdown-editor-count { color: $midnight-grey; }
+
+  .dropdown-editor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+  }
+
+  .dropdown-editor-card {
+    padding: 9px 12px;
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    cursor: pointer;
+    word-break: break-all;
+
+    &:hover, &:focus { border-color: $dusky-blue; outline: none; }
+  }
+}
+
+.dropdown-editor, .dropdown-list-editor {
+    .dropdown-editor-mono { font-family: SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .dropdown-editor-muted { color: $midnight-grey; font-style: italic; }
+}
+
+.dropdown-list-editor {
+    .dropdown-list-editor-head { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+    .dropdown-editor-field { display: flex; flex-direction: column; gap: 4px; margin: 0; font-weight: 600; min-width: 220px; }
+    .dropdown-editor-items-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .dropdown-editor-items-tools { display: flex; gap: 6px; }
+    .dropdown-editor-items-scroll { max-height: 50vh; overflow: auto; border: 1px solid $border-color; border-radius: 4px; }
+
+    .dropdown-editor-items {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+
+        th, td { padding: 4px 8px; border-bottom: 1px solid $light-grey; vertical-align: middle; }
+        thead th { position: sticky; top: 0; background: $off-white; z-index: 1; }
+        thead td { position: sticky; top: 0; background: $off-white; z-index: 1; }
+        .dropdown-editor-order { width: 1%; white-space: nowrap; }
+        .dropdown-editor-order .btn { padding: 0 4px; line-height: 1.2; }
+        .dropdown-editor-remove { width: 1%; }
+        .dropdown-editor-remove .btn { font-size: 18px; line-height: 1; padding: 0 6px; }
+        .dropdown-editor-blank { color: $midnight-grey; font-style: italic; }
+    }
+
+    .dropdown-editor-add { display: flex; gap: 6px; margin-top: 10px; }
+    .dropdown-editor-add input { flex: 1 1 0; }
+    .dropdown-editor-confirm, .dropdown-editor-error { margin-top: 10px; }
+}

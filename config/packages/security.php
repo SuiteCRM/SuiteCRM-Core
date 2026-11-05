@@ -30,6 +30,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use App\Module\Users\Entity\User;
 use App\Security\Ldap\AppLdapUserProvider;
 use App\Security\Saml\AppSamlAuthenticator;
+use App\Security\Saml\SamlEntryPoint;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Ldap\Ldap;
@@ -256,7 +257,8 @@ return static function (ContainerConfigurator $containerConfig) {
             'custom_authenticators' => [
                 'app.saml.authenticator',
             ],
-            'entry_point' => 'app.saml.authenticator',
+            // keeps the page asked for (url fragment) through the SAML login
+            'entry_point' => 'app.saml.entry_point',
             'saml' => [
                 'provider' => 'app_user_provider',
                 // Match SAML attribute 'uid' with username.
@@ -380,6 +382,10 @@ return static function (ContainerConfigurator $containerConfig) {
         $services->set('app.saml.authenticator')
             ->class(AppSamlAuthenticator::class)
             ->parent('security.authenticator.saml.main');
+
+        $services->set('app.saml.entry_point')
+            ->class(SamlEntryPoint::class)
+            ->args([service('router')]);
     }
 
 };

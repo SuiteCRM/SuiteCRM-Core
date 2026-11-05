@@ -74,6 +74,13 @@ interface EventEmitterMap {
     [key: string]: EventEmitter<any>;
 }
 
+/**
+ * Session storage key of the pre-login url: the in-memory state does not survive
+ * the full-page redirects of an external login (SAML).
+ * Also written by the SAML entry point (App\Security\Saml\SamlEntryPoint).
+ */
+const preLoginUrlStorageKey = 'scrm-pre-login-url';
+
 @Injectable({
     providedIn: 'root',
 })
@@ -402,6 +409,7 @@ export class AppStateStore implements StateStore {
      */
     public setPreLoginUrl(preLoginUrl: string): void {
         this.updateState({...internalState, preLoginUrl});
+        this.storePreLoginUrl(preLoginUrl);
     }
 
     /**
@@ -410,7 +418,37 @@ export class AppStateStore implements StateStore {
      * @returns string
      */
     public getPreLoginUrl(): string {
-        return internalState.preLoginUrl ?? '';
+        return this.readStoredPreLoginUrl() || (internalState.preLoginUrl ?? '');
+    }
+
+    /**
+     * Store the pre-login url in the session storage
+     *
+     * @param preLoginUrl
+     */
+    protected storePreLoginUrl(preLoginUrl: string): void {
+        try {
+            if (preLoginUrl) {
+                sessionStorage.setItem(preLoginUrlStorageKey, preLoginUrl);
+            } else {
+                sessionStorage.removeItem(preLoginUrlStorageKey);
+            }
+        } catch (e) {
+            // session storage not available: the in-memory state is used
+        }
+    }
+
+    /**
+     * Get the pre-login url from the session storage
+     *
+     * @returns string
+     */
+    protected readStoredPreLoginUrl(): string {
+        try {
+            return sessionStorage.getItem(preLoginUrlStorageKey) ?? '';
+        } catch (e) {
+            return '';
+        }
     }
 
     /**

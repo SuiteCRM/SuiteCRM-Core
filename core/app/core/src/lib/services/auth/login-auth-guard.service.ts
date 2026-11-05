@@ -63,8 +63,16 @@ export class LoginAuthGuard  {
                     }
 
                     if (user && user.active === true) {
-                        // Session is active, go to home page
+                        // Session is active
                         this.authService.setCurrentUser(user);
+
+                        // go to the page asked for before the login, if any
+                        const preLoginUrl = this.appStateStore.getPreLoginUrl();
+                        if (preLoginUrl) {
+                            this.appStateStore.setPreLoginUrl('');
+                            return this.router.parseUrl(preLoginUrl);
+                        }
+
                         return homePageUrlTree;
                     }
 

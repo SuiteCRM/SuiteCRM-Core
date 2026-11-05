@@ -452,6 +452,13 @@ export class AuthService {
                             return redirectUrlTree;
                         }
 
+                        // back from an external login (SAML): go to the page asked for before the login
+                        const preLoginUrl = this.appStateStore.getPreLoginUrl();
+                        if (preLoginUrl && preLoginUrl !== snapshot.url) {
+                            this.appStateStore.setPreLoginUrl('');
+                            return this.router.parseUrl(preLoginUrl);
+                        }
+
                         return true;
                     }
                     this.appStateStore.setPreLoginUrl(snapshot.url);

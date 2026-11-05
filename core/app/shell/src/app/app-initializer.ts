@@ -24,7 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Injectable, Injector} from '@angular/core';
+import {Injectable, Injector, Type} from '@angular/core';
 import {Route, Router} from '@angular/router';
 import {
     AppStateStore,
@@ -49,7 +49,9 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    SystemSettingsComponent,
+    HistorySubpanelSettingsComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -184,6 +186,25 @@ export class AppInit {
                             }
                         }
                     });
+                    // System Settings and History Subpanel settings of the administration (admin panel
+                    // links), before the generic classic view routes.
+                    const configuratorViews: { [path: string]: Type<any> } = {
+                        'configurator/edit': SystemSettingsComponent,
+                        'configurator/historyContactsEmails': HistorySubpanelSettingsComponent,
+                    };
+                    Object.entries(configuratorViews).forEach(([path, component]) => routes.push({
+                        path,
+                        component,
+                        canActivate: [AuthGuard],
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration'
+                        }
+                    }));
                     routes.push(loggedOutConfig);
 
                     Object.keys(configRoutes).forEach(routeName => {

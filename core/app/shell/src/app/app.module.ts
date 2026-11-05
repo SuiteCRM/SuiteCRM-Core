@@ -63,7 +63,9 @@ import {
     RecordListModalModule,
     RecordModalComponent,
     RecordModule,
+    HistorySubpanelSettingsModule,
     SidebarComponent,
+    SystemSettingsModule,
     ButtonModule,
     TableModule
 } from 'core';
@@ -111,7 +113,9 @@ export const initializeApp = (appInitService: AppInit) => (): Promise<any> => ap
         RecordListModalModule,
         RecordModalComponent,
         ApolloModule,
-        SidebarComponent
+        SidebarComponent,
+        SystemSettingsModule,
+        HistorySubpanelSettingsModule
     ],
     providers: [
         {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},

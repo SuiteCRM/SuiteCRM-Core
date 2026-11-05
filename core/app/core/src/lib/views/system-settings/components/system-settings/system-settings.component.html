@@ -1,0 +1,140 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="system-settings">
+    <h2 class="system-settings-title">{{ label('LBL_SYSTEM_SETTINGS') }}</h2>
+
+    <p *ngIf="loading && !data" class="system-settings-muted">…</p>
+
+    <form *ngIf="data" novalidate>
+        <ng-container *ngTemplateOutlet="buttons"></ng-container>
+
+        <fieldset class="system-settings-panel">
+            <legend>{{ label('DEFAULT_SYSTEM_SETTINGS') }}</legend>
+            <div class="system-settings-grid">
+                <ng-container *ngFor="let field of userInterface">
+                    <ng-container *ngTemplateOutlet="setting; context: {$implicit: field}"></ng-container>
+                </ng-container>
+
+                <div class="system-settings-field">
+                    <span class="system-settings-label">{{ fieldLabel('CURRENT_LOGO') }}</span>
+                    <img class="system-settings-logo" [src]="logo?.url || data.logo" [alt]="label('LBL_LOGO')">
+                    <small class="form-text text-muted" [innerHTML]="label('CURRENT_LOGO_HELP')"></small>
+                </div>
+                <div class="system-settings-field">
+                    <label for="system-settings-logo">{{ fieldLabel('NEW_LOGO') }}</label>
+                    <input #logoInput type="file" id="system-settings-logo" class="form-control form-control-sm"
+                           accept="image/png,image/jpeg" [disabled]="loading" (change)="selectLogo(logoInput)">
+                    <small class="form-text text-muted" [innerHTML]="label('NEW_LOGO_HELP_NO_SPACE')"></small>
+                </div>
+            </div>
+            <p class="system-settings-link">
+                <a [routerLink]="['/administration', 'ConfigureAjaxUI']">{{ label('LBL_CONFIG_AJAX') }}</a>
+                <small class="form-text text-muted">{{ label('LBL_CONFIG_AJAX_DESC') }}</small>
+            </p>
+        </fieldset>
+
+        <fieldset class="system-settings-panel">
+            <legend>{{ label('LBL_PROXY_TITLE') }}</legend>
+            <div class="system-settings-grid">
+                <ng-container *ngTemplateOutlet="setting; context: {$implicit: proxyOn}"></ng-container>
+            </div>
+            <div *ngIf="values.proxy_on" class="system-settings-grid system-settings-sub">
+                <ng-container *ngFor="let field of proxy">
+                    <ng-container *ngTemplateOutlet="setting; context: {$implicit: field}"></ng-container>
+                </ng-container>
+                <ng-container *ngIf="values.proxy_auth">
+                    <ng-container *ngFor="let field of proxyAuth">
+                        <ng-container *ngTemplateOutlet="setting; context: {$implicit: field}"></ng-container>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </fieldset>
+
+        <fieldset class="system-settings-panel">
+            <legend>{{ label('ADVANCED') }}</legend>
+            <div class="system-settings-grid">
+                <ng-container *ngFor="let field of advanced">
+                    <ng-container *ngTemplateOutlet="setting; context: {$implicit: field}"></ng-container>
+                </ng-container>
+            </div>
+        </fieldset>
+
+        <fieldset class="system-settings-panel">
+            <legend *ngIf="data.loggerVisible">{{ label('LBL_LOGGER') }}</legend>
+            <div *ngIf="data.loggerVisible" class="system-settings-grid">
+                <ng-container *ngFor="let field of logger">
+                    <ng-container *ngTemplateOutlet="setting; context: {$implicit: field}"></ng-container>
+                </ng-container>
+            </div>
+            <p class="system-settings-link">
+                <a [routerLink]="['/configurator', 'LogView']" target="_blank">{{ label('LBL_LOGVIEW') }}</a>
+            </p>
+        </fieldset>
+
+        <ng-container *ngTemplateOutlet="buttons"></ng-container>
+    </form>
+
+    <ng-template #buttons>
+        <div class="system-settings-buttons">
+            <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="save()">{{ label('LBL_SAVE_BUTTON_LABEL') }}</button>
+            <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/administration']">{{ label('LBL_CANCEL_BUTTON_LABEL') }}</a>
+        </div>
+    </ng-template>
+
+    <ng-template #setting let-field>
+        <div *ngIf="field.type === 'bool'; else input" class="system-settings-field">
+            <div class="system-settings-option">
+                <input type="checkbox" [id]="'system-settings-' + field.name" [(ngModel)]="values[field.name]"
+                       [ngModelOptions]="{standalone: true}">
+                <label [for]="'system-settings-' + field.name">{{ fieldLabel(field.label) }}</label>
+            </div>
+            <small *ngIf="field.help" class="form-text text-muted" [innerHTML]="label(field.help)"></small>
+        </div>
+
+        <ng-template #input>
+            <div class="system-settings-field">
+                <label [for]="'system-settings-' + field.name">
+                    {{ fieldLabel(field.label) }}<span *ngIf="field.required" class="system-settings-required">*</span>
+                </label>
+                <select *ngIf="field.type === 'select'; else text" [id]="'system-settings-' + field.name"
+                        class="form-control form-control-sm" [(ngModel)]="values[field.name]" [ngModelOptions]="{standalone: true}">
+                    <option *ngFor="let option of data.options[field.name]" [value]="option.value">{{ option.label }}</option>
+                </select>
+                <ng-template #text>
+                    <input [type]="field.type === 'password' ? 'password' : 'text'" [id]="'system-settings-' + field.name"
+                           class="form-control form-control-sm" [class.is-invalid]="submitted && invalid(field.name)"
+                           [attr.inputmode]="field.type === 'number' ? 'numeric' : null"
+                           [attr.autocomplete]="field.type === 'password' ? 'new-password' : 'off'"
+                           [placeholder]="field.name === 'proxy_password' && data.proxyPasswordSet ? '••••••••' : ''"
+                           [(ngModel)]="values[field.name]" [ngModelOptions]="{standalone: true}">
+                </ng-template>
+                <small *ngIf="field.help" class="form-text text-muted" [innerHTML]="label(field.help)"></small>
+            </div>
+        </ng-template>
+    </ng-template>
+</div>

@@ -1,0 +1,141 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="studio-relationships">
+    <div class="studio-toolbar">
+        <button *ngIf="canAdd" type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="edit('')">{{ label('LBL_BTN_ADD_RELATIONSHIP') }}</button>
+    </div>
+
+    <p *ngIf="!relationships" class="studio-muted">…</p>
+
+    <div *ngIf="relationships" class="studio-scroll">
+        <table class="studio-data-table studio-table">
+            <thead>
+            <tr>
+                <th *ngFor="let column of columns" scope="col" [attr.aria-sort]="sortState(column.key)">
+                    <button type="button" class="btn btn-link studio-sort" (click)="sortBy(column.key)">
+                        {{ label(column.label) }}
+                        <span *ngIf="sort === column.key" aria-hidden="true">{{ descending ? '▾' : '▴' }}</span>
+                    </button>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let item of shown; trackBy: trackName" [class.is-changed]="rel && !editor?.isNew && rel.name === item.name.replace('*', '')">
+                <td><a href="javascript:void(0)" class="studio-mono" (click)="edit(item.name)">{{ item.name }}</a></td>
+                <td>{{ item.lhsModule }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.rhsModule }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <p *ngIf="!relationships.length" class="studio-muted">{{ label('LBL_NO_RELS') }}</p>
+        <p class="studio-muted">{{ label('LBL_CUSTOM_RELATIONSHIPS') }}</p>
+    </div>
+
+    <!-- The legacy relationship editor. -->
+    <section *ngIf="editor && rel" class="studio-rel-editor" [attr.aria-label]="label('LBL_RELATIONSHIP_EDIT')">
+        <h3 class="studio-subtitle">{{ label('LBL_RELATIONSHIP_EDIT') }}</h3>
+
+        <div class="studio-toolbar">
+            <button *ngIf="!rel.readonly" type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="saveAndDeploy()">{{ label('LBL_BTN_SAVEPUBLISH') }}</button>
+            <button *ngIf="canSaveLabels" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="saveLabels()">{{ label('LBL_BTN_SAVE') }}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="close()">{{ label('LBL_BTN_CANCEL') }}</button>
+            <button *ngIf="canDelete" type="button" class="btn btn-sm btn-outline-danger" [disabled]="loading" (click)="confirmDelete = true; keepTables = false">{{ label('LBL_BTN_DELETE') }}</button>
+        </div>
+
+        <div *ngIf="confirmDelete" class="studio-notice" role="alertdialog" aria-labelledby="studio-rel-delete">
+            <p id="studio-rel-delete"><strong>{{ label('LBL_CONFIRM_RELATIONSHIP_DELETE') }}</strong></p>
+            <label class="studio-check"><input type="checkbox" [(ngModel)]="keepTables"> {{ label('ML_LBL_DO_NOT_REMOVE_TABLES') }}</label>
+            <div class="studio-toolbar">
+                <button type="button" class="btn btn-sm btn-danger" [disabled]="loading" (click)="delete()">{{ label('LBL_BTN_DELETE') }}</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="confirmDelete = false">{{ label('LBL_BTN_CANCEL') }}</button>
+            </div>
+        </div>
+
+        <div class="studio-form">
+            <ng-container *ngIf="!isOneToOne">
+                <label for="studio-rel-language">{{ label('LBL_DROPDOWN_LANGUAGE') }}</label>
+                <select id="studio-rel-language" class="form-control form-control-sm studio-select" [disabled]="loading"
+                        [(ngModel)]="language" (ngModelChange)="changeLanguage()">
+                    <option *ngFor="let option of editor.languages; trackBy: trackOption" [value]="option.value">{{ option.label }}</option>
+                </select>
+            </ng-container>
+            <ng-container *ngIf="rel.name">
+                <span class="studio-form-label">{{ label('LBL_REL_NAME') }}</span>
+                <span class="studio-mono">{{ rel.name }}</span>
+            </ng-container>
+        </div>
+
+        <div class="studio-rel-sides">
+            <fieldset class="studio-rel-side">
+                <legend>{{ label('LBL_LHS_MODULE') }}</legend>
+                <label for="studio-rel-lhs">{{ label('LBL_MODULE') }}</label>
+                <input id="studio-rel-lhs" type="text" class="form-control form-control-sm" [value]="editor.lhsModuleLabel" disabled>
+                <ng-container *ngIf="hasPanels && hasLhsPanel">
+                    <label for="studio-rel-lhs-label">{{ label('LBL_REL_LABEL') }}</label>
+                    <input id="studio-rel-lhs-label" type="text" class="form-control form-control-sm" [(ngModel)]="rel.lhsLabel">
+                    <label for="studio-rel-lhs-subpanel">{{ label('LBL_SUBPANEL_FROM') }} {{ editor.lhsModuleLabel }}</label>
+                    <select id="studio-rel-lhs-subpanel" class="form-control form-control-sm" [disabled]="rel.readonly" [(ngModel)]="rel.lhsSubpanel">
+                        <option *ngFor="let subpanel of editor.lhsSubpanels; trackBy: trackValue" [value]="subpanel">{{ subpanel }}</option>
+                    </select>
+                </ng-container>
+            </fieldset>
+
+            <fieldset class="studio-rel-side">
+                <legend>{{ label('LBL_REL_TYPE') }}</legend>
+                <label for="studio-rel-type" class="sr-only">{{ label('LBL_REL_TYPE') }}</label>
+                <select id="studio-rel-type" class="form-control form-control-sm" [disabled]="rel.readonly || loading"
+                        [(ngModel)]="rel.type" (ngModelChange)="changeType()">
+                    <option *ngFor="let option of editor.types; trackBy: trackOption" [value]="option.value">{{ option.label }}</option>
+                </select>
+            </fieldset>
+
+            <fieldset class="studio-rel-side">
+                <legend>{{ label('LBL_RHS_MODULE') }}</legend>
+                <label for="studio-rel-rhs">{{ label('LBL_MODULE') }}</label>
+                <input *ngIf="rel.readonly; else rhsSelect" id="studio-rel-rhs" type="text" class="form-control form-control-sm" [value]="rel.rhsModule" disabled>
+                <ng-template #rhsSelect>
+                    <select id="studio-rel-rhs" class="form-control form-control-sm" [disabled]="loading"
+                            [(ngModel)]="rel.rhsModule" (ngModelChange)="changeModule()">
+                        <option *ngFor="let option of editor.modules; trackBy: trackOption" [value]="option.value">{{ option.label }}</option>
+                    </select>
+                </ng-template>
+                <ng-container *ngIf="hasPanels && hasRhsPanel">
+                    <label for="studio-rel-rhs-label">{{ label('LBL_REL_LABEL') }}</label>
+                    <input id="studio-rel-rhs-label" type="text" class="form-control form-control-sm" [(ngModel)]="rel.rhsLabel">
+                    <label for="studio-rel-rhs-subpanel">{{ label('LBL_SUBPANEL_FROM') }} {{ editor.rhsModuleLabel }}</label>
+                    <select id="studio-rel-rhs-subpanel" class="form-control form-control-sm" [disabled]="rel.readonly" [(ngModel)]="rel.rhsSubpanel">
+                        <option *ngFor="let subpanel of editor.rhsSubpanels; trackBy: trackValue" [value]="subpanel">{{ subpanel }}</option>
+                    </select>
+                </ng-container>
+            </fieldset>
+        </div>
+
+        <p *ngIf="rel.relationshipOnly" class="studio-muted">{{ label('LBL_RELATIONSHIP_ONLY') }}</p>
+    </section>
+</div>

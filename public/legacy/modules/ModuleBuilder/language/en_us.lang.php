@@ -670,3 +670,14 @@ $mod_strings = array(
     'LBL_ALL_MODULES' => 'All Modules',
     'LBL_RELATED_FIELD_ID_NAME_LABEL' => '{0} (related {1} ID)',
 );
+
+// The Studio page of SuiteCRM 8: the texts the legacy Studio does not have.
+$mod_strings['LBL_STUDIO_VIEW_MOVE_UP'] = 'Move up';
+$mod_strings['LBL_STUDIO_VIEW_MOVE_DOWN'] = 'Move down';
+$mod_strings['LBL_STUDIO_VIEW_MOVE_TO'] = 'Move to';
+$mod_strings['LBL_STUDIO_VIEW_RESTORED'] = 'Layout of the history: Save & Deploy restores it.';
+$mod_strings['LBL_STUDIO_VIEW_COPIED'] = 'Fields of the EditView: Save & Deploy copies them.';
+$mod_strings['LBL_STUDIO_VIEW_EXPAND'] = 'Expand to the row';
+$mod_strings['LBL_STUDIO_VIEW_REDUCE'] = 'Reduce to a column';
+$mod_strings['LBL_STUDIO_VIEW_REMOVE'] = 'Remove';
+$mod_strings['LBL_STUDIO_VIEW_RESET_CONFIRM'] = 'Remove the customizations checked from the module? They cannot be restored.';

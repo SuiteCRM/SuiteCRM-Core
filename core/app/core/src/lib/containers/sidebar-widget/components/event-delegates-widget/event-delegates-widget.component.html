@@ -1,0 +1,147 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<section class="event-delegates">
+    <header class="event-delegates-head">
+        <h3 class="event-delegates-title">
+            {{ label('LBL_DEFAULT_SUBPANEL_TITLE') }}
+            <span *ngIf="data" class="event-delegates-total">{{ data.counts.all }}</span>
+        </h3>
+        <div *ngIf="data" class="event-delegates-stats">
+            <span *ngFor="let status of inviteStatuses" class="event-delegates-pill" [ngClass]="statusClass(status)">
+                {{ listLabel('fp_event_invite_status_dom', status) }} <strong>{{ count('invite', status) }}</strong>
+            </span>
+            <span *ngFor="let status of acceptStatuses" class="event-delegates-pill" [ngClass]="statusClass(status)">
+                {{ listLabel('fp_event_status_dom', status) }} <strong>{{ count('accept', status) }}</strong>
+            </span>
+        </div>
+        <div *ngIf="data?.editable" class="event-delegates-tools">
+            <div ngbDropdown class="d-inline-block">
+                <button type="button" class="btn btn-sm btn-outline-secondary" ngbDropdownToggle [disabled]="loading">
+                    {{ label('LBL_SELECT_DELEGATES') }}
+                </button>
+                <div ngbDropdownMenu>
+                    <button *ngFor="let module of ['Contacts', 'Leads', 'Prospects', 'ProspectLists']" type="button" ngbDropdownItem
+                            (click)="add(module)">{{ label(addLabels[module]) }}</button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading || !data.counts.all"
+                    [title]="data.template ? '' : label('LBL_ERROR_MSG_5')" (click)="invite()">{{ label('LBL_INVITE_PDF') }}</button>
+        </div>
+    </header>
+
+    <form class="event-delegates-filters" (ngSubmit)="applyFilters()">
+        <input type="search" name="search" class="form-control form-control-sm event-delegates-search"
+               [attr.aria-label]="label('LBL_DELEGATES_SEARCH')" [placeholder]="label('LBL_DELEGATES_SEARCH')"
+               [(ngModel)]="filters.search">
+        <select name="module" class="form-control form-control-sm" [attr.aria-label]="language.getAppString('LBL_TYPE')"
+                [(ngModel)]="filters.module" (ngModelChange)="applyFilters()">
+            <option value="">{{ language.getAppString('LBL_TYPE') }}: {{ label('LBL_DELEGATES_ALL') }}</option>
+            <option *ngFor="let module of modules" [value]="module">{{ moduleLabel(module) }}</option>
+        </select>
+        <select name="invite" class="form-control form-control-sm" [attr.aria-label]="language.getAppString('LBL_STATUS_EVENT')"
+                [(ngModel)]="filters.invite" (ngModelChange)="applyFilters()">
+            <option value="">{{ language.getAppString('LBL_STATUS_EVENT') }}: {{ label('LBL_DELEGATES_ALL') }}</option>
+            <option *ngFor="let status of inviteStatuses" [value]="status">{{ listLabel('fp_event_invite_status_dom', status) }}</option>
+        </select>
+        <select name="accept" class="form-control form-control-sm" [attr.aria-label]="language.getAppString('LBL_ACCEPT_STATUS')"
+                [(ngModel)]="filters.accept" (ngModelChange)="applyFilters()">
+            <option value="">{{ language.getAppString('LBL_ACCEPT_STATUS') }}: {{ label('LBL_DELEGATES_ALL') }}</option>
+            <option *ngFor="let status of acceptStatuses.concat(['No Response'])" [value]="status">{{ listLabel('fp_event_status_dom', status) }}</option>
+        </select>
+        <button type="submit" class="btn btn-sm btn-main" [disabled]="loading">{{ language.getAppString('LBL_SEARCH') }}</button>
+        <button *ngIf="filtered" type="button" class="btn btn-sm btn-outline-secondary" (click)="clearFilters()">
+            {{ language.getAppString('LBL_CLEAR_BUTTON_LABEL') }}</button>
+    </form>
+
+    <div *ngIf="data?.editable && selectedCount" class="event-delegates-bulk" role="region" [attr.aria-label]="label('LBL_MANAGE_DELEGATES')">
+        <span><strong>{{ selectedCount }}</strong> {{ label('LBL_DELEGATES_SELECTED') }}</span>
+        <button *ngIf="!allMatching && pageSelected && data.total > data.rows.length" type="button" class="btn btn-sm btn-link"
+                (click)="selectMatching()">{{ label('LBL_DELEGATES_SELECT_MATCHING') }} ({{ data.total }})</button>
+        <span class="event-delegates-bulk-label">{{ label('LBL_DELEGATES_MARK_AS') }}</span>
+        <button *ngFor="let status of inviteStatuses" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading"
+                (click)="mark('invite', status)">{{ listLabel('fp_event_invite_status_dom', status) }}</button>
+        <span class="event-delegates-bulk-sep" aria-hidden="true">|</span>
+        <button *ngFor="let status of acceptStatuses" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading"
+                (click)="mark('accept', status)">{{ listLabel('fp_event_status_dom', status) }}</button>
+        <button type="button" class="btn btn-sm btn-link" (click)="clearSelection()">{{ language.getAppString('LBL_CLEAR_BUTTON_LABEL') }}</button>
+    </div>
+
+    <p *ngIf="loading && !data" class="event-delegates-muted">…</p>
+    <p *ngIf="error && !data" class="event-delegates-error" role="alert">{{ label('LBL_DELEGATES_ERROR') }}</p>
+
+    <ng-container *ngIf="data">
+        <p *ngIf="!data.total" class="event-delegates-muted">
+            {{ data.counts.all ? label('LBL_DELEGATES_NO_MATCH') : label('LBL_DELEGATES_EMPTY') }}</p>
+
+        <div *ngIf="data.total" class="event-delegates-scroll" [class.is-loading]="loading">
+            <table class="event-delegates-table">
+                <thead>
+                <tr>
+                    <th *ngIf="data.editable" scope="col" class="event-delegates-check">
+                        <input type="checkbox" [checked]="pageSelected" [attr.aria-label]="label('LBL_DELEGATES_SELECT_PAGE')"
+                               (change)="togglePage()">
+                    </th>
+                    <th scope="col">{{ language.getAppString('LBL_NAME') }}</th>
+                    <th scope="col">{{ language.getAppString('LBL_TYPE') }}</th>
+                    <th scope="col">{{ label('LBL_DELEGATES_ACCOUNT') }}</th>
+                    <th scope="col">{{ label('LBL_DELEGATES_EMAIL') }}</th>
+                    <th scope="col">{{ language.getAppString('LBL_STATUS_EVENT') }}</th>
+                    <th scope="col">{{ language.getAppString('LBL_ACCEPT_STATUS') }}</th>
+                    <th *ngIf="data.editable" scope="col"><span class="sr-only visually-hidden">{{ label('LBL_DELEGATES_REMOVE') }}</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let row of data.rows" [class.is-selected]="allMatching || !!selected[rowKey(row)]">
+                    <td *ngIf="data.editable" class="event-delegates-check">
+                        <input type="checkbox" [checked]="allMatching || !!selected[rowKey(row)]" [attr.aria-label]="row.name"
+                               (change)="toggle(row)">
+                    </td>
+                    <td><a [routerLink]="recordLink(row)">{{ row.name || row.id }}</a></td>
+                    <td>{{ moduleLabel(row.module) }}</td>
+                    <td>{{ row.account }}</td>
+                    <td class="event-delegates-email">{{ row.email }}</td>
+                    <td><span class="event-delegates-pill" [ngClass]="statusClass(row.invite)">{{ listLabel('fp_event_invite_status_dom', row.invite) }}</span></td>
+                    <td><span class="event-delegates-pill" [ngClass]="statusClass(row.accept)">{{ listLabel('fp_event_status_dom', row.accept) }}</span></td>
+                    <td *ngIf="data.editable" class="event-delegates-remove">
+                        <button type="button" class="btn btn-sm btn-link" [attr.aria-label]="label('LBL_DELEGATES_REMOVE') + ': ' + row.name"
+                                [title]="label('LBL_DELEGATES_REMOVE')" [disabled]="loading" (click)="remove(row)">&times;</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div *ngIf="data.total > data.pageSize" class="event-delegates-pager">
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading || !data.offset"
+                    (click)="page(data.offset - data.pageSize)">« {{ label('LBL_DELEGATES_PREVIOUS') }}</button>
+            <span>{{ data.offset + 1 }}–{{ pageEnd }} {{ language.getAppString('LBL_LIST_OF') }} {{ data.total }}</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading || pageEnd >= data.total"
+                    (click)="page(data.offset + data.pageSize)">{{ label('LBL_DELEGATES_NEXT') }} »</button>
+        </div>
+    </ng-container>
+</section>

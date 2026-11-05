@@ -67,6 +67,18 @@ $viewdefs [$module_name] =
                             ),
                         'syncDetailEditViews' => true,
                     ),
+                // The delegates of the event (contacts, leads, targets) in the record view, with
+                // their invitation and acceptance status and the actions of the legacy Delegates
+                // subpanel (EventViewDefinitionMapper removes the subpanel from the record view).
+                'bottomWidgets' =>
+                    array(
+                        0 =>
+                            array(
+                                'type' => 'event-delegates',
+                                'modes' => array('detail'),
+                                'options' => array(),
+                            ),
+                    ),
                 'panels' =>
                     array(
                         'LBL_PANEL_OVERVIEW' =>

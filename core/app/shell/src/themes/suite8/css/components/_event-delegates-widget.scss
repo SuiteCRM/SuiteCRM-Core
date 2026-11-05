@@ -1,0 +1,118 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// Delegates of an event (record view bottom widget event-delegates).
+.event-delegates {
+    padding: 12px 16px;
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    color: $median-grey;
+
+    .event-delegates-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 16px;
+        margin: 0 0 10px;
+    }
+
+    .event-delegates-title { margin: 0; font-size: 15px; font-weight: 700; }
+    .event-delegates-total { margin-left: 4px; color: $midnight-grey; font-weight: 400; }
+    .event-delegates-stats { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 auto; }
+    .event-delegates-tools { display: flex; gap: 8px; margin-left: auto; }
+
+    .event-delegates-filters,
+    .event-delegates-bulk,
+    .event-delegates-pager {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 8px;
+        margin: 0 0 10px;
+    }
+
+    .event-delegates-filters select { width: auto; max-width: 100%; }
+    .event-delegates-search { flex: 0 1 260px; min-width: 160px; }
+
+    .event-delegates-bulk {
+        padding: 6px 10px;
+        background: $off-white;
+        border-radius: 4px;
+    }
+
+    .event-delegates-bulk-label { margin-left: 8px; color: $dusky-blue; }
+    .event-delegates-bulk-sep { color: $lilac-grey; }
+    .event-delegates-pager { margin: 10px 0 0; font-size: 13px; }
+    .event-delegates-muted { color: $midnight-grey; }
+    .event-delegates-error { color: #b42318; }
+
+    .event-delegates-scroll { overflow-x: auto; }
+    .event-delegates-scroll.is-loading { opacity: .6; pointer-events: none; }
+
+    .event-delegates-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th, td {
+            padding: 6px 8px;
+            border-top: 1px solid $light-grey;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            border-top: 0;
+            background: $off-white;
+            color: $dusky-blue;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        tr.is-selected td { background: $off-white-lighter; }
+    }
+
+    .event-delegates-check { width: 32px; }
+    .event-delegates-remove { width: 40px; text-align: right; }
+    .event-delegates-email { word-break: break-all; }
+
+    .event-delegates-pill {
+        display: inline-block;
+        padding: 1px 8px;
+        border-radius: 10px;
+        background: $light-grey;
+        color: $median-grey;
+        font-size: 12px;
+        white-space: nowrap;
+
+        &.is-invited { background: #dbeafe; color: #1e3a8a; }
+        &.is-attended { background: #dcfce7; color: #14532d; }
+        &.is-not-attended { background: #fee2e2; color: #7f1d1d; }
+        &.is-accepted { background: #dcfce7; color: #14532d; }
+        &.is-declined { background: #fee2e2; color: #7f1d1d; }
+    }
+}

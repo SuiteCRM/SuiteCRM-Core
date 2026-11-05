@@ -147,7 +147,7 @@ parameters:
     events:
       index: true
       list: true
-      record: false
+      record: true
     event-locations:
       index: true
       list: true

@@ -929,3 +929,5 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './containers/sidebar-widget/components/event-delegates-widget/event-delegates-widget.component';
+export * from './containers/sidebar-widget/components/event-delegates-widget/event-delegates-widget.module';

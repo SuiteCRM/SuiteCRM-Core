@@ -92,7 +92,14 @@ array(
         0 =>
         array(
           0 => 'name',
-          1 => 'date_entered',
+          1 =>
+          array(
+            'name' => 'date_entered',
+            'displayParams' =>
+            array(
+              'readOnly' => true,
+            ),
+          ),
         ),
         1 =>
         array(

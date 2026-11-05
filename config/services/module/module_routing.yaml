@@ -151,7 +151,7 @@ parameters:
     event-locations:
       index: true
       list: true
-      record: false
+      record: true
     contracts:
       index: true
       list: true

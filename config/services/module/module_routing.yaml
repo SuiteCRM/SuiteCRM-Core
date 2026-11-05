@@ -207,7 +207,8 @@ parameters:
     reports:
       index: true
       list: true
-      record: false
+      record: true
+      create: false
     scheduled-reports:
       index: true
       list: true

@@ -1,0 +1,323 @@
+<div class="report-editor">
+    <div class="report-editor-head">
+        <h2 class="report-editor-title">
+            {{ report?.name || app('LBL_CREATE_BUTTON_LABEL') }}
+            <span class="report-editor-module">{{ text('LBL_MODULE_NAME') }}</span>
+        </h2>
+        <div class="report-editor-buttons">
+            <button type="button" class="btn btn-sm btn-outline-main" (click)="cancel()">{{ app('LBL_CANCEL_BUTTON_LABEL') }}</button>
+            <button type="button" class="btn btn-sm btn-main" [disabled]="!report || saving" (click)="save()">{{ app('LBL_SAVE_BUTTON_LABEL') }}</button>
+        </div>
+    </div>
+
+    <p *ngIf="error" class="report-editor-message report-editor-error">{{ text('LBL_REPORT_VIEWER_ERROR') }}</p>
+    <p *ngIf="loading" class="report-editor-message">{{ text('LBL_REPORT_VIEWER_LOADING') }}</p>
+
+    <ng-container *ngIf="report">
+        <!-- Details of the report. -->
+        <section class="report-editor-panel report-editor-details">
+            <label class="report-editor-item">
+                <span>{{ l('AOR_Reports.LBL_NAME') }} <span class="report-editor-required">*</span></span>
+                <input type="text" class="form-control form-control-sm" name="name" [(ngModel)]="report.name">
+            </label>
+            <div class="report-editor-item">
+                <span>{{ l('AOR_Reports.LBL_ASSIGNED_TO_NAME') }}</span>
+                <div class="report-editor-picker">
+                    <input type="text" class="form-control form-control-sm" readonly [value]="report.assignedUserName"
+                           [attr.aria-label]="l('AOR_Reports.LBL_ASSIGNED_TO_NAME')">
+                    <button type="button" class="btn btn-sm btn-outline-main" (click)="selectUser()">{{ text('LBL_REPORT_EDITOR_SELECT') }}</button>
+                </div>
+            </div>
+            <label class="report-editor-item">
+                <span>{{ l('AOR_Reports.LBL_REPORT_MODULE') }} <span class="report-editor-required">*</span></span>
+                <select class="form-control form-control-sm" name="reportModule" [ngModel]="report.reportModule"
+                        (ngModelChange)="changeModule($event)">
+                    <option value="" disabled></option>
+                    <option *ngFor="let module of report.options.modules" [value]="module.value">{{ module.label }}</option>
+                </select>
+            </label>
+            <label class="report-editor-item">
+                <span>{{ l('AOR_Reports.LBL_GRAPHS_PER_ROW') }}</span>
+                <input type="number" min="1" class="form-control form-control-sm" name="graphsPerRow" [(ngModel)]="report.graphsPerRow">
+            </label>
+            <label class="report-editor-item report-editor-wide">
+                <span>{{ l('AOR_Reports.LBL_DESCRIPTION') }}</span>
+                <textarea class="form-control form-control-sm" rows="3" name="description" [(ngModel)]="report.description"></textarea>
+            </label>
+        </section>
+
+        <div *ngIf="report.reportModule" class="report-editor-body">
+            <!-- Module tree: a module lists its fields; a field is added to the fields or the conditions. -->
+            <aside class="report-editor-panel report-editor-tree">
+                <h3>{{ l('AOR_Reports.LBL_AOR_MODULETREE_SUBPANEL_TITLE') }}</h3>
+                <ul *ngIf="tree" class="report-editor-nodes">
+                    <ng-container *ngTemplateOutlet="nodeTemplate; context: {$implicit: tree}"></ng-container>
+                </ul>
+                <h3>{{ l('AOR_Reports.LBL_AOR_FIELDS_SUBPANEL_TITLE') }}
+                    <span *ngIf="selectedNode" class="report-editor-path">({{ selectedNode.pathLabel }})</span></h3>
+                <p class="report-editor-help">{{ text('LBL_REPORT_EDITOR_ADD_HELP') }}</p>
+                <ul class="report-editor-tree-fields">
+                    <li *ngFor="let field of treeFields">
+                        <button type="button" (click)="add(field)">{{ field.label }}</button>
+                    </li>
+                </ul>
+            </aside>
+
+            <section class="report-editor-panel report-editor-lines">
+                <ul class="nav nav-tabs report-editor-tabs" role="tablist">
+                    <li class="nav-item" *ngFor="let item of tabs">
+                        <button type="button" class="nav-link" role="tab" [class.active]="tab === item.key"
+                                [attr.aria-selected]="tab === item.key" (click)="tab = item.key">{{ item.label }}</button>
+                    </li>
+                </ul>
+
+                <!-- Fields. -->
+                <div *ngIf="tab === 'fields'" class="report-editor-tab">
+                    <label *ngIf="fields.length" class="report-editor-inline">
+                        <span>{{ l('AOR_Reports.LBL_MAIN_GROUPS') }}</span>
+                        <select class="form-control form-control-sm" name="mainGroup" [(ngModel)]="mainGroup">
+                            <option [ngValue]="null">{{ app('LBL_NONE') }}</option>
+                            <option *ngFor="let line of fields" [ngValue]="line.key">{{ line.label }}</option>
+                        </select>
+                    </label>
+                    <div class="report-editor-table-wrap">
+                        <table *ngIf="fields.length" class="report-editor-table">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>{{ l('AOR_Fields.LBL_MODULE_PATH') }}</th>
+                                <th>{{ l('AOR_Fields.LBL_FIELD') }}</th>
+                                <th>{{ l('AOR_Fields.LBL_DISPLAY') }}</th>
+                                <th>{{ l('AOR_Fields.LBL_LINK') }}</th>
+                                <th>{{ l('AOR_Fields.LBL_LABEL') }}</th>
+                                <th>{{ l('AOR_Fields.LBL_FUNCTION') }}</th>
+                                <th>{{ l('AOR_Fields.LBL_SORT') }}</th>
+                                <th>{{ l('AOR_Fields.LBL_GROUP') }}</th>
+                                <th>{{ l('AOR_Fields.LBL_FORMAT') }}</th>
+                                <th>{{ l('AOR_Fields.LBL_TOTAL') }}</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody cdkDropList (cdkDropListDropped)="dropField($event)">
+                            <tr class="report-editor-line" *ngFor="let line of fields; trackBy: trackLine" cdkDrag cdkDragLockAxis="y">
+                                <td class="report-editor-handle" cdkDragHandle [attr.aria-label]="text('LBL_REPORT_EDITOR_MOVE')">⠿</td>
+                                <td>{{ line.pathLabel }}</td>
+                                <td>{{ line.fieldLabel }}</td>
+                                <td><input type="checkbox" [(ngModel)]="line.display" [attr.aria-label]="l('AOR_Fields.LBL_DISPLAY')"></td>
+                                <td><input type="checkbox" [(ngModel)]="line.link" [attr.aria-label]="l('AOR_Fields.LBL_LINK')"></td>
+                                <td><input type="text" class="form-control form-control-sm" maxlength="150" [(ngModel)]="line.label"
+                                           [attr.aria-label]="l('AOR_Fields.LBL_LABEL')"></td>
+                                <td>
+                                    <select class="form-control form-control-sm" [(ngModel)]="line.function" [attr.aria-label]="l('AOR_Fields.LBL_FUNCTION')">
+                                        <option *ngFor="let option of report.options.functions" [value]="option.value">{{ option.label }}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-control form-control-sm" [(ngModel)]="line.sort" [attr.aria-label]="l('AOR_Fields.LBL_SORT')">
+                                        <option *ngFor="let option of report.options.sorts" [value]="option.value">{{ option.label }}</option>
+                                    </select>
+                                </td>
+                                <td><input type="checkbox" [(ngModel)]="line.group" [attr.aria-label]="l('AOR_Fields.LBL_GROUP')"></td>
+                                <td>
+                                    <select *ngIf="isDate(line)" class="form-control form-control-sm" [(ngModel)]="line.format"
+                                            [attr.aria-label]="l('AOR_Fields.LBL_FORMAT')">
+                                        <option *ngFor="let option of report.options.formats" [value]="option.value">{{ option.label }}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-control form-control-sm" [(ngModel)]="line.total" [attr.aria-label]="l('AOR_Fields.LBL_TOTAL')">
+                                        <option *ngFor="let option of report.options.totals" [value]="option.value">{{ option.label }}</option>
+                                    </select>
+                                </td>
+                                <td><button type="button" class="btn btn-sm btn-outline-danger" [attr.aria-label]="app('LBL_REMOVE')"
+                                            (click)="removeField(line)">−</button></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Conditions. -->
+                <div *ngIf="tab === 'conditions'" class="report-editor-tab">
+                    <button type="button" class="btn btn-sm btn-outline-main" (click)="addParenthesis()">( … ) {{ text('LBL_REPORT_EDITOR_ADD_PARENTHESIS') }}</button>
+                    <div class="report-editor-table-wrap">
+                        <table *ngIf="conditions.length" class="report-editor-table">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>{{ l('AOR_Conditions.LBL_LOGIC_OP') }}</th>
+                                <th>{{ l('AOR_Fields.LBL_MODULE_PATH') }}</th>
+                                <th>{{ l('AOR_Fields.LBL_FIELD') }}</th>
+                                <th>{{ l('AOR_Conditions.LBL_OPERATOR') }}</th>
+                                <th>{{ l('AOR_Conditions.LBL_VALUE_TYPE') }}</th>
+                                <th>{{ l('AOR_Conditions.LBL_VALUE') }}</th>
+                                <th>{{ l('AOR_Conditions.LBL_PARAMETER') }}</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody cdkDropList (cdkDropListDropped)="dropCondition($event)">
+                            <tr class="report-editor-line" *ngFor="let line of conditions; let index = index; trackBy: trackLine" cdkDrag cdkDragLockAxis="y"
+                                [class.report-editor-parenthesis]="line.parenthesis">
+                                <td class="report-editor-handle" cdkDragHandle [attr.aria-label]="text('LBL_REPORT_EDITOR_MOVE')">⠿</td>
+                                <td>
+                                    <select *ngIf="hasLogic(index)" class="form-control form-control-sm" [(ngModel)]="line.logic"
+                                            [attr.aria-label]="l('AOR_Conditions.LBL_LOGIC_OP')">
+                                        <option value="AND">{{ l('AOR_Conditions.LBL_CONDITION_AND') }}</option>
+                                        <option value="OR">{{ l('AOR_Conditions.LBL_CONDITION_OR') }}</option>
+                                    </select>
+                                </td>
+                                <ng-container *ngIf="line.parenthesis; else condition">
+                                    <td colspan="6" class="report-editor-bracket" [style.padding-left.px]="12 + depth(index) * 24">
+                                        {{ line.parenthesis === 'START' ? '(' : ')' }}
+                                    </td>
+                                </ng-container>
+                                <ng-template #condition>
+                                    <td [style.padding-left.px]="12 + depth(index) * 24">{{ line.pathLabel }}</td>
+                                    <td>{{ line.fieldLabel }}</td>
+                                    <td>
+                                        <select class="form-control form-control-sm" [(ngModel)]="line.operator"
+                                                [attr.aria-label]="l('AOR_Conditions.LBL_OPERATOR')">
+                                            <option *ngFor="let option of line.info.operators" [value]="option.value">{{ option.label }}</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-control form-control-sm" [(ngModel)]="line.valueType"
+                                                (ngModelChange)="changeValueType(line)" [attr.aria-label]="l('AOR_Conditions.LBL_VALUE_TYPE')">
+                                            <option *ngFor="let option of line.info.valueTypes" [value]="option.value">{{ option.label }}</option>
+                                        </select>
+                                    </td>
+                                    <td class="report-editor-value">
+                                        <ng-container *ngTemplateOutlet="valueTemplate; context: {$implicit: line}"></ng-container>
+                                    </td>
+                                    <td><input type="checkbox" [(ngModel)]="line.parameter" [attr.aria-label]="l('AOR_Conditions.LBL_PARAMETER')"></td>
+                                </ng-template>
+                                <td>
+                                    <button *ngIf="line.parenthesis !== 'END'" type="button" class="btn btn-sm btn-outline-danger"
+                                            [attr.aria-label]="app('LBL_REMOVE')" (click)="removeCondition(line)">−</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Charts. -->
+                <div *ngIf="tab === 'charts'" class="report-editor-tab">
+                    <div class="report-editor-table-wrap">
+                        <table *ngIf="charts.length" class="report-editor-table">
+                            <thead>
+                            <tr>
+                                <th>{{ l('AOR_Reports.LBL_CHART_TITLE') }}</th>
+                                <th>{{ l('AOR_Reports.LBL_CHART_TYPE') }}</th>
+                                <th>{{ l('AOR_Reports.LBL_CHART_X_FIELD') }}</th>
+                                <th>{{ l('AOR_Reports.LBL_CHART_Y_FIELD') }}</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr *ngFor="let chart of charts; trackBy: trackLine">
+                                <td><input type="text" class="form-control form-control-sm" [(ngModel)]="chart.title"
+                                           [attr.aria-label]="l('AOR_Reports.LBL_CHART_TITLE')"></td>
+                                <td>
+                                    <select class="form-control form-control-sm" [(ngModel)]="chart.type" [attr.aria-label]="l('AOR_Reports.LBL_CHART_TYPE')">
+                                        <option *ngFor="let option of report.options.chartTypes" [value]="option.value">{{ option.label }}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-control form-control-sm" [(ngModel)]="chart.x" [attr.aria-label]="l('AOR_Reports.LBL_CHART_X_FIELD')">
+                                        <option *ngFor="let field of chartFields" [ngValue]="field.key">{{ field.label }}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-control form-control-sm" [(ngModel)]="chart.y" [attr.aria-label]="l('AOR_Reports.LBL_CHART_Y_FIELD')">
+                                        <option *ngFor="let field of chartFields" [ngValue]="field.key">{{ field.label }}</option>
+                                    </select>
+                                </td>
+                                <td><button type="button" class="btn btn-sm btn-outline-danger" [attr.aria-label]="app('LBL_REMOVE')"
+                                            (click)="removeChart(chart)">−</button></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-main" (click)="addChart()">{{ l('AOR_Reports.LBL_ADD_CHART') }}</button>
+                </div>
+            </section>
+        </div>
+    </ng-container>
+
+    <!-- A module of the module tree and its relationships. -->
+    <ng-template #nodeTemplate let-node>
+        <li>
+            <div class="report-editor-node" [class.is-selected]="selectedNode === node">
+                <button type="button" class="report-editor-toggle" [attr.aria-expanded]="node.open" [attr.aria-label]="node.label"
+                        (click)="toggle(node)">{{ node.open ? '▾' : '▸' }}</button>
+                <button type="button" class="report-editor-node-label" (click)="select(node)">{{ node.label }}</button>
+            </div>
+            <ul *ngIf="node.open && node.children?.length" class="report-editor-nodes">
+                <ng-container *ngFor="let child of node.children">
+                    <ng-container *ngTemplateOutlet="nodeTemplate; context: {$implicit: child}"></ng-container>
+                </ng-container>
+            </ul>
+        </li>
+    </ng-template>
+
+    <!-- The value of a condition, as offered for its type and field. -->
+    <ng-template #valueTemplate let-line>
+        <ng-container [ngSwitch]="line.valueType">
+            <select *ngSwitchCase="'Field'" class="form-control form-control-sm" [(ngModel)]="line.value"
+                    [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+                <option value="">{{ app('LBL_NONE') }}</option>
+                <option *ngFor="let option of report.module.fields" [value]="option.value">{{ option.label }}</option>
+            </select>
+            <div *ngSwitchCase="'Date'" class="report-editor-date">
+                <select class="form-control form-control-sm" [(ngModel)]="line.value[0]" [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+                    <option *ngFor="let option of report.module.dateBases" [value]="option.value">{{ option.label }}</option>
+                </select>
+                <select class="form-control form-control-sm" [(ngModel)]="line.value[1]" [attr.aria-label]="l('AOR_Conditions.LBL_OPERATOR')">
+                    <option *ngFor="let option of report.options.dateOperators" [value]="option.value">{{ option.label }}</option>
+                </select>
+                <ng-container *ngIf="isPlusMinus(line)">
+                    <input type="number" min="0" class="form-control form-control-sm" [(ngModel)]="line.value[2]"
+                           [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+                    <select class="form-control form-control-sm" [(ngModel)]="line.value[3]" [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+                        <option *ngFor="let option of report.options.dateUnits" [value]="option.value">{{ option.label }}</option>
+                    </select>
+                </ng-container>
+            </div>
+            <select *ngSwitchCase="'Multi'" multiple class="form-control form-control-sm report-editor-multi" [(ngModel)]="line.value"
+                    [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+                <option *ngFor="let option of line.info.options" [ngValue]="option.value">{{ option.label }}</option>
+            </select>
+            <select *ngSwitchCase="'Period'" class="form-control form-control-sm" [(ngModel)]="line.value"
+                    [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+                <option *ngFor="let option of report.options.periods" [value]="option.value">{{ option.label }}</option>
+            </select>
+            <span *ngSwitchCase="'CurrentUserID'"></span>
+            <ng-container *ngSwitchDefault [ngSwitch]="line.info.input">
+                <select *ngSwitchCase="'select'" class="form-control form-control-sm" [(ngModel)]="line.value"
+                        [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+                    <option *ngFor="let option of line.info.options" [value]="option.value">{{ option.label }}</option>
+                </select>
+                <select *ngSwitchCase="'multi'" multiple class="form-control form-control-sm report-editor-multi" [(ngModel)]="line.value"
+                        [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+                    <option *ngFor="let option of line.info.options" [ngValue]="option.value">{{ option.label }}</option>
+                </select>
+                <input *ngSwitchCase="'bool'" type="checkbox" [ngModel]="line.value === '1'"
+                       (ngModelChange)="line.value = $event ? '1' : '0'" [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+                <input *ngSwitchCase="'date'" type="date" class="form-control form-control-sm" [(ngModel)]="line.value"
+                       [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+                <input *ngSwitchCase="'datetime'" type="datetime-local" class="form-control form-control-sm" [(ngModel)]="line.value"
+                       [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+                <input *ngSwitchCase="'number'" type="number" class="form-control form-control-sm" [(ngModel)]="line.value"
+                       [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+                <div *ngSwitchCase="'relate'" class="report-editor-picker">
+                    <input type="text" class="form-control form-control-sm" readonly [value]="line.valueLabel || line.value"
+                           [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+                    <button type="button" class="btn btn-sm btn-outline-main" (click)="selectRecord(line)">{{ text('LBL_REPORT_EDITOR_SELECT') }}</button>
+                </div>
+                <input *ngSwitchDefault type="text" class="form-control form-control-sm" [(ngModel)]="line.value"
+                       [attr.aria-label]="l('AOR_Conditions.LBL_VALUE')">
+            </ng-container>
+        </ng-container>
+    </ng-template>
+</div>

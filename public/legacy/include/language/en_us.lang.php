@@ -4511,3 +4511,10 @@ $app_strings['LBL_NOT_AUTHORIZED'] = 'Not authorized';
 $app_strings['LBL_AUTOFILL_MISSING_RELATE_MODULE'] = 'Autofill failed: related module is not configured.';
 $app_strings['LBL_AUTOFILL_MISSING_RELATE_ID'] = 'Autofill failed: no related record selected.';
 $app_strings['LBL_AUTOFILL_MISSING_UPDATE_FIELDS'] = 'Autofill failed: no fields configured for update.';
+
+$app_strings['LBL_DASHBOARD_CLOSE_CONFIRM'] = 'Do you want to close this activity?';
+$app_strings['LBL_DASHBOARD_REMOVE_DASHLET_CONFIRM'] = 'Do you want to remove this dashlet from your dashboard?';
+$app_strings['LBL_DASHBOARD_REMOVE_TAB_CONFIRM'] = 'Do you want to remove this tab and its dashlets?';
+$app_strings['LBL_DASHBOARD_SAVE_ERROR'] = 'The changes to the dashboard could not be saved.';
+$app_strings['LBL_DASHBOARD_DELETE_POST_CONFIRM'] = 'Do you want to delete this post?';
+$app_strings['LBL_REPORT_EDITOR_CHANGE_MODULE'] = 'Changing the report module removes the fields, conditions and charts of the report. Continue?';

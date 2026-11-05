@@ -1,0 +1,112 @@
+<div class="dashboard-view">
+    <div class="dashboard-head">
+        <nav *ngIf="data?.pages?.length" class="dashboard-tabs" [attr.aria-label]="label('LBL_DASHBOARD_TABS')">
+            <button *ngFor="let tab of data.pages; let index = index" type="button" class="dashboard-tab"
+                    [class.is-active]="index === data.page" [attr.aria-current]="index === data.page ? 'page' : null"
+                    (click)="openTab(index)">{{ tab.title }}</button>
+            <ng-container *ngIf="canEdit">
+                <button type="button" class="dashboard-tab dashboard-tab-add" [title]="label('LBL_DASHBOARD_ADD_TAB')"
+                        [attr.aria-label]="label('LBL_DASHBOARD_ADD_TAB')" (click)="addTab()">+</button>
+                <div ngbDropdown class="dashboard-tab-menu" placement="bottom-start">
+                    <button type="button" ngbDropdownToggle class="dashboard-tab dashboard-tab-more"
+                            [attr.aria-label]="label('LBL_DASHBOARD_TAB_ACTIONS') + ' — ' + current?.title">⋯</button>
+                    <div ngbDropdownMenu class="dashboard-menu">
+                        <button *ngIf="data.page > 0" type="button" ngbDropdownItem (click)="renameTab()">
+                            {{ label('LBL_DASHBOARD_RENAME_TAB') }}
+                        </button>
+                        <div class="dropdown-header">{{ label('LBL_DASHBOARD_COLUMNS') }}</div>
+                        <button *ngFor="let count of [1, 2, 3]" type="button" ngbDropdownItem
+                                [class.is-active]="current?.columns.length === count"
+                                [attr.aria-pressed]="current?.columns.length === count" (click)="setColumns(count)">
+                            {{ count }}
+                        </button>
+                        <ng-container *ngIf="data.page > 0">
+                            <div class="dropdown-divider"></div>
+                            <button type="button" ngbDropdownItem class="dashboard-danger" (click)="removeTab()">
+                                {{ label('LBL_DASHBOARD_REMOVE_TAB') }}
+                            </button>
+                        </ng-container>
+                    </div>
+                </div>
+            </ng-container>
+        </nav>
+        <button *ngIf="canEdit" type="button" class="dashboard-manage" (click)="addDashlets()">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            {{ label('LBL_DASHBOARD_ADD_DASHLETS') }}
+        </button>
+    </div>
+
+    <p *ngIf="loading && !data" class="dashboard-message">{{ label('LBL_DASHBOARD_LOADING') }}</p>
+    <p *ngIf="error" class="dashboard-message dashboard-error" role="alert">{{ label('LBL_DASHBOARD_ERROR') }}</p>
+
+    <ng-container *ngIf="current && !error">
+        <p *ngIf="isEmpty" class="dashboard-message">{{ label(canEdit ? 'LBL_DASHBOARD_EMPTY' : 'LBL_DASHBOARD_NO_DATA') }}</p>
+
+        <div class="dashboard-grid" cdkDropListGroup [class.is-loading]="loading" [class.is-editable]="canEdit"
+             [style.grid-template-columns]="gridColumns(current)">
+            <div *ngFor="let column of current.columns" class="dashboard-column"
+                 cdkDropList [cdkDropListData]="column.dashlets" [cdkDropListDisabled]="!canEdit"
+                 (cdkDropListDropped)="drop($event)">
+                <section *ngFor="let id of column.dashlets; trackBy: trackById" class="dashboard-dashlet"
+                         cdkDrag [cdkDragData]="id" [cdkDragDisabled]="!canEdit" [attr.aria-label]="dashlet(id).title">
+                    <div *cdkDragPlaceholder class="dashboard-drop-placeholder"></div>
+                    <div *cdkDragPreview class="dashboard-drag-preview">{{ dashlet(id).title }}</div>
+                    <header class="dashboard-dashlet-head" cdkDragHandle [cdkDragHandleDisabled]="!canEdit"
+                            [title]="canEdit ? label('LBL_DASHBOARD_MOVE_HINT') : ''">
+                        <h3>{{ dashlet(id).title }}</h3>
+                        <div class="dashboard-dashlet-actions">
+                            <button type="button" class="dashboard-icon-btn" [title]="label('LBL_DASHBOARD_REFRESH')"
+                                    [attr.aria-label]="label('LBL_DASHBOARD_REFRESH') + ' — ' + dashlet(id).title"
+                                    (click)="refresh(id)">
+                                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                                    <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3" fill="none" stroke="currentColor"
+                                          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <div *ngIf="canEdit" ngbDropdown class="dashboard-move" placement="bottom-end">
+                                <button type="button" ngbDropdownToggle class="dashboard-icon-btn" [title]="label('LBL_DASHBOARD_MOVE')"
+                                        [attr.aria-label]="label('LBL_DASHBOARD_MOVE') + ' — ' + dashlet(id).title">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                                        <path d="M8 1.5v13M1.5 8h13M8 1.5L5.8 3.7M8 1.5l2.2 2.2M8 14.5l-2.2-2.2M8 14.5l2.2-2.2M1.5 8l2.2-2.2M1.5 8l2.2 2.2M14.5 8l-2.2-2.2M14.5 8l-2.2 2.2"
+                                              fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                                <div ngbDropdownMenu class="dashboard-menu">
+                                    <button *ngFor="let direction of moveDirections" type="button" ngbDropdownItem
+                                            [disabled]="!canMove(id, direction.key)" (click)="move(id, direction.key)">
+                                        {{ label(direction.label) }}
+                                    </button>
+                                </div>
+                            </div>
+                            <button *ngIf="canEdit && dashlet(id).configurable" type="button" class="dashboard-icon-btn"
+                                    [title]="label('LBL_DASHBOARD_OPTIONS')"
+                                    [attr.aria-label]="label('LBL_DASHBOARD_OPTIONS') + ' — ' + dashlet(id).title"
+                                    (click)="configure(id)">
+                                <svg width="16" height="16" viewBox="0 0 14.4 15" aria-hidden="true">
+                                    <path fill="currentColor"
+                                          d="M12.6,2.3L10.9,3c-0.5-0.4-1.1-0.7-1.7-1L9.1,0.2C8.5,0.1,7.9,0,7.2,0C6.6,0,6,0.1,5.4,0.2L5.2,2C4.6,2.2,4,2.6,3.5,3L1.8,2.3C1,3.1,0.3,4.2,0,5.4l1.5,1.1c-0.1,0.3-0.1,0.6-0.1,1c0,0.3,0,0.6,0.1,1L0,9.5c0.3,1.2,1,2.3,1.8,3.2L3.5,12c0.5,0.4,1.1,0.7,1.7,1l0.2,1.8C5.9,14.9,6.6,15,7.2,15c0.6,0,1.2-0.1,1.8-0.2L9.2,13c0.6-0.2,1.2-0.6,1.7-1l1.7,0.7c0.8-0.9,1.5-2,1.8-3.2L13,8.5C13,8.2,13,7.9,13,7.5c0-0.3,0-0.6-0.1-1l1.5-1.1C14.1,4.2,13.5,3.1,12.6,2.3L12.6,2.3z M7.2,10.8c-1.8,0-3.3-1.5-3.3-3.3s1.5-3.3,3.3-3.3s3.3,1.5,3.3,3.3S9.1,10.8,7.2,10.8z"/>
+                                </svg>
+                            </button>
+                            <button *ngIf="canEdit" type="button" class="dashboard-icon-btn"
+                                    [title]="label('LBL_DASHBOARD_REMOVE')"
+                                    [attr.aria-label]="label('LBL_DASHBOARD_REMOVE') + ' — ' + dashlet(id).title"
+                                    (click)="remove(id)">
+                                <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+                                    <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </header>
+                    <scrm-list-dashlet *ngIf="dashlet(id).type === 'list'" [dashlet]="dashlet(id)"></scrm-list-dashlet>
+                    <scrm-chart-dashlet *ngIf="dashlet(id).type === 'chart'" [dashlet]="dashlet(id)"></scrm-chart-dashlet>
+                    <scrm-feed-dashlet *ngIf="dashlet(id).type === 'feed'" [dashlet]="dashlet(id)"></scrm-feed-dashlet>
+                    <scrm-frame-dashlet *ngIf="dashlet(id).type === 'frame'" [dashlet]="dashlet(id)"></scrm-frame-dashlet>
+                    <scrm-legacy-dashlet *ngIf="dashlet(id).type === 'legacy'" [id]="id"
+                                        [title]="dashlet(id).title"></scrm-legacy-dashlet>
+                </section>
+            </div>
+        </div>
+    </ng-container>
+</div>

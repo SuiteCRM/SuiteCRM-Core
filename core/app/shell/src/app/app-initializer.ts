@@ -35,6 +35,7 @@ import {
     ClassicViewResolver,
     ClassicViewUiComponent,
     CreateRecordComponent,
+    DashboardComponent,
     ExtensionLoader,
     InstallAuthGuard,
     InstallViewComponent,
@@ -164,6 +165,23 @@ export class AppInit {
                                 redirectTo: ''
                             }
                         ]
+                    });
+
+                    // The Home dashboard. The legacy dashboard stays on home/index.
+                    // The page follows its ?tab= query param itself.
+                    routes.push({
+                        path: 'home',
+                        component: DashboardComponent,
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'paramsChange',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: true,
+                            checkSession: true,
+                            module: 'home'
+                        }
                     });
 
                     routes.push({

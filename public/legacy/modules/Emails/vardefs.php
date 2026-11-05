@@ -862,6 +862,29 @@ $dictionary['Email'] = array(
     ) // end indices
 );
 
+// Sender, recipients and body of the email as text, for the list and record views (read by
+// App\Module\Emails\LegacyHandler\EmailViewHandler).
+$emailViewFields = [
+    'email_from' => ['type' => 'varchar', 'len' => 255, 'vname' => 'LBL_FROM'],
+    'email_to' => ['type' => 'text', 'vname' => 'LBL_TO'],
+    'email_cc' => ['type' => 'text', 'vname' => 'LBL_CC'],
+    'email_bcc' => ['type' => 'text', 'vname' => 'LBL_BCC'],
+    'email_body' => ['type' => 'html', 'vname' => 'LBL_BODY'],
+];
+
+foreach ($emailViewFields as $emailViewFieldName => $emailViewField) {
+    $dictionary['Email']['fields'][$emailViewFieldName] = $emailViewField + [
+        'name' => $emailViewFieldName,
+        'source' => 'non-db',
+        'massupdate' => false,
+        'importable' => false,
+        'reportable' => false,
+        'inline_edit' => false,
+        'studio' => false,
+    ];
+}
+unset($emailViewFields, $emailViewFieldName, $emailViewField);
+
 VardefManager::createVardef('Emails', 'Email', array('default',
     'basic',
     'assignable', 'security_groups',

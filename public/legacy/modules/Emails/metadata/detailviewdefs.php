@@ -39,132 +39,105 @@
  */
 
 $module_name = 'Emails';
-$viewdefs[$module_name]['DetailView'] = array(
-    'templateMeta' => array(
-        'form' => array(
-            'buttons' => array(
-                'EDIT',
-                'DUPLICATE',
-                'DELETE',
-                [
-                    'customCode' => '<input type=button onclick="window.location.href=\'index.php?module=Emails&action=DeleteFromImap&folder=INBOX.TestInbox&folder=inbound&inbound_email_record={$bean->inbound_email_record}&uid={$bean->uid}&msgno={$bean->msgNo}&record={$bean->id}&return_module=Emails&return_action=index\';" value="{$MOD.LBL_BUTTON_DELETE_IMAP}">'
-                ],
-                'FIND_DUPLICATES',
-                array(
-                    'customCode' => '<input type=button onclick="window.location.href=\'index.php?module=Emails&action=ReplyTo&return_module=Emails&return_action=index&folder=INBOX.TestInbox&folder=inbound&inbound_email_record={$bean->inbound_email_record}&uid={$bean->uid}&msgno={$bean->msgno}&record={$bean->id}\';" value="{$MOD.LBL_BUTTON_REPLY_TITLE}">'
-                ),
-                array(
-                    'customCode' => '<input type=button onclick="window.location.href=\'index.php?module=Emails&action=ReplyToAll&return_module=Emails&return_action=index&folder=INBOX.TestInbox&folder=inbound&inbound_email_record={$bean->inbound_email_record}&uid={$bean->uid}&msgno={$bean->msgno}&record={$bean->id}\';" value="{$MOD.LBL_BUTTON_REPLY_ALL}">'
-                ),
-                array(
-                    'customCode' => '<input type=button onclick="window.location.href=\'index.php?module=Emails&action=Forward&return_module=Emails&return_action=index&folder=INBOX.TestInbox&folder=inbound&inbound_email_record={$bean->inbound_email_record}&uid={$bean->uid}&msgno={$bean->msgno}&record={$bean->id}\';" value="{$MOD.LBL_BUTTON_FORWARD}">'
-                ),
-                array(
-                    'customCode' => '<input type=button onclick="openQuickCreateModal(\'Bugs\',\'&name={$bean->name}\',\'{$bean->from_addr_name}\');" value="{$MOD.LBL_CREATE} {$APP.LBL_EMAIL_QC_BUGS}">'
-                        . '<input type="hidden" id="parentEmailId" name="parentEmailId" value="{$bean->id}">'
-                ),
-                array(
-                    'customCode' => '<input type=button onclick="openQuickCreateModal(\'Cases\',\'&name={$bean->name}\',\'{$bean->from_addr_name}\');" value="{$MOD.LBL_CREATE} {$APP.LBL_EMAIL_QC_CASES}">'
-                        . '<input type="hidden" id="parentEmailId" name="parentEmailId" value="{$bean->id}">'
-                ),
-                array(
-                    'customCode' => '<input type=button onclick="openQuickCreateModal(\'Contacts\',\'&last_name={$bean->name}\',\'{$bean->from_addr_name}\');" value="{$MOD.LBL_CREATE} {$APP.LBL_EMAIL_QC_CONTACTS}">'
-                        . '<input type="hidden" id="parentEmailId" name="parentEmailId" value="{$bean->id}">'
-                ),
-                array(
-                    'customCode' => '<input type=button onclick="openQuickCreateModal(\'Leads\',\'&last_name={$bean->name}\',\'{$bean->from_addr_name}\');" value="{$MOD.LBL_CREATE} {$APP.LBL_EMAIL_QC_LEADS}">'
-                        . '<input type="hidden" id="parentEmailId" name="parentEmailId" value="{$bean->id}">'
-                ),
-                array(
-                    'customCode' => '<input type=button onclick="openQuickCreateModal(\'Opportunities\',\'&name={$bean->name}\',\'{$bean->from_addr_name}\');" value="{$MOD.LBL_CREATE} {$APP.LBL_EMAIL_QC_OPPORTUNITIES}">'
-                        . '<input type="hidden" id="parentEmailId" name="parentEmailId" value="{$bean->id}">'
-                ),
-            )
-        ),
-        'includes' => array(
-            array(
-                'file' => 'modules/Emails/include/DetailView/quickCreateModal.js',
-            ),
-        ),
+$viewdefs[$module_name]['DetailView'] = [
+    'templateMeta' => [
+        'form' => [
+            'buttons' => ['DELETE'],
+        ],
         'maxColumns' => '2',
-        'widths' => array(
-            array('label' => '10', 'field' => '30'),
-            array('label' => '10', 'field' => '30')
-        ),
-    ),
-
-    'panels' => array(
-
-        'LBL_EMAIL_INFORMATION' => array(
-            array(
-                'opt_in' => array(
-                    'name' => 'opt_in',
-                    'label' => 'LBL_OPT_IN',
-                ),
-            ),
-            [
-                'date_sent_received' => [
-                    'name' => 'date_sent_received',
-                    'vname' => 'date_sent_received',
-                    'label' => 'LBL_DATE_SENT_RECEIVED',
+        'widths' => [
+            ['label' => '10', 'field' => '30'],
+            ['label' => '10', 'field' => '30'],
+        ],
+        'useTabs' => false,
+        'tabDefs' => [
+            'LBL_EMAIL_INFORMATION' => [
+                'newTab' => false,
+                'panelDefault' => 'expanded',
+            ],
+        ],
+    ],
+    // Reply, Reply All and Forward open the compose modal with the answer prepared, as the
+    // legacy mail client; a draft is edited in the compose modal.
+    'recordActions' => [
+        'actions' => [
+            'email-reply' => [
+                'key' => 'email-reply',
+                'labelKey' => 'LBL_BUTTON_REPLY_TITLE',
+                'priority' => 100,
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['view'],
+                'displayLogic' => [
+                    'hideForDraft' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'activeOnFields' => ['status' => [['operator' => 'is-equal', 'values' => ['draft']]]],
+                        ],
+                    ],
                 ],
             ],
-            array(
-                'from_addr_name' => array(
-                    'name' => 'from_addr_name',
-                    'label' => 'LBL_FROM',
-                ),
-            ),
-            array(
-                'to_addrs_names' => array(
-                    'name' => 'to_addrs_names',
-                    'label' => 'LBL_TO',
-                ),
-            ),
-            array(
-                'cc_addrs_names' => array(
-                    'name' => 'cc_addrs_names',
-                    'label' => 'LBL_CC',
-                ),
-            ),
-            array(
-                'bcc_addrs_names' => array(
-                    'name' => 'bcc_addrs_names',
-                    'label' => 'LBL_BCC',
-                ),
-            ),
-            array(
-                'name' => array(
-                    'name' => 'name',
-                    'label' => 'LBL_SUBJECT',
-                ),
-            ),
-            array(
-                'description' => array(
-                    'name' => 'description_html',
-                    'label' => 'LBL_BODY'
-                ),
-            ),
-            [
-                'parent_name'
+            'email-reply-all' => [
+                'key' => 'email-reply-all',
+                'labelKey' => 'LBL_BUTTON_REPLY_ALL',
+                'priority' => 101,
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['view'],
+                'displayLogic' => [
+                    'hideForDraft' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'activeOnFields' => ['status' => [['operator' => 'is-equal', 'values' => ['draft']]]],
+                        ],
+                    ],
+                ],
             ],
-            [
-                'date_entered' => [
-                    'name' => 'date_entered',
-                    'customCode' => '{$fields.date_entered.value} {$APP.LBL_BY} {$fields.created_by_name.value}',
-                    'label' => 'LBL_DATE_ENTERED',
-                ]
+            'email-forward' => [
+                'key' => 'email-forward',
+                'labelKey' => 'LBL_BUTTON_FORWARD',
+                'priority' => 102,
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['view'],
+                'displayLogic' => [
+                    'hideForDraft' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'activeOnFields' => ['status' => [['operator' => 'is-equal', 'values' => ['draft']]]],
+                        ],
+                    ],
+                ],
             ],
-            [
-                'date_modified' => [
-                    'name' => 'date_modified',
-                    'customCode' => '{$fields.date_modified.value} {$APP.LBL_BY} {$fields.modified_by_name.value}',
-                    'label' => 'LBL_DATE_MODIFIED',
-                ]
+            'email-edit-draft' => [
+                'key' => 'email-edit-draft',
+                'labelKey' => 'LBL_BUTTON_EDIT_EDIT_DRAFT',
+                'priority' => 100,
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['edit'],
+                'displayLogic' => [
+                    'hideForSentEmail' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'activeOnFields' => ['status' => [['operator' => 'not-equal', 'values' => ['draft']]]],
+                        ],
+                    ],
+                ],
             ],
-            [
-                'category_id',
-            ],
-        )
-    )
-);
+        ],
+        // A sent or archived email is not edited or copied; a draft is written in the compose modal.
+        'exclude' => ['edit', 'duplicate'],
+    ],
+    'panels' => [
+        'LBL_EMAIL_INFORMATION' => [
+            ['email_from', 'date_sent_received'],
+            ['email_to'],
+            ['email_cc', 'email_bcc'],
+            ['name'],
+            ['parent_name', 'status'],
+            ['assigned_user_name', 'email_attachments'],
+            ['email_body'],
+        ],
+    ],
+];

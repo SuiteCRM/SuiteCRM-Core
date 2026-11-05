@@ -37,13 +37,16 @@ import {RecordTableWidgetComponent} from "../record-table-widget/record-table-wi
 import {RecordTableWidgetModule} from "../record-table-widget/record-table-widget.module";
 import {BannerGridSidebarWidgetModule} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.module";
 import {BannerGridSidebarWidgetComponent} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.component";
+import {SchedulerJobLogWidgetModule} from '../scheduler-job-log-widget/scheduler-job-log-widget.module';
+import {SchedulerJobLogWidgetComponent} from '../scheduler-job-log-widget/scheduler-job-log-widget.component';
 
 export const sidebarWidgetModules = [
     HistorySidebarWidgetModule,
     ChartSidebarWidgetModule,
     StatisticsSidebarWidgetModule,
     RecordTableWidgetModule,
-    BannerGridSidebarWidgetModule
+    BannerGridSidebarWidgetModule,
+    SchedulerJobLogWidgetModule
 ];
 
 export const componentTypeMap = {
@@ -52,5 +55,6 @@ export const componentTypeMap = {
     statistics: StatisticsSidebarWidgetComponent,
     'record-thread': RecordThreadSidebarWidgetComponent,
     'record-table': RecordTableWidgetComponent,
-    'banner-grid': BannerGridSidebarWidgetComponent
+    'banner-grid': BannerGridSidebarWidgetComponent,
+    'scheduler-job-log': SchedulerJobLogWidgetComponent
 };

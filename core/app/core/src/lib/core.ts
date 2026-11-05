@@ -929,3 +929,7 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './fields/scheduler-interval/scheduler-interval.component';
+export * from './fields/scheduler-interval/scheduler-interval.module';
+export * from './containers/sidebar-widget/components/scheduler-job-log-widget/scheduler-job-log-widget.component';
+export * from './containers/sidebar-widget/components/scheduler-job-log-widget/scheduler-job-log-widget.module';

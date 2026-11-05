@@ -1,0 +1,75 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<ng-container *ngIf="!editing; else edit">{{ readable() }}</ng-container>
+
+<ng-template #edit>
+    <div class="scheduler-interval-interval">
+        <div class="form-check scheduler-interval-advanced-toggle">
+            <input type="checkbox" class="form-check-input" id="scheduler-interval-advanced" [ngModel]="advanced"
+                   (ngModelChange)="setAdvanced($event)" [ngModelOptions]="{standalone: true}">
+            <label class="form-check-label" for="scheduler-interval-advanced">{{ label('LBL_ADV_OPTIONS') }}</label>
+        </div>
+
+        <div *ngIf="!advanced" class="scheduler-interval-basic">
+            <div class="scheduler-interval-every">
+                <span>{{ label('LBL_EVERY') }}</span>
+                <select class="form-control form-control-sm" [attr.aria-label]="label('LBL_EVERY')"
+                        [(ngModel)]="interval" (ngModelChange)="update()" [ngModelOptions]="{standalone: true}">
+                    <option *ngFor="let value of intervals" [ngValue]="value">{{ value }}</option>
+                </select>
+                <select class="form-control form-control-sm" [attr.aria-label]="label('LBL_EVERY')"
+                        [(ngModel)]="period" (ngModelChange)="update()" [ngModelOptions]="{standalone: true}">
+                    <option *ngFor="let value of periods" [ngValue]="value">{{ periodLabel(value) }}</option>
+                </select>
+            </div>
+            <div class="scheduler-interval-days">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="scheduler-interval-day-all" [ngModel]="allDays"
+                           (ngModelChange)="setAllDays($event)" [ngModelOptions]="{standalone: true}">
+                    <label class="form-check-label" for="scheduler-interval-day-all"><em>{{ label('LBL_ALL') }}</em></label>
+                </div>
+                <div *ngFor="let day of days" class="form-check">
+                    <input type="checkbox" class="form-check-input" [id]="'scheduler-interval-day-' + day.value"
+                           [(ngModel)]="selectedDays[day.value]" (ngModelChange)="update()" [ngModelOptions]="{standalone: true}">
+                    <label class="form-check-label" [for]="'scheduler-interval-day-' + day.value">{{ label(day.label) }}</label>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="advanced" class="scheduler-interval-advanced">
+            <div class="scheduler-interval-parts">
+                <label *ngFor="let part of partLabels; let index = index; trackBy: trackIndex" class="scheduler-interval-part">
+                    <span>{{ label(part) }}</span>
+                    <input type="text" class="form-control form-control-sm" maxlength="25"
+                           [(ngModel)]="parts[index]" (ngModelChange)="update()" [ngModelOptions]="{standalone: true}">
+                </label>
+            </div>
+            <small class="form-text text-muted"><em>{{ label('LBL_CRONTAB_EXAMPLES') }}</em></small>
+        </div>
+    </div>
+</ng-template>

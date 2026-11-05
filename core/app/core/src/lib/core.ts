@@ -570,6 +570,8 @@ export * from './fields/password/templates/detail/password.component';
 export * from './fields/password/templates/detail/password.module';
 export * from './fields/password/templates/edit/password.component';
 export * from './fields/password/templates/edit/password.module';
+export * from './fields/timestamp/templates/detail/timestamp.component';
+export * from './fields/timestamp/templates/detail/timestamp.module';
 export * from './fields/phone/templates/detail/phone.component';
 export * from './fields/phone/templates/detail/phone.module';
 export * from './fields/radioenum/templates/detail/radioenum.component';

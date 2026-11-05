@@ -47,3 +47,19 @@ parameters:
               - list
             acl:
               - edit
+      oauth-tokens:
+        actions:
+          delete:
+            key: oauth-token-delete
+            labelKey: LBL_DELETE_RECORD
+            titleKey: LBL_DELETE_RECORD
+            action: oauth-token-delete
+            icon: trash-filled
+            asyncProcess: true
+            routing: false
+            params:
+              displayConfirmation: true
+              confirmationLabel: NTC_DELETE_CONFIRMATION
+            modes:
+              - list
+            acl: []

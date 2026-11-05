@@ -140,6 +140,8 @@ import {TextTemplateDetailFieldModule} from "./texttemplate/templates/detail/tex
 import {TextTemplateDetailFieldComponent} from "./texttemplate/templates/detail/texttemplate.component";
 import {ImageListFieldComponent} from "./image/templates/list/image.component";
 import {ImageListFieldModule} from "./image/templates/list/image.module";
+import {TimestampDetailFieldComponent} from './timestamp/templates/detail/timestamp.component';
+import {TimestampDetailFieldModule} from './timestamp/templates/detail/timestamp.module';
 
 export const baseFieldModules = [
     VarcharDetailFieldModule,
@@ -180,6 +182,7 @@ export const baseFieldModules = [
     ImageEditFieldModule,
     ImageDetailFieldModule,
     ImageListFieldModule,
+    TimestampDetailFieldModule,
     MultiEnumDetailFieldModule,
     MultiEnumEditFieldModule,
     MultiEnumFilterFieldModule,
@@ -243,6 +246,7 @@ export const baseFieldComponents = [
     ImageEditFieldComponent,
     ImageDetailFieldComponent,
     ImageListFieldComponent,
+    TimestampDetailFieldComponent,
     MultiEnumDetailFieldComponent,
     MultiEnumEditFieldComponent,
     MultiEnumFilterFieldComponent,
@@ -333,6 +337,12 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'image.edit': ImageEditFieldComponent,
     'image.detail': ImageDetailFieldComponent,
     'image.list': ImageListFieldComponent,
+    'long-timestamp.list': TimestampDetailFieldComponent,
+    'long-timestamp.detail': TimestampDetailFieldComponent,
+    'int-timestamp.list': TimestampDetailFieldComponent,
+    'int-timestamp.detail': TimestampDetailFieldComponent,
+    'varchar-secret.list': PasswordDetailFieldComponent,
+    'varchar-secret.detail': PasswordDetailFieldComponent,
     'multienum.list': MultiEnumDetailFieldComponent,
     'multienum.detail': MultiEnumDetailFieldComponent,
     'multienum.edit': MultiEnumEditFieldComponent,

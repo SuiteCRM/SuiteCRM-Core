@@ -74,7 +74,7 @@ $subpanel_layout = array(
             'width' => '10%',
             'vname' => 'LBL_ASSIGNED_TO_NAME',
         ),
-        'del_button'=>array(
+        'delete_button'=>array(
             'widget_class' => 'SubPanelDeleteButton',
             'vname' => 'LBL_LIST_DELETE',
             'width' => '6%',

@@ -88,6 +88,7 @@ $dictionary['OAuthToken'] = array('table' => 'oauth_tokens',
             'type' => 'long',
             'required' => true,
             'comment' => 'Token timestamp',
+            'displayType' => 'timestamp',
             'function' => array('name' => 'displayDateFromTs', 'returns' => 'html', 'onListView' => true)
       ),
       'verify' =>

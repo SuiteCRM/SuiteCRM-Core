@@ -77,16 +77,20 @@ $viewdefs [$module_name] =
                     ),
                     1 =>
                     array(
-                        0 => 'date_entered',
-                        1 => 'date_modified',
+                        0 =>
+                        array(
+                            'name' => 'date_entered',
+                            'readonly' => true,
+                        ),
+                        1 =>
+                        array(
+                            'name' => 'date_modified',
+                            'readonly' => true,
+                        ),
                     ),
                     2 =>
                     array(
                         0 => 'description',
-                        1 =>
-                        array(
-                            'name' => 'aop_case_updates_contacts_1_name',
-                        ),
                     ),
                     3 =>
                     array(
@@ -103,7 +107,7 @@ $viewdefs [$module_name] =
                             'name' => 'contact_name',
                             'label' => 'LBL_CONTACT_NAME',
                         ),
-                        1 => '',
+                        1 => 'internal',
                     ),
                 ),
             ),

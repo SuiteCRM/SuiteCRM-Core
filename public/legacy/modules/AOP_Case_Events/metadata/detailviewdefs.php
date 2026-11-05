@@ -76,8 +76,14 @@ $viewdefs [$moduleName] =
                                         1 => 'assigned_user_name',
                                     ),
                                 1 => array(
-                                        0 => 'date_entered',
-                                        1 => 'date_modified',
+                                        0 => array(
+                                                'name' => 'date_entered',
+                                                'readonly' => true,
+                                            ),
+                                        1 => array(
+                                                'name' => 'date_modified',
+                                                'readonly' => true,
+                                            ),
                                     ),
                                 2 => array(
                                         0 => 'description',

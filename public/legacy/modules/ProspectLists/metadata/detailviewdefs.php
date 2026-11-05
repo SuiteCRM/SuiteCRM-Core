@@ -48,6 +48,18 @@ array('customCode'=> '<input title="{$APP.LBL_EXPORT}"  class="button" type="but
                                         array('label' => '10', 'field' => '30')
                                         ),
                         ),
+'recordActions' => [
+    'actions' => [
+        'export-members' => [
+            'key' => 'export-members',
+            'labelKey' => 'LBL_EXPORT_MEMBERS',
+            'priority' => 1950,
+            'asyncProcess' => true,
+            'modes' => ['detail'],
+            'acl' => ['export'],
+        ],
+    ]
+],
 'panels' => array(
    'default' => array(
       array(

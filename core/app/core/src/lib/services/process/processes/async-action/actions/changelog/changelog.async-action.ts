@@ -30,6 +30,7 @@ import {Router} from '@angular/router';
 import {MessageService} from '../../../../../message/message.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ClassicModalComponent} from "../../../../../../components/modal/components/classic-modal/classic-modal.component";
+import {ChangeLogModalComponent} from "../../../../../../components/change-log-modal/change-log-modal.component";
 
 @Injectable({
     providedIn: 'root'
@@ -47,12 +48,31 @@ export class ChangelogAsyncAction extends AsyncActionHandler {
 
     run(data: AsyncActionData): void {
 
+        if (data?.module && data?.id) {
+            this.showChangeLogModal(data.module, data.id);
+            return;
+        }
+
         if (!data || !data.url) {
             this.message.addDangerMessageByKey('LBL_MISSING_HANDLER_DATA_ROUTE');
             return;
         }
 
         this.showClassicViewModal(data.url);
+    }
+
+    /**
+     * Show the change log of a record (process record-change-log)
+     */
+    protected showChangeLogModal(module: string, id: string): void {
+        const modal = this.modalService.open(ChangeLogModalComponent,
+            {
+                size: 'xl',
+                centered: true,
+                scrollable: true
+            });
+        modal.componentInstance.module = module;
+        modal.componentInstance.id = id;
     }
 
     /**

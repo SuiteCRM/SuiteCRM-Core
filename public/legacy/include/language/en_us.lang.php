@@ -4159,6 +4159,7 @@ $app_strings['LBL_SUMMARY_DEFAULT'] = "{{fields.name.value}}";
 $app_strings['LBL_SUMMARY_PERSON'] = "{{fields.salutation.value}} {{fields.first_name.value}} {{fields.last_name.value}}";
 $app_strings['LBL_REVISION_FILENAME'] = "{{fields.document_name.value}} - v{{fields.revision.value}}";
 $app_strings['LBL_SUMMARY_DOCUMENT'] = "{{fields.document_name.value}}";
+$app_strings['LBL_SUMMARY_CAMPAIGN_LOG'] = "{{fields.activity_type.value}}";
 $app_strings['LBL_CREATE'] = 'Create';
 $app_strings['LBL_CLEAR_FILTER'] = 'Clear Filter';
 $app_strings['LBL_QUICK_FILTERS'] = 'Quick Filters';

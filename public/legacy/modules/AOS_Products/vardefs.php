@@ -168,6 +168,10 @@ $dictionary['AOS_Products'] = array(
                 'name' => 'currency_id',
                 'vname' => 'LBL_CURRENCY',
                 'type' => 'id',
+                'initDefaultProcess' => 'currency-default',
+                'defaultValueModes' => [
+                    'create',
+                ],
                 'massupdate' => 0,
                 'comments' => '',
                 'help' => '',

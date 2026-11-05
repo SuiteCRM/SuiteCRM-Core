@@ -171,7 +171,7 @@ parameters:
     products:
       index: true
       list: true
-      record: false
+      record: true
     quotes:
       index: true
       list: true

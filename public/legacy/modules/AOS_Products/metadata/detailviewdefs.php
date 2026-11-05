@@ -111,15 +111,6 @@ array(
         array(
           0 =>
           array(
-            'name' => 'currency_id',
-            'studio' => 'visible',
-            'label' => 'LBL_CURRENCY',
-          ),
-        ),
-        3 =>
-        array(
-          0 =>
-          array(
             'name' => 'cost',
             'label' => 'LBL_COST',
           ),
@@ -129,7 +120,7 @@ array(
             'label' => 'LBL_PRICE',
           ),
         ),
-        4 =>
+        3 =>
         array(
           0 =>
           array(
@@ -146,7 +137,7 @@ array(
             ),
           ),
         ),
-        5 =>
+        4 =>
         array(
           0 =>
           array(
@@ -154,13 +145,20 @@ array(
             'label' => 'LBL_DESCRIPTION',
           ),
         ),
-        6 =>
+        5 =>
         array(
           0 =>
           array(
             'name' => 'product_image',
             'label' => 'LBL_PRODUCT_IMAGE',
             'customCode' => '<img src="{$fields.product_image.value}"/>',
+            // SuiteCRM 8 record view: shown with the image field (see ProductImageApiMapper).
+            'type' => 'image',
+            'readonly' => true,
+            'metadata' =>
+            array(
+              'showThumbnail' => false,
+            ),
           ),
         ),
       ),

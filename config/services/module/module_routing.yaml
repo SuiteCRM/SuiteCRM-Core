@@ -227,7 +227,7 @@ parameters:
     acl-roles:
       index: true
       list: true
-      record: false
+      record: true
     schedulers:
       index: true
       list: true

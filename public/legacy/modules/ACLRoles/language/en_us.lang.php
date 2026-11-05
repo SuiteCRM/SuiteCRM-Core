@@ -62,4 +62,9 @@ $mod_strings = array(
     'LBL_DUPLICATE_OF' => 'Duplicate Of ',
 
     'LBL_SECURITYGROUPS' => 'Security Groups',
+    'LBL_SECURITYGROUPS_SUBPANEL_TITLE' => 'Security Groups',
+    'LBL_ACCESS_MATRIX' => 'Access',
+    'LBL_ACCESS_MATRIX_FILTER' => 'Filter modules',
+    'LBL_ACCESS_MATRIX_ALL' => 'Set for the modules shown',
+    'LBL_ACCESS_MATRIX_NA' => 'N/A',
 );

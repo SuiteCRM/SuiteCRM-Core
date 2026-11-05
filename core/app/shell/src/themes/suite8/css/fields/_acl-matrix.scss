@@ -1,0 +1,98 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// Access matrix of a role (acl-matrix field): the legacy matrix (modules in rows, actions in columns, the
+// levels in the colours of the suite8 theme), scrolled in its own box with its headers kept.
+.acl-matrix {
+    width: 100%;
+
+    .acl-matrix-message { margin: 0; }
+    .acl-matrix-filter { max-width: 260px; margin-bottom: 8px; }
+
+    .acl-matrix-scroll {
+        max-height: 70vh;
+        overflow: auto;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+    }
+
+    .acl-matrix-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 13px;
+
+        th, td {
+            padding: 4px 8px;
+            text-align: center;
+            white-space: nowrap;
+            border-bottom: 1px solid $light-grey;
+            background: $white;
+        }
+
+        thead th, thead td {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            font-weight: 700;
+        }
+
+        thead tr.acl-matrix-all th, thead tr.acl-matrix-all td {
+            top: 29px;
+            background: $off-white;
+        }
+
+        .acl-matrix-module {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        thead .acl-matrix-module { z-index: 3; }
+
+        tbody tr:hover th, tbody tr:hover td { background: $off-white-lighter; }
+
+        select {
+            width: auto;
+            min-width: 92px;
+            margin: 0 auto;
+            font-weight: 700;
+        }
+
+        select option { color: $median-grey; font-weight: 400; }
+    }
+
+    .acl-matrix-level-all, .acl-matrix-level-enabled { color: #3c763d; font-weight: 700; }
+    .acl-matrix-level-owner { color: #000; font-weight: 700; }
+    .acl-matrix-level-group, .acl-matrix-level-none, .acl-matrix-level-disabled, .acl-matrix-level-admin { color: #31708f; font-weight: 700; }
+    .acl-matrix-level-default { font-weight: 400; }
+    select.acl-matrix-level-default { font-weight: 400; }
+
+    .acl-matrix-greyed span, .acl-matrix-greyed select { color: #a9a9a9; }
+    .acl-matrix-na { color: #c00; }
+}

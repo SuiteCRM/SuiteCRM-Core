@@ -1006,6 +1006,69 @@ class SugarEmailAddressTest extends SuitePHPUnitFrameworkTestCase
     }
 
     /**
+     * Test that addAddress() replaces an address already listed with another case.
+     */
+    public function testAddAddressIgnoresCase(): void
+    {
+        $this->ea->addAddress('test22@email.com', true);
+        $this->ea->addAddress('Test22@Email.com');
+
+        self::assertCount(1, $this->ea->addresses);
+        self::assertSame('Test22@Email.com', array_values($this->ea->addresses)[0]['email_address']);
+    }
+
+    /**
+     * Test that saveEmail() links each email address only once.
+     */
+    public function testSaveEmailKeepsOneLinkPerEmailAddress(): void
+    {
+        $db = DBManagerFactory::getInstance();
+        $beanId = 'test_email_links_bean';
+        $countLinks = static function ($emailId = null) use ($db, $beanId) {
+            $query = "SELECT COUNT(*) FROM email_addr_bean_rel WHERE bean_id = '$beanId' AND bean_module = 'Contacts' AND deleted = 0";
+            if ($emailId !== null) {
+                $query .= " AND email_address_id = '$emailId'";
+            }
+
+            return (int)$db->getOne($query);
+        };
+
+        $this->ea->addAddress('test23@email.com', true);
+        $this->ea->addAddress('test24@email.com');
+        $this->ea->saveEmail($beanId, 'Contacts');
+        $emailId = $this->ea->getEmailGUID('test24@email.com');
+        self::assertSame(2, $countLinks());
+
+        // a record already holding several links to the same email address
+        for ($i = 0; $i < 3; $i++) {
+            $db->query(
+                "INSERT INTO email_addr_bean_rel (id, email_address_id, bean_id, bean_module, primary_address, reply_to_address, date_created, date_modified, deleted)
+                VALUES ('" . create_guid() . "', '$emailId', '$beanId', 'Contacts', 0, 0, NOW(), NOW(), 0)"
+            );
+        }
+
+        // retrieve and save again: one entry per link is loaded, one link per email address is kept
+        $ea = new SugarEmailAddress();
+        $ea->addresses = $ea->getAddressesByGUID($beanId, 'Contacts');
+        self::assertCount(5, $ea->addresses);
+        $ea->saveEmail($beanId, 'Contacts');
+        self::assertSame(1, $countLinks($emailId));
+        self::assertSame(2, $countLinks());
+
+        // the same email address added again with another case
+        $ea = new SugarEmailAddress();
+        $ea->addresses = $ea->getAddressesByGUID($beanId, 'Contacts');
+        $ea->addAddress('TEST24@email.com');
+        $ea->saveEmail($beanId, 'Contacts');
+        $ea->saveEmail($beanId, 'Contacts');
+        self::assertSame(1, $countLinks($emailId));
+        self::assertSame(2, $countLinks());
+
+        $db->query("DELETE FROM email_addr_bean_rel WHERE bean_id = '$beanId'");
+        $db->query("DELETE FROM email_addresses WHERE email_address_caps IN ('TEST23@EMAIL.COM', 'TEST24@EMAIL.COM')");
+    }
+
+    /**
      * Test for updateFlags() method.
      */
     public function testUpdateFlags(): void

@@ -642,9 +642,15 @@ class SugarEmailAddress extends SugarBean
 
         // find all email addresses
         $current_links = array();
+        $duplicate_links = array();
         $q2 = "SELECT *  FROM email_addr_bean_rel eabr WHERE eabr.bean_id = '" . $this->db->quote($id) . "' AND eabr.bean_module = '" . $this->db->quote($module) . "' AND eabr.deleted=0";
         $r2 = $this->db->query($q2);
         while (($row2 = $this->db->fetchByAssoc($r2)) != null) {
+            if (isset($current_links[$row2['email_address_id']])) {
+                // several links to the same email address: keep one, drop the others
+                $duplicate_links[] = $row2;
+                continue;
+            }
             $current_links[$row2['email_address_id']] = $row2;
         }
 
@@ -652,6 +658,7 @@ class SugarEmailAddress extends SugarBean
 
         if (!empty($this->addresses)) {
             // insert new relationships and create email address record, if they don't exist
+            $processed_ids = array();
             foreach ($this->addresses as $address) {
                 if (!empty($address['email_address'])) {
                     $guid = create_guid();
@@ -665,6 +672,13 @@ class SugarEmailAddress extends SugarBean
                         $emailId,
                         !is_null($optIn) ? $address['confirm_opt_in_flag'] : null
                     );// this will save the email address if not found
+
+                    // the same email address may be listed more than once (one entry per link
+                    // loaded on retrieve, or a case variant): link it only once
+                    if (isset($processed_ids[$emailId])) {
+                        continue;
+                    }
+                    $processed_ids[$emailId] = true;
 
                     //verify linkage and flags.
                     $upd_eabr = "";
@@ -700,9 +714,12 @@ class SugarEmailAddress extends SugarBean
 
         //delete link to dropped email address.
         // for lead conversion, do not delete email addresses
-        if (!empty($current_links) && !$isConversion) {
+        $links_to_delete = $isConversion ? array() : array_values($current_links);
+        // duplicate links to the same email address are never wanted
+        $links_to_delete = array_merge($links_to_delete, $duplicate_links);
+        if (!empty($links_to_delete)) {
             $delete = "";
-            foreach ($current_links as $eabr) {
+            foreach ($links_to_delete as $eabr) {
                 $delete .= empty($delete) ? "'" . $this->db->quote($eabr['id']) . "' " : ",'" . $this->db->quote($eabr['id']) . "'";
             }
 
@@ -1077,8 +1094,9 @@ class SugarEmailAddress extends SugarBean
             $addr = trim($addr);
 
             // If we have such address already, remove it and add new one in.
+            // Case-insensitive, like the email_address_caps lookup in AddUpdateEmailAddress()
             foreach ($this->addresses as $k => $address) {
-                if ($address['email_address'] == $addr) {
+                if (strcasecmp(trim((string)$address['email_address']), $addr) === 0) {
                     unset($this->addresses[$k]);
                 } elseif ($primary && $address['primary_address'] == '1') {
                     // We should only have one primary. If we are adding a primary but

@@ -110,6 +110,7 @@ $mod_strings = array(
     'LBL_SHIPPING_TAX_AMT' => 'Shipping Tax',
     'LBL_ADD_PRODUCT_LINE' => 'Add Product Line',
     'LBL_ADD_SERVICE_LINE' => 'Add Service Line ',
+    'LBL_REMOVE_PRODUCT_LINE' => 'Remove',
     'LBL_PRINT_AS_PDF' => 'Print as PDF',
     'LBL_EMAIL_PDF' => 'Email PDF',
     'LBL_PDF_NAME' => 'Contract',

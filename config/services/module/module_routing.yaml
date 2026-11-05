@@ -155,11 +155,11 @@ parameters:
     contracts:
       index: true
       list: true
-      record: false
+      record: true
     invoices:
       index: true
       list: true
-      record: false
+      record: true
     pdf-templates:
       index: true
       list: true
@@ -175,7 +175,7 @@ parameters:
     quotes:
       index: true
       list: true
-      record: false
+      record: true
     products-quotes:
       index: true
       list: true

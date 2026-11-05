@@ -4511,3 +4511,8 @@ $app_strings['LBL_NOT_AUTHORIZED'] = 'Not authorized';
 $app_strings['LBL_AUTOFILL_MISSING_RELATE_MODULE'] = 'Autofill failed: related module is not configured.';
 $app_strings['LBL_AUTOFILL_MISSING_RELATE_ID'] = 'Autofill failed: no related record selected.';
 $app_strings['LBL_AUTOFILL_MISSING_UPDATE_FIELDS'] = 'Autofill failed: no fields configured for update.';
+
+$app_strings['LBL_PRODUCT_LINE_ITEMS_EMPTY'] = 'No line items';
+$app_strings['LBL_PRODUCT_LINE_ITEMS_SEARCH'] = 'Search a product by name or part number';
+$app_strings['LBL_PRODUCT_LINE_ITEMS_NO_PRODUCT'] = 'No product found';
+$app_strings['LBL_PRODUCT_LINE_ITEMS_CHOOSE_PRODUCT'] = 'Choose a product in the list';

@@ -140,6 +140,10 @@ import {TextTemplateDetailFieldModule} from "./texttemplate/templates/detail/tex
 import {TextTemplateDetailFieldComponent} from "./texttemplate/templates/detail/texttemplate.component";
 import {ImageListFieldComponent} from "./image/templates/list/image.component";
 import {ImageListFieldModule} from "./image/templates/list/image.module";
+import {ProductLineItemsDetailFieldComponent} from './product-line-items/templates/detail/product-line-items.component';
+import {ProductLineItemsDetailFieldModule} from './product-line-items/templates/detail/product-line-items.module';
+import {ProductLineItemsEditFieldComponent} from './product-line-items/templates/edit/product-line-items.component';
+import {ProductLineItemsEditFieldModule} from './product-line-items/templates/edit/product-line-items.module';
 
 export const baseFieldModules = [
     VarcharDetailFieldModule,
@@ -180,6 +184,8 @@ export const baseFieldModules = [
     ImageEditFieldModule,
     ImageDetailFieldModule,
     ImageListFieldModule,
+    ProductLineItemsDetailFieldModule,
+    ProductLineItemsEditFieldModule,
     MultiEnumDetailFieldModule,
     MultiEnumEditFieldModule,
     MultiEnumFilterFieldModule,
@@ -243,6 +249,8 @@ export const baseFieldComponents = [
     ImageEditFieldComponent,
     ImageDetailFieldComponent,
     ImageListFieldComponent,
+    ProductLineItemsDetailFieldComponent,
+    ProductLineItemsEditFieldComponent,
     MultiEnumDetailFieldComponent,
     MultiEnumEditFieldComponent,
     MultiEnumFilterFieldComponent,
@@ -333,6 +341,8 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'image.edit': ImageEditFieldComponent,
     'image.detail': ImageDetailFieldComponent,
     'image.list': ImageListFieldComponent,
+    'product-line-items.detail': ProductLineItemsDetailFieldComponent,
+    'product-line-items.edit': ProductLineItemsEditFieldComponent,
     'multienum.list': MultiEnumDetailFieldComponent,
     'multienum.detail': MultiEnumDetailFieldComponent,
     'multienum.edit': MultiEnumEditFieldComponent,

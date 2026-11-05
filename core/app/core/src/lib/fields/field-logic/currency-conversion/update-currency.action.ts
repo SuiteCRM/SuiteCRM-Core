@@ -80,8 +80,11 @@ export class UpdateCurrencyAction extends FieldLogicActionHandler {
             mode: 'edit' as ViewMode
         }
 
+        // The field value is in the internal format, its form control in the user format: the
+        // base currency logic reads the field value, also when the field is not shown (e.g. in
+        // another tab, where no field component updates it from the form control).
         const formattedValue = this.currencyFormatter.toUserFormat(value.toString(), options);
-        field.value = formattedValue;
+        field.value = value.toString();
         field.formControl.setValue(formattedValue);
         // re-validate the parent form-control after value update
         record.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});

@@ -1,0 +1,238 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+
+.product-line-items {
+  width: 100%;
+
+  .empty {
+    margin: 0;
+    color: $dusty-grey;
+  }
+
+  .line-group {
+    margin-bottom: 1em;
+  }
+
+  &.edit .line-group {
+    padding: 0.6em;
+    border: 1px solid $border-color;
+    border-radius: 0.25em;
+  }
+
+  .line-group-name {
+    margin: 0 0 0.4em;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .line-group-head,
+  .line-group-foot {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5em;
+  }
+
+  .line-group-head {
+    margin-bottom: 0.5em;
+  }
+
+  .line-group-input {
+    max-width: 22em;
+  }
+
+  .line-group-foot {
+    justify-content: space-between;
+    margin-top: 0.4em;
+  }
+
+  .line-group-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+  }
+
+  .lines-scroll {
+    overflow-x: auto;
+  }
+
+  // The product list of a line opens over the lines below: the scroll would cut it at the last line.
+  .lines-scroll-searching {
+    overflow: visible;
+  }
+
+  .lines-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: 0.4em 0.5em;
+      border-bottom: 1px solid $light-grey;
+      vertical-align: top;
+    }
+
+    th {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: $dusty-grey;
+      white-space: nowrap;
+    }
+
+    textarea {
+      margin-top: 0.25em;
+    }
+
+    .number {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .quantity {
+      width: 5em;
+    }
+
+    .item {
+      min-width: 16em;
+    }
+
+    .price {
+      width: 8.5em;
+    }
+
+    .discount {
+      width: 10.5em;
+    }
+
+    .vat {
+      width: 7em;
+    }
+
+    .actions {
+      width: 1%;
+    }
+  }
+
+  .discount-inputs {
+    display: flex;
+    gap: 0.25em;
+
+    input {
+      flex: 1 1 4em;
+      min-width: 4em;
+    }
+
+    select {
+      flex: 0 0 4.5em;
+    }
+  }
+
+  .muted {
+    color: $dusty-grey;
+    font-size: 0.75rem;
+  }
+
+  .text {
+    white-space: pre-line;
+    font-size: 0.75rem;
+  }
+
+  .hint {
+    color: $danger;
+    font-size: 0.75rem;
+  }
+
+  .invalid .product-search input {
+    border-color: $danger;
+  }
+
+  .product-search {
+    position: relative;
+  }
+
+  .product-results {
+    position: absolute;
+    z-index: 20;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 16em;
+    margin: 0.1em 0 0;
+    padding: 0.25em 0;
+    overflow-y: auto;
+    list-style: none;
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: 0.25em;
+    box-shadow: 0 0.25em 0.75em $grey-transparent;
+
+    li {
+      padding: 0.4em 0.6em;
+    }
+  }
+
+  .product-result {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75em;
+    cursor: pointer;
+
+    &:hover {
+      background: $off-white;
+    }
+  }
+
+  .remove-line {
+    padding: 0;
+    white-space: nowrap;
+  }
+
+  .line-group-totals {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 0.1em 1em;
+    width: max-content;
+    margin: 0.4em 0 0 auto;
+    font-size: 0.8rem;
+
+    dt {
+      font-weight: normal;
+      color: $dusty-grey;
+      text-align: right;
+    }
+
+    dd {
+      margin: 0;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .grand-total {
+      font-weight: 600;
+      color: inherit;
+    }
+  }
+}

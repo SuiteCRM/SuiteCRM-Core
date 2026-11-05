@@ -1,0 +1,111 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2026 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="product-line-items" *ngIf="value">
+    <p *ngIf="!hasLines()" class="empty">{{ label('LBL_PRODUCT_LINE_ITEMS_EMPTY') }}</p>
+    <ng-container *ngFor="let group of value.groups">
+        <section *ngIf="group.lines.length" class="line-group">
+            <h4 *ngIf="value.enableGroups && group.name" class="line-group-name">{{ group.name }}</h4>
+
+            <div *ngIf="products(group.lines).length" class="lines-scroll">
+                <table class="lines-table">
+                    <thead>
+                    <tr>
+                        <th class="number quantity">{{ label('LBL_PRODUCT_QUANITY') }}</th>
+                        <th class="item">{{ label('LBL_PRODUCT_NAME') }}</th>
+                        <th class="number">{{ label('LBL_LIST_PRICE') }}</th>
+                        <th class="number">{{ label('LBL_DISCOUNT_AMT') }}</th>
+                        <th class="number">{{ label('LBL_UNIT_PRICE') }}</th>
+                        <th class="number">{{ label('LBL_VAT') }}</th>
+                        <th class="number">{{ label('LBL_VAT_AMT') }}</th>
+                        <th class="number">{{ label('LBL_TOTAL_PRICE') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let line of products(group.lines)">
+                        <td class="number">{{ quantity(line.product_qty) }}</td>
+                        <td class="item">
+                            <a [routerLink]="['/products/record', line.product_id]">{{ line.name }}</a>
+                            <div *ngIf="line.part_number" class="muted">{{ line.part_number }}</div>
+                            <div *ngIf="line.item_description" class="text">{{ line.item_description }}</div>
+                            <div *ngIf="line.description" class="text">
+                                <span class="muted">{{ label('LBL_PRODUCT_NOTE') }}:</span> {{ line.description }}
+                            </div>
+                        </td>
+                        <td class="number">{{ money(line.product_list_price) }}</td>
+                        <td class="number">{{ discount(line) }}</td>
+                        <td class="number">{{ money(line.product_unit_price) }}</td>
+                        <td class="number">{{ vat(line.vat) }}</td>
+                        <td class="number">{{ money(line.vat_amt) }}</td>
+                        <td class="number">{{ money(line.product_total_price) }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div *ngIf="services(group.lines).length" class="lines-scroll">
+                <table class="lines-table">
+                    <thead>
+                    <tr>
+                        <th class="item">{{ label('LBL_SERVICE_NAME') }}</th>
+                        <th class="number">{{ label('LBL_SERVICE_LIST_PRICE') }}</th>
+                        <th class="number">{{ label('LBL_SERVICE_DISCOUNT') }}</th>
+                        <th class="number">{{ label('LBL_SERVICE_PRICE') }}</th>
+                        <th class="number">{{ label('LBL_VAT') }}</th>
+                        <th class="number">{{ label('LBL_VAT_AMT') }}</th>
+                        <th class="number">{{ label('LBL_TOTAL_PRICE') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let line of services(group.lines)">
+                        <td class="item text">{{ line.name }}</td>
+                        <td class="number">{{ money(line.product_list_price) }}</td>
+                        <td class="number">{{ discount(line) }}</td>
+                        <td class="number">{{ money(line.product_unit_price) }}</td>
+                        <td class="number">{{ vat(line.vat) }}</td>
+                        <td class="number">{{ money(line.vat_amt) }}</td>
+                        <td class="number">{{ money(line.product_total_price) }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <dl class="line-group-totals">
+                <dt>{{ label('LBL_TOTAL_AMT') }}</dt>
+                <dd>{{ money(group.total_amt) }}</dd>
+                <dt>{{ label('LBL_DISCOUNT_AMOUNT') }}</dt>
+                <dd>{{ money(group.discount_amount) }}</dd>
+                <dt>{{ label('LBL_SUBTOTAL_AMOUNT') }}</dt>
+                <dd>{{ money(group.subtotal_amount) }}</dd>
+                <dt>{{ label('LBL_TAX_AMOUNT') }}</dt>
+                <dd>{{ money(group.tax_amount) }}</dd>
+                <dt class="grand-total">{{ label(value.enableGroups ? 'LBL_GROUP_TOTAL' : 'LBL_GRAND_TOTAL') }}</dt>
+                <dd class="grand-total">{{ money(group.total_amount) }}</dd>
+            </dl>
+        </section>
+    </ng-container>
+</div>

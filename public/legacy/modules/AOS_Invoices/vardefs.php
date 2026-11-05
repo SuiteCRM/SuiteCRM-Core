@@ -522,6 +522,10 @@ $dictionary['AOS_Invoices'] = array(
                 'name' => 'currency_id',
                 'vname' => 'LBL_CURRENCY',
                 'type' => 'id',
+                'initDefaultProcess' => 'currency-default',
+                'defaultValueModes' => [
+                    'create',
+                ],
                 'massupdate' => 0,
                 'comments' => '',
                 'help' => '',
@@ -555,7 +559,7 @@ $dictionary['AOS_Invoices'] = array(
                 'audited' => 1,
                 'reportable' => true,
                 'len' => '11',
-                'disable_num_format' => '',
+                'disable_num_format' => true,
             ),
         'quote_date' =>
             array(

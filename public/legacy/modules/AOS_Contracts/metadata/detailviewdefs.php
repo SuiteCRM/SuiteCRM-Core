@@ -1,5 +1,25 @@
 <?php
 $module_name = 'AOS_Contracts';
+// Record view PDF actions: the templates of the module, as in the legacy template popup.
+$pdfTemplatesModal = [
+    'module' => 'AOS_PDF_Templates',
+    'presetFilter' => [
+        'key' => 'default',
+        'module' => 'saved-search',
+        'attributes' => ['contents' => ''],
+        'criteria' => [
+            'name' => 'default',
+            'filters' => [
+                'type' => [
+                    'field' => 'type',
+                    'operator' => '=',
+                    'values' => ['AOS_Contracts'],
+                    'rangeSearch' => false,
+                ],
+            ],
+        ],
+    ],
+];
 $viewdefs [$module_name] =
 array(
   'DetailView' =>
@@ -70,11 +90,20 @@ array(
                 'aclModule' => 'AOS_PDF_Templates',
                 'params' => [
                     'createNote' => true,
-                    'selectModal' => [
-                        'module' => 'AOS_PDF_Templates'
-                    ]
+                    'selectModal' => $pdfTemplatesModal,
                 ]
-            ]
+            ],
+            'email-pdf' => [
+                'key' => 'email-pdf',
+                'labelKey' => 'LBL_EMAIL_PDF',
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['view'],
+                'aclModule' => 'AOS_PDF_Templates',
+                'params' => [
+                    'selectModal' => $pdfTemplatesModal,
+                ]
+            ],
         ],
     ],
     'panels' =>
@@ -178,25 +207,15 @@ array(
         array(
           0 =>
           array(
-            'name' => 'currency_id',
-            'studio' => 'visible',
-            'label' => 'LBL_CURRENCY',
+            'name' => 'line_items',
+            'label' => 'LBL_LINE_ITEMS',
+            // Record view: the panel title is the label of the line items.
+            'metadata' => [
+              'labelDisplay' => 'none',
+            ],
           ),
         ),
         1 =>
-        array(
-          0 =>
-          array(
-            'name' => 'line_items',
-            'label' => 'LBL_LINE_ITEMS',
-          ),
-        ),
-        2 =>
-        array(
-          0 => '',
-          1 => '',
-        ),
-        3 =>
         array(
           0 =>
           array(
@@ -204,7 +223,7 @@ array(
             'label' => 'LBL_TOTAL_AMT',
           ),
         ),
-        4 =>
+        2 =>
         array(
           0 =>
           array(
@@ -212,7 +231,7 @@ array(
             'label' => 'LBL_DISCOUNT_AMOUNT',
           ),
         ),
-        5 =>
+        3 =>
         array(
           0 =>
           array(
@@ -220,15 +239,20 @@ array(
             'label' => 'LBL_SUBTOTAL_AMOUNT',
           ),
         ),
-        6 =>
+        4 =>
         array(
           0 =>
           array(
             'name' => 'shipping_amount',
             'label' => 'LBL_SHIPPING_AMOUNT',
           ),
+          1 =>
+          array(
+            'name' => 'shipping_tax',
+            'label' => 'LBL_SHIPPING_TAX',
+          ),
         ),
-        7 =>
+        5 =>
         array(
           0 =>
           array(
@@ -236,7 +260,7 @@ array(
             'label' => 'LBL_SHIPPING_TAX_AMT',
           ),
         ),
-        8 =>
+        6 =>
         array(
           0 =>
           array(
@@ -244,7 +268,7 @@ array(
             'label' => 'LBL_TAX_AMOUNT',
           ),
         ),
-        9 =>
+        7 =>
         array(
           0 =>
           array(

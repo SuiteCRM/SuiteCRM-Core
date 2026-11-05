@@ -1,6 +1,26 @@
 <?php
 $module_name = 'AOS_Invoices';
 $_object_name = 'aos_invoices';
+// Record view PDF actions: the templates of the module, as in the legacy template popup.
+$pdfTemplatesModal = [
+    'module' => 'AOS_PDF_Templates',
+    'presetFilter' => [
+        'key' => 'default',
+        'module' => 'saved-search',
+        'attributes' => ['contents' => ''],
+        'criteria' => [
+            'name' => 'default',
+            'filters' => [
+                'type' => [
+                    'field' => 'type',
+                    'operator' => '=',
+                    'values' => ['AOS_Invoices'],
+                    'rangeSearch' => false,
+                ],
+            ],
+        ],
+    ],
+];
 $viewdefs [$module_name] =
 array(
   'DetailView' =>
@@ -75,11 +95,48 @@ array(
                 'aclModule' => 'AOS_PDF_Templates',
                 'params' => [
                     'createNote' => true,
-                    'selectModal' => [
-                        'module' => 'AOS_PDF_Templates'
-                    ]
+                    'selectModal' => $pdfTemplatesModal,
                 ]
-            ]
+            ],
+            'email-pdf' => [
+                'key' => 'email-pdf',
+                'labelKey' => 'LBL_EMAIL_PDF',
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['view'],
+                'aclModule' => 'AOS_PDF_Templates',
+                'params' => [
+                    'selectModal' => $pdfTemplatesModal,
+                ]
+            ],
+        ],
+    ],
+    // The account addresses are copied when the account is chosen, as in the legacy edit view.
+    'recordLogic' => [
+        'account-addresses' => [
+            'key' => 'autofillFromRelate',
+            'modes' => ['edit', 'create'],
+            'params' => [
+                'fieldDependencies' => ['billing_account'],
+                'activeOnFields' => [
+                    'billing_account' => [
+                        ['operator' => 'not-empty'],
+                    ],
+                ],
+                'relateField' => 'billing_account',
+                'updateFields' => [
+                    'billing_address_street' => ['sourceField' => 'billing_address_street'],
+                    'billing_address_city' => ['sourceField' => 'billing_address_city'],
+                    'billing_address_state' => ['sourceField' => 'billing_address_state'],
+                    'billing_address_postalcode' => ['sourceField' => 'billing_address_postalcode'],
+                    'billing_address_country' => ['sourceField' => 'billing_address_country'],
+                    'shipping_address_street' => ['sourceField' => 'shipping_address_street'],
+                    'shipping_address_city' => ['sourceField' => 'shipping_address_city'],
+                    'shipping_address_state' => ['sourceField' => 'shipping_address_state'],
+                    'shipping_address_postalcode' => ['sourceField' => 'shipping_address_postalcode'],
+                    'shipping_address_country' => ['sourceField' => 'shipping_address_country'],
+                ],
+            ],
         ],
     ],
     'panels' =>
@@ -197,25 +254,15 @@ array(
         array(
           0 =>
           array(
-            'name' => 'currency_id',
-            'studio' => 'visible',
-            'label' => 'LBL_CURRENCY',
-          ),
-            1 => '',
-        ),
-        1 =>
-        array(
-          0 =>
-          array(
             'name' => 'line_items',
             'label' => 'LBL_LINE_ITEMS',
+            // Record view: the panel title is the label of the line items.
+            'metadata' => [
+              'labelDisplay' => 'none',
+            ],
           ),
         ),
-        2 =>
-        array(
-          0 => '',
-        ),
-        3 =>
+        1 =>
         array(
           0 =>
           array(
@@ -223,7 +270,7 @@ array(
             'label' => 'LBL_TOTAL_AMT',
           ),
         ),
-        4 =>
+        2 =>
         array(
           0 =>
           array(
@@ -231,7 +278,7 @@ array(
             'label' => 'LBL_DISCOUNT_AMOUNT',
           ),
         ),
-        5 =>
+        3 =>
         array(
           0 =>
           array(
@@ -239,15 +286,20 @@ array(
             'label' => 'LBL_SUBTOTAL_AMOUNT',
           ),
         ),
-        6 =>
+        4 =>
         array(
           0 =>
           array(
             'name' => 'shipping_amount',
             'label' => 'LBL_SHIPPING_AMOUNT',
           ),
+          1 =>
+          array(
+            'name' => 'shipping_tax',
+            'label' => 'LBL_SHIPPING_TAX',
+          ),
         ),
-        7 =>
+        5 =>
         array(
           0 =>
           array(
@@ -255,7 +307,7 @@ array(
             'label' => 'LBL_SHIPPING_TAX_AMT',
           ),
         ),
-        8 =>
+        6 =>
         array(
           0 =>
           array(
@@ -263,7 +315,7 @@ array(
             'label' => 'LBL_TAX_AMOUNT',
           ),
         ),
-        9 =>
+        7 =>
         array(
           0 =>
           array(

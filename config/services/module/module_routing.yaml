@@ -15,7 +15,7 @@ parameters:
     calls:
       index: true
       list: true
-      record: false
+      record: true
     tasks:
       index: true
       list: true
@@ -23,7 +23,7 @@ parameters:
     meetings:
       index: true
       list: true
-      record: false
+      record: true
     notes:
       index: true
       list: true

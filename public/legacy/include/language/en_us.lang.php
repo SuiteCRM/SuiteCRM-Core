@@ -4511,3 +4511,8 @@ $app_strings['LBL_NOT_AUTHORIZED'] = 'Not authorized';
 $app_strings['LBL_AUTOFILL_MISSING_RELATE_MODULE'] = 'Autofill failed: related module is not configured.';
 $app_strings['LBL_AUTOFILL_MISSING_RELATE_ID'] = 'Autofill failed: no related record selected.';
 $app_strings['LBL_AUTOFILL_MISSING_UPDATE_FIELDS'] = 'Autofill failed: no fields configured for update.';
+
+$app_strings['LBL_EVENT_INVITEES_EMPTY'] = 'No invitees';
+$app_strings['LBL_EVENT_INVITEES_SEARCH'] = 'Search users, contacts and leads by name or email address';
+$app_strings['LBL_EVENT_INVITEES_NO_RESULT'] = 'No one found';
+$app_strings['LBL_EVENT_REMINDERS_EMPTY'] = 'No reminders';

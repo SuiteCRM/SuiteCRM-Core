@@ -145,107 +145,210 @@ array(
         ),
       ),
     ),
-    'panels' =>
-    array(
-      'lbl_call_information' =>
-      array(
-        0 =>
-        array(
-          0 =>
-          array(
-            'name' => 'name',
-            'label' => 'LBL_SUBJECT',
-          ),
-          1 =>
-          array(
-            'name' => 'direction',
-            'customCode' => '{$fields.direction.options[$fields.direction.value]} {$fields.status.options[$fields.status.value]}',
-            'label' => 'LBL_STATUS',
-          ),
-        ),
-        1 =>
-        array(
-          0 =>
-          array(
-            'name' => 'date_start',
-            'customCode' => '{$fields.date_start.value}&nbsp;',
-            'label' => 'LBL_DATE_TIME',
-          ),
-          1 =>
-          array(
-            'name' => 'parent_name',
-            'customLabel' => '{sugar_translate label=\'LBL_MODULE_NAME\' module=$fields.parent_type.value}',
-          ),
-        ),
-        2 =>
-        array(
-          0 =>
-          array(
-            'name' => 'duration_hours',
-            'customCode' => '{$fields.duration_hours.value}{$MOD.LBL_HOURS_ABBREV} {$fields.duration_minutes.value}{$MOD.LBL_MINSS_ABBREV}&nbsp;',
-            'label' => 'LBL_DURATION',
-          ),
-//          1 =>
-//          array (
-//            'name' => 'reminder_time',
-//            'customCode' => '{include file="modules/Meetings/tpls/reminders.tpl"}',
-//            'label' => 'LBL_REMINDER',
-//          ),
-                1 => array(
-                    'name' => 'reminders',
-                    'label' => 'LBL_REMINDERS',
-                ),
-        ),
-        3 =>
-        array(
-          0 =>
-          array(
-            'name' => 'description',
-            'comment' => 'Full text of the note',
-            'label' => 'LBL_DESCRIPTION',
-          ),
-        ),
-        4 =>
-        array(
-          0 =>
-          array(
-            'name' => 'assigned_user_name',
-            'customCode' => '{$fields.assigned_user_name.value}',
-            'label' => 'LBL_ASSIGNED_TO',
-          ),
-        ),
-      ),
-      'lbl_reschedule_panel' =>
-      array(
-        0 =>
-        array(
-          0 =>
-          array(
-            'name' => 'reschedule_history',
-            'comment' => 'Call duration, minutes portion',
-            'label' => 'LBL_RESCHEDULE_HISTORY',
-          ),
-          1 => '',
-        ),
-      ),
-      'LBL_PANEL_ASSIGNMENT' =>
-      array(
-        0 =>
-        array(
-          0 =>
-          array(
-            'name' => 'date_entered',
-            'customCode' => '{$fields.date_entered.value} {$APP.LBL_BY} {$fields.created_by_name.value}&nbsp;',
-            'label' => 'LBL_DATE_ENTERED',
-          ),
-          1 =>
-          array(
-            'name' => 'date_modified',
-            'customCode' => '{$fields.date_modified.value} {$APP.LBL_BY} {$fields.modified_by_name.value}&nbsp;',
-            'label' => 'LBL_DATE_MODIFIED',
-          ),
-        ),
-      ),
-    ),
+    // Record view actions, as the legacy buttons: Close, Close and Create New, Reschedule,
+    // and Save and Send Invites in the edit view.
+    'recordActions' => [
+        'actions' => [
+            'close-activity' => [
+                'key' => 'close-activity',
+                'labelKey' => 'LBL_CLOSE_BUTTON_TITLE',
+                'priority' => 100,
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['edit'],
+                'displayLogic' => [
+                    'hideWhenHeld' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'activeOnFields' => [
+                                'status' => ['Held'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'close-create-activity' => [
+                'key' => 'close-create-activity',
+                'labelKey' => 'LBL_CLOSE_AND_CREATE_BUTTON_TITLE',
+                'priority' => 110,
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['edit'],
+                'displayLogic' => [
+                    'hideWhenHeld' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'activeOnFields' => [
+                                'status' => ['Held'],
+                            ],
+                        ],
+                    ],
+                ],
+                'params' => [
+                    'queryParams' => [
+                        'status' => 'Planned',
+                    ],
+                ],
+            ],
+            // A copy is planned again, as the legacy duplicate (getDefaultStatus()).
+            'duplicate' => [
+                'key' => 'duplicate',
+                'labelKey' => 'LBL_DUPLICATE_BUTTON',
+                'priority' => 1900,
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['export', 'edit'],
+                'params' => [
+                    'queryParams' => [
+                        'status' => 'Planned',
+                    ],
+                ],
+            ],
+            'call-reschedule' => [
+                'key' => 'call-reschedule',
+                'labelKey' => 'LBL_RESCHEDULE_LABEL',
+                'priority' => 120,
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['edit'],
+                'displayLogic' => [
+                    'hideWhenHeld' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'activeOnFields' => [
+                                'status' => ['Held'],
+                            ],
+                        ],
+                    ],
+                ],
+                'params' => [
+                    'fieldModal' => [
+                        'titleKey' => 'LBL_RESCHEDULE_TITLE',
+                        'actionLabelKey' => 'LBL_RESCHEDULE_LABEL',
+                        'centered' => true,
+                        'fieldGridOptions' => [
+                            'maxColumns' => 1,
+                        ],
+                        'fields' => [
+                            'date_start' => [
+                                'name' => 'date_start',
+                                'type' => 'datetime',
+                                'label' => 'LBL_RESCHEDULE_DATE',
+                                'fieldDefinition' => [
+                                    'required' => true,
+                                ],
+                            ],
+                            'reason' => [
+                                'name' => 'reason',
+                                'type' => 'enum',
+                                'label' => 'LBL_RESCHEDULE_REASON',
+                                'fieldDefinition' => [
+                                    'options' => 'call_reschedule_dom',
+                                    'required' => true,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'saveSendInvites' => [
+                'key' => 'saveSendInvites',
+                'labelKey' => 'LBL_SEND_BUTTON_LABEL',
+                'priority' => 120,
+                'params' => [
+                    'expanded' => true,
+                    'disableOnRun' => true,
+                ],
+                'modes' => ['edit', 'create'],
+                'acl' => ['edit'],
+            ],
+        ],
+    ],
+    'panels' => [
+    'lbl_call_information' => [
+        [
+            [
+                'name' => 'name',
+                'label' => 'LBL_SUBJECT',
+            ],
+            'status',
+        ],
+        [
+            'direction',
+            [
+                'name' => 'parent_name',
+                'label' => 'LBL_LIST_RELATED_TO',
+            ],
+        ],
+        [
+            [
+                'name' => 'date_start',
+                'label' => 'LBL_DATE_TIME',
+            ],
+            [
+                'name' => 'date_end',
+                // Set by the save, from the start date and the duration.
+                'readonly' => true,
+            ],
+        ],
+        [
+            'duration_hours',
+            'duration_minutes',
+        ],
+        [
+            [
+                'name' => 'invitees',
+                'label' => 'LBL_INVITEE',
+            ],
+        ],
+        [
+            [
+                'name' => 'reminders',
+                'label' => 'LBL_REMINDERS',
+            ],
+        ],
+        [
+            'description',
+        ],
+        [
+            [
+                'name' => 'assigned_user_name',
+                'label' => 'LBL_ASSIGNED_TO',
+            ],
+        ],
+    ],
+    'lbl_reschedule_panel' => [
+        [
+            [
+                'name' => 'reschedule_history',
+                'label' => 'LBL_RESCHEDULE_HISTORY',
+            ],
+        ],
+    ],
+    'LBL_PANEL_ASSIGNMENT' => [
+        [
+            [
+                'name' => 'date_entered',
+                'readonly' => true,
+            ],
+            [
+                'name' => 'date_modified',
+                'readonly' => true,
+            ],
+        ],
+        [
+            [
+                'name' => 'created_by_name',
+                'label' => 'LBL_CREATED',
+                'readonly' => true,
+            ],
+            [
+                'name' => 'modified_by_name',
+                'label' => 'LBL_MODIFIED',
+                'readonly' => true,
+            ],
+        ],
+    ],
+    ],
   ),
 );

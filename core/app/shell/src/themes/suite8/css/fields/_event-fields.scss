@@ -1,0 +1,175 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+
+// Invitees and reminders of calls and meetings (event-invitees, event-reminders fields).
+
+.event-invitees,
+.event-reminders {
+  width: 100%;
+
+  .empty,
+  .muted {
+    margin: 0;
+    color: $dusty-grey;
+  }
+}
+
+.event-invitees {
+  .invitee-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .invitee {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5em;
+    padding: 0.2em 0;
+  }
+
+  .invitee-module,
+  .invitee-email {
+    color: $dusty-grey;
+    font-size: 0.75rem;
+  }
+
+  .invitee-module {
+    min-width: 4.5em;
+  }
+
+  .invitee-status {
+    padding: 0 0.5em;
+    border-radius: 0.6em;
+    background: $off-white;
+    font-size: 0.75rem;
+  }
+
+  .remove-invitee {
+    padding: 0;
+  }
+
+  .invitee-search {
+    position: relative;
+    max-width: 28em;
+    margin-top: 0.4em;
+  }
+
+  .invitee-results {
+    position: absolute;
+    z-index: 20;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 16em;
+    margin: 0.1em 0 0;
+    padding: 0.25em 0;
+    overflow-y: auto;
+    list-style: none;
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: 0.25em;
+    box-shadow: 0 0.25em 0.75em $grey-transparent;
+
+    li {
+      padding: 0.4em 0.6em;
+    }
+  }
+
+  .invitee-result {
+    display: flex;
+    gap: 0.5em;
+    cursor: pointer;
+
+    &:hover {
+      background: $off-white;
+    }
+  }
+}
+
+.event-reminders {
+  .reminder-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .reminder {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75em;
+    padding: 0.2em 0;
+  }
+
+  .reminder-invitees {
+    color: $dusty-grey;
+  }
+
+  .reminder-edit {
+    margin-bottom: 0.6em;
+    padding: 0.5em;
+    border: 1px solid $border-color;
+    border-radius: 0.25em;
+  }
+
+  .reminder-actions,
+  .reminder-invitees {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  .reminder-actions select {
+    width: auto;
+  }
+
+  .reminder-action {
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+    margin: 0;
+  }
+
+  .reminder-invitees {
+    margin-top: 0.4em;
+  }
+
+  .reminder-invitee {
+    padding: 0 0 0 0.5em;
+    border-radius: 0.6em;
+    background: $off-white;
+    color: initial;
+    font-size: 0.8rem;
+  }
+
+  .remove-invitee,
+  .remove-reminder {
+    padding: 0 0.3em;
+  }
+}

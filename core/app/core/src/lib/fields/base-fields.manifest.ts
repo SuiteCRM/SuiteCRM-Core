@@ -140,6 +140,14 @@ import {TextTemplateDetailFieldModule} from "./texttemplate/templates/detail/tex
 import {TextTemplateDetailFieldComponent} from "./texttemplate/templates/detail/texttemplate.component";
 import {ImageListFieldComponent} from "./image/templates/list/image.component";
 import {ImageListFieldModule} from "./image/templates/list/image.module";
+import {EventInviteesDetailFieldComponent} from './event-invitees/templates/detail/event-invitees.component';
+import {EventInviteesDetailFieldModule} from './event-invitees/templates/detail/event-invitees.module';
+import {EventInviteesEditFieldComponent} from './event-invitees/templates/edit/event-invitees.component';
+import {EventInviteesEditFieldModule} from './event-invitees/templates/edit/event-invitees.module';
+import {EventRemindersDetailFieldComponent} from './event-reminders/templates/detail/event-reminders.component';
+import {EventRemindersDetailFieldModule} from './event-reminders/templates/detail/event-reminders.module';
+import {EventRemindersEditFieldComponent} from './event-reminders/templates/edit/event-reminders.component';
+import {EventRemindersEditFieldModule} from './event-reminders/templates/edit/event-reminders.module';
 
 export const baseFieldModules = [
     VarcharDetailFieldModule,
@@ -180,6 +188,10 @@ export const baseFieldModules = [
     ImageEditFieldModule,
     ImageDetailFieldModule,
     ImageListFieldModule,
+    EventInviteesDetailFieldModule,
+    EventInviteesEditFieldModule,
+    EventRemindersDetailFieldModule,
+    EventRemindersEditFieldModule,
     MultiEnumDetailFieldModule,
     MultiEnumEditFieldModule,
     MultiEnumFilterFieldModule,
@@ -243,6 +255,10 @@ export const baseFieldComponents = [
     ImageEditFieldComponent,
     ImageDetailFieldComponent,
     ImageListFieldComponent,
+    EventInviteesDetailFieldComponent,
+    EventInviteesEditFieldComponent,
+    EventRemindersDetailFieldComponent,
+    EventRemindersEditFieldComponent,
     MultiEnumDetailFieldComponent,
     MultiEnumEditFieldComponent,
     MultiEnumFilterFieldComponent,
@@ -333,6 +349,10 @@ export const baseViewFieldsMap: FieldComponentMap = {
     'image.edit': ImageEditFieldComponent,
     'image.detail': ImageDetailFieldComponent,
     'image.list': ImageListFieldComponent,
+    'event-invitees.detail': EventInviteesDetailFieldComponent,
+    'event-invitees.edit': EventInviteesEditFieldComponent,
+    'event-reminders.detail': EventRemindersDetailFieldComponent,
+    'event-reminders.edit': EventRemindersEditFieldComponent,
     'multienum.list': MultiEnumDetailFieldComponent,
     'multienum.detail': MultiEnumDetailFieldComponent,
     'multienum.edit': MultiEnumEditFieldComponent,

@@ -115,71 +115,155 @@ array(
       ),
       'useTabs' => false,
     ),
-    'panels' =>
-    array(
-      'lbl_meeting_information' =>
-      array(
-        array(
-          array(
-            'name' => 'name',
-            'label' => 'LBL_SUBJECT',
-          ),
-          'status',
-        ),
-        array(
-          array(
-            'name' => 'date_start',
-            'label' => 'LBL_DATE_TIME',
-          ),
-        ),
-        array(
-          array(
-            'name' => 'duration',
-            'customCode' => '{$fields.duration_hours.value}{$MOD.LBL_HOURS_ABBREV} {$fields.duration_minutes.value}{$MOD.LBL_MINSS_ABBREV} ',
-            'label' => 'LBL_DURATION',
-          ),
-          array(
-            'name' => 'parent_name',
-            'customLabel' => '{sugar_translate label=\'LBL_MODULE_NAME\' module=$fields.parent_type.value}',
-          ),
-        ),
-        array(
-//          array(
-//            'name' => 'reminder_time',
-//            'customCode' => '{include file="modules/Meetings/tpls/reminders.tpl"}',
-//            'label' => 'LBL_REMINDER',
-//            ),
-          array(
-            'name' => 'reminders',
-            'label' => 'LBL_REMINDERS',
-            ),
-          'location',
-        ),
-        array(
-          'description',
-        ),
-      ),
-      'LBL_PANEL_ASSIGNMENT' =>
-      array(
-        array(
-          array(
-            'name' => 'assigned_user_name',
-            'label' => 'LBL_ASSIGNED_TO',
-          ),
-          array(
-            'name' => 'date_modified',
-            'label' => 'LBL_DATE_MODIFIED',
-            'customCode' => '{$fields.date_modified.value} {$APP.LBL_BY} {$fields.modified_by_name.value}',
-          ),
-
-        ),
-        array(
-          array(
-            'name' => 'date_entered',
-            'customCode' => '{$fields.date_entered.value} {$APP.LBL_BY} {$fields.created_by_name.value}',
-          ),
-        ),
-      ),
-    ),
+    // Record view actions, as the legacy buttons: Close, Close and Create New,
+    // and Save and Send Invites in the edit view.
+    'recordActions' => [
+        'actions' => [
+            'close-activity' => [
+                'key' => 'close-activity',
+                'labelKey' => 'LBL_CLOSE_BUTTON_TITLE',
+                'priority' => 100,
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['edit'],
+                'displayLogic' => [
+                    'hideWhenHeld' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'activeOnFields' => [
+                                'status' => ['Held'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'close-create-activity' => [
+                'key' => 'close-create-activity',
+                'labelKey' => 'LBL_CLOSE_AND_CREATE_BUTTON_TITLE',
+                'priority' => 110,
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['edit'],
+                'displayLogic' => [
+                    'hideWhenHeld' => [
+                        'modes' => ['detail'],
+                        'params' => [
+                            'activeOnFields' => [
+                                'status' => ['Held'],
+                            ],
+                        ],
+                    ],
+                ],
+                'params' => [
+                    'queryParams' => [
+                        'status' => 'Planned',
+                    ],
+                ],
+            ],
+            // A copy is planned again, as the legacy duplicate (getDefaultStatus()).
+            'duplicate' => [
+                'key' => 'duplicate',
+                'labelKey' => 'LBL_DUPLICATE_BUTTON',
+                'priority' => 1900,
+                'asyncProcess' => true,
+                'modes' => ['detail'],
+                'acl' => ['export', 'edit'],
+                'params' => [
+                    'queryParams' => [
+                        'status' => 'Planned',
+                    ],
+                ],
+            ],
+            'saveSendInvites' => [
+                'key' => 'saveSendInvites',
+                'labelKey' => 'LBL_SEND_BUTTON_LABEL',
+                'priority' => 120,
+                'params' => [
+                    'expanded' => true,
+                    'disableOnRun' => true,
+                ],
+                'modes' => ['edit', 'create'],
+                'acl' => ['edit'],
+            ],
+        ],
+    ],
+    'panels' => [
+    'lbl_meeting_information' => [
+        [
+            [
+                'name' => 'name',
+                'label' => 'LBL_SUBJECT',
+            ],
+            'status',
+        ],
+        [
+            [
+                'name' => 'date_start',
+                'label' => 'LBL_DATE_TIME',
+            ],
+            [
+                'name' => 'parent_name',
+                'label' => 'LBL_LIST_RELATED_TO',
+            ],
+        ],
+        [
+            [
+                'name' => 'date_end',
+                // Set by the save, from the start date and the duration.
+                'readonly' => true,
+            ],
+            'location',
+        ],
+        [
+            'duration_hours',
+            'duration_minutes',
+        ],
+        [
+            [
+                'name' => 'invitees',
+                'label' => 'LBL_INVITEE',
+            ],
+        ],
+        [
+            [
+                'name' => 'reminders',
+                'label' => 'LBL_REMINDERS',
+            ],
+        ],
+        [
+            'description',
+        ],
+        [
+            [
+                'name' => 'assigned_user_name',
+                'label' => 'LBL_ASSIGNED_TO',
+            ],
+        ],
+    ],
+    'LBL_PANEL_ASSIGNMENT' => [
+        [
+            [
+                'name' => 'date_entered',
+                'readonly' => true,
+            ],
+            [
+                'name' => 'date_modified',
+                'readonly' => true,
+            ],
+        ],
+        [
+            [
+                'name' => 'created_by_name',
+                'label' => 'LBL_CREATED',
+                'readonly' => true,
+            ],
+            [
+                'name' => 'modified_by_name',
+                'label' => 'LBL_MODIFIED',
+                'readonly' => true,
+            ],
+        ],
+    ],
+    ],
   ),
 );

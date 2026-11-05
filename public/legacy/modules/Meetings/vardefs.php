@@ -300,6 +300,20 @@ $dictionary['Meeting'] = array('table' => 'meetings',
             'massupdate' => false,
         ),
 
+        // Users, contacts and leads invited (record view event-invitees field). Before
+        // `reminders`: the invitees are saved first, the reminders keep invited people only.
+        'invitees' => array(
+            'name' => 'invitees',
+            'vname' => 'LBL_INVITEE',
+            'type' => 'event-invitees',
+            'source' => 'non-db',
+            'massupdate' => false,
+            'importable' => 'false',
+            'reportable' => false,
+            'duplicate_merge' => 'disabled',
+            'inline_edit' => false,
+            'studio' => false,
+        ),
         'reminders' => array(
             'required' => false,
             'name' => 'reminders',

@@ -261,6 +261,13 @@ export class RequiredValidator implements ValidatorInterface {
             return false;
         }
 
+        // A grouped field (e.g. a parent field "Related to": module select + record search) takes
+        // the definition, so the `required`, of its main field but has no value itself: its own
+        // check would always fail. Its fields are checked one by one.
+        if (viewFieldType === 'grouped-field' || fieldDefinitionType === 'grouped-field') {
+            return false;
+        }
+
         return isTrue(viewField.fieldDefinition.required);
     }
 

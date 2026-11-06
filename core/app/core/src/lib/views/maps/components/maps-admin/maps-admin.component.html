@@ -1,0 +1,108 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="maps-page maps-admin">
+    <ng-container *ngIf="mode === 'test'; else counts">
+        <h2 class="maps-page-title">{{ label('LBL_MAP_ADDRESS_TEST') }}</h2>
+        <form class="maps-page-panel" (ngSubmit)="test()">
+            <div class="maps-page-row">
+                <label for="maps-geocoding-address">{{ label('LBL_MAP_ADDRESS') }}</label>
+                <input id="maps-geocoding-address" name="address" class="form-control form-control-sm" maxlength="255" autocomplete="off"
+                       [(ngModel)]="address">
+            </div>
+            <div class="maps-page-buttons">
+                <button type="submit" class="btn btn-sm btn-main" [disabled]="loading || !address.trim()">{{ label('LBL_MAP_PROCESS') }}</button>
+            </div>
+        </form>
+        <pre *ngIf="result !== null" class="maps-admin-result">{{ result }}</pre>
+    </ng-container>
+
+    <ng-template #counts>
+        <h2 class="maps-page-title">{{ label('LBL_GEOCODED_COUNTS') }}</h2>
+        <p *ngIf="loading && !data" class="maps-page-muted">…</p>
+        <ng-container *ngIf="data">
+            <p class="maps-page-intro">{{ label('LBL_GEOCODED_COUNTS_DESCRIPTION') }}</p>
+            <p *ngIf="data.provider">{{ label('LBL_MAPS_VIEW_PROVIDER') }}:
+                <strong>{{ label(data.provider === 'osm' ? 'LBL_MAPS_VIEW_PROVIDER_OSM' : 'LBL_MAPS_VIEW_PROVIDER_GOOGLE') }}</strong>
+                <ng-container *ngIf="data.provider === 'osm'"> — {{ label('LBL_MAPS_VIEW_OSM_MODULES') }}: {{ data.geocodeModules?.join(', ') }}</ng-container>
+            </p>
+            <p *ngIf="data.lastStatus"><strong>{{ label('LBL_MAP_LAST_STATUS') }}: {{ data.lastStatus }}</strong></p>
+            <div class="maps-page-buttons maps-admin-actions">
+                <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="geocode('')">{{ label('LBL_MAPS_VIEW_GEOCODE_ALL') }}</button>
+            </div>
+            <div class="maps-page-scroll">
+                <table class="maps-page-table" [class.is-loading]="loading">
+                    <thead>
+                    <tr>
+                        <th>{{ label('LBL_MODULE_HEADING') }}</th>
+                        <th *ngFor="let heading of data.headings">{{ heading.label }}</th>
+                        <th>{{ label('LBL_MODULE_TOTAL_HEADING') }}</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let module of data.modules">
+                        <td class="maps-page-name">{{ module.label }}</td>
+                        <td *ngFor="let heading of data.headings">{{ module.counts[heading.key] ?? '' }}</td>
+                        <td class="maps-page-name">{{ module.total }}</td>
+                        <td class="maps-admin-row-actions">
+                            <button *ngIf="canGeocode(module.module)" type="button" class="btn btn-sm btn-link" [disabled]="loading"
+                                    (click)="geocode(module.module)">{{ label('LBL_MAPS_VIEW_GEOCODE') }}</button>
+                            <button type="button" class="btn btn-sm btn-link" [disabled]="loading" (click)="reset(module)">{{ label('LBL_MODULE_RESET_HEADING') }}</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div *ngIf="data.provider === 'osm'; else cronUrl" class="maps-page-panel maps-admin-panel">
+                <strong>{{ label('LBL_MAPS_VIEW_PROVIDER_OSM') }}</strong>
+                <p>{{ data.osmScheduler }}</p>
+            </div>
+            <ng-template #cronUrl>
+                <div class="maps-page-panel maps-admin-panel">
+                    <strong>{{ label('LBL_CRON_URL') }}</strong>
+                    <p>{{ label('LBL_CRON_INSTRUCTIONS') }}</p>
+                    <code>{{ data.cronUrl }}</code>
+                </div>
+            </ng-template>
+
+            <div class="maps-page-panel maps-admin-panel">
+                <strong>{{ label('LBL_EXPORT_ADDRESS_URL') }}</strong>
+                <p>{{ label('LBL_EXPORT_INSTRUCTIONS') }}</p>
+                <div class="maps-page-buttons">
+                    <button *ngFor="let module of data.exportModules" type="button" class="btn btn-sm btn-outline-secondary"
+                            (click)="export(module)">{{ label('LBL_MAPS_VIEW_EXPORT') }} {{ module }}</button>
+                </div>
+            </div>
+
+            <div class="maps-page-buttons">
+                <button type="button" class="btn btn-sm btn-outline-danger" [disabled]="loading" (click)="deleteCache()">{{ label('LBL_MAPS_VIEW_DELETE_CACHE') }}</button>
+            </div>
+        </ng-container>
+    </ng-template>
+</div>

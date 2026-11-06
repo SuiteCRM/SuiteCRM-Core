@@ -180,4 +180,12 @@ $mod_strings = array(
 
     'LBL_ASCENDING' => 'Ascending',
     'LBL_DESCENDING' => 'Descending',
+
+    // Gantt chart of the SuiteCRM 8 record views of the projects and project templates.
+    'LBL_GANTT_NO_TASK' => 'No task yet: Add New Task.',
+    'LBL_GANTT_DELETE_TASK_CONFIRM' => 'Delete this task?',
+    'LBL_GANTT_NONE' => 'None',
+    'LBL_GANTT_NOTES' => 'Notes',
+    'LBL_GANTT_MOVE' => 'Drag to change the order',
+    'LBL_GANTT_TEMPLATE_DAYS' => 'The days are counted from the start of the project created from the template.',
 );

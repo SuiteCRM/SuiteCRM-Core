@@ -108,6 +108,32 @@ array(
       ),
       'syncDetailEditViews' => true,
     ),
+    // SuiteCRM 8 record view: the Gantt chart of the project under the details, and the Duplicate of
+    // the legacy view, which copies the tasks too (the core Duplicate copies the fields only).
+    'bottomWidgets' =>
+    array(
+      0 =>
+      array(
+        'type' => 'project-gantt',
+        'modes' => array('detail'),
+        'options' => array(),
+      ),
+    ),
+    'recordActions' =>
+    array(
+      'exclude' => array('duplicate'),
+      'actions' =>
+      array(
+        'project-duplicate' =>
+        array(
+          'key' => 'project-duplicate',
+          'labelKey' => 'LBL_DUPLICATE_BUTTON',
+          'asyncProcess' => true,
+          'modes' => array('detail'),
+          'acl' => array('edit'),
+        ),
+      ),
+    ),
     'panels' =>
     array(
       'lbl_project_information' =>

@@ -929,3 +929,6 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './containers/sidebar-widget/components/project-gantt-widget/project-gantt-widget.component';
+export * from './containers/sidebar-widget/components/project-gantt-widget/project-gantt-widget.module';
+export * from './views/record/actions/project-template-create-project/project-template-create-project.action';

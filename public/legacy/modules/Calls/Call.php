@@ -180,8 +180,11 @@ class Call extends SugarBean
             if (!empty($this->duration_hours) || !empty($this->duration_minutes)) {
                 $td = $timedate->fromDb($this->date_start);
                 if ($td) {
+                    // An empty part (e.g. no minutes) counts as 0: "+1 hours  mins" can't be parsed
+                    $durationHours = (int)$this->duration_hours;
+                    $durationMinutes = (int)$this->duration_minutes;
                     $this->date_end = $td->modify(
-                        "+{$this->duration_hours} hours {$this->duration_minutes} mins"
+                        "+{$durationHours} hours {$durationMinutes} mins"
                     )->asDb();
                 }
             } else {

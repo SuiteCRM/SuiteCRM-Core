@@ -106,4 +106,5 @@ $mod_strings = array(
     'LBL_TEMPLATE_ATTACHMENTS_REMOVE_CONFIRM' => 'Remove this attachment from the template?',
     'LBL_TEMPLATE_ATTACHMENTS_TOO_BIG' => 'The file is larger than the maximum upload size.',
     'LBL_TEMPLATE_ATTACHMENTS_ERROR' => 'The attachments could not be loaded or changed. Please try again.',
+    'LBL_TEMPLATE_ATTACHMENTS_SAVE_FIRST' => 'Save the template to add attachments.',
 );

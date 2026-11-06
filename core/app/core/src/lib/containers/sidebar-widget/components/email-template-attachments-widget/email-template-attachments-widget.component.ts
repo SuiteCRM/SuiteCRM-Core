@@ -47,7 +47,9 @@ export interface TemplateAttachment {
  * Attachments of an email template (record view, bottom widget `email-template-attachments`), as
  * the legacy template editor: the files of the template, downloaded from their note; a file is
  * added or removed at once. They stay notes of the template, where the email senders look for
- * them (EmailTemplateAttachmentsHandler).
+ * them (EmailTemplateAttachmentsHandler). Shown in the detail and edit views (files added while
+ * editing the template, as in the legacy editor) and in the create view, where a new template has
+ * no id for its notes yet: a hint to save it first.
  */
 @Component({
     selector: 'scrm-email-template-attachments-widget',
@@ -76,6 +78,11 @@ export class EmailTemplateAttachmentsWidgetComponent extends BaseWidgetComponent
         protected cdr: ChangeDetectorRef
     ) {
         super();
+    }
+
+    /** The template exists (not the create view): its files can be listed and changed. */
+    get saved(): boolean {
+        return !!this.recordId;
     }
 
     /** The user can change the template (edit access of the record view). */

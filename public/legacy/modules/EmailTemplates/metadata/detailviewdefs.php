@@ -63,7 +63,7 @@ $viewdefs['EmailTemplates']['DetailView'] = array(
     'bottomWidgets' => array(
         array(
             'type' => 'email-template-attachments',
-            'modes' => array('detail'),
+            'modes' => array('detail', 'edit', 'create'),
             'options' => array(),
         ),
     ),

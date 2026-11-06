@@ -37,7 +37,8 @@
         </li>
     </ul>
     <ng-template #empty>
-        <p *ngIf="!loading && !error" class="email-template-attachments-muted">{{ label('LBL_TEMPLATE_ATTACHMENTS_EMPTY') }}</p>
+        <p *ngIf="!loading && !error && saved" class="email-template-attachments-muted">{{ label('LBL_TEMPLATE_ATTACHMENTS_EMPTY') }}</p>
+        <p *ngIf="!saved" class="email-template-attachments-muted">{{ label('LBL_TEMPLATE_ATTACHMENTS_SAVE_FIRST') }}</p>
     </ng-template>
     <label *ngIf="editable" class="btn btn-sm btn-outline-secondary email-template-attachments-add" [class.disabled]="loading">
         {{ label('LBL_ADD_FILE') }}

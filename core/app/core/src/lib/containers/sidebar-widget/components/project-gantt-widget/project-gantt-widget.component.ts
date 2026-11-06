@@ -354,7 +354,11 @@ export class ProjectGanttWidgetComponent extends BaseWidgetComponent implements 
         let count = Math.round((new Date(last + 'T00:00:00Z').getTime() - start.getTime()) / 86400000) + 1;
         count = Math.max(count, 30);
 
-        const locale = this.language.getCurrentLanguage()?.replace('_', '-') || 'en';
+        // getCurrentLanguage() returns the local storage value, which is {} (not a string) for a
+        // user who never chose a language: the days would not be built and the task window would
+        // stay open after a save.
+        const language: unknown = this.language.getCurrentLanguage();
+        const locale = typeof language === 'string' && language ? language.replace('_', '-') : 'en';
         this.days = [];
         this.months = [];
         for (let i = 0; i < count; i++) {

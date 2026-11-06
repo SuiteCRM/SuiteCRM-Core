@@ -44,6 +44,13 @@ class ActivityStreamsSettingsHandler extends LegacyHandler
      */
     protected const USER_FEED = 'UserFeed';
 
+    /**
+     * The social feeds the legacy page adds to the modules (view.adminsettings.php): no feed
+     * file, only their setting (sugarfeed_module_<name>, read by the My Activity Stream dashlet),
+     * their name as label.
+     */
+    protected const SOCIAL_FEEDS = ['Facebook', 'Twitter'];
+
     protected const LABELS = [
         'LBL_MODULE_NAME', 'LBL_ENABLE_FEED', 'LBL_ENABLE_MODULE_LIST', 'LBL_ENABLE_USER_FEED', 'LBL_FLUSH_RECORDS',
         'LBL_CONFIRM_DELETE_RECORDS', 'LBL_RECORDS_DELETED',
@@ -80,6 +87,14 @@ class ActivityStreamsSettingsHandler extends LegacyHandler
                     'module' => (string)$module,
                     'label' => $this->decode((string)($app_list_strings['moduleList'][$module] ?? $module)),
                     'enabled' => $enabled,
+                ];
+            }
+
+            foreach (self::SOCIAL_FEEDS as $module) {
+                $modules[] = [
+                    'module' => $module,
+                    'label' => $module,
+                    'enabled' => ($admin->settings['sugarfeed_module_' . $module] ?? '') == '1',
                 ];
             }
 
@@ -122,7 +137,9 @@ class ActivityStreamsSettingsHandler extends LegacyHandler
             $feedModules = \SugarFeed::getAllFeedModules();
 
             if ($enabled) {
-                foreach ($feedModules as $module) {
+                // The social feeds too, as the legacy page posts them with the modules (when the
+                // feed is turned off, the legacy page leaves their settings as they are).
+                foreach (array_merge($feedModules, self::SOCIAL_FEEDS) as $module) {
                     $active = $module === self::USER_FEED ? $userFeed : !empty($modules[$module]);
                     if ($active) {
                         \SugarFeed::activateModuleFeed($module);

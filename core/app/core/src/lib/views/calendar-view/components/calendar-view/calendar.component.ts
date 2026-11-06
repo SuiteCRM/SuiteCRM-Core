@@ -195,6 +195,7 @@ export class CalendarViewComponent implements OnInit, OnDestroy {
         modal.componentInstance.color = this.data.settings.colors.find(color => color.frontModule === event.module) ?? null;
         modal.componentInstance.label = (key: string): string => this.label(key);
         modal.componentInstance.period = this.period(event);
+        this.showModal();
         modal.closed.pipe(take(1)).subscribe((action: string) => {
             if (action === 'view') {
                 this.router.navigateByUrl(this.navigation.getRecordRouterLink(event.module, event.id));
@@ -219,6 +220,7 @@ export class CalendarViewComponent implements OnInit, OnDestroy {
         }));
         modal.componentInstance.label = (key: string): string => this.label(key);
         modal.componentInstance.when = this.slotLabel(slot);
+        this.showModal();
         modal.closed.pipe(take(1)).subscribe((module: string) => this.openCreate(module, slot));
     }
 
@@ -236,6 +238,7 @@ export class CalendarViewComponent implements OnInit, OnDestroy {
         const modal = this.modals.open(CalendarSettingsModalComponent, {windowClass: 'calendar-view-modal', size: 'lg', scrollable: true});
         modal.componentInstance.settings = JSON.parse(JSON.stringify(this.data.settings));
         modal.componentInstance.label = (key: string): string => this.label(key);
+        this.showModal();
         modal.closed.pipe(take(1)).subscribe((settings: CalendarSettings) => this.change({action: 'settings', settings}));
     }
 
@@ -244,7 +247,17 @@ export class CalendarViewComponent implements OnInit, OnDestroy {
         modal.componentInstance.users = this.data.users;
         modal.componentInstance.value = [...this.data.sharedIds];
         modal.componentInstance.label = (key: string): string => this.label(key);
+        this.showModal();
         modal.closed.pipe(take(1)).subscribe((ids: string[]) => this.change({action: 'users', ids}));
+    }
+
+    /**
+     * Shows a modal with the inputs just set on it: the application runs without zone.js and a
+     * slot selected with the mouse ends in a pointerup listener of the window, which runs no
+     * change detection, so the window stayed empty until the next click in it.
+     */
+    protected showModal(): void {
+        this.cdr.markForCheck();
     }
 
     protected remove(event: CalendarEvent): void {

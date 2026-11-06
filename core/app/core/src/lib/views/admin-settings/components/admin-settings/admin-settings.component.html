@@ -1,0 +1,182 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="admin-settings">
+    <h2 class="admin-settings-title">{{ data?.title }}</h2>
+
+    <p *ngIf="loading && !data" class="admin-settings-muted">…</p>
+
+    <form *ngIf="data" class="admin-settings-form" novalidate>
+        <ng-container *ngTemplateOutlet="buttons"></ng-container>
+
+        <ng-container *ngFor="let section of data.sections; let index = index">
+        <fieldset *ngIf="visible(section)" class="admin-settings-panel">
+            <legend>{{ section.title }}</legend>
+            <p *ngIf="section.intro" class="admin-settings-intro text-muted" [innerHTML]="section.intro"></p>
+
+            <div *ngIf="section.fields.length" class="admin-settings-grid">
+                <ng-container *ngFor="let field of section.fields">
+                    <ng-container *ngIf="visible(field)">
+                        <ng-container *ngTemplateOutlet="setting; context: {$implicit: field}"></ng-container>
+                    </ng-container>
+                </ng-container>
+            </div>
+
+            <div *ngIf="section.actions?.length" class="admin-settings-buttons admin-settings-actions">
+                <button *ngFor="let action of section.actions" type="button" class="btn btn-sm btn-outline-secondary"
+                        [disabled]="loading" (click)="runAction(index, action.name)">{{ action.label }}</button>
+            </div>
+            <div *ngIf="results[index]?.html" class="admin-settings-result" [innerHTML]="results[index].html"></div>
+        </fieldset>
+        </ng-container>
+
+        <ng-container *ngTemplateOutlet="buttons"></ng-container>
+    </form>
+
+    <ng-template #buttons>
+        <div class="admin-settings-buttons admin-settings-toolbar">
+            <button *ngIf="!data?.readonly" type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="save()">{{ appLabel('LBL_SAVE_BUTTON_LABEL') }}</button>
+            <a class="btn btn-sm btn-outline-secondary" [routerLink]="[back()]">{{ appLabel('LBL_CANCEL_BUTTON_LABEL') }}</a>
+        </div>
+    </ng-template>
+
+    <ng-template #setting let-field>
+        <div class="admin-settings-field" [class.admin-settings-wide]="field.wide || field.type === 'lists' || field.type === 'pairs'"
+             [ngSwitch]="field.type">
+
+            <ng-container *ngSwitchCase="'bool'">
+                <div class="admin-settings-option">
+                    <input type="checkbox" [id]="'admin-settings-' + field.name" [(ngModel)]="values[field.name]"
+                           [ngModelOptions]="{standalone: true}">
+                    <label [for]="'admin-settings-' + field.name">{{ field.label }}</label>
+                </div>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'html'">
+                <span *ngIf="field.label" class="admin-settings-label">{{ field.label }}</span>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'lists'">
+                <span *ngIf="field.label" class="admin-settings-label">{{ field.label }}</span>
+                <div class="admin-settings-lists" cdkDropListGroup>
+                    <div class="admin-settings-list">
+                        <h4>{{ field.enabledLabel }}</h4>
+                        <ul cdkDropList cdkDropListData="enabled" [cdkDropListSortingDisabled]="!field.ordered"
+                            (cdkDropListDropped)="drop(field, $event)">
+                            <li *ngFor="let item of enabledItems(field); let position = index; let last = last"
+                                cdkDrag [cdkDragData]="item" cdkDragPreviewClass="admin-settings-drag">
+                                <span class="admin-settings-handle" aria-hidden="true">⠿</span>
+                                <span class="admin-settings-item">{{ item.label }}</span>
+                                <span class="admin-settings-item-buttons">
+                                    <ng-container *ngIf="field.ordered">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="position === 0"
+                                                [title]="appLabel('LNK_LIST_PREVIOUS')" [attr.aria-label]="appLabel('LNK_LIST_PREVIOUS') + ': ' + item.label"
+                                                (click)="move(field, position, -1)">↑</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="last"
+                                                [title]="appLabel('LNK_LIST_NEXT')" [attr.aria-label]="appLabel('LNK_LIST_NEXT') + ': ' + item.label"
+                                                (click)="move(field, position, 1)">↓</button>
+                                    </ng-container>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="locked(field, item)"
+                                            [title]="field.disabledLabel" [attr.aria-label]="field.disabledLabel + ': ' + item.label"
+                                            (click)="disable(field, item)">→</button>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="admin-settings-list">
+                        <h4>{{ field.disabledLabel }}</h4>
+                        <ul cdkDropList cdkDropListData="disabled" cdkDropListSortingDisabled
+                            [cdkDropListEnterPredicate]="canDisable(field)" (cdkDropListDropped)="drop(field, $event)">
+                            <li *ngFor="let item of disabledItems(field)" cdkDrag [cdkDragData]="item" cdkDragPreviewClass="admin-settings-drag">
+                                <span class="admin-settings-item-buttons">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            [title]="field.enabledLabel" [attr.aria-label]="field.enabledLabel + ': ' + item.label"
+                                            (click)="enable(field, item)">←</button>
+                                </span>
+                                <span class="admin-settings-item">{{ item.label }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'pairs'">
+                <span *ngIf="field.label" class="admin-settings-label">{{ field.label }}</span>
+                <div *ngFor="let pair of pairs(field); let position = index; trackBy: trackIndex" class="admin-settings-pair">
+                    <label [for]="'admin-settings-' + field.name + '-' + position + '-0'">{{ field.leftLabel }}</label>
+                    <select [id]="'admin-settings-' + field.name + '-' + position + '-0'" class="form-control form-control-sm"
+                            [(ngModel)]="pair[0]" [ngModelOptions]="{standalone: true}">
+                        <option *ngFor="let option of field.options" [value]="option.value">{{ option.label }}</option>
+                    </select>
+                    <label [for]="'admin-settings-' + field.name + '-' + position + '-1'">{{ field.rightLabel }}</label>
+                    <select [id]="'admin-settings-' + field.name + '-' + position + '-1'" class="form-control form-control-sm"
+                            [(ngModel)]="pair[1]" [ngModelOptions]="{standalone: true}">
+                        <option *ngFor="let option of field.options" [value]="option.value">{{ option.label }}</option>
+                    </select>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removePair(field, position)">{{ field.removeLabel }}</button>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addPair(field)">{{ field.addLabel }}</button>
+            </ng-container>
+
+            <ng-container *ngSwitchDefault>
+                <label [for]="'admin-settings-' + field.name">
+                    {{ field.label }}<span *ngIf="field.required" class="admin-settings-required">*</span>
+                </label>
+                <select *ngIf="field.type === 'select'" [id]="'admin-settings-' + field.name" class="form-control form-control-sm"
+                        [class.is-invalid]="submitted && invalid(field)" [(ngModel)]="values[field.name]" [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="enableLocked()">
+                    <option *ngFor="let option of field.options" [value]="option.value">{{ option.label }}</option>
+                </select>
+                <textarea *ngIf="field.type === 'textarea'" [id]="'admin-settings-' + field.name" class="form-control form-control-sm"
+                          rows="4" [class.is-invalid]="submitted && invalid(field)" [(ngModel)]="values[field.name]"
+                          [ngModelOptions]="{standalone: true}"></textarea>
+                <div *ngIf="field.type === 'text' || field.type === 'number' || field.type === 'password'" class="admin-settings-input">
+                    <input [type]="field.type === 'password' ? 'password' : 'text'" [id]="'admin-settings-' + field.name"
+                           class="form-control form-control-sm" [class.is-invalid]="submitted && invalid(field)"
+                           [attr.inputmode]="field.type === 'number' ? 'numeric' : null"
+                           [attr.maxlength]="field.maxlength || null"
+                           [attr.autocomplete]="field.type === 'password' ? 'new-password' : 'off'"
+                           [placeholder]="field.type === 'password' && field.set && !cleared[field.name] ? '••••••••' : ''"
+                           [disabled]="!!cleared[field.name]"
+                           [(ngModel)]="values[field.name]" [ngModelOptions]="{standalone: true}">
+                    <span *ngIf="field.suffix" class="admin-settings-suffix">{{ field.suffix }}</span>
+                </div>
+                <!-- A saved password (not required) is kept when left empty, or removed. -->
+                <div *ngIf="field.type === 'password' && field.set && !field.required" class="admin-settings-option admin-settings-clear">
+                    <input type="checkbox" [id]="'admin-settings-' + field.name + '-clear'" [(ngModel)]="cleared[field.name]"
+                           [ngModelOptions]="{standalone: true}" (ngModelChange)="values[field.name] = ''">
+                    <label [for]="'admin-settings-' + field.name + '-clear'">{{ appLabel('LBL_CLEAR_BUTTON_LABEL') }}</label>
+                </div>
+            </ng-container>
+
+            <span *ngIf="field.links?.length" class="admin-settings-links">
+                <a *ngFor="let link of links(field)" [href]="link.href" target="_blank">{{ link.label }}</a>
+            </span>
+            <small *ngIf="field.help" class="form-text text-muted" [innerHTML]="field.help"></small>
+        </div>
+    </ng-template>
+</div>

@@ -51,7 +51,8 @@ import {
     AdminPanelComponent,
     TwoFactorComponent,
     MapsAdminComponent,
-    QuickRadiusComponent
+    QuickRadiusComponent,
+    AdminSettingsComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -218,6 +219,47 @@ export class AppInit {
                             checkSession: true,
                             module: 'administration',
                             mapsAdminPage: page
+                        }
+                    }));
+
+                    // Settings pages of the administration (admin panel links), before the generic
+                    // classic view routes: one view, the page key in the route data.
+                    const adminSettingsPages: { [path: string]: string } = {
+                        'administration/AOSAdmin': 'aos',
+                        'administration/AOPAdmin': 'aop',
+                        'administration/Locale': 'locale',
+                        'administration/Languages': 'languages',
+                        'administration/ThemeSettings': 'themes',
+                        'administration/SearchSettings': 'search',
+                        'administration/ElasticSearchSettings': 'elasticsearch',
+                        'administration/PasswordManager': 'password',
+                        'administration/ConfigureTabs': 'tabs',
+                        'administration/BusinessHours': 'business-hours',
+                        'administration/CalendarSyncSettings': 'calendar-sync',
+                        // Google Maps Settings (jjwg_Maps config page).
+                        'maps/config': 'maps',
+                        'emailman/config': 'email-settings',
+                        'emailman/campaignconfig': 'campaign-email-settings',
+                        // Connector Settings and its pages.
+                        'connectors/ConnectorSettings': 'connectors',
+                        'connectors/ModifyProperties': 'connector-properties',
+                        'connectors/ModifyDisplay': 'connector-display',
+                        'connectors/ModifyMapping': 'connector-mapping',
+                        'connectors/ModifySearch': 'connector-search',
+                    };
+                    Object.entries(adminSettingsPages).forEach(([path, page]) => routes.push({
+                        path,
+                        component: AdminSettingsComponent,
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration',
+                            adminSettingsPage: page
                         }
                     }));
                     routes.push(loggedOutConfig);

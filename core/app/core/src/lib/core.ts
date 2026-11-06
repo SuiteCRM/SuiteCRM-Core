@@ -937,3 +937,6 @@ export * from './containers/sidebar-widget/components/maps-widgets/area-map-widg
 export * from './views/maps/components/map-display/map-display.component';
 export * from './views/maps/components/maps-admin/maps-admin.component';
 export * from './views/maps/components/quick-radius/quick-radius.component';
+export * from './views/admin-settings/components/admin-settings/admin-settings.model';
+export * from './views/admin-settings/components/admin-settings/admin-settings.component';
+export * from './views/admin-settings/components/admin-settings/admin-settings.module';

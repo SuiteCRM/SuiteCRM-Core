@@ -166,6 +166,8 @@ $mod_strings = array(
     'LBL_BODY' => 'Body',
     'LBL_BORDER' => 'Border',
     'LBL_TEXT' => 'Text',
+    'LBL_CALENDAR_VIEW_ALL_DAY' => 'All day',
+    'LBL_CALENDAR_VIEW_MORE' => '+%s more',
 );
 
 

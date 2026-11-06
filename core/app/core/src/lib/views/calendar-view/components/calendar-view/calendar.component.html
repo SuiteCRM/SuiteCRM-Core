@@ -1,0 +1,92 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="calendar-view">
+    <div class="calendar-view-header">
+        <h2 class="calendar-view-page-title">{{ label('LBL_MODULE_TITLE') }}</h2>
+
+        <div *ngIf="data" class="calendar-view-views" role="group" [attr.aria-label]="label('LBL_MODULE_TITLE')">
+            <button *ngFor="let item of views" type="button" class="calendar-view-view" [class.is-active]="data.view === item.view"
+                    [attr.aria-pressed]="data.view === item.view" (click)="show(item.view)">{{ label(item.label) }}</button>
+        </div>
+    </div>
+
+    <div *ngIf="data" class="calendar-view-toolbar">
+        <div class="calendar-view-nav">
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" [title]="navLabel('PREVIOUS')"
+                    [attr.aria-label]="navLabel('PREVIOUS')" (click)="previous()">‹</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="today()">{{ label('LNK_VIEW_CALENDAR') }}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" [title]="navLabel('NEXT')"
+                    [attr.aria-label]="navLabel('NEXT')" (click)="next()">›</button>
+            <h3 class="calendar-view-title" aria-live="polite">{{ data.title }}</h3>
+        </div>
+
+        <div class="calendar-view-tools">
+            <form class="calendar-view-goto" (ngSubmit)="goTo()">
+                <label class="sr-only visually-hidden" for="calendar-view-goto">{{ label('LBL_GOTO_DATE') }}</label>
+                <input id="calendar-view-goto" name="goto" type="date" class="form-control form-control-sm" [(ngModel)]="gotoDate">
+                <button type="submit" class="btn btn-sm btn-outline-secondary" [disabled]="loading">{{ label('LBL_GOTO_DATE') }}</button>
+            </form>
+            <button *ngIf="shared" type="button" class="btn btn-sm btn-outline-secondary" (click)="openUsers()">{{ label('LBL_EDIT_USERLIST') }}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openSettings()">{{ label('LBL_SETTINGS') }}</button>
+        </div>
+    </div>
+
+    <p *ngIf="error" class="calendar-view-error" role="alert">{{ label(error) }}</p>
+    <p *ngIf="loading && !data" class="calendar-view-muted">{{ label('LBL_LOADING') }}</p>
+
+    <div *ngIf="data && !error" class="calendar-view-calendars" [class.is-loading]="loading">
+        <section *ngFor="let calendar of data.calendars" class="calendar-view-calendar">
+            <h4 *ngIf="shared && calendar.userId" class="calendar-view-user">{{ calendar.userName }}</h4>
+            <scrm-calendar-grid
+                [view]="data.view"
+                [days]="data.days"
+                [weekdays]="data.weekdays"
+                [hours]="data.hours"
+                [events]="calendar.events"
+                [settings]="data.settings"
+                [showUser]="shared && !calendar.userId"
+                [canCreate]="canCreate"
+                [userId]="calendar.userId"
+                [userName]="calendar.userName"
+                [labels]="{more: label('LBL_CALENDAR_VIEW_MORE'), allDay: label('LBL_CALENDAR_VIEW_ALL_DAY')}"
+                (create)="create($event)"
+                (open)="open($event)"
+                (move)="moveEvent($event)"
+                (resize)="resizeEvent($event)"
+                (showDay)="showDay($event)">
+            </scrm-calendar-grid>
+        </section>
+
+        <ul class="calendar-view-legend">
+            <li *ngFor="let color of data.settings.colors">
+                <span class="calendar-view-swatch" [style.background-color]="'#' + color.body" [style.border-color]="'#' + color.border"></span>
+                {{ color.label }}
+            </li>
+        </ul>
+    </div>
+</div>

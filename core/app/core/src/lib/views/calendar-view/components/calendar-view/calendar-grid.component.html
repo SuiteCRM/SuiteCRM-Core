@@ -1,0 +1,115 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="calendar-view-grid" [class.is-dragging]="action?.started">
+
+    <!-- Time grid: day and week views with time slots, shared week. -->
+    <div *ngIf="timeGrid; else dayGrid" class="calendar-view-time">
+        <div class="calendar-view-row calendar-view-head">
+            <div class="calendar-view-gutter"></div>
+            <div *ngFor="let column of columns" class="calendar-view-head-day" [class.is-today]="column.day.today"
+                 [class.is-weekend]="column.day.weekend">
+                <button type="button" class="calendar-view-day-link" (click)="onShowDay(column.day.date, $event)">{{ column.day.label }}</button>
+            </div>
+        </div>
+
+        <div class="calendar-view-row calendar-view-allday">
+            <div class="calendar-view-gutter calendar-view-allday-label">{{ labels.allDay }}</div>
+            <div *ngFor="let column of columns" class="calendar-view-allday-day" [attr.data-date]="column.day.date"
+                 [class.is-today]="column.day.today" [class.is-weekend]="column.day.weekend"
+                 [class.is-creatable]="canCreate" (click)="onDayClick(column.day.date, $event)">
+                <button *ngFor="let event of column.allDay" type="button" class="calendar-view-event calendar-view-chip"
+                        [ngStyle]="eventStyle(event)" [title]="eventTitle(event)" (click)="onEventClick(event, $event)">
+                    <span *ngIf="!event.allDay && startsOn(event, column.day.date)" class="calendar-view-event-time">{{ event.time }}</span>
+                    {{ eventName(event) }}
+                </button>
+            </div>
+        </div>
+
+        <div class="calendar-view-row calendar-view-body" [style.height.px]="height">
+            <div class="calendar-view-gutter calendar-view-hours">
+                <span *ngFor="let hour of hourRows" class="calendar-view-hour" [style.top.px]="hour.top">{{ hour.label }}</span>
+            </div>
+            <div *ngFor="let column of columns" class="calendar-view-col" [attr.data-date]="column.day.date"
+                 [class.is-today]="column.day.today" [class.is-weekend]="column.day.weekend"
+                 [class.is-creatable]="canCreate" (pointerdown)="onColumnPointerDown(column.day.date, $event)"
+                 (click)="onColumnClick(column.day.date, $any($event))">
+                <span *ngFor="let hour of hourRows" class="calendar-view-line" [style.top.px]="hour.top"></span>
+                <span *ngFor="let hour of hourRows" class="calendar-view-line is-half" [style.top.px]="hour.top + halfHour"></span>
+
+                <button *ngFor="let item of column.timed" type="button" class="calendar-view-event calendar-view-block"
+                        [class.is-movable]="item.event.movable && settings?.draggable" [class.is-moving]="isMoving(item.event)"
+                        [class.is-short]="item.height < 36"
+                        [style.top.px]="item.top" [style.height.px]="item.height"
+                        [style.left]="'calc(' + item.left + '% + 1px)'" [style.width]="'calc(' + item.width + '% - 3px)'"
+                        [ngStyle]="eventStyle(item.event)" [title]="eventTitle(item.event)"
+                        (pointerdown)="onEventPointerDown(item.event, $event, column.day.date)"
+                        (click)="onEventClick(item.event, $event)">
+                    <span class="calendar-view-event-time">{{ item.event.time }}</span>
+                    <span class="calendar-view-event-name">{{ eventName(item.event) }}</span>
+                    <span *ngIf="item.event.movable && settings?.resizable" class="calendar-view-resize" aria-hidden="true"
+                          (pointerdown)="onResizePointerDown(item, $event)" (click)="$event.stopPropagation()"></span>
+                </button>
+
+                <div *ngIf="preview(column.day.date) as shown" class="calendar-view-preview" [class.is-select]="!shown.event"
+                     [style.top.px]="shown.top" [style.height.px]="shown.height"
+                     [ngStyle]="shown.event ? eventStyle(shown.event) : {}">
+                    <span class="calendar-view-event-time">{{ shown.time }}</span>
+                    <span *ngIf="shown.event" class="calendar-view-event-name">{{ eventName(shown.event) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day grid: month views, day and week views without time slots. -->
+    <ng-template #dayGrid>
+        <div class="calendar-view-days" [class.is-month]="view === 'month' || view === 'sharedMonth'">
+            <div class="calendar-view-days-row calendar-view-days-head">
+                <div *ngFor="let name of headNames" class="calendar-view-weekday">{{ name }}</div>
+            </div>
+            <div *ngFor="let row of rows" class="calendar-view-days-row">
+                <div *ngFor="let cell of row" class="calendar-view-cell" [attr.data-date]="cell.day.date"
+                     [class.is-today]="cell.day.today" [class.is-weekend]="cell.day.weekend"
+                     [class.is-outside]="cell.day.outside" [class.is-drop]="isDropTarget(cell.day.date)"
+                     [class.is-creatable]="canCreate" (click)="onDayClick(cell.day.date, $event)">
+                    <button type="button" class="calendar-view-day-link calendar-view-cell-number"
+                            (click)="onShowDay(cell.day.date, $event)">{{ cell.day.number }}</button>
+                    <button *ngFor="let event of cell.events" type="button" class="calendar-view-event calendar-view-chip"
+                            [class.is-movable]="event.movable && settings?.draggable" [class.is-moving]="isMoving(event)"
+                            [ngStyle]="eventStyle(event)" [title]="eventTitle(event)"
+                            (pointerdown)="onEventPointerDown(event, $event, cell.day.date)"
+                            (click)="onEventClick(event, $event)">
+                        <span *ngIf="!event.allDay && startsOn(event, cell.day.date)" class="calendar-view-event-time">{{ event.time }}</span>
+                        {{ eventName(event) }}
+                    </button>
+                    <button *ngIf="cell.more" type="button" class="calendar-view-more"
+                            (click)="onShowDay(cell.day.date, $event)">{{ moreLabel(cell.more) }}</button>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</div>

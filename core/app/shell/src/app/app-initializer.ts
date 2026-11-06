@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    CalendarViewComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -184,6 +185,23 @@ export class AppInit {
                             }
                         }
                     });
+
+                    // Calendar view (Calendar tab and menu, also with the legacy view/date params),
+                    // before the generic classic view routes. The view follows its query params itself.
+                    ['calendar', 'calendar/index'].forEach(path => routes.push({
+                        path,
+                        component: CalendarViewComponent,
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'paramsChange',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: true,
+                            checkSession: true,
+                            module: 'calendar'
+                        }
+                    }));
                     routes.push(loggedOutConfig);
 
                     Object.keys(configRoutes).forEach(routeName => {

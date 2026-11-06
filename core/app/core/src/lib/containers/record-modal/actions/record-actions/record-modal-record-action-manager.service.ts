@@ -45,5 +45,10 @@ export class RecordModalActionManager extends BaseActionManager<RecordModalActio
         cancel.modes.forEach(mode => this.actions[mode][cancel.key] = cancel);
         save.modes.forEach(mode => this.actions[mode][save.key] = save);
         async.modes.forEach(mode => this.actions[mode][async.key] = async);
+
+        // The create actions of the record view (saveNew, cancelCreate), in a create modal: its save
+        // and cancel. Without handlers, the modal shows no buttons.
+        this.actions.create['saveNew'] = save;
+        this.actions.create['cancelCreate'] = cancel;
     }
 }

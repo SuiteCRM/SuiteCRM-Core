@@ -46,6 +46,35 @@ class SavedSearchTest extends SuitePHPUnitFrameworkTestCase
         self::assertGreaterThan(0, strlen((string) $result));
     }
 
+    public function testRetrieveSavedSearchDecodesJsonContents(): void
+    {
+        global $current_user;
+
+        $expected = [
+            'search_module' => 'Accounts',
+            'name_advanced' => 'Acme',
+            'orderBy' => 'name',
+            'sortOrder' => 'ASC',
+            'advanced' => true,
+        ];
+        $savedSearch = BeanFactory::newBean('SavedSearch');
+        $savedSearch->name = 'SavedSearch JSON retrieval test';
+        $savedSearch->assigned_user_id = $current_user->id;
+        $savedSearch->contents = json_encode($expected, JSON_THROW_ON_ERROR);
+
+        try {
+            $id = $savedSearch->save();
+            $retrieved = BeanFactory::newBean('SavedSearch');
+            $retrieved->retrieveSavedSearch($id);
+
+            self::assertSame($expected, $retrieved->contents);
+        } finally {
+            if (!empty($savedSearch->id)) {
+                $savedSearch->mark_deleted($savedSearch->id);
+            }
+        }
+    }
+
     public function handleSaveAndRetrieveSavedSearch($id): void
     {
         $savedSearch = BeanFactory::newBean('SavedSearch');

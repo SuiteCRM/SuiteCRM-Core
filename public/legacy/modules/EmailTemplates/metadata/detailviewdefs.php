@@ -42,88 +42,39 @@ if (!defined('sugarEntry') || !sugarEntry) {
     die('Not A Valid Entry Point');
 }
 
+// The layout of the record view (the legacy pages use their own templates, DetailView.html and
+// EditView.html): the HTML body in the HTML editor, the plain text body of a text only template
+// (EmailTemplateBodyFieldDefinitionMapper), and the attachments under the details.
 $viewdefs['EmailTemplates']['DetailView'] = array(
-    'templateMeta' => array('maxColumns' => '2',
-                            'widths' => array(
-                                            array('label' => '10', 'field' => '30'),
-                                            array('label' => '10', 'field' => '30')
-                                            ),
-    ),
- 'panels' =>array(
-  'default' =>
-  array(
-    
-    array(
-      'name',
-      '',
-    ),
-    
-    array(
-      'type',
-    ),
-    
-    array(
-      
-      array(
-        'name' => 'description',
-        'displayParams' =>
-        array(
-          'rows' => '1',
-          'cols' => '90',
+    'templateMeta' => array(
+        'maxColumns' => '2',
+        'widths' => array(
+            array('label' => '10', 'field' => '30'),
+            array('label' => '10', 'field' => '30')
         ),
-      ),
-    ),
-    
-    array(
-      
-      array(
-        'name' => 'tracker_url',
-        'fields' =>
-        array(
-          'tracker_url',
-          'url_text',
+        'useTabs' => false,
+        'tabDefs' => array(
+            'DEFAULT' => array(
+                'newTab' => false,
+                'panelDefault' => 'expanded',
+            ),
         ),
-      ),
     ),
-    
-    array(
-      
-      array(
-        'name' => 'subject',
-        'displayParams' =>
+    'bottomWidgets' => array(
         array(
-          'rows' => '1',
-          'cols' => '90',
+            'type' => 'email-template-attachments',
+            'modes' => array('detail', 'edit', 'create'),
+            'options' => array(),
         ),
-      ),
     ),
-    
-    array(
-      'text_only',
-    ),
-    
-    array(
-      
-      array(
-        'name' => 'body_html',
-        'displayParams' =>
-        array(
-          'rows' => '20',
-          'cols' => '100',
+    'panels' => array(
+        'default' => array(
+            array('name', 'type'),
+            array('assigned_user_name', 'text_only'),
+            array('description'),
+            array('subject'),
+            array('body_html'),
+            array('body'),
         ),
-      ),
     ),
-    
-    array(
-      
-      array(
-        'name' => 'ATTACHMENTS_JAVASCRIPT',
-        'customCode' => '{$fields.attachments_javascript.value} {$fields.attachments.value}',
-        'description' => 'This field was auto generated',
-      ),
-    ),
-  ),
-)
-
-
 );

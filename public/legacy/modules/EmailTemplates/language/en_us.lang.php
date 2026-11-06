@@ -101,4 +101,10 @@ $mod_strings = array(
     'LBL_TYPE' => 'Type',
     'LBL_WIDTH' => 'Width Default',
     'LNK_IMPORT_CAMPAIGNS' => 'Import Campaign',
+    'LBL_TEMPLATE_ATTACHMENTS_EMPTY' => 'No attachments.',
+    'LBL_TEMPLATE_ATTACHMENTS_REMOVE' => 'Remove',
+    'LBL_TEMPLATE_ATTACHMENTS_REMOVE_CONFIRM' => 'Remove this attachment from the template?',
+    'LBL_TEMPLATE_ATTACHMENTS_TOO_BIG' => 'The file is larger than the maximum upload size.',
+    'LBL_TEMPLATE_ATTACHMENTS_ERROR' => 'The attachments could not be loaded or changed. Please try again.',
+    'LBL_TEMPLATE_ATTACHMENTS_SAVE_FIRST' => 'Save the template to add attachments.',
 );

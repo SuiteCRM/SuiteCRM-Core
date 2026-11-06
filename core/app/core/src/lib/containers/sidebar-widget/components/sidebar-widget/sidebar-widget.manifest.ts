@@ -37,13 +37,16 @@ import {RecordTableWidgetComponent} from "../record-table-widget/record-table-wi
 import {RecordTableWidgetModule} from "../record-table-widget/record-table-widget.module";
 import {BannerGridSidebarWidgetModule} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.module";
 import {BannerGridSidebarWidgetComponent} from "../banner-grid-sidebar-widget/banner-grid-sidebar-widget.component";
+import {EmailTemplateAttachmentsWidgetModule} from '../email-template-attachments-widget/email-template-attachments-widget.module';
+import {EmailTemplateAttachmentsWidgetComponent} from '../email-template-attachments-widget/email-template-attachments-widget.component';
 
 export const sidebarWidgetModules = [
     HistorySidebarWidgetModule,
     ChartSidebarWidgetModule,
     StatisticsSidebarWidgetModule,
     RecordTableWidgetModule,
-    BannerGridSidebarWidgetModule
+    BannerGridSidebarWidgetModule,
+    EmailTemplateAttachmentsWidgetModule
 ];
 
 export const componentTypeMap = {
@@ -52,5 +55,6 @@ export const componentTypeMap = {
     statistics: StatisticsSidebarWidgetComponent,
     'record-thread': RecordThreadSidebarWidgetComponent,
     'record-table': RecordTableWidgetComponent,
-    'banner-grid': BannerGridSidebarWidgetComponent
+    'banner-grid': BannerGridSidebarWidgetComponent,
+    'email-template-attachments': EmailTemplateAttachmentsWidgetComponent
 };

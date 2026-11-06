@@ -43,6 +43,10 @@ interface GeocodedModule {
 }
 
 interface GeocodedCounts {
+    /** The map provider, the modules a Geocode button geocodes, the OpenStreetMap scheduler. */
+    provider?: 'google' | 'osm';
+    geocodeModules?: string[];
+    osmScheduler?: string;
     headings: { key: string; label: string }[];
     modules: GeocodedModule[];
     lastStatus: string;
@@ -106,6 +110,11 @@ export class MapsAdminComponent implements OnInit, OnDestroy {
 
     label(key: string): string {
         return this.data?.labels?.[key] || this.labels[key] || this.language.getAppString(key) || key;
+    }
+
+    /** Whether the Geocode button of a module is shown (with OpenStreetMap, the modules geocoded with it). */
+    canGeocode(module: string): boolean {
+        return !this.data?.geocodeModules || this.data.geocodeModules.includes(module);
     }
 
     geocode(module: string): void {

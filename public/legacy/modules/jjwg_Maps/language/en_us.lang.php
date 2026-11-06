@@ -140,14 +140,14 @@ $mod_strings['LBL_CONFIG_GROUP_FIELD_FOR_PROJECTS'] = 'Group Field for Projects:
 $mod_strings['LBL_CONFIG_GROUP_FIELD_FOR_MEETINGS'] = 'Group Field for Meetings:';
 $mod_strings['LBL_CONFIG_GROUP_FIELD_FOR_PROSPECTS'] = 'Group Field for  Prospects/Targets:';
 
-$mod_strings['LBL_CONFIG_GEOCODING_SETTINGS_TITLE'] = 'Geocoding/Google Settings:';
+$mod_strings['LBL_CONFIG_GEOCODING_SETTINGS_TITLE'] = 'Geocoding Settings:';
 $mod_strings['LBL_CONFIG_GEOCODING_API_URL_TITLE'] = 'Geocoding API URL:';
 $mod_strings['LBL_CONFIG_GEOCODING_API_URL_DESC'] = 'The URL of the Google Maps API V3 or Proxy';
 $mod_strings['LBL_CONFIG_GEOCODING_API_SECRET_TITLE'] = 'Secret Phrase for Proxy:';
 $mod_strings['LBL_CONFIG_GEOCODING_API_SECRET_DESC'] = 'The Secret Phrase to be used with the Proxy MD5 comparison.';
 $mod_strings['LBL_CONFIG_GEOCODING_LIMIT_TITLE'] = 'Geocoding Limit:';
 $mod_strings['LBL_CONFIG_GEOCODING_LIMIT_DESC'] = "'geocoding_limit' sets the query limit when selecting records to geocode.";
-$mod_strings['LBL_CONFIG_GOOGLE_GEOCODING_LIMIT_TITLE'] = 'Google Geocoding Limit:';
+$mod_strings['LBL_CONFIG_GOOGLE_GEOCODING_LIMIT_TITLE'] = 'Geocoding Requests Limit:';
 $mod_strings['LBL_CONFIG_GOOGLE_GEOCODING_LIMIT_DESC'] = "'google_geocoding_limit' sets the request limit when geocoding using the Google Maps API.";
 $mod_strings['LBL_CONFIG_EXPORT_ADDRESSES_LIMIT_TITLE'] = 'Export Addresses Limit:';
 $mod_strings['LBL_CONFIG_EXPORT_ADDRESSES_LIMIT_DESC'] = "'export_addresses_limit' sets the query limit when selecting records to export.";
@@ -191,7 +191,7 @@ $mod_strings['LBL_GOOGLE_API_KEY'] = 'Google Api Key';
 $mod_strings['LBL_ERROR_NO_GOOGLE_API_KEY'] = 'Please set the Google Api Key in the Google Maps Administrative Panel.';
 
 // Maps views of SuiteCRM 8 (map widgets, quick radius map, geocoding pages).
-$mod_strings['LBL_MAPS_VIEW_NO_API_KEY'] = 'No Google Maps API key is set (Admin > Google Maps Settings): the map cannot be shown.';
+$mod_strings['LBL_MAPS_VIEW_NO_API_KEY'] = 'No Google Maps API key is set (Admin > Maps Settings): the map cannot be shown.';
 $mod_strings['LBL_MAPS_VIEW_MAP_LOAD_ERROR'] = 'Google Maps could not be loaded.';
 $mod_strings['LBL_MAPS_VIEW_MARKER_STATUS'] = 'Marker status';
 $mod_strings['LBL_MAPS_VIEW_MARKER_POSITION'] = 'Current position';
@@ -217,3 +217,28 @@ $mod_strings['LBL_MAPS_VIEW_EXPORT'] = 'Export';
 $mod_strings['LBL_MAPS_VIEW_DELETE_CACHE'] = 'Delete - Address Cache';
 $mod_strings['LBL_MAPS_VIEW_RESET_CONFIRM'] = 'Reset the geocoding information of this module?';
 $mod_strings['LBL_MAPS_VIEW_DELETE_CACHE_CONFIRM'] = 'Delete all the address cache?';
+
+// Map provider: Google Maps or OpenStreetMap (map tiles and Nominatim geocoding).
+$mod_strings['LBL_MAPS_VIEW_OSM_LOAD_ERROR'] = 'OpenStreetMap could not be loaded.';
+$mod_strings['LBL_MAPS_VIEW_OSM_MARKER'] = 'With OpenStreetMap (Admin > Maps Settings), the position is not placed on a map: type the latitude and longitude.';
+$mod_strings['LBL_MAPS_VIEW_OSM_AREA'] = 'With OpenStreetMap (Admin > Maps Settings), the area is not drawn on a map: type its coordinates.';
+$mod_strings['LBL_MAPS_VIEW_PROVIDER'] = 'Map provider';
+$mod_strings['LBL_MAPS_VIEW_PROVIDER_GOOGLE'] = 'Google Maps';
+$mod_strings['LBL_MAPS_VIEW_PROVIDER_OSM'] = 'OpenStreetMap';
+$mod_strings['LBL_MAPS_VIEW_OSM_MODULES'] = 'Geocoded with OpenStreetMap';
+$mod_strings['LBL_MAPS_VIEW_OSM_SCHEDULER'] = 'The scheduler "Geocode Addresses (OpenStreetMap)" (Admin > Schedulers) geocodes these modules between {from} and {to} ({timezone}), within the geocoding limits, one request per second.';
+$mod_strings['LBL_MAPS_VIEW_OSM_SCHEDULER_ANYTIME'] = 'The scheduler "Geocode Addresses (OpenStreetMap)" (Admin > Schedulers) geocodes these modules each time it runs, within the geocoding limits, one request per second.';
+$mod_strings['LBL_CONFIG_MAP_PROVIDER_SETTINGS_TITLE'] = 'Map Provider:';
+$mod_strings['LBL_CONFIG_MAP_PROVIDER_TITLE'] = 'Map Provider:';
+$mod_strings['LBL_CONFIG_MAP_PROVIDER_DESC'] = 'Google Maps needs an API key. OpenStreetMap needs no key: its map tiles and its geocoding (Nominatim, one request per second) come from the URLs of its settings.';
+$mod_strings['LBL_CONFIG_OSM_SETTINGS_TITLE'] = 'OpenStreetMap Settings:';
+$mod_strings['LBL_CONFIG_OSM_TILE_URL_TITLE'] = 'Map Tiles URL:';
+$mod_strings['LBL_CONFIG_OSM_ATTRIBUTION_TITLE'] = 'Map Attribution:';
+$mod_strings['LBL_CONFIG_OSM_GEOCODING_URL_TITLE'] = 'Geocoding URL (Nominatim Search):';
+$mod_strings['LBL_CONFIG_OSM_GEOCODE_MODULES_TITLE'] = 'Modules Geocoded with OpenStreetMap:';
+$mod_strings['LBL_CONFIG_OSM_GEOCODE_MODULES_DESC'] = 'The modules the Geocode buttons and the scheduler geocode, among the valid geocode modules: their addresses are sent to the geocoding service. Empty: all of them.';
+$mod_strings['LBL_CONFIG_GEOCODING_HOUR_FROM_TITLE'] = 'Scheduler Geocoding From (Hour):';
+$mod_strings['LBL_CONFIG_GEOCODING_HOUR_TO_TITLE'] = 'Scheduler Geocoding To (Hour):';
+$mod_strings['LBL_CONFIG_GEOCODING_HOURS_DESC'] = 'The hours (0-23) when the scheduler "Geocode Addresses (OpenStreetMap)" geocodes, e.g. from 18 to 6 at night. The same hour: at any time.';
+$mod_strings['LBL_CONFIG_GEOCODING_TIMEZONE_TITLE'] = 'Scheduler Geocoding Time Zone:';
+$mod_strings['LBL_CONFIG_GEOCODED_MODULES_SETTINGS_TITLE'] = 'Geocoded Modules:';

@@ -28,6 +28,8 @@
 namespace App\Module\Maps\LegacyHandler;
 
 use App\Engine\LegacyHandler\LegacyHandler;
+use App\Module\Maps\Service\Geocoding\MapsGeocoding;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * The Google Maps settings of the maps modules (jjwg_Maps::configuration, config
@@ -43,6 +45,7 @@ class MapsHandler extends LegacyHandler
         'LBL_MAPS_VIEW_NO_API_KEY', 'LBL_MAPS_VIEW_MAP_LOAD_ERROR', 'LBL_MAPS_VIEW_MARKER_STATUS',
         'LBL_MAPS_VIEW_MARKER_POSITION', 'LBL_MAPS_VIEW_MARKER_ADDRESS', 'LBL_MAPS_VIEW_DRAGGING',
         'LBL_MAPS_VIEW_DRAG_ENDED', 'LBL_MAPS_VIEW_DRAG_HELP', 'LBL_MAPS_VIEW_NO_ADDRESS',
+        'LBL_MAPS_VIEW_OSM_LOAD_ERROR', 'LBL_MAPS_VIEW_OSM_MARKER', 'LBL_MAPS_VIEW_OSM_AREA',
     ];
 
     /** Labels of the map display and quick radius pages (jjwg_Maps strings). */
@@ -63,6 +66,14 @@ class MapsHandler extends LegacyHandler
         'LBL_AREA_EDIT_TITLE', 'LBL_AREA_EDIT_DESC_1', 'LBL_AREA_EDIT_DESC_2', 'LBL_AREA_EDIT_RESET',
         'LBL_AREA_EDIT_USE_AREA_COORDINATES', 'LBL_AREA_EDIT_COORDINATE_RESULTS',
     ];
+
+    protected MapsGeocoding $geocoding;
+
+    #[Required]
+    public function setGeocoding(MapsGeocoding $geocoding): void
+    {
+        $this->geocoding = $geocoding;
+    }
 
     public function getHandlerKey(): string
     {
@@ -87,6 +98,10 @@ class MapsHandler extends LegacyHandler
             }
 
             return [
+                // The map provider (Google Maps or OpenStreetMap) and the OpenStreetMap tiles.
+                'provider' => MapsGeocoding::isOsm($config) ? MapsGeocoding::OSM : MapsGeocoding::GOOGLE,
+                'tileUrl' => (string)($config['osm_tile_url'] ?? ''),
+                'attribution' => (string)($config['osm_attribution'] ?? ''),
                 'apiKey' => (string)($config['google_maps_api_key'] ?? ''),
                 'center' => [
                     'lat' => (float)($config['map_default_center_latitude'] ?? 39.5),
@@ -120,6 +135,7 @@ class MapsHandler extends LegacyHandler
             $request = array_map(static fn ($value) => is_scalar($value) ? (string)$value : '', $request);
 
             $controller = new \jjwg_MapsController();
+            $this->geocoding->apply($controller);
             // The legacy page stops with its message when the quick address is not found: checked first.
             if (!empty($request['quick_address'])) {
                 $info = $controller->bean->getGoogleMapsGeocode($request['quick_address'], false, true);

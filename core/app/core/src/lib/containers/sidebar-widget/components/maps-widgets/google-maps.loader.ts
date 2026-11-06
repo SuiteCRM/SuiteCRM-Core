@@ -58,6 +58,10 @@ export function loadGoogleMaps(apiKey: string): Promise<any> {
 
 /** The settings of the `maps` process (Maps::config). */
 export interface MapsConfig {
+    /** The map provider and the OpenStreetMap tiles. */
+    provider?: 'google' | 'osm';
+    tileUrl?: string;
+    attribution?: string;
     apiKey: string;
     center: { lat: number; lng: number };
     markerImages: string;

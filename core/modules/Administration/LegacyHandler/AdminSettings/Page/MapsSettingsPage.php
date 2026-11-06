@@ -30,10 +30,11 @@ namespace App\Module\Administration\LegacyHandler\AdminSettings\Page;
 use App\Module\Administration\LegacyHandler\AdminSettings\AdminSettingsPage;
 
 /**
- * Google Maps Settings of the administration (legacy jjwg_Maps config page), as the
- * legacy page: the API key and the geocoded modules, the address type and the marker group field of
- * each module, the geocoding, address cache, logic hooks and map settings, each with its default.
- * Saved by jjwg_Maps::saveConfiguration as the legacy form posts it.
+ * Maps Settings of the administration (legacy jjwg_Maps config page), as the legacy page: the
+ * map provider (Google Maps or OpenStreetMap, each with its own settings: the API key, the map
+ * tiles, the geocoding URL, modules and hours), the geocoded modules, the address type and the
+ * marker group field of each module, the geocoding, address cache, logic hooks and map settings,
+ * each with its default. Saved by jjwg_Maps::saveConfiguration as the legacy form posts it.
  */
 class MapsSettingsPage extends AdminSettingsPage
 {
@@ -118,6 +119,14 @@ class MapsSettingsPage extends AdminSettingsPage
         foreach (self::SWITCHES as $name) {
             $values[$name] = !empty($config[$name]) ? '1' : '0';
         }
+        foreach (['map_provider', 'osm_tile_url', 'osm_attribution', 'osm_geocoding_url', 'geocoding_hour_from',
+                     'geocoding_hour_to', 'geocoding_timezone'] as $name) {
+            $values[$name] = (string)($config[$name] ?? '');
+        }
+        $values['osm_geocode_modules'] = implode(', ', $config['osm_geocode_modules'] ?? []);
+        // The settings of the chosen map provider only.
+        $osm = ['field' => 'map_provider', 'values' => ['osm']];
+        $google = ['field' => 'map_provider', 'values' => ['google']];
 
         $field = fn (string $name, string $label, string $type, array $extra = []): array => $this->field($name, $label, $type, $extra + [
             'help' => $this->defaultHelp(in_array($name, self::SWITCHES, true)
@@ -126,22 +135,46 @@ class MapsSettingsPage extends AdminSettingsPage
         ], self::MODULE);
 
         return [
-            'title' => $this->text('LBL_CONFIG_TITLE', self::MODULE),
+            'title' => $this->text('LBL_JJWG_MAPS_ADMIN_CONFIG_TITLE'),
             'sections' => [
+                $this->section('LBL_CONFIG_MAP_PROVIDER_SETTINGS_TITLE', [
+                    $field('map_provider', 'LBL_CONFIG_MAP_PROVIDER_TITLE', 'select', [
+                        'options' => $this->options([
+                            'google' => $this->text('LBL_MAPS_VIEW_PROVIDER_GOOGLE', self::MODULE),
+                            'osm' => $this->text('LBL_MAPS_VIEW_PROVIDER_OSM', self::MODULE),
+                        ]),
+                        'help' => 'LBL_CONFIG_MAP_PROVIDER_DESC',
+                    ]),
+                ], self::MODULE),
+                $this->section('LBL_CONFIG_OSM_SETTINGS_TITLE', [
+                    $field('osm_tile_url', 'LBL_CONFIG_OSM_TILE_URL_TITLE', 'text', ['maxlength' => 255, 'wide' => true]),
+                    $field('osm_attribution', 'LBL_CONFIG_OSM_ATTRIBUTION_TITLE', 'text', ['maxlength' => 255, 'wide' => true]),
+                    $field('osm_geocoding_url', 'LBL_CONFIG_OSM_GEOCODING_URL_TITLE', 'text', ['maxlength' => 255, 'wide' => true]),
+                    $field('osm_geocode_modules', 'LBL_CONFIG_OSM_GEOCODE_MODULES_TITLE', 'text', [
+                        'maxlength' => 255, 'wide' => true, 'help' => 'LBL_CONFIG_OSM_GEOCODE_MODULES_DESC',
+                    ]),
+                    $field('geocoding_hour_from', 'LBL_CONFIG_GEOCODING_HOUR_FROM_TITLE', 'number', ['help' => 'LBL_CONFIG_GEOCODING_HOURS_DESC']),
+                    $field('geocoding_hour_to', 'LBL_CONFIG_GEOCODING_HOUR_TO_TITLE', 'number'),
+                    $field('geocoding_timezone', 'LBL_CONFIG_GEOCODING_TIMEZONE_TITLE', 'select', [
+                        'options' => $this->options(array_combine(\DateTimeZone::listIdentifiers(), \DateTimeZone::listIdentifiers())),
+                    ]),
+                ], self::MODULE) + ['showIf' => [$osm]],
                 $this->section('LBL_GOOGLE_API_KEY', [
                     $this->field('google_maps_api_key', 'LBL_GOOGLE_API_KEY', 'text', [
                         'maxlength' => 255,
                         'wide' => true,
                         'links' => [['label' => $this->text('LBL_GET_GOOGLE_API_KEY', self::MODULE), 'href' => 'https://developers.google.com/maps/documentation/javascript/']],
                     ], self::MODULE),
+                ], self::MODULE) + ['showIf' => [$google]],
+                $this->section('LBL_CONFIG_GEOCODED_MODULES_SETTINGS_TITLE', [
                     $field('valid_geocode_modules', 'LBL_CONFIG_VALID_GEOCODE_MODULES', 'text', ['wide' => true]),
                     $field('valid_geocode_tables', 'LBL_CONFIG_VALID_GEOCODE_TABLES', 'text', ['wide' => true]),
                 ], self::MODULE),
                 $this->section('LBL_CONFIG_ADDRESS_TYPE_SETTINGS_TITLE', $addressFields, self::MODULE),
                 $this->section('LBL_CONFIG_MARKER_GROUP_FIELD_SETTINGS_TITLE', $groupFields, self::MODULE),
                 $this->section('LBL_CONFIG_GEOCODING_SETTINGS_TITLE', [
-                    $field('geocoding_api_url', 'LBL_CONFIG_GEOCODING_API_URL_TITLE', 'text', ['wide' => true]),
-                    $field('geocoding_api_secret', 'LBL_CONFIG_GEOCODING_API_SECRET_TITLE', 'text'),
+                    $field('geocoding_api_url', 'LBL_CONFIG_GEOCODING_API_URL_TITLE', 'text', ['wide' => true, 'showIf' => [$google]]),
+                    $field('geocoding_api_secret', 'LBL_CONFIG_GEOCODING_API_SECRET_TITLE', 'text', ['showIf' => [$google]]),
                     $field('geocoding_limit', 'LBL_CONFIG_GEOCODING_LIMIT_TITLE', 'number'),
                     $field('google_geocoding_limit', 'LBL_CONFIG_GOOGLE_GEOCODING_LIMIT_TITLE', 'number'),
                     $field('allow_approximate_location_type', 'LBL_CONFIG_ALLOW_APPROXIMATE_LOCATION_TYPE_TITLE', 'select', ['options' => $switch]),

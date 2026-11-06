@@ -46,6 +46,10 @@
         <p *ngIf="loading && !data" class="maps-page-muted">…</p>
         <ng-container *ngIf="data">
             <p class="maps-page-intro">{{ label('LBL_GEOCODED_COUNTS_DESCRIPTION') }}</p>
+            <p *ngIf="data.provider">{{ label('LBL_MAPS_VIEW_PROVIDER') }}:
+                <strong>{{ label(data.provider === 'osm' ? 'LBL_MAPS_VIEW_PROVIDER_OSM' : 'LBL_MAPS_VIEW_PROVIDER_GOOGLE') }}</strong>
+                <ng-container *ngIf="data.provider === 'osm'"> — {{ label('LBL_MAPS_VIEW_OSM_MODULES') }}: {{ data.geocodeModules?.join(', ') }}</ng-container>
+            </p>
             <p *ngIf="data.lastStatus"><strong>{{ label('LBL_MAP_LAST_STATUS') }}: {{ data.lastStatus }}</strong></p>
             <div class="maps-page-buttons maps-admin-actions">
                 <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="geocode('')">{{ label('LBL_MAPS_VIEW_GEOCODE_ALL') }}</button>
@@ -66,7 +70,8 @@
                         <td *ngFor="let heading of data.headings">{{ module.counts[heading.key] ?? '' }}</td>
                         <td class="maps-page-name">{{ module.total }}</td>
                         <td class="maps-admin-row-actions">
-                            <button type="button" class="btn btn-sm btn-link" [disabled]="loading" (click)="geocode(module.module)">{{ label('LBL_MAPS_VIEW_GEOCODE') }}</button>
+                            <button *ngIf="canGeocode(module.module)" type="button" class="btn btn-sm btn-link" [disabled]="loading"
+                                    (click)="geocode(module.module)">{{ label('LBL_MAPS_VIEW_GEOCODE') }}</button>
                             <button type="button" class="btn btn-sm btn-link" [disabled]="loading" (click)="reset(module)">{{ label('LBL_MODULE_RESET_HEADING') }}</button>
                         </td>
                     </tr>
@@ -74,11 +79,17 @@
                 </table>
             </div>
 
-            <div class="maps-page-panel maps-admin-panel">
-                <strong>{{ label('LBL_CRON_URL') }}</strong>
-                <p>{{ label('LBL_CRON_INSTRUCTIONS') }}</p>
-                <code>{{ data.cronUrl }}</code>
+            <div *ngIf="data.provider === 'osm'; else cronUrl" class="maps-page-panel maps-admin-panel">
+                <strong>{{ label('LBL_MAPS_VIEW_PROVIDER_OSM') }}</strong>
+                <p>{{ data.osmScheduler }}</p>
             </div>
+            <ng-template #cronUrl>
+                <div class="maps-page-panel maps-admin-panel">
+                    <strong>{{ label('LBL_CRON_URL') }}</strong>
+                    <p>{{ label('LBL_CRON_INSTRUCTIONS') }}</p>
+                    <code>{{ data.cronUrl }}</code>
+                </div>
+            </ng-template>
 
             <div class="maps-page-panel maps-admin-panel">
                 <strong>{{ label('LBL_EXPORT_ADDRESS_URL') }}</strong>

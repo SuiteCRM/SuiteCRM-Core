@@ -28,6 +28,8 @@
 namespace App\Module\Maps\LegacyHandler;
 
 use App\Engine\LegacyHandler\LegacyHandler;
+use App\Module\Maps\Service\Geocoding\MapsGeocoding;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * The geocoding screens of the Google Maps administration (legacy jjwg_Maps
@@ -48,7 +50,16 @@ class MapsAdminHandler extends LegacyHandler
     protected const VIEW_LABELS = [
         'LBL_MAPS_VIEW_GEOCODE', 'LBL_MAPS_VIEW_GEOCODE_ALL', 'LBL_MAPS_VIEW_EXPORT',
         'LBL_MAPS_VIEW_DELETE_CACHE', 'LBL_MAPS_VIEW_RESET_CONFIRM', 'LBL_MAPS_VIEW_DELETE_CACHE_CONFIRM',
+        'LBL_MAPS_VIEW_PROVIDER', 'LBL_MAPS_VIEW_PROVIDER_GOOGLE', 'LBL_MAPS_VIEW_PROVIDER_OSM', 'LBL_MAPS_VIEW_OSM_MODULES',
     ];
+
+    protected MapsGeocoding $geocoding;
+
+    #[Required]
+    public function setGeocoding(MapsGeocoding $geocoding): void
+    {
+        $this->geocoding = $geocoding;
+    }
 
     public function getHandlerKey(): string
     {
@@ -71,11 +82,60 @@ class MapsAdminHandler extends LegacyHandler
     public function geocode(string $module): array
     {
         return $this->inLegacy(function () use ($module) {
-            $controller = $this->controller();
-            $this->withRequest(['display_module' => $module, 'cron' => '1'], fn () => $controller->action_geocode_addresses());
-
-            return $this->countsData((string)$controller->last_status);
+            return $this->countsData($this->geocodeModules($module === '' ? [] : [$module]));
         });
+    }
+
+    /**
+     * The scheduled geocoding (MapsGeocodeScheduler): with OpenStreetMap only, within its geocoding
+     * hours, the modules geocoded with it. Returns what was done, for the log.
+     */
+    public function geocodeScheduled(\DateTimeInterface $now): string
+    {
+        return $this->inLegacy(function () use ($now) {
+            \BeanFactory::newBean('jjwg_Maps');
+            $settings = $GLOBALS['jjwg_config'] ?? [];
+            if (!MapsGeocoding::isOsm($settings)) {
+                return 'the map provider is not OpenStreetMap: nothing to do';
+            }
+            if (!MapsGeocoding::inGeocodingHours($now, $settings)) {
+                return 'outside the geocoding hours: nothing to do';
+            }
+            $lastStatus = $this->geocodeModules([]);
+
+            return 'geocoded, last status: ' . ($lastStatus !== '' ? $lastStatus : 'none');
+        });
+    }
+
+    /**
+     * Geocodes the addresses of modules (all when none) as the legacy geocode_addresses action run
+     * by the cron, within the geocoding limits. With OpenStreetMap, only the modules geocoded with
+     * it, one after the other. Returns the last geocoding status.
+     *
+     * @param string[] $modules
+     */
+    protected function geocodeModules(array $modules): string
+    {
+        $controller = $this->controller();
+        if (!MapsGeocoding::isOsm($controller->settings)) {
+            $this->withRequest(['display_module' => $modules[0] ?? '', 'cron' => '1'], fn () => $controller->action_geocode_addresses());
+
+            return (string)($controller->last_status ?? '');
+        }
+
+        $allowed = MapsGeocoding::osmModules($controller->settings);
+        $modules = $modules === [] ? $allowed : array_values(array_intersect($modules, $allowed));
+        if ($modules === []) {
+            throw new \InvalidArgumentException('Module not geocoded with OpenStreetMap');
+        }
+        foreach ($modules as $module) {
+            $this->withRequest(['display_module' => $module, 'cron' => '1'], fn () => $controller->action_geocode_addresses());
+            if (in_array($controller->last_status ?? '', ['OVER_QUERY_LIMIT', 'REQUEST_DENIED', 'UNKNOWN_ERROR'], true)) {
+                break;
+            }
+        }
+
+        return (string)($controller->last_status ?? '');
     }
 
     /**
@@ -139,6 +199,10 @@ class MapsAdminHandler extends LegacyHandler
             }
             $controller = $this->controller();
             $result = $controller->bean->getGoogleMapsGeocode($address, true, true);
+            if (is_array($result) && isset($result['provider'])) {
+                // The OpenStreetMap answer, in the Google format of the maps module.
+                $result = ['provider' => $result['provider']] + $result;
+            }
 
             return ['result' => print_r($result, true), 'labels' => $this->labels()];
         });
@@ -173,8 +237,33 @@ class MapsAdminHandler extends LegacyHandler
             'lastStatus' => preg_match('/^[A-Z_]+$/', $lastStatus) ? $lastStatus : '',
             'exportModules' => array_values(array_intersect(['Accounts', 'Contacts', 'Leads', 'Prospects'], $controller->settings['valid_geocode_modules'] ?? [])),
             'cronUrl' => rtrim((string)($sugar_config['site_url'] ?? ''), '/') . '/legacy/index.php?module=jjwg_Maps&entryPoint=jjwg_Maps&cron=1',
+            // The map provider, the modules a Geocode button geocodes and the OpenStreetMap scheduler.
+            'provider' => MapsGeocoding::isOsm($controller->settings) ? MapsGeocoding::OSM : MapsGeocoding::GOOGLE,
+            'geocodeModules' => MapsGeocoding::isOsm($controller->settings)
+                ? MapsGeocoding::osmModules($controller->settings)
+                : array_values($controller->settings['valid_geocode_modules'] ?? []),
+            'osmScheduler' => $this->schedulerText($controller->settings),
             'labels' => $this->labels(),
         ];
+    }
+
+    /**
+     * What the OpenStreetMap scheduler does, with its hours.
+     *
+     * @param array<string, mixed> $settings
+     */
+    protected function schedulerText(array $settings): string
+    {
+        $strings = return_module_language($GLOBALS['current_language'], 'jjwg_Maps');
+        $from = (int)($settings['geocoding_hour_from'] ?? 0);
+        $to = (int)($settings['geocoding_hour_to'] ?? 0);
+        $text = (string)($strings[$from === $to ? 'LBL_MAPS_VIEW_OSM_SCHEDULER_ANYTIME' : 'LBL_MAPS_VIEW_OSM_SCHEDULER'] ?? '');
+
+        return $this->decode(strtr($text, [
+            '{from}' => sprintf('%02d:00', $from),
+            '{to}' => sprintf('%02d:00', $to),
+            '{timezone}' => (string)($settings['geocoding_timezone'] ?? 'UTC'),
+        ]));
     }
 
     protected function labels(): array
@@ -198,7 +287,7 @@ class MapsAdminHandler extends LegacyHandler
         $GLOBALS['currentModule'] = 'jjwg_Maps';
         $GLOBALS['mod_strings'] = return_module_language($GLOBALS['current_language'], 'jjwg_Maps');
 
-        return new class extends \jjwg_MapsController {
+        $controller = new class extends \jjwg_MapsController {
             /** The CSV of action_export_geocoding_addresses, without its headers and exit. */
             public function exportAddresses(): void
             {
@@ -222,6 +311,10 @@ class MapsAdminHandler extends LegacyHandler
                 fclose($out);
             }
         };
+        // The geocoding of the map provider.
+        $this->geocoding->apply($controller);
+
+        return $controller;
     }
 
     /**

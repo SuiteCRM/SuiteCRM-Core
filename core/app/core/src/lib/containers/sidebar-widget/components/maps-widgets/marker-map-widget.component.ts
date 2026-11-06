@@ -114,6 +114,12 @@ export class MarkerMapWidgetComponent extends BaseWidgetComponent implements OnI
         this.subs.push(this.processService.submit(MarkerMapWidgetComponent.PROCESS, {action: 'config'}).pipe(take(1)).subscribe({
             next: (process: Process) => {
                 this.mapsConfig = process?.data as MapsConfig;
+                // With OpenStreetMap, no map to place the marker or draw the area on.
+                if (this.mapsConfig?.provider === 'osm') {
+                    this.message = this.label('LBL_MAPS_VIEW_OSM_MARKER');
+                    this.cdr.detectChanges();
+                    return;
+                }
                 if (!this.mapsConfig?.apiKey) {
                     this.message = this.label('LBL_MAPS_VIEW_NO_API_KEY');
                     this.cdr.detectChanges();

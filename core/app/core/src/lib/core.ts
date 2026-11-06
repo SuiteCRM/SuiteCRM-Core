@@ -931,6 +931,7 @@ export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
 export * from './fields/coordinate/coordinate.component';
 export * from './containers/sidebar-widget/components/maps-widgets/google-maps.loader';
+export * from './containers/sidebar-widget/components/maps-widgets/leaflet.loader';
 export * from './containers/sidebar-widget/components/maps-widgets/map-record-widget.component';
 export * from './containers/sidebar-widget/components/maps-widgets/marker-map-widget.component';
 export * from './containers/sidebar-widget/components/maps-widgets/area-map-widget.component';

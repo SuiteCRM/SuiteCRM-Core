@@ -34,6 +34,7 @@ import {MessageService} from '../../../../services/message/message.service';
 import {ModuleNameMapper} from '../../../../services/navigation/module-name-mapper/module-name-mapper.service';
 import {Process, ProcessService} from '../../../../services/process/process.service';
 import {MapsConfig, loadGoogleMaps} from '../../../../containers/sidebar-widget/components/maps-widgets/google-maps.loader';
+import {loadLeaflet, OSM_DEFAULT_TILES, osmAttribution} from '../../../../containers/sidebar-widget/components/maps-widgets/leaflet.loader';
 
 export interface MapMarker {
     id: string;
@@ -76,7 +77,8 @@ interface MapMarkersData {
  * legend, a group is hidden by its legend checkbox), the custom markers and areas of a map record,
  * and the table of the records: their link, address, phone, group and user; the selected ones are
  * added to a target list (accounts, contacts, leads, targets, users), as the legacy page. Without
- * Google Maps API key, the table only.
+ * Google Maps API key, the table only. With OpenStreetMap as map provider (maps settings), the same
+ * map with Leaflet and the OpenStreetMap tiles: no API key needed.
  *
  * Used by the map widget of the map records and by the quick radius page.
  */
@@ -104,6 +106,8 @@ export class MapDisplayComponent implements OnChanges, OnDestroy {
     targetList = '';
 
     protected google: any = null;
+    /** Leaflet, with OpenStreetMap as map provider. */
+    protected leaflet: any = null;
     protected map: any = null;
     protected overlays: any[] = [];
     protected groupMarkers: { [group: string]: any[] } = {};
@@ -129,6 +133,9 @@ export class MapDisplayComponent implements OnChanges, OnDestroy {
 
     ngOnDestroy(): void {
         this.subs.forEach(sub => sub.unsubscribe());
+        if (this.leaflet && this.map) {
+            this.map.remove();
+        }
     }
 
     label(key: string): string {
@@ -170,7 +177,15 @@ export class MapDisplayComponent implements OnChanges, OnDestroy {
 
     toggleGroup(group: string, visible: boolean): void {
         this.hiddenGroups[group] = !visible;
-        this.zone.runOutsideAngular(() => (this.groupMarkers[group] ?? []).forEach(marker => marker.setMap(visible ? this.map : null)));
+        this.zone.runOutsideAngular(() => (this.groupMarkers[group] ?? []).forEach(marker => {
+            if (this.leaflet && visible) {
+                marker.addTo(this.map);
+            } else if (this.leaflet) {
+                marker.remove();
+            } else {
+                marker.setMap(visible ? this.map : null);
+            }
+        }));
     }
 
     /** Opens the info window of a marker of the table on the map. */
@@ -178,6 +193,11 @@ export class MapDisplayComponent implements OnChanges, OnDestroy {
         const shown = this.overlays.find(overlay => overlay.markerId === marker.id);
         if (shown && this.map) {
             this.zone.runOutsideAngular(() => {
+                if (this.leaflet) {
+                    this.map.panTo(shown.getLatLng());
+                    shown.openPopup();
+                    return;
+                }
                 this.map.panTo(shown.getPosition());
                 this.openInfo(shown, marker);
             });
@@ -222,6 +242,14 @@ export class MapDisplayComponent implements OnChanges, OnDestroy {
                         this.message = this.language.getAppString('LBL_ACTION_ERROR') || 'Error';
                     } else if (this.data.error) {
                         this.message = this.data.error;
+                    } else if (this.mapsConfig?.provider === 'osm') {
+                        loadLeaflet().then(leaflet => {
+                            this.leaflet = leaflet;
+                            this.drawOsm();
+                        }).catch(() => {
+                            this.message = this.label('LBL_MAPS_VIEW_OSM_LOAD_ERROR');
+                            this.cdr.detectChanges();
+                        });
                     } else if (!this.mapsConfig?.apiKey) {
                         this.message = this.label('LBL_MAPS_VIEW_NO_API_KEY');
                     } else {
@@ -305,8 +333,91 @@ export class MapDisplayComponent implements OnChanges, OnDestroy {
         return overlay;
     }
 
+    /**
+     * The map with Leaflet and the OpenStreetMap tiles: the same center, markers (group icons),
+     * custom markers and areas as the Google map, the view fitted to them.
+     */
+    protected drawOsm(): void {
+        const leaflet = this.leaflet;
+        const data = this.data;
+        this.zone.runOutsideAngular(() => {
+            const center: [number, number] = data.center && this.valid(data.center)
+                ? [Number(data.center.lat), Number(data.center.lng)]
+                : [this.mapsConfig.center.lat, this.mapsConfig.center.lng];
+            if (!this.map) {
+                this.map = leaflet.map(this.canvas.nativeElement, {center, zoom: 4});
+                leaflet.tileLayer(this.mapsConfig.tileUrl || OSM_DEFAULT_TILES, {
+                    maxZoom: 19,
+                    attribution: osmAttribution(this.mapsConfig.attribution)
+                }).addTo(this.map);
+            }
+            this.overlays.forEach(overlay => overlay.remove());
+            this.overlays = [];
+            this.groupMarkers = {};
+            const points: [number, number][] = [];
+
+            if (data.center && this.valid(data.center)) {
+                this.addOsmMarker(data.center, this.centerIcon(), [20, 34], points);
+            }
+            data.markers.forEach(marker => {
+                if (!this.valid(marker)) {
+                    return;
+                }
+                const overlay = this.addOsmMarker(marker, this.groupIcon(marker.group ?? ''), [20, 34], points);
+                (this.groupMarkers[marker.group ?? ''] = this.groupMarkers[marker.group ?? ''] ?? []).push(overlay);
+            });
+            data.customMarkers.forEach(marker => {
+                if (this.valid(marker)) {
+                    const image = marker.image && marker.image !== 'None' ? this.mapsConfig.markerImages + encodeURIComponent(marker.image) + '.png' : null;
+                    this.addOsmMarker(marker, image, [32, 37], points);
+                }
+            });
+            data.customAreas.forEach(area => {
+                const latLngs = area.points.map(point => [point.lat, point.lng] as [number, number]);
+                const polygon = leaflet.polygon(latLngs, {
+                    color: '#000099', opacity: 0.8, weight: 1, fillColor: '#000099', fillOpacity: 0.15
+                }).addTo(this.map);
+                points.push(...latLngs);
+                this.overlays.push(polygon);
+            });
+
+            // The canvas was hidden until the markers came: Leaflet measures it again.
+            this.map.invalidateSize();
+            if (points.length) {
+                this.map.fitBounds(leaflet.latLngBounds(points), {padding: [24, 24], maxZoom: 15});
+            } else {
+                this.map.setView(center, 4);
+            }
+        });
+        this.cdr.detectChanges();
+    }
+
+    /** A Leaflet marker: an icon (anchored at its bottom middle), else a dot; its popup. */
+    protected addOsmMarker(marker: MapMarker, icon: string, size: [number, number], points: [number, number][]): any {
+        const leaflet = this.leaflet;
+        const position: [number, number] = [Number(marker.lat), Number(marker.lng)];
+        const overlay = icon
+            ? leaflet.marker(position, {
+                title: marker.name,
+                icon: leaflet.icon({iconUrl: icon, iconSize: size, iconAnchor: [size[0] / 2, size[1]], popupAnchor: [0, 4 - size[1]]})
+            })
+            : leaflet.circleMarker(position, {radius: 7, color: '#000099', weight: 2, fillOpacity: 0.6});
+        overlay.markerId = marker.id;
+        overlay.bindPopup(() => this.infoContent(marker));
+        overlay.addTo(this.map);
+        points.push(position);
+        this.overlays.push(overlay);
+
+        return overlay;
+    }
+
     /** The info window of a marker: its name (record link), address, phone, account and user. */
     protected openInfo(overlay: any, marker: MapMarker): void {
+        this.infoWindow.setContent(this.infoContent(marker));
+        this.infoWindow.open(this.map, overlay);
+    }
+
+    protected infoContent(marker: MapMarker): HTMLElement {
         const content = document.createElement('div');
         const title = document.createElement(marker.module ? 'a' : 'strong');
         title.textContent = marker.name;
@@ -319,8 +430,8 @@ export class MapDisplayComponent implements OnChanges, OnDestroy {
             line.textContent = text;
             content.appendChild(line);
         });
-        this.infoWindow.setContent(content);
-        this.infoWindow.open(this.map, overlay);
+
+        return content;
     }
 
     protected valid(marker: MapMarker): boolean {

@@ -49,7 +49,9 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    MapsAdminComponent,
+    QuickRadiusComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -184,6 +186,40 @@ export class AppInit {
                             }
                         }
                     });
+                    // The Quick Radius Map of the Maps menu and the geocoding pages of the Google Maps
+                    // administration (admin panel links), before the generic classic view routes.
+                    routes.push({
+                        path: 'maps/quick_radius',
+                        component: QuickRadiusComponent,
+                        canActivate: [AuthGuard],
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'maps'
+                        }
+                    });
+                    const mapsAdminPages: { [path: string]: string } = {
+                        'maps/geocoded_counts': 'counts',
+                        'maps/geocode_addresses': 'geocode',
+                        'maps/geocoding_test': 'test',
+                    };
+                    Object.entries(mapsAdminPages).forEach(([path, page]) => routes.push({
+                        path,
+                        component: MapsAdminComponent,
+                        canActivate: [AuthGuard],
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration',
+                            mapsAdminPage: page
+                        }
+                    }));
                     routes.push(loggedOutConfig);
 
                     Object.keys(configRoutes).forEach(routeName => {

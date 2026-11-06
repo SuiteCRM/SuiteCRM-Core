@@ -181,21 +181,21 @@ parameters:
       list: true
       record: false
     maps:
-      index: false
-      list: false
-      record: false
+      index: true
+      list: true
+      record: true
     markers:
       index: true
       list: true
-      record: false
+      record: true
     areas:
       index: true
       list: true
-      record: false
+      record: true
     address-cache:
       index: true
       list: true
-      record: false
+      record: true
     case-events:
       index: true
       list: true

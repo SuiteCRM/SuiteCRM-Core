@@ -174,7 +174,9 @@ export class CreateViewStore extends RecordViewStore {
         } as Record;
 
         if (this.preferences.getUserPreference('use_real_names') !== 'off') {
-            blankRecord.attributes.assigned_user_name.full_name = (user?.firstName ?? '') + (user?.lastName ?? '');
+            blankRecord.attributes.assigned_user_name.full_name = [user?.firstName, user?.lastName]
+                .filter(name => !!name)
+                .join(' ');
         } else {
             blankRecord.attributes.assigned_user_name.user_name = user.userName;
         }

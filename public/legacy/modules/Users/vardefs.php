@@ -384,6 +384,12 @@ $dictionary['User'] = array(
             'reportable' => false,
             'inline_edit' => false,
             'studio' => array('formula' => false),
+            // Users do not change the type of their own profile (UserTypeValidator)
+            'asyncValidators' => array(
+                'user-type-validation' => array(
+                    'key' => 'user-type-validation',
+                ),
+            ),
         ),
         'deleted' => array(
             'name' => 'deleted',
@@ -862,3 +868,62 @@ $dictionary['User'] = array(
             ],
     ],
 );
+
+// Fields of the user record view that are not columns of the users table: the preferences of
+// the legacy Advanced tab, the password fields and the user type of a new group user. They are
+// read and saved by the SuiteCRM 8 user profile services (App\Module\Users).
+$userProfileFields = [
+    // User settings
+    'pref_mailmerge_on' => ['type' => 'bool', 'vname' => 'LBL_MAILMERGE'],
+    'pref_use_real_names' => ['type' => 'bool', 'vname' => 'LBL_USE_REAL_NAMES'],
+    'pref_export_delimiter' => ['type' => 'varchar', 'len' => 5, 'vname' => 'LBL_EXPORT_DELIMITER'],
+    'pref_default_export_charset' => ['type' => 'enum', 'vname' => 'LBL_EXPORT_CHARSET'],
+    'pref_reminder_checked' => ['type' => 'bool', 'vname' => 'LBL_POPUP_REMINDER'],
+    'pref_reminder_time' => ['type' => 'enum', 'options' => 'reminder_time_options', 'vname' => 'LBL_POPUP_REMINDER_TIME'],
+    'pref_email_reminder_checked' => ['type' => 'bool', 'vname' => 'LBL_EMAIL_REMINDER'],
+    'pref_email_reminder_time' => ['type' => 'enum', 'options' => 'reminder_time_options', 'vname' => 'LBL_EMAIL_REMINDER_TIME'],
+    'pref_snooze_alert_timer' => ['type' => 'enum', 'options' => 'snooze_alert_timer', 'vname' => 'LBL_SNOOZE_TIMER'],
+    // Locale settings
+    'pref_datef' => ['type' => 'enum', 'vname' => 'LBL_DATE_FORMAT'],
+    'pref_timef' => ['type' => 'enum', 'vname' => 'LBL_TIME_FORMAT'],
+    'pref_timezone' => ['type' => 'enum', 'vname' => 'LBL_TIMEZONE'],
+    'pref_currency' => ['type' => 'enum', 'vname' => 'LBL_CURRENCY'],
+    'pref_default_currency_significant_digits' => ['type' => 'enum', 'vname' => 'LBL_CURRENCY_SIG_DIGITS'],
+    'pref_num_grp_sep' => ['type' => 'varchar', 'len' => 1, 'vname' => 'LBL_NUMBER_GROUPING_SEP'],
+    'pref_dec_sep' => ['type' => 'varchar', 'len' => 1, 'vname' => 'LBL_DECIMAL_SEP'],
+    'pref_default_locale_name_format' => ['type' => 'enum', 'vname' => 'LBL_LOCALE_DEFAULT_NAME_FORMAT'],
+    'pref_language' => ['type' => 'enum', 'vname' => 'LBL_USER_LANGUAGE'],
+    // Calendar options
+    'pref_calendar_publish_key' => ['type' => 'varchar', 'len' => 36, 'vname' => 'LBL_PUBLISH_KEY'],
+    'pref_fdow' => ['type' => 'enum', 'vname' => 'LBL_FDOW'],
+    // Layout options
+    'pref_use_group_tabs' => ['type' => 'bool', 'vname' => 'LBL_USE_GROUP_TABS'],
+    'pref_sort_modules_by_name' => ['type' => 'bool', 'vname' => 'LBL_SORT_MODULES'],
+    'pref_subpanel_tabs' => ['type' => 'bool', 'vname' => 'LBL_SUBPANEL_TABS'],
+    'pref_count_collapsed_subpanels' => ['type' => 'bool', 'vname' => 'LBL_COUNT_COLLAPSED_SUBPANELS'],
+    'pref_listview_pagination_type' => ['type' => 'enum', 'options' => 'listview_pagination_type', 'vname' => 'LBL_SET_LISTVIEW_PAGINATION_TYPE'],
+    'pref_subpanel_pagination_type' => ['type' => 'enum', 'options' => 'subpanel_pagination_type', 'vname' => 'LBL_SET_SUBPANEL_PAGINATION_TYPE'],
+    'pref_record_modal_pagination_type' => ['type' => 'enum', 'options' => 'record_modal_pagination_type', 'vname' => 'LBL_SET_RECORD_MODAL_PAGINATION_TYPE'],
+    // Email options
+    'pref_email_link_type' => ['type' => 'enum', 'options' => 'dom_email_link_type', 'vname' => 'LBL_EMAIL_LINK_TYPE'],
+    'pref_editor_type' => ['type' => 'enum', 'options' => 'dom_editor_type', 'vname' => 'LBL_EDITOR_TYPE'],
+    // Password
+    'old_password' => ['type' => 'password', 'len' => 255, 'vname' => 'LBL_OLD_PASSWORD'],
+    'new_password' => ['type' => 'password', 'len' => 255, 'vname' => 'LBL_NEW_PASSWORD'],
+    'confirm_new_password' => ['type' => 'password', 'len' => 255, 'vname' => 'LBL_CONFIRM_PASSWORD'],
+    // "Create Group User" (usertype=group in the URL of the create view, as the legacy menu)
+    'usertype' => ['type' => 'varchar', 'len' => 10, 'vname' => 'LBL_USER_TYPE'],
+];
+
+foreach ($userProfileFields as $userProfileFieldName => $userProfileField) {
+    $dictionary['User']['fields'][$userProfileFieldName] = $userProfileField + [
+        'name' => $userProfileFieldName,
+        'source' => 'non-db',
+        'massupdate' => false,
+        'importable' => false,
+        'reportable' => false,
+        'inline_edit' => false,
+        'studio' => false,
+    ];
+}
+unset($userProfileFields, $userProfileFieldName, $userProfileField);

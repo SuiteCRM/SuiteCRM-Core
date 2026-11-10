@@ -769,7 +769,8 @@ export class RecordViewStore extends ViewStore implements StateStore, BaseRecord
         return this.metadataStore.recordViewMetadata$.pipe(map((recordMetadata: RecordViewMetadata) => {
             const fieldsMap: ViewFieldDefinitionMap = {};
 
-            recordMetadata.panels.forEach(panel => {
+            // Empty while the metadata is reloaded (cache reset after the users edit view).
+            (recordMetadata?.panels ?? []).forEach(panel => {
                 panel.rows.forEach(row => {
                     row.cols.forEach(col => {
                         const fieldName = col.name ?? col.fieldDefinition.name ?? '';
@@ -778,7 +779,7 @@ export class RecordViewStore extends ViewStore implements StateStore, BaseRecord
                 });
             });
 
-            Object.keys(recordMetadata.vardefs).forEach(fieldKey => {
+            Object.keys(recordMetadata?.vardefs ?? {}).forEach(fieldKey => {
                 const vardef = recordMetadata.vardefs[fieldKey] ?? null;
                 if (!vardef || isEmpty(vardef)) {
                     return;

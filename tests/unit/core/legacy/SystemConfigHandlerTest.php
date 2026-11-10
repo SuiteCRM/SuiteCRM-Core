@@ -28,7 +28,7 @@
 
 namespace App\Tests\unit\core\legacy;
 
-use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Exception\ItemNotFoundException;
 use App\Engine\LegacyHandler\ActionNameMapperHandler;
 use App\Routes\LegacyHandler\ClassicViewRoutingExclusionsHandler;
 use App\Currency\LegacyHandler\CurrencyHandler;

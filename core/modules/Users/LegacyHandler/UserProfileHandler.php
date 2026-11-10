@@ -86,6 +86,16 @@ class UserProfileHandler extends LegacyHandler
     public const USER_TYPE_FIELD = 'UserType';
 
     /**
+     * Type of the administrators (list user_type_dom); the other users are 'RegularUser'.
+     */
+    public const ADMINISTRATOR_TYPE = 'Administrator';
+
+    /**
+     * Application label of the message shown when users change the type of their own profile.
+     */
+    public const OWN_USER_TYPE_LABEL = 'LBL_USER_TYPE_OWN_PROFILE';
+
+    /**
      * 'group' for a group user created from the "Create Group User" menu (URL of the create view).
      */
     public const NEW_USER_TYPE_FIELD = 'usertype';
@@ -109,7 +119,7 @@ class UserProfileHandler extends LegacyHandler
         $user = $userId !== '' ? BeanFactory::getBean('Users', $userId) : null;
         if ($user instanceof User && !empty($user->id)) {
             $values = $this->readPreferences($user);
-            $values[self::USER_TYPE_FIELD] = $user->is_admin ? 'Administrator' : 'RegularUser';
+            $values[self::USER_TYPE_FIELD] = $user->is_admin ? self::ADMINISTRATOR_TYPE : 'RegularUser';
         }
         foreach (self::PASSWORD_FIELDS as $field) {
             $values[$field] = '';
@@ -296,6 +306,51 @@ class UserProfileHandler extends LegacyHandler
         $this->close();
 
         return $result;
+    }
+
+    /**
+     * Whether the type would change the type of the current user. As in the legacy edit view,
+     * users do not change the type of their own profile (an administrator would give up its
+     * own access); only administrators change the type of the other users (User::save()).
+     */
+    public function isOwnTypeChange(string $userId, string $type): bool
+    {
+        if ($userId === '' || $type === '') {
+            return false;
+        }
+
+        $this->init();
+        $this->startLegacyApp();
+
+        global $current_user;
+
+        $changed = false;
+        if (($current_user->id ?? '') === $userId) {
+            $user = BeanFactory::getBean('Users', $userId);
+            $changed = $user instanceof User && ($type === self::ADMINISTRATOR_TYPE) !== (bool)$user->is_admin;
+        }
+
+        $this->close();
+
+        return $changed;
+    }
+
+    /**
+     * Refuses a save that changes the type of the current user (see isOwnTypeChange(); the
+     * edit view checks it first, with UserTypeValidator).
+     */
+    public function checkUserType(string $userId, string $type): void
+    {
+        if (!$this->isOwnTypeChange($userId, $type)) {
+            return;
+        }
+
+        $this->init();
+        $this->startLegacyApp();
+        $error = translate(self::OWN_USER_TYPE_LABEL);
+        $this->close();
+
+        throw new BadRequestHttpException($error);
     }
 
     /**

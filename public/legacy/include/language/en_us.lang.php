@@ -4516,3 +4516,4 @@ $app_strings['LBL_USER_CHANGE_PASSWORD'] = 'Change Password';
 $app_strings['LBL_OLD_PASSWORD'] = 'Current Password';
 $app_strings['LBL_NEW_PASSWORD'] = 'New Password';
 $app_strings['LBL_CONFIRM_PASSWORD'] = 'Confirm Password';
+$app_strings['LBL_USER_TYPE_OWN_PROFILE'] = 'You cannot change the user type of your own profile.';

@@ -384,6 +384,12 @@ $dictionary['User'] = array(
             'reportable' => false,
             'inline_edit' => false,
             'studio' => array('formula' => false),
+            // Users do not change the type of their own profile (UserTypeValidator)
+            'asyncValidators' => array(
+                'user-type-validation' => array(
+                    'key' => 'user-type-validation',
+                ),
+            ),
         ),
         'deleted' => array(
             'name' => 'deleted',

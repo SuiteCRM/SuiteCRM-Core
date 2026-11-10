@@ -35,10 +35,11 @@ use App\Module\Users\LegacyHandler\UserProfileHandler;
 /**
  * Saves the preferences, type and password of the user record view.
  *
- * The legacy User::save() saves the preferences and the type from the posted form
+ * The legacy User::save() saves the preferences from the posted form
  * (User::saveFormPreferences()): before the save, the profile fields are given to it as the
- * inputs of that form, then removed from $_POST after the save. The new password is checked
- * before the save and set after it (User::change_password()).
+ * inputs of that form, then removed from $_POST after the save. The type is saved as the
+ * is_admin flag of the user, as the legacy form posts it. The new password is checked before
+ * the save and set after it (User::change_password()).
  */
 class UserProfileSaveHandler implements RecordSaveHandlerInterface
 {
@@ -117,6 +118,14 @@ class UserProfileSaveHandler implements RecordSaveHandlerInterface
             $inputRecord->setAttributes($attributes);
 
             return;
+        }
+
+        // The legacy form posts is_admin with the type (input set by user_status_display() of
+        // UserEditView.js): User::saveFormPreferences() alone does not save the type.
+        $type = (string)($values[UserProfileHandler::USER_TYPE_FIELD] ?? '');
+        if ($type !== '') {
+            $this->handler->checkUserType((string)($previousVersion?->getId() ?? ''), $type);
+            $attributes['is_admin'] = $type === UserProfileHandler::ADMINISTRATOR_TYPE;
         }
         $inputRecord->setAttributes($attributes);
 

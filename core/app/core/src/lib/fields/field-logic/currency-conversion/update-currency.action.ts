@@ -59,7 +59,7 @@ export class UpdateCurrencyAction extends FieldLogicActionHandler {
 
         const currencyId = record?.fields[currencyIdFieldName]?.value ?? null;
         let value = parseFloat(field?.value ?? null);
-        let baseValue = parseFloat(record?.fields[baseCurrencyFieldName]?.value ?? null);
+        let baseValue = parseFloat(this.currencyFormatter.toInternalFormat(record?.fields[baseCurrencyFieldName]?.formControl?.value ?? null));
 
         if (!isFinite(value) || !isFinite(baseValue) || currencyId === null) {
             return;
@@ -81,7 +81,7 @@ export class UpdateCurrencyAction extends FieldLogicActionHandler {
         }
 
         const formattedValue = this.currencyFormatter.toUserFormat(value.toString(), options);
-        field.value = formattedValue;
+        field.value = value.toString();
         field.formControl.setValue(formattedValue);
         // re-validate the parent form-control after value update
         record.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});

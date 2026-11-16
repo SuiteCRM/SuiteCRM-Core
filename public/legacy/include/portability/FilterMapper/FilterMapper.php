@@ -27,6 +27,7 @@
 
 require_once __DIR__ . '/FilterMappers.php';
 require_once __DIR__ . '/FilterMapperInterface.php';
+require_once __DIR__ . '/NumericFilterFormatter.php';
 
 class FilterMapper
 {
@@ -41,6 +42,11 @@ class FilterMapper
     private $mappers;
 
     /**
+     * @var NumericFilterFormatter
+     */
+    private $numericFormatter;
+
+    /**
      * LegacyFilterMapper constructor.
      */
     public function __construct()
@@ -49,6 +55,7 @@ class FilterMapper
         require 'filter_operator_map.php';
         $this->filterOperatorMap = $filter_operator_map;
         $this->mappers = new FilterMappers();
+        $this->numericFormatter = new NumericFilterFormatter();
     }
 
 
@@ -183,6 +190,19 @@ class FilterMapper
         }
 
         return $mapped;
+    }
+
+    /**
+     * Map Filters to the legacy input of SearchForm2, which runs unformat_number() on numeric
+     * values. Anything stored rather than searched on, like saved search contents, must keep
+     * internal numbers and use toLegacy() instead.
+     * @param array $criteria
+     * @param string $type
+     * @return array
+     */
+    public function toLegacySearch(array $criteria, string $type): array
+    {
+        return $this->toLegacy($this->numericFormatter->toUserFormat($criteria), $type);
     }
 
     /**

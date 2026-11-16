@@ -537,6 +537,14 @@ export class ListViewStore extends ViewStore implements StateStore {
         const filters = {...this.internalState.activeFilters};
         let criteria = this.mergeCriteria(filters);
 
+        Object.keys(criteria?.filters ?? {}).forEach(criteriaKey => {
+            const criterion = criteria.filters[criteriaKey];
+
+            if (criterion?.target || criterion?.start || criterion?.end) {
+                criterion.rangeSearch = true;
+            }
+        });
+
         this.recordList.updateSearchCriteria(criteria, reload);
         this.updateFilterLocalStorage();
     }

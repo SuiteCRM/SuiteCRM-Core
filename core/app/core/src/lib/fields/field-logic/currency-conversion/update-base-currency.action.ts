@@ -32,6 +32,7 @@ import {ViewMode} from '../../../common/views/view.model';
 
 import {FieldLogicActionData, FieldLogicActionHandler} from '../field-logic.action';
 import {CurrencyService} from '../../../services/currency/currency.service';
+import {CurrencyFormatter} from "../../../services/formatters/currency/currency-formatter.service";
 
 @Injectable({
     providedIn: 'root'
@@ -41,7 +42,7 @@ export class UpdateBaseCurrencyAction extends FieldLogicActionHandler {
     key = 'update-base-currency';
     modes = ['edit', 'create', 'massupdate', 'filter'] as ViewMode[];
 
-    constructor(protected currencyService: CurrencyService) {
+    constructor(protected currencyService: CurrencyService, protected currencyFormatter: CurrencyFormatter) {
         super();
     }
 
@@ -57,7 +58,7 @@ export class UpdateBaseCurrencyAction extends FieldLogicActionHandler {
         const currencyFieldName = action.params.currencyField ?? 'amount';
 
         const currencyId = record?.fields[currencyIdFieldName]?.value ?? null;
-        let value = parseFloat(record?.fields[currencyFieldName]?.value ?? null);
+        let value = parseFloat(this.currencyFormatter.toInternalFormat(record?.fields[currencyFieldName]?.formControl?.value ?? null));
 
         if (!isFinite(value)) {
             return;
@@ -77,8 +78,9 @@ export class UpdateBaseCurrencyAction extends FieldLogicActionHandler {
     }
 
     protected updateValue(field: Field, baseValue: number, record: Record): void {
+        const formattedValue = this.currencyFormatter.toUserFormat(baseValue.toString(), {mode: 'edit' as ViewMode});
         field.value = baseValue.toString();
-        field.formControl.setValue(baseValue.toString());
+        field.formControl.setValue(formattedValue);
         // re-validate the parent form-control after value update
         record.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
     }

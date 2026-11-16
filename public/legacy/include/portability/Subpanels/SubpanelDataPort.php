@@ -67,7 +67,7 @@ class SubpanelDataPort
         require_once 'include/portability/FilterMapper/FilterMapper.php';
         $filterMapper = new FilterMapper();
 
-        $mapped = $filterMapper->toLegacy($criteria, 'basic');
+        $mapped = $filterMapper->toLegacySearch($criteria, 'basic');
 
         if (!empty($mapped)){
             foreach($mapped as $key => $item){

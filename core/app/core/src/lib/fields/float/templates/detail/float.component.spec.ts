@@ -65,6 +65,23 @@ describe('FloatDetailFieldComponent', () => {
     const mockStore = new UserPreferenceMockStore(preferences);
     const mockNumberFormatter = new NumberFormatter(mockStore, new FormControlUtils(), 'en-US');
 
+    const mockSystemConfigStore = {
+        configs$: of({
+            default_number_grouping_seperator: {
+                id: '/docroot/api/system-configs/default_number_grouping_seperator',
+                _id: 'default_number_grouping_seperator',
+                value: ';',
+                items: []
+            },
+            default_decimal_seperator: {
+                id: '/docroot/api/system-configs/default_decimal_seperator',
+                _id: 'default_decimal_seperator',
+                value: ',',
+                items: []
+            }
+        })
+    } as unknown as SystemConfigStore;
+
 
     /* eslint-enable camelcase,@typescript-eslint/camelcase */
 
@@ -82,29 +99,14 @@ describe('FloatDetailFieldComponent', () => {
                     provide: UserPreferenceStore, useValue: mockStore
                 },
                 {
-                    provide: SystemConfigStore, useValue: {
-                        configs$: of({
-                            default_number_grouping_seperator: {
-                                id: '/docroot/api/system-configs/default_number_grouping_seperator',
-                                _id: 'default_number_grouping_seperator',
-                                value: ';',
-                                items: []
-                            },
-                            default_decimal_seperator: {
-                                id: '/docroot/api/system-configs/default_decimal_seperator',
-                                _id: 'default_decimal_seperator',
-                                value: ',',
-                                items: []
-                            }
-                        })
-                    }
+                    provide: SystemConfigStore, useValue: mockSystemConfigStore
                 },
                 {provide: NumberFormatter, useValue: mockNumberFormatter},
                 {provide: DatetimeFormatter, useValue: datetimeFormatterMock},
                 {provide: DateFormatter, useValue: dateFormatterMock},
                 {
                     provide: CurrencyFormatter,
-                    useValue: new CurrencyFormatter(mockStore, mockNumberFormatter, 'en_us')
+                    useValue: new CurrencyFormatter(mockStore, mockSystemConfigStore, mockNumberFormatter, 'en_us')
                 },
             ],
         }).compileComponents();

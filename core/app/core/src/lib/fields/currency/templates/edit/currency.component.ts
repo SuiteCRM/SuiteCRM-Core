@@ -56,7 +56,7 @@ export class CurrencyEditFieldComponent extends BaseNumberComponent implements O
     ngOnInit(): void {
         super.ngOnInit();
         this.subscribeValueChanges();
-        this.value = this.typeFormatter.toUserFormat(this.field.type, this.field.value, this.getOptions());
+        this.value = this.field.formControl.value;
     }
 
     getOptions(): FormatOptions {

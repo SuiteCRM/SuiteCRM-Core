@@ -10,6 +10,9 @@
     #SAVE_FOOTER,#CANCEL_FOOTER {
         display: none;
     }
+    select[multiple=true] {
+        height: 100%;
+    }
     select {
         background: url($select-edit-background-url) no-repeat right;
         background-size: 25px 11px;

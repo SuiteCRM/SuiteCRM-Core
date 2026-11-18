@@ -43,13 +43,13 @@ class templateParser
                         $idName = $focus_arr['id_name'];
 
                         if (empty($focus->$idName)) {
-                            continue;
-                        }
+                            $relate_focus = BeanFactory::newBean($focus_arr['module']);
+                        } else {
+                            $relate_focus = BeanFactory::getBean($focus_arr['module'], $focus->$idName);
 
-                        $relate_focus = BeanFactory::getBean($focus_arr['module'], $focus->$idName);
-
-                        if (empty($relate_focus)) {
-                            continue;
+                            if (empty($relate_focus)) {
+                                $relate_focus = BeanFactory::newBean($focus_arr['module']);
+                            }
                         }
 
                         $string = templateParser::parse_template_bean($string, $focus_arr['name'], $relate_focus, $userFormat);

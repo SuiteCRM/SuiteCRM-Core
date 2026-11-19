@@ -680,4 +680,7 @@ $mod_strings['LBL_STUDIO_VIEW_COPIED'] = 'Fields of the EditView: Save & Deploy 
 $mod_strings['LBL_STUDIO_VIEW_EXPAND'] = 'Expand to the row';
 $mod_strings['LBL_STUDIO_VIEW_REDUCE'] = 'Reduce to a column';
 $mod_strings['LBL_STUDIO_VIEW_REMOVE'] = 'Remove';
+$mod_strings['LBL_STUDIO_VIEW_DRAG'] = 'Drag to move';
+$mod_strings['LBL_STUDIO_VIEW_TOOL_HELP'] = 'Drag to its place in the layout, or click to add it to the panel on screen';
+$mod_strings['LBL_STUDIO_VIEW_ROW_BELOW'] = 'New row below';
 $mod_strings['LBL_STUDIO_VIEW_RESET_CONFIRM'] = 'Remove the customizations checked from the module? They cannot be restored.';

@@ -24,10 +24,10 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {CdkDragDrop, DragDropModule} from '@angular/cdk/drag-drop';
+import {CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import {Subscription} from 'rxjs';
 import {take} from 'rxjs/operators';
 import {LanguageStore} from '../../../../store/language/language.store';
@@ -44,6 +44,11 @@ import {
     StudioHistoryEntry,
     StudioLabels
 } from '../../studio.model';
+
+/**
+ * The height of the fixed navbar, over the top of the page.
+ */
+const NAVBAR_HEIGHT = 64;
 
 /**
  * A slot of the layout: its panel, row and column.
@@ -66,6 +71,9 @@ export type StudioGridDrag = { kind: 'slot'; ref: StudioSlotRef } | { kind: 'ava
  * slots, a field on a whole row, the label and tab order of a field, the label of a panel; Save
  * (a draft) and Save & Deploy as the legacy editor, View History, Restore Default, Copy from
  * EditView and Sync to Detail View.
+ *
+ * The new panel and the new row of the toolbox are dragged to their place in the layout, and
+ * the panels and rows of the layout are moved by drag and drop, as in the legacy editor.
  */
 @Component({
     selector: 'scrm-studio-grid-layout',
@@ -103,14 +111,22 @@ export class StudioGridLayoutComponent implements OnChanges, OnDestroy {
     loading = false;
     /** The ids of the drop lists (toolbox and slots), connected to one another. */
     dropIds: string[] = [];
+    /** The ids of the rows of the panels, connected to one another and to the new row of the toolbox. */
+    rowListIds: string[] = [];
+    /** The panel of the new row of the toolbox: none. */
+    readonly noPanel = -1;
+    /** The row or panel just added, highlighted for a moment. */
+    added: StudioGridSlot[] | StudioGridPanel = null;
 
     protected sub: Subscription;
+    protected addedTimer: ReturnType<typeof setTimeout>;
 
     constructor(
         protected processService: ProcessService,
         protected languageStore: LanguageStore,
         protected message: MessageService,
-        protected cdr: ChangeDetectorRef
+        protected cdr: ChangeDetectorRef,
+        protected host: ElementRef<HTMLElement>
     ) {
     }
 
@@ -122,6 +138,7 @@ export class StudioGridLayoutComponent implements OnChanges, OnDestroy {
 
     ngOnDestroy(): void {
         this.sub?.unsubscribe();
+        clearTimeout(this.addedTimer);
     }
 
     label(key: string): string {
@@ -167,6 +184,17 @@ export class StudioGridLayoutComponent implements OnChanges, OnDestroy {
 
     slotId(ref: StudioSlotRef): string {
         return `studio-slot-${ref.panel}-${ref.row}-${ref.col}`;
+    }
+
+    rowsId(panel: number): string {
+        return `studio-rows-${panel}`;
+    }
+
+    /**
+     * The fields of a row, to name it while it is dragged.
+     */
+    rowLabel(slots: StudioGridSlot[]): string {
+        return slots.filter(slot => this.isField(slot)).map(slot => slot.label || slot.name).join(' · ') || this.label('LBL_FILLER');
     }
 
     /**
@@ -282,17 +310,45 @@ export class StudioGridLayoutComponent implements OnChanges, OnDestroy {
     }
 
     /**
-     * A new panel at the end of the layout (legacy new panel: lbl_<view>_panel<n>).
+     * A new panel at the end of the layout, or before the panel given (legacy new panel:
+     * lbl_<view>_panel<n>).
      */
-    addPanel(): void {
-        this.panels.push({
+    addPanel(index = this.panels.length): void {
+        const panel: StudioGridPanel = {
             id: `lbl_${this.view.toLowerCase()}_panel${this.nextPanelId++}`,
             label: this.label('LBL_NEW_PANEL'),
             labelEditable: true,
             newTab: false,
             panelDefault: 'expanded',
             rows: [this.newRow()]
-        });
+        };
+        this.panels.splice(index, 0, panel);
+        this.firstPanelTab();
+        this.refreshIds();
+        this.reveal(panel);
+    }
+
+    /**
+     * The new panel of the toolbox clicked, not dragged: after the panel on screen.
+     */
+    addPanelOnScreen(): void {
+        this.addPanel(this.panelOnScreen() + 1);
+    }
+
+    /**
+     * A panel dropped on the layout: the new panel of the toolbox created there, a panel of the
+     * layout moved there (legacy drag and drop of the panels).
+     */
+    dropPanel(event: CdkDragDrop<unknown>): void {
+        if (this.disabled) {
+            return;
+        }
+        if (event.previousContainer !== event.container) {
+            this.addPanel(event.currentIndex);
+            return;
+        }
+        moveItemInArray(this.panels, event.previousIndex, event.currentIndex);
+        this.firstPanelTab();
         this.refreshIds();
     }
 
@@ -312,8 +368,42 @@ export class StudioGridLayoutComponent implements OnChanges, OnDestroy {
         }
     }
 
-    addRow(panel: number): void {
-        this.panels[panel].rows.push(this.newRow());
+    /**
+     * A new row at the end of a panel, or before the row given.
+     */
+    addRow(panel: number, index = this.panels[panel].rows.length): void {
+        const row = this.newRow();
+        this.panels[panel].rows.splice(index, 0, row);
+        this.refreshIds();
+        this.reveal(row);
+    }
+
+    /**
+     * The new row of the toolbox clicked, not dragged: at the end of the panel on screen.
+     */
+    addRowOnScreen(): void {
+        this.addRow(this.panelOnScreen());
+    }
+
+    /**
+     * A row dropped on the rows of a panel: the new row of the toolbox created there, a row of
+     * the layout moved there (legacy drag and drop of the rows).
+     */
+    dropRow(event: CdkDragDrop<number>): void {
+        if (this.disabled) {
+            return;
+        }
+        const from = event.previousContainer.data;
+        const to = event.container.data;
+        if (from === this.noPanel) {
+            this.addRow(to, event.currentIndex);
+            return;
+        }
+        if (from === to) {
+            moveItemInArray(this.panels[to].rows, event.previousIndex, event.currentIndex);
+        } else {
+            transferArrayItem(this.panels[from].rows, this.panels[to].rows, event.previousIndex, event.currentIndex);
+        }
         this.refreshIds();
     }
 
@@ -434,6 +524,7 @@ export class StudioGridLayoutComponent implements OnChanges, OnDestroy {
         this.changes = {};
         this.editingSlot = null;
         this.editingPanel = null;
+        this.added = null;
         this.error = '';
         this.refreshIds();
     }
@@ -491,6 +582,43 @@ export class StudioGridLayoutComponent implements OnChanges, OnDestroy {
         const ids = ['studio-available', 'studio-filler'];
         this.panels.forEach((panel, p) => panel.rows.forEach((slots, r) => slots.forEach((slot, c) => ids.push(this.slotId({panel: p, row: r, col: c})))));
         this.dropIds = ids;
+        this.rowListIds = this.panels.map((panel, p) => this.rowsId(p));
+    }
+
+    /**
+     * The panel taking most of the screen (the last panel when none is on screen).
+     */
+    protected panelOnScreen(): number {
+        let panel = this.panels.length - 1;
+        let most = 0;
+        this.host.nativeElement.querySelectorAll('.studio-panel-box').forEach((box, index) => {
+            const rect = box.getBoundingClientRect();
+            const visible = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, NAVBAR_HEIGHT);
+            if (visible > most) {
+                most = visible;
+                panel = index;
+            }
+        });
+
+        return panel;
+    }
+
+    /**
+     * A new row or panel highlighted for a moment, and scrolled to when it is out of the screen.
+     */
+    protected reveal(added: StudioGridSlot[] | StudioGridPanel): void {
+        this.added = added;
+        this.cdr.detectChanges();
+        const element = this.host.nativeElement.querySelector('.is-added');
+        const rect = element?.getBoundingClientRect();
+        if (rect && (rect.top < NAVBAR_HEIGHT || rect.bottom > window.innerHeight)) {
+            element.scrollIntoView({block: 'center', behavior: 'smooth'});
+        }
+        clearTimeout(this.addedTimer);
+        this.addedTimer = setTimeout(() => {
+            this.added = null;
+            this.cdr.markForCheck();
+        }, 1500);
     }
 
     protected submit(options: { [key: string]: any }, next: (data: StudioGridLayout) => void): void {

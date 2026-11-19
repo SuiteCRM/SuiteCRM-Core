@@ -403,8 +403,69 @@
         background: #faf9fb;
     }
 
-    .studio-toolbox-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+    .studio-toolbox-actions { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
     .studio-filler-source { margin-bottom: 8px; }
+
+    // The new panel and the new row of the toolbox: tiles dragged to the layout. Their
+    // place is kept while they are dragged.
+    .studio-tool-source { min-height: 30px; }
+
+    .studio-tool {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        width: 100%;
+        min-height: 30px;
+        padding: 3px 6px;
+        border: 1px solid #8d8a96;
+        border-radius: 3px;
+        background: #fff;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: move;
+        touch-action: none;
+
+        &:disabled { opacity: .5; cursor: default; }
+        &:focus-visible { outline: 2px solid #0e7c86; outline-offset: 1px; }
+    }
+
+    // The handle of what is dragged: a column of dots.
+    .studio-grip {
+        flex: 0 0 8px;
+        align-self: stretch;
+        min-height: 16px;
+        background: radial-gradient(circle, #8d8a96 1px, transparent 1.5px) center / 4px 5px repeat;
+        cursor: move;
+        touch-action: none;
+    }
+
+    // Where the new panel or row dragged lands (in the toolbox: its tile, faded). The theme hides
+    // the placeholders of what is dragged.
+    .studio-drop-mark {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        margin-bottom: 4px;
+        opacity: 1;
+        border: 2px dashed #0e7c86;
+        border-radius: 3px;
+        background: #e6f4f5;
+        color: #0b636b;
+        font-weight: 700;
+
+        &.is-panel { min-height: 64px; margin-bottom: 10px; }
+    }
+
+    .studio-tool-source .studio-drop-mark {
+        min-height: 30px;
+        margin: 0;
+        border: 1px dashed #b9b6c1;
+        background: none;
+        color: #8d8a96;
+        font-weight: 400;
+    }
 
     .studio-available {
         min-height: 60px;
@@ -428,12 +489,41 @@
 
     .studio-panels { min-width: 0; }
 
+    // A layout without panel still takes the new panel dropped.
+    .studio-panel-list { min-height: 64px; }
+
     .studio-panel-box {
         margin-bottom: 10px;
         padding: 8px;
         border: 1px solid #c9c6d1;
         border-radius: 4px;
         background: #f2f1f5;
+    }
+
+    // The panel or row just added.
+    .studio-panel-box.is-added, .studio-grid-row.is-added { animation: studio-added 1.5s ease-out; }
+
+    @keyframes studio-added {
+        from { box-shadow: 0 0 0 3px #0e7c86; }
+        to { box-shadow: 0 0 0 3px rgba(14, 124, 134, 0); }
+    }
+
+    // The panel or row dragged, where it lands, and the others making room for it.
+    .studio-panel-box.cdk-drag-placeholder, .studio-grid-row.cdk-drag-placeholder {
+        opacity: .45;
+        outline: 2px dashed #0e7c86;
+    }
+
+    .studio-panel-list.cdk-drop-list-dragging > .studio-panel-box:not(.cdk-drag-placeholder),
+    .studio-rows.cdk-drop-list-dragging > .studio-grid-row:not(.cdk-drag-placeholder) {
+        transition: transform .2s cubic-bezier(0, 0, .2, 1);
+    }
+
+    // A panel without row still takes the rows dropped.
+    .studio-rows {
+        min-height: 8px;
+
+        &.is-empty { min-height: 46px; border: 1px dashed #b9b6c1; border-radius: 3px; }
     }
 
     .studio-panel-bar {
@@ -475,7 +565,7 @@
     }
 
     .studio-filler { color: #8d8a96; font-size: 12px; }
-    .studio-row-tools { display: flex; flex-direction: column; justify-content: center; }
+    .studio-row-tools { display: grid; grid-template-columns: repeat(2, auto); align-content: center; }
     .studio-row-tools .btn { padding: 0 4px; line-height: 1.1; }
 
     // A phone or a small screen: the screen first, then the tree and the help.
@@ -629,4 +719,18 @@
     @media (max-width: 600px) {
         .studio-form { grid-template-columns: minmax(0, 1fr); }
     }
+}
+
+// The panel or row dragged: its name, at the pointer.
+.cdk-drag-preview.studio-drag-chip {
+    max-width: 320px;
+    padding: 4px 10px;
+    overflow: hidden;
+    border: 1px solid #0e7c86;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

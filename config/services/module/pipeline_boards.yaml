@@ -1,0 +1,29 @@
+# Pipeline boards (Kanban view): the records of a module in columns, one per value of a
+# dropdown field, moved from a column to another by drag and drop.
+#
+# One board per module, by the front end name of the module (view <module>/board):
+# - module: legacy module;
+# - stage_field: dropdown field giving the column of a record;
+# - amount_field: amount shown on the cards; the columns sum its *_usdollar field
+#   (system currency) when the module has one;
+# - subtitle_field: field shown under the name of a card;
+# - filters: dropdown fields, or assigned_user_id, the board can be filtered by;
+# - closed_stages: stages outside the active pipeline: folded until the user unfolds
+#   them, and their records are never marked as stalled;
+# - stale_days: days without a change after which a record of an active stage is marked
+#   as stalled on its card (0: never);
+# - page_size: cards read at once in a column.
+#
+# A board also needs its route (board: true in module_routing.yaml) and a link to it, as
+# the one of the Opportunities menu (public/legacy/modules/Opportunities/Menu.php).
+parameters:
+  module.pipeline_boards:
+    opportunities:
+      module: Opportunities
+      stage_field: sales_stage
+      amount_field: amount
+      subtitle_field: account_name
+      filters: [ opportunity_type, assigned_user_id ]
+      closed_stages: [ 'Closed Won', 'Closed Lost' ]
+      stale_days: 90
+      page_size: 25

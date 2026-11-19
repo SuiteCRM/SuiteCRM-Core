@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    PipelineBoardComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -187,6 +188,25 @@ export class AppInit {
                     routes.push(loggedOutConfig);
 
                     Object.keys(configRoutes).forEach(routeName => {
+                        // Pipeline board of the module (Kanban view): it follows its query
+                        // params (the filters) itself.
+                        if (configRoutes[routeName].board) {
+                            routes.push({
+                                path: routeName + '/board',
+                                component: PipelineBoardComponent,
+                                canActivate: [AuthGuard],
+                                runGuardsAndResolvers: 'paramsChange',
+                                resolve: {
+                                    metadata: BaseModuleResolver
+                                },
+                                data: {
+                                    reuseRoute: true,
+                                    checkSession: true,
+                                    module: routeName
+                                }
+                            });
+                        }
+
                         if (configRoutes[routeName].index) {
                             routes.push({
                                 path: routeName,

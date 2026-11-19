@@ -209,9 +209,16 @@ export class PipelineBoardComponent implements OnInit, OnDestroy {
         this.loadCards(column);
     }
 
-    /** A card dropped in another column. */
+    /**
+     * A card dropped in another column. Released outside the columns, or over a column it
+     * cannot enter, it stays where it was: the drag and drop would else leave it in the last
+     * column it went over.
+     */
     drop(event: CdkDragDrop<BoardColumn>): void {
         this.dragSource = null;
+        if (!event.isPointerOverContainer) {
+            return;
+        }
         this.move(event.item.data as BoardCard, event.previousContainer.data, event.container.data);
     }
 

@@ -1,0 +1,144 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// Pipeline board (Kanban view) of a module: the columns of its stages, their cards, the
+// "Move to" menu of a card and the card that follows the pointer. Every selector stays under
+// .pipeline-board, but the dragged card and the "Move to" menu, attached to the body.
+.pipeline-board {
+    // Below the fixed navbar, like the list view (padding-top: 3em); the board takes the
+    // height of the window above the footer of the application (50px) and its columns scroll.
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    height: calc(100vh - 50px);
+    min-height: 420px;
+    padding: calc(3rem + 16px) 22px 16px;
+    color: #2f2c3a;
+    font-size: 14px;
+
+    .pipeline-board-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 16px; margin: 0 0 12px; }
+    .pipeline-board-title { margin: 0 0 4px; font-size: 22px; font-weight: 400; }
+    .pipeline-board-summary { margin: 0; color: #4b4758; }
+    .pipeline-board-links { display: flex; gap: 8px; }
+
+    .pipeline-board-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 16px; margin: 0 0 12px; padding: 10px 16px; border: 1px solid #e3e0e8; border-radius: 4px; background: #fff; }
+    .pipeline-board-filter { flex: 0 1 240px; min-width: 160px; }
+    .pipeline-board-filter label { display: block; margin: 0 0 4px; color: #4b4758; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+    .pipeline-board-hint { display: flex; align-items: center; gap: 8px; margin: 0 0 6px auto; color: #5d5a68; font-size: 13px; }
+
+    .pipeline-board-message { margin: 0 0 16px; padding: 24px; border: 1px dashed #c9c5d3; border-radius: 8px; background: #fff; color: #5d5a68; text-align: center; }
+    .pipeline-board-error { border-color: #b84a40; color: #8f342c; }
+
+    // The columns side by side, scrolling sideways; each scrolls its cards.
+    .pipeline-board-columns { display: flex; flex: 1 1 auto; align-items: stretch; gap: 12px; min-height: 0; padding-bottom: 8px; overflow-x: auto; scrollbar-width: thin; scrollbar-color: #a29fad transparent; transition: opacity .15s; }
+    .pipeline-board-columns.is-loading { opacity: .6; pointer-events: none; }
+
+    .pipeline-board-column { position: relative; display: flex; flex: 0 0 288px; flex-direction: column; min-height: 0; border: 1px solid #e1dee8; border-radius: 8px; background: #f4f2f7; }
+    .pipeline-board-column.is-closed { background: #f8f7fa; }
+
+    .pipeline-board-column-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 2px 8px; padding: 8px 12px 8px 4px; border-bottom: 1px solid #e1dee8; }
+    .pipeline-board-column-title { margin: 0; color: #534d64; font-size: 14px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+    .pipeline-board-count { min-width: 28px; padding: 2px 8px; border-radius: 12px; background: #534d64; color: #fff; font-size: 12px; font-weight: 700; text-align: center; }
+    .pipeline-board-column.is-closed .pipeline-board-count { background: #6a6676; }
+    .pipeline-board-amount { grid-column: 2 / 4; color: #4b4758; font-size: 13px; font-variant-numeric: tabular-nums; }
+
+    .pipeline-board-fold { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 6px; background: none; color: #5d5a68; cursor: pointer; }
+    .pipeline-board-fold:hover { background: #e7e4ee; color: #2f2c3a; }
+
+    .pipeline-board-cards { display: flex; flex: 1 1 auto; flex-direction: column; gap: 8px; min-height: 96px; padding: 8px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #c9c5d3 transparent; }
+    // The column a card is dragged over.
+    .pipeline-board-cards.cdk-drop-list-dragging { outline: 2px dashed #8f8a9e; outline-offset: -4px; border-radius: 8px; }
+
+    .pipeline-board-card { position: relative; flex: 0 0 auto; padding: 10px 12px; border: 1px solid #e1dee8; border-left: 3px solid #c9c5d3; border-radius: 6px; background: #fff; cursor: grab; }
+    .pipeline-board-card:hover { border-color: #a29fad; border-left-color: #a29fad; }
+    .pipeline-board-card.is-stale, .pipeline-board-card.is-stale:hover { border-left-color: #d97706; }
+    .pipeline-board-card.is-locked { cursor: default; }
+    .pipeline-board-card.is-moving { opacity: .6; }
+    // The theme gives .cdk-drag a z-index (1250 !important), above the menus and the modals.
+    .pipeline-board-card.cdk-drag { z-index: auto !important; }
+
+    .pipeline-board-card-name { display: block; color: #2f2c3a; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+    .pipeline-board-card-name:hover { color: #534d64; text-decoration: underline; }
+    .pipeline-board-card-subtitle { margin: 2px 0 0; color: #4b4758; overflow-wrap: anywhere; }
+    .pipeline-board-card-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 6px 0 0; }
+    .pipeline-board-card-amount { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .pipeline-board-tag { padding: 1px 8px; border: 1px solid #d5d1de; border-radius: 10px; color: #4b4758; font-size: 12px; }
+    .pipeline-board-card-foot { justify-content: space-between; color: #5d5a68; font-size: 12px; }
+    .pipeline-board-stale { display: inline-flex; align-items: center; gap: 6px; padding: 1px 8px; border-radius: 10px; background: #fef3c7; color: #7c3a06; font-weight: 600; }
+    .pipeline-board-stale-mark { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; background: #d97706; }
+
+    // The "Move to" menu, in the top right corner of its card.
+    .pipeline-board-card.is-editable .pipeline-board-card-name { padding-right: 28px; }
+    .pipeline-board-move { position: absolute; top: 4px; right: 4px; }
+    .pipeline-board-card-menu { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 6px; background: none; color: #5d5a68; cursor: pointer; }
+    .pipeline-board-card-menu:hover { background: #f1eff5; color: #2f2c3a; }
+    .pipeline-board-card-menu::after { display: none; }
+
+    .pipeline-board-empty { margin: 0; padding: 16px 8px; color: #6a6676; font-size: 13px; text-align: center; }
+    .pipeline-board-more { flex: 0 0 auto; min-height: 36px; border: 1px solid #c9c5d3; border-radius: 6px; background: #fff; color: #534d64; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .pipeline-board-more:hover { border-color: #534d64; }
+    .pipeline-board-more:disabled { opacity: .5; cursor: default; }
+
+    // The place of the dragged card: where it was in its own column, at the top of the
+    // other columns (a moved record becomes the last changed of its new stage).
+    .pipeline-board-placeholder { display: flex; flex: 0 0 auto; align-items: center; justify-content: center; min-height: 56px; border: 2px dashed #a29fad; border-radius: 6px; background: #fbfafc; color: #6a6676; font-size: 13px; }
+    .pipeline-board-column:not(.is-source) .pipeline-board-placeholder { order: -1; }
+    // The theme hides the placeholders of the drag and drop (opacity: 0).
+    .pipeline-board-placeholder.cdk-drag-placeholder { opacity: 1; }
+
+    // Folded column: a strip with its title upright; the whole strip takes a dropped card.
+    .pipeline-board-column.is-folded { flex-basis: 56px; cursor: default; }
+    .pipeline-board-column.is-folded .pipeline-board-column-head { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 8px 4px; border-bottom: 0; }
+    .pipeline-board-column.is-folded .pipeline-board-fold svg { transform: rotate(180deg); }
+    .pipeline-board-column.is-folded .pipeline-board-column-title { max-height: 260px; overflow: hidden; writing-mode: vertical-rl; white-space: nowrap; text-overflow: ellipsis; }
+    .pipeline-board-column.is-folded .pipeline-board-amount { display: none; }
+    .pipeline-board-column.is-folded .pipeline-board-cards { position: absolute; inset: 0; min-height: 0; padding: 0; overflow: hidden; }
+    .pipeline-board-column.is-folded .pipeline-board-placeholder { display: none; }
+    // While a card is dragged, the strip under the title is what the pointer is over.
+    .pipeline-board-columns.is-dragging .pipeline-board-column.is-folded .pipeline-board-column-head { pointer-events: none; }
+
+    @media (max-width: 767px) {
+        height: auto;
+        min-height: 100vh;
+        padding-left: 16px;
+        padding-right: 16px;
+
+        .pipeline-board-hint { margin-left: 0; }
+        .pipeline-board-columns { min-height: 60vh; max-height: 80vh; }
+        .pipeline-board-column { flex-basis: 82vw; }
+    }
+}
+
+// The card that follows the pointer (attached to the body by the drag and drop).
+.pipeline-board-drag-preview { display: flex; flex-direction: column; gap: 2px; box-sizing: border-box; width: 264px; padding: 10px 12px; border: 1px solid #a29fad; border-left: 3px solid #534d64; border-radius: 6px; background: #fff; color: #2f2c3a; font-size: 14px; box-shadow: 0 8px 24px rgba(47, 44, 58, .18); }
+.pipeline-board-drag-preview span { color: #4b4758; }
+.cdk-drag-preview.pipeline-board-drag-preview { z-index: 1100; }
+
+// The "Move to" menu of a card (attached to the body, so that its column does not cut it).
+.pipeline-board-menu { max-width: min(360px, 90vw); max-height: 60vh; overflow-x: hidden; overflow-y: auto; }
+// The menus of the theme are dark: their header takes the colour of their items.
+.pipeline-board-menu .dropdown-header { color: inherit; font-size: 12px; font-weight: 700; text-transform: uppercase; opacity: .8; }
+.pipeline-board-menu .dropdown-item { min-height: 36px; white-space: normal; }

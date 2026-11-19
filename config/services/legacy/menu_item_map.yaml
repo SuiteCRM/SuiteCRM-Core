@@ -25,6 +25,9 @@ parameters:
         contacts:
             Create_Contact_Vcard:
                 icon: plus
+        opportunities:
+            Board:
+                icon: kanban
         calls:
             Calls:
                 icon: plus

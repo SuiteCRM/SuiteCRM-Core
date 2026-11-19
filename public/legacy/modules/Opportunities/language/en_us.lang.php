@@ -81,6 +81,7 @@ $mod_strings = array(
     'LBL_NEW_FORM_TITLE' => 'Create Opportunity',
     'LNK_NEW_OPPORTUNITY' => 'Create Opportunity',
     'LNK_OPPORTUNITY_LIST' => 'View Opportunities',
+    'LNK_PIPELINE_BOARD' => 'View Pipeline Board',
     'ERR_DELETE_RECORD' => 'A record number must be specified to delete the opportunity.',
     'LBL_TOP_OPPORTUNITIES' => 'My Top Open Opportunities',
     'OPPORTUNITY_REMOVE_PROJECT_CONFIRM' => 'Are you sure you want to remove this opportunity from the project?',

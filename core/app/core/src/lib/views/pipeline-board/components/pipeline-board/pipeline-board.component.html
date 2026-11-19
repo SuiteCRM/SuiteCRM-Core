@@ -1,0 +1,144 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="pipeline-board">
+    <header class="pipeline-board-head">
+        <div class="pipeline-board-heading">
+            <h2 class="pipeline-board-title">
+                <ng-container *ngIf="data">{{ data.title }} · </ng-container>{{ label('LBL_PIPELINE_BOARD_TITLE') }}
+            </h2>
+            <p *ngIf="data" class="pipeline-board-summary">
+                {{ label('LBL_PIPELINE_BOARD_ACTIVE') }}:
+                <strong>{{ records(activeCount) }}</strong>
+                <ng-container *ngIf="data.hasAmount"> · <strong>{{ money(activeAmount) }}</strong></ng-container>
+            </p>
+        </div>
+        <div *ngIf="data" class="pipeline-board-links">
+            <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/', data.board]">{{ label('LBL_PIPELINE_BOARD_LIST_VIEW') }}</a>
+            <a *ngIf="data.canCreate" class="btn btn-sm btn-main" [routerLink]="['/', data.board, 'create']">{{ label('LBL_NEW') }}</a>
+        </div>
+    </header>
+
+    <div *ngIf="data" class="pipeline-board-filters" role="search">
+        <div *ngFor="let filter of data.filters" class="pipeline-board-filter">
+            <label [for]="'pipeline-board-filter-' + filter.field">{{ filter.label }}</label>
+            <select [id]="'pipeline-board-filter-' + filter.field" class="form-control form-control-sm" [disabled]="loading"
+                    [ngModel]="filter.value" (ngModelChange)="setFilter(filter, $event)">
+                <option value="">{{ label('LBL_PIPELINE_BOARD_ALL') }}</option>
+                <option *ngFor="let option of filter.options" [value]="option.value">{{ option.label }}</option>
+            </select>
+        </div>
+        <p *ngIf="data.staleDays" class="pipeline-board-hint">
+            <span class="pipeline-board-stale-mark" aria-hidden="true"></span>
+            {{ label('LBL_PIPELINE_BOARD_STALE_HINT', {days: data.staleDays}) }}
+        </p>
+    </div>
+
+    <p *ngIf="loading && !data" class="pipeline-board-message">{{ label('LBL_PIPELINE_BOARD_LOADING') }}</p>
+    <p *ngIf="error" class="pipeline-board-message pipeline-board-error" role="alert">{{ label('LBL_PIPELINE_BOARD_ERROR') }}</p>
+
+    <div *ngIf="data && !error" class="pipeline-board-columns" cdkDropListGroup
+         [class.is-loading]="loading" [class.is-dragging]="dragSource !== null">
+        <section *ngFor="let column of data.columns; trackBy: trackByStage" class="pipeline-board-column"
+                 [class.is-folded]="column.folded" [class.is-closed]="column.closed"
+                 [class.is-source]="dragSource === column.stage" [attr.aria-label]="columnLabel(column)">
+            <header class="pipeline-board-column-head">
+                <button type="button" class="pipeline-board-fold" [attr.aria-expanded]="!column.folded"
+                        [title]="label(column.folded ? 'LBL_PIPELINE_BOARD_UNFOLD' : 'LBL_PIPELINE_BOARD_FOLD')"
+                        [attr.aria-label]="label(column.folded ? 'LBL_PIPELINE_BOARD_UNFOLD' : 'LBL_PIPELINE_BOARD_FOLD') + ' — ' + columnLabel(column)"
+                        (click)="toggle(column)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <h3 class="pipeline-board-column-title">{{ columnLabel(column) }}</h3>
+                <span class="pipeline-board-count" [title]="records(column.count)">{{ column.count }}</span>
+                <span *ngIf="data.hasAmount" class="pipeline-board-amount" [title]="label('LBL_PIPELINE_BOARD_TOTAL')">{{ money(column.amount) }}</span>
+            </header>
+
+            <!-- The drop zone of the column: also there when folded, so that a card can be dropped on it. -->
+            <div class="pipeline-board-cards" cdkDropList cdkDropListSortingDisabled [cdkDropListData]="column"
+                 [cdkDropListEnterPredicate]="canEnter" (cdkDropListDropped)="drop($event)">
+                <ng-container *ngIf="!column.folded">
+                    <article *ngFor="let card of column.cards; trackBy: trackById" class="pipeline-board-card"
+                             [class.is-stale]="card.stale" [class.is-editable]="card.canEdit" [class.is-locked]="!card.canEdit" [class.is-moving]="moving[card.id]"
+                             cdkDrag [cdkDragData]="card" [cdkDragDisabled]="!canDrag(card)" [cdkDragStartDelay]="dragDelay"
+                             (cdkDragStarted)="dragSource = column.stage" (cdkDragEnded)="dragSource = null"
+                             [title]="card.canEdit ? '' : label('LBL_PIPELINE_BOARD_READ_ONLY')">
+                        <div *cdkDragPlaceholder class="pipeline-board-placeholder">{{ label('LBL_PIPELINE_BOARD_DROP_HERE') }}</div>
+                        <div *cdkDragPreview class="pipeline-board-drag-preview">
+                            <strong>{{ card.name || label('LBL_PIPELINE_BOARD_NO_NAME') }}</strong>
+                            <span *ngIf="card.subtitle">{{ card.subtitle }}</span>
+                        </div>
+
+                        <a class="pipeline-board-card-name" [routerLink]="recordLink(card)">{{ card.name || label('LBL_PIPELINE_BOARD_NO_NAME') }}</a>
+                        <div *ngIf="card.canEdit" ngbDropdown #menu="ngbDropdown" container="body" placement="bottom-end" class="pipeline-board-move">
+                            <button type="button" ngbDropdownToggle class="pipeline-board-card-menu" [disabled]="moving[card.id]"
+                                    [title]="label('LBL_PIPELINE_BOARD_MOVE_TO')"
+                                    [attr.aria-label]="label('LBL_PIPELINE_BOARD_MOVE_TO') + ' — ' + card.name">
+                                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                                    <circle cx="3" cy="8" r="1.5" fill="currentColor"/>
+                                    <circle cx="8" cy="8" r="1.5" fill="currentColor"/>
+                                    <circle cx="13" cy="8" r="1.5" fill="currentColor"/>
+                                </svg>
+                            </button>
+                            <div ngbDropdownMenu class="pipeline-board-menu">
+                                <ng-container *ngIf="menu.isOpen()">
+                                    <div class="dropdown-header">{{ label('LBL_PIPELINE_BOARD_MOVE_TO') }}</div>
+                                    <button *ngFor="let target of targets(column)" type="button" ngbDropdownItem
+                                            (click)="move(card, column, target)">{{ columnLabel(target) }}</button>
+                                </ng-container>
+                            </div>
+                        </div>
+                        <p *ngIf="card.subtitle" class="pipeline-board-card-subtitle">{{ card.subtitle }}</p>
+                        <div *ngIf="card.amount !== null || card.tags.length" class="pipeline-board-card-row">
+                            <span *ngIf="card.amount !== null" class="pipeline-board-card-amount">{{ money(card.amount, card.currencyId) }}</span>
+                            <span *ngFor="let tag of card.tags" class="pipeline-board-tag">{{ tag }}</span>
+                        </div>
+                        <div *ngIf="card.userName || card.stale" class="pipeline-board-card-row pipeline-board-card-foot">
+                            <span *ngIf="card.userName" class="pipeline-board-card-user">{{ card.userName }}</span>
+                            <span *ngIf="card.stale" class="pipeline-board-stale"
+                                  [title]="label('LBL_PIPELINE_BOARD_LAST_CHANGE') + ': ' + date(card.modified)">
+                                <span class="pipeline-board-stale-mark" aria-hidden="true"></span>
+                                {{ label('LBL_PIPELINE_BOARD_STALE', {days: card.idleDays}) }}
+                            </span>
+                        </div>
+                    </article>
+
+                    <p *ngIf="column.loaded && !column.cards.length && !column.loading" class="pipeline-board-empty">
+                        {{ label('LBL_PIPELINE_BOARD_EMPTY_COLUMN') }}
+                    </p>
+                    <p *ngIf="column.loading && !column.cards.length" class="pipeline-board-empty">{{ label('LBL_PIPELINE_BOARD_LOADING') }}</p>
+                    <button *ngIf="column.loaded && column.cards.length < column.count" type="button" class="pipeline-board-more"
+                            [disabled]="column.loading" (click)="more(column)">
+                        {{ label('LBL_PIPELINE_BOARD_MORE') }} ({{ column.count - column.cards.length }})
+                    </button>
+                </ng-container>
+            </div>
+        </section>
+    </div>
+</div>

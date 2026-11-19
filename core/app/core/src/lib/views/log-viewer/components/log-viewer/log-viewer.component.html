@@ -1,0 +1,143 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="log-viewer">
+    <h2 class="log-viewer-title">{{ label('LBL_LOGVIEW') }}</h2>
+
+    <p *ngIf="loading && !data" class="log-viewer-muted">…</p>
+    <p *ngIf="data && !data.available" class="log-viewer-error" role="alert">{{ label('LBL_LOGVIEW_NOT_AVAILABLE') }}</p>
+
+    <ng-container *ngIf="tab">
+        <ul class="nav nav-tabs log-viewer-tabs" role="tablist">
+            <li class="nav-item" *ngFor="let item of tabs">
+                <button type="button" class="nav-link" role="tab" [class.active]="item === tab"
+                        [attr.aria-selected]="item === tab" (click)="select(item)">{{ partLabel(item) }}</button>
+            </li>
+        </ul>
+
+        <p *ngIf="!tab.part.sources.length" class="log-viewer-muted"><em>{{ label('LBL_LOGVIEW_NO_FILE') }}</em></p>
+
+        <ng-container *ngIf="tab.part.sources.length">
+            <form class="log-viewer-filters" (ngSubmit)="refresh()">
+                <div class="log-viewer-filter log-viewer-file">
+                    <label for="log-viewer-source">{{ label('LBL_LOGVIEW_FILE') }}</label>
+                    <select id="log-viewer-source" name="source" class="form-control form-control-sm" [(ngModel)]="tab.source" (ngModelChange)="refresh()">
+                        <option *ngIf="tab.part.sources.length > 1" value="">{{ label('LBL_LOGVIEW_ALL_FILES') }}</option>
+                        <option *ngFor="let source of tab.part.sources; trackBy: trackSource" [value]="source.key">{{ source.label }} ({{ size(source.size) }})</option>
+                    </select>
+                </div>
+                <div class="log-viewer-filter log-viewer-level">
+                    <label for="log-viewer-level">{{ label('LBL_LOGVIEW_MIN_LEVEL') }}</label>
+                    <select id="log-viewer-level" name="level" class="form-control form-control-sm" [(ngModel)]="tab.level" (ngModelChange)="refresh()">
+                        <option value="">{{ label('LBL_LOGVIEW_ALL_LEVELS') }}</option>
+                        <option *ngFor="let level of tab.part.levels" [value]="level">{{ level }}</option>
+                    </select>
+                </div>
+                <div class="log-viewer-filter log-viewer-search">
+                    <label for="log-viewer-search">{{ fieldLabel('LBL_SEARCH') }}</label>
+                    <input id="log-viewer-search" name="search" type="search" class="form-control form-control-sm" [(ngModel)]="tab.search">
+                </div>
+                <label class="log-viewer-regex">
+                    <input type="checkbox" name="regex" [(ngModel)]="tab.regex"> {{ fieldLabel('LBL_REG_EXP') }}
+                </label>
+                <div class="log-viewer-buttons">
+                    <button type="submit" class="btn btn-sm btn-main">{{ label('LBL_SEARCH_BUTTON_LABEL') }}</button>
+                    <button *ngIf="filtered" type="button" class="btn btn-sm btn-outline-secondary" (click)="clearFilters()">{{ label('LBL_CLEAR_BUTTON_LABEL') }}</button>
+                </div>
+            </form>
+
+            <div class="log-viewer-toolbar">
+                <div class="log-viewer-buttons">
+                    <button type="button" class="btn btn-sm" [ngClass]="tab.fromMark ? 'btn-outline-secondary' : 'btn-main'"
+                            (click)="showAll()">{{ label('LBL_ALL') }}</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="setMark()">{{ label('LBL_MARK_POINT') }}</button>
+                    <button type="button" class="btn btn-sm" [ngClass]="tab.fromMark ? 'btn-main' : 'btn-outline-secondary'"
+                            (click)="showFromMark()">{{ label('LBL_REFRESH_FROM_MARK') }}</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="showNext()">{{ buttonLabel('LBL_NEXT_') }} »</button>
+                </div>
+                <span *ngIf="tab.marked" class="log-viewer-muted">{{ label('LBL_MARK_POINT') }}: {{ tab.marked }}</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary log-viewer-download" [disabled]="!tab.rows.length"
+                        (click)="download()">{{ label('LBL_LOGVIEW_DOWNLOAD') }}</button>
+            </div>
+
+            <p *ngIf="!reading && tab.loaded && !tab.rows.length" class="log-viewer-muted">
+                <em>{{ label(tab.fromMark && !filtered ? 'LBL_LOG_NOT_CHANGED' : 'LBL_LOGVIEW_EMPTY') }}</em>
+            </p>
+
+            <div *ngIf="tab.rows.length" class="log-viewer-scroll">
+                <table class="log-viewer-table">
+                    <thead>
+                    <tr>
+                        <th scope="col" class="log-viewer-open"></th>
+                        <th scope="col">{{ label('LBL_LOGVIEW_DATE') }}</th>
+                        <th *ngIf="showFile" scope="col">{{ label('LBL_LOGVIEW_FILE') }}</th>
+                        <th scope="col">{{ label('LBL_LOGVIEW_LEVEL') }}</th>
+                        <th *ngIf="showChannel" scope="col">{{ label('LBL_LOGVIEW_CHANNEL') }}</th>
+                        <th *ngIf="showUser" scope="col">{{ label('LBL_LOGVIEW_USER') }}</th>
+                        <th scope="col" class="log-viewer-message">{{ label('LBL_LOGVIEW_MESSAGE') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let row of tab.rows" [class.is-open]="row.open" (click)="toggle(row)">
+                        <td class="log-viewer-open">
+                            <button type="button" class="log-viewer-toggle" [attr.aria-expanded]="row.open"
+                                    [attr.aria-label]="label('LBL_LOGVIEW_MESSAGE')">{{ row.open ? '▾' : '▸' }}</button>
+                        </td>
+                        <td class="log-viewer-date" [title]="row.entry.date">{{ row.date }}</td>
+                        <td *ngIf="showFile" class="log-viewer-file-name">{{ row.file }}</td>
+                        <td>
+                            <span *ngIf="row.entry.level" class="log-viewer-pill" [ngClass]="'is-log-' + row.severity">{{ row.entry.level }}</span>
+                        </td>
+                        <td *ngIf="showChannel">{{ row.entry.channel }}</td>
+                        <td *ngIf="showUser" class="log-viewer-user" [attr.title]="row.entry.userName ? row.entry.user : null">{{ row.user }}</td>
+                        <td class="log-viewer-message">
+                            <div class="log-viewer-text">{{ row.message }}</div>
+                            <ng-container *ngIf="row.open">
+                                <p *ngIf="row.entry.pid" class="log-viewer-process">{{ label('LBL_LOGVIEW_PROCESS') }}: {{ row.entry.pid }}</p>
+                                <pre *ngIf="row.detail" class="log-viewer-detail" (click)="$event.stopPropagation()">{{ row.detail }}</pre>
+                                <p *ngIf="row.entry.truncated" class="log-viewer-muted"><em>{{ label('LBL_LOGVIEW_CUT') }}</em></p>
+                            </ng-container>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="log-viewer-pager log-viewer-footer">
+                <ng-container *ngIf="reading">
+                    <span>{{ label('LBL_LOGVIEW_READING') }} {{ size(reading.scanned) }} {{ label('LBL_LOGVIEW_READ') }}</span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="stop()">{{ label('LBL_LOGVIEW_STOP') }}</button>
+                </ng-container>
+                <ng-container *ngIf="!reading && tab.loaded">
+                    <span *ngIf="tab.rows.length">{{ label('LBL_LOGVIEW_LINES') }} {{ tab.rows.length }}</span>
+                    <button *ngIf="tab.more" type="button" class="btn btn-sm btn-outline-secondary" (click)="older()">{{ label('LBL_LOGVIEW_OLDER') }}</button>
+                    <span *ngIf="!tab.more && tab.rows.length && !tab.fromMark" class="log-viewer-muted">{{ label('LBL_LOGVIEW_START') }}</span>
+                </ng-container>
+            </div>
+        </ng-container>
+    </ng-container>
+</div>

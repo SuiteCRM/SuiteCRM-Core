@@ -1,0 +1,216 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// Log viewer of the administration (View Log): the tabs of its two parts (Symfony logs, legacy
+// logs), the filters, the buttons of the mark point and the lines of the logs, that open on
+// their context.
+.log-viewer {
+    // Below the fixed navbar, like the list view (padding-top: 3em).
+    padding: calc(3rem + 16px) 24px 48px;
+    color: $median-grey;
+
+    .log-viewer-title { margin: 0 0 8px; font-size: 22px; font-weight: 400; }
+    .log-viewer-error { color: #b42318; }
+    .log-viewer-muted { color: $midnight-grey; }
+    .log-viewer-buttons { display: flex; gap: 8px; }
+
+    .log-viewer-tabs {
+        margin-bottom: 12px;
+
+        .nav-link {
+            border-top: 0;
+            border-right: 0;
+            border-left: 0;
+            background: none;
+            color: $midnight-grey;
+
+            &.active {
+                border-bottom: 2px solid $primary;
+                color: $median-grey;
+                font-weight: 600;
+            }
+        }
+    }
+
+    .log-viewer-filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 12px 16px;
+        margin: 0 0 12px;
+        padding: 12px 16px;
+        background: $white;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+    }
+
+    .log-viewer-filter {
+        flex: 0 1 240px;
+        min-width: 160px;
+
+        label {
+            display: block;
+            margin: 0 0 4px;
+            color: $dusky-blue;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+    }
+
+    .log-viewer-file { flex-basis: 360px; }
+    .log-viewer-level { flex-basis: 160px; }
+    .log-viewer-search { flex: 1 1 240px; }
+
+    .log-viewer-regex {
+        margin: 0 0 6px;
+        white-space: nowrap;
+
+        input { margin-right: 4px; }
+    }
+
+    .log-viewer-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 16px;
+        margin: 0 0 12px;
+    }
+
+    .log-viewer-download { margin-left: auto; }
+
+    .log-viewer-scroll { overflow-x: auto; }
+
+    .log-viewer-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: $white;
+        border: 1px solid $border-color;
+
+        th, td {
+            padding: 8px 10px;
+            border-top: 1px solid $light-grey;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            border-top: 0;
+            background: $off-white;
+            color: $dusky-blue;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        td { font-size: 13px; }
+
+        tbody tr {
+            cursor: pointer;
+
+            &:hover { background: $off-white-lighter; }
+        }
+
+        .log-viewer-open {
+            width: 28px;
+            padding-right: 0;
+        }
+
+        .log-viewer-message { width: 100%; }
+        .log-viewer-date, .log-viewer-file-name, .log-viewer-user { white-space: nowrap; }
+    }
+
+    .log-viewer-toggle {
+        padding: 0;
+        border: 0;
+        background: none;
+        color: $midnight-grey;
+        line-height: 1.4;
+    }
+
+    // The message on two lines at most, whole when the line is open.
+    .log-viewer-text {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        font-family: SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    tr.is-open .log-viewer-text {
+        display: block;
+        white-space: pre-wrap;
+    }
+
+    // The process of a legacy line, told when the line is open.
+    .log-viewer-process {
+        margin: 6px 0 0;
+        color: $midnight-grey;
+        font-size: 12px;
+    }
+
+    .log-viewer-detail {
+        max-height: 420px;
+        margin: 8px 0 0;
+        padding: 8px 10px;
+        overflow: auto;
+        border: 1px solid $light-grey;
+        border-radius: 4px;
+        background: $off-white-lighter;
+        color: $median-grey;
+        font-size: 12px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    // Levels: errors in red, warnings in amber, the other ones in grey.
+    .log-viewer-pill {
+        display: inline-block;
+        padding: 2px 9px;
+        border-radius: 11px;
+        background: #6b7280;
+        color: $white;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1.6;
+        white-space: nowrap;
+
+        &.is-log-error { background: #b42318; }
+        &.is-log-warning { background: #b45309; }
+        &.is-log-info { background: #4b5563; }
+        &.is-log-debug { background: #9ca3af; }
+    }
+
+    .log-viewer-pager {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 12px 0 8px;
+        font-size: 13px;
+    }
+}

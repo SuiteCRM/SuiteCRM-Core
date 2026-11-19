@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    LogViewerComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -182,6 +183,23 @@ export class AppInit {
                                 preferences: false,
                                 languageStrings: ['appStrings']
                             }
+                        }
+                    });
+
+                    // Log viewer of the administration (View Log of the System Settings), before
+                    // the generic classic view routes.
+                    routes.push({
+                        path: 'configurator/LogView',
+                        component: LogViewerComponent,
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration'
                         }
                     });
                     routes.push(loggedOutConfig);

@@ -103,6 +103,8 @@ services:
   _instanceof:
     App\Process\Service\ProcessHandlerInterface:
       tags: [ 'app.process.handler' ]
+    App\Logging\LogViewer\Source\LogSourceProviderInterface:
+      tags: [ 'app.log.viewer.source.provider' ]
     App\UserPreferences\LegacyHandler\UserPreferencesMapperInterface:
       tags: [ 'user.preferences.mapper' ]
     App\SystemConfig\LegacyHandler\SystemConfigMapperInterface:
@@ -233,6 +235,18 @@ services:
   App\Schedulers\Service\SchedulerRegistry:
     arguments:
       - !tagged { tag: 'app.scheduler' }
+
+  # The logs of the log viewer of the administration: the services tagged
+  # app.log.viewer.source.provider (LogSourceProviderInterface) declare the files it reads
+  App\Logging\LogViewer\LegacyHandler\LogViewerHandler:
+    arguments:
+      $providers: !tagged { tag: 'app.log.viewer.source.provider' }
+
+  # The folders Monolog writes to, as config/packages/monolog.yaml resolves them (LOG_DIR)
+  App\Logging\LogViewer\Source\SymfonyLogSourceProvider:
+    arguments:
+      $logDir: '%env(default:log.dir:env.logs:LOG_DIR)%'
+      $baseLogDir: '%env(default:base.log.dir:env.base_logs:LOG_DIR)%'
 
   App\Engine\Service\Extensions\ExtensionAssetCopyCacheWarmer:
     arguments:

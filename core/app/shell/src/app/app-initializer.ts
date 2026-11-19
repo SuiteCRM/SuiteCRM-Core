@@ -24,8 +24,8 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {Injectable, Injector} from '@angular/core';
-import {Route, Router} from '@angular/router';
+import {inject, Injectable, Injector} from '@angular/core';
+import {CanMatchFn, Route, Router} from '@angular/router';
 import {
     AppStateStore,
     AuthGuard,
@@ -49,9 +49,18 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    StudioComponent
 } from 'core';
 import {take} from 'rxjs/operators';
+
+/**
+ * The Studio route of the admin panel (module-builder/index?type=studio) only: the other
+ * ModuleBuilder pages keep their route.
+ */
+const studioMatch: CanMatchFn = () => {
+    return inject(Router).getCurrentNavigation()?.extractedUrl?.queryParamMap?.get('type') === 'studio';
+};
 
 @Injectable()
 export class AppInit {
@@ -182,6 +191,23 @@ export class AppInit {
                                 preferences: false,
                                 languageStrings: ['appStrings']
                             }
+                        }
+                    });
+                    // Studio (admin panel link), before the generic classic view routes; the
+                    // components not in the page yet open in the legacy Studio.
+                    routes.push({
+                        path: 'module-builder/index',
+                        component: StudioComponent,
+                        canMatch: [studioMatch],
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'administration'
                         }
                     });
                     routes.push(loggedOutConfig);

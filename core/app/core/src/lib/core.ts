@@ -929,3 +929,15 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './views/studio/studio.model';
+export * from './views/studio/studio-legacy';
+export * from './views/studio/studio-field-form';
+export * from './views/studio/components/studio/studio.component';
+export * from './views/studio/components/studio-labels/studio-labels.component';
+export * from './views/studio/components/studio-fields/studio-fields.component';
+export * from './views/studio/components/studio-field-editor/studio-field-editor.component';
+export * from './views/studio/components/studio-list-layout/studio-list-layout.component';
+export * from './views/studio/components/studio-grid-layout/studio-grid-layout.component';
+export * from './views/studio/components/studio-relationships/studio-relationships.component';
+export * from './views/studio/components/studio-reset/studio-reset.component';
+export * from './views/studio/components/studio-export/studio-export.component';

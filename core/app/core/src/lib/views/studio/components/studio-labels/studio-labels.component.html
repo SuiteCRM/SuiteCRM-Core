@@ -1,0 +1,61 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<div class="studio-labels">
+    <div class="studio-toolbar">
+        <button type="button" class="btn btn-sm btn-main" [disabled]="loading || !changed" (click)="save()">{{ label('LBL_BTN_SAVEPUBLISH') }}</button>
+        <a class="btn btn-sm btn-outline-secondary" href="#/studio/wizard?wizard=StudioWizard&option=RenameTabs">{{ label('LBL_BTN_RENAME_MODULE') }}</a>
+        <ng-container *ngIf="data">
+            <label class="studio-inline" for="studio-labels-language">{{ label('LBL_LANGUAGE') }}</label>
+            <select id="studio-labels-language" class="form-control form-control-sm studio-select" [disabled]="loading"
+                    [(ngModel)]="language" (ngModelChange)="load()">
+                <option *ngFor="let option of data.languages" [value]="option.value">{{ option.label }}</option>
+            </select>
+            <select class="form-control form-control-sm studio-select" [attr.aria-label]="label('LBL_LABELS')" [disabled]="loading"
+                    [(ngModel)]="type" (ngModelChange)="load()">
+                <option *ngFor="let option of data.types" [value]="option.value">{{ option.label }}</option>
+            </select>
+        </ng-container>
+        <input type="search" class="form-control form-control-sm studio-search" [placeholder]="label('LBL_SEARCH')"
+               [attr.aria-label]="label('LBL_SEARCH')" [(ngModel)]="search">
+    </div>
+
+    <div *ngIf="data" class="studio-scroll">
+        <table class="studio-data-table studio-table">
+            <tbody>
+            <tr *ngFor="let item of shown; trackBy: trackKey" [class.is-changed]="changes[item.key] !== undefined">
+                <th scope="row"><label class="studio-mono" [for]="'studio-label-' + item.key">{{ item.key }}</label></th>
+                <td>
+                    <input type="text" class="form-control form-control-sm" [id]="'studio-label-' + item.key"
+                           [ngModel]="value(item)" (ngModelChange)="change(item, $event)">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p *ngIf="!shown.length" class="studio-muted">{{ label('LBL_NONE') }}</p>
+    </div>
+</div>

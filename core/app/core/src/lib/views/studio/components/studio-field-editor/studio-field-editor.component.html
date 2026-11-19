@@ -1,0 +1,98 @@
+<! --
+/**
+* SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+* Copyright (C) 2021 SuiteCRM Ltd.
+*
+* This program is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Affero General Public License version 3 as published by the
+* Free Software Foundation with the addition of the following permission added
+* to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+* IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+* WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+* details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see http://www.gnu.org/licenses.
+*
+* In accordance with Section 7(b) of the GNU Affero General Public License
+* version 3, these Appropriate Legal Notices must retain the display of the
+* "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+* feasible for technical reasons, the Appropriate Legal Notices must display
+* the words "Supercharged by SuiteCRM".
+*/
+-->
+<section class="studio-field-editor" [attr.aria-label]="form?.title || label('LBL_EDIT_FIELDS')" [attr.aria-busy]="loading">
+    <h3 class="studio-subtitle">{{ form?.title || label('LBL_EDIT_FIELDS') }}</h3>
+
+    <p *ngIf="!form" class="studio-muted">…</p>
+
+    <ng-container *ngIf="form">
+        <div class="studio-toolbar">
+            <button *ngIf="form.canSave" type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="save()">{{ label('LBL_BTN_SAVE') }}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="cancel()">{{ label('LBL_BTN_CANCEL') }}</button>
+            <button *ngIf="form.canDelete" type="button" class="btn btn-sm btn-outline-danger" [disabled]="loading" (click)="confirmDelete = true">{{ label('LBL_BTN_DELETE') }}</button>
+            <button *ngIf="form.canClone" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="clone()">{{ label('LBL_BTN_CLONE') }}</button>
+        </div>
+
+        <div *ngIf="confirmDelete" class="studio-notice" role="alertdialog" aria-labelledby="studio-field-delete">
+            <p id="studio-field-delete" class="studio-pre-line"><strong>{{ form.deleteConfirm || label('LBL_CONFIRM_FIELD_DELETE') }}</strong></p>
+            <div class="studio-toolbar">
+                <button type="button" class="btn btn-sm btn-danger" [disabled]="loading" (click)="delete()">{{ label('LBL_BTN_DELETE') }}</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="loading" (click)="confirmDelete = false">{{ label('LBL_BTN_CANCEL') }}</button>
+            </div>
+        </div>
+
+        <ul *ngIf="errors.length" class="studio-notice studio-errors" role="alert">
+            <li *ngFor="let error of errors">{{ error }}</li>
+        </ul>
+
+        <div class="studio-form studio-field-form">
+            <ng-container *ngFor="let row of shownRows; trackBy: trackRow">
+                <label *ngIf="rowControlId(row) as forId; else plainLabel" class="studio-form-label" [for]="forId">{{ row.label }}</label>
+                <ng-template #plainLabel><span class="studio-form-label">{{ row.label }}</span></ng-template>
+                <div class="studio-field-controls">
+                    <ng-container *ngFor="let part of row.parts">
+                        <ng-container *ngIf="isControl(part); else notControl">
+                            <ng-container [ngSwitch]="part.control.kind">
+                                <ng-container *ngSwitchCase="'select'">
+                                    <select *ngIf="part.control.multiple; else single" multiple class="form-control form-control-sm studio-select"
+                                            [id]="part.control.uid" [disabled]="part.control.disabled || loading"
+                                            [(ngModel)]="part.control.selected" (ngModelChange)="changed(part.control)">
+                                        <option *ngFor="let option of part.control.options" [value]="option.value">{{ option.label }}</option>
+                                    </select>
+                                    <ng-template #single>
+                                        <select class="form-control form-control-sm studio-select"
+                                                [id]="part.control.uid" [disabled]="part.control.disabled || loading"
+                                                [(ngModel)]="part.control.value" (ngModelChange)="changed(part.control)">
+                                            <option *ngFor="let option of part.control.options" [value]="option.value">{{ option.label }}</option>
+                                        </select>
+                                    </ng-template>
+                                </ng-container>
+                                <textarea *ngSwitchCase="'textarea'" class="form-control form-control-sm" rows="3" [id]="part.control.uid"
+                                          [disabled]="part.control.disabled" [readonly]="part.control.readonly" [(ngModel)]="part.control.value"></textarea>
+                                <input *ngSwitchCase="'checkbox'" type="checkbox" class="studio-field-check" [id]="part.control.uid"
+                                       [disabled]="part.control.disabled" [(ngModel)]="part.control.checked" (ngModelChange)="changed(part.control)">
+                                <input *ngSwitchCase="'radio'" type="radio" [name]="'studio-' + part.control.name" [value]="part.control.value"
+                                       [id]="part.control.uid" [disabled]="part.control.disabled" [checked]="part.control.checked"
+                                       (change)="checkRadio(part.control)">
+                                <button *ngSwitchCase="'button'" type="button" class="btn btn-sm btn-outline-secondary" [disabled]="part.control.disabled || loading"
+                                        (click)="clicked(part.control)">{{ part.control.value }}</button>
+                                <input *ngSwitchDefault type="text" class="form-control form-control-sm" [id]="part.control.uid"
+                                       [attr.maxlength]="part.control.maxlength" [disabled]="part.control.disabled" [readonly]="part.control.readonly"
+                                       [(ngModel)]="part.control.value" (change)="changed(part.control)">
+                            </ng-container>
+                        </ng-container>
+                        <ng-template #notControl>
+                            <span *ngIf="isText(part); else lineBreak" class="studio-field-text">{{ part.text }}</span>
+                            <ng-template #lineBreak><span class="studio-field-break" aria-hidden="true"></span></ng-template>
+                        </ng-template>
+                    </ng-container>
+                </div>
+            </ng-container>
+        </div>
+    </ng-container>
+</section>

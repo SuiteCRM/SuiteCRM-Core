@@ -46,14 +46,20 @@ class ActivityStreamsSettingsHandler extends LegacyHandler
 
     /**
      * The social feeds the legacy page adds to the modules (view.adminsettings.php): no feed
-     * file, only their setting (sugarfeed_module_<name>, read by the My Activity Stream dashlet),
-     * their name as label.
+     * file, only their setting (sugarfeed_module_<name>, read by the My Activity Stream dashlet).
+     * Their label is the SugarFeed string LBL_SOCIAL_FEED_<NAME> when there is one, else their
+     * name: Twitter is now called X, its setting keeps its name.
      */
     protected const SOCIAL_FEEDS = ['Facebook', 'Twitter'];
 
+    /**
+     * LBL_SOCIAL_FEEDS_NOTE is the note under the modules: the legacy social feeds
+     * (include/social) call old versions of the APIs of the platforms (Facebook SDK 3.2.3 with
+     * me/home and read_stream, X API v1.1 statuses/home_timeline).
+     */
     protected const LABELS = [
         'LBL_MODULE_NAME', 'LBL_ENABLE_FEED', 'LBL_ENABLE_MODULE_LIST', 'LBL_ENABLE_USER_FEED', 'LBL_FLUSH_RECORDS',
-        'LBL_CONFIRM_DELETE_RECORDS', 'LBL_RECORDS_DELETED',
+        'LBL_CONFIRM_DELETE_RECORDS', 'LBL_RECORDS_DELETED', 'LBL_SOCIAL_FEEDS_NOTE',
     ];
 
     public function getHandlerKey(): string
@@ -90,15 +96,15 @@ class ActivityStreamsSettingsHandler extends LegacyHandler
                 ];
             }
 
+            $strings = return_module_language($current_language, 'SugarFeed');
             foreach (self::SOCIAL_FEEDS as $module) {
                 $modules[] = [
                     'module' => $module,
-                    'label' => $module,
+                    'label' => $this->decode((string)($strings['LBL_SOCIAL_FEED_' . strtoupper($module)] ?? $module)),
                     'enabled' => ($admin->settings['sugarfeed_module_' . $module] ?? '') == '1',
                 ];
             }
 
-            $strings = return_module_language($current_language, 'SugarFeed');
             $labels = [];
             foreach (self::LABELS as $label) {
                 $labels[$label] = rtrim($this->decode((string)($strings[$label] ?? $label)), ': ');

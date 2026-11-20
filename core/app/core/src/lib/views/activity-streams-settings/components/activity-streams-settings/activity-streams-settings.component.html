@@ -48,6 +48,8 @@
                     <label [for]="'activity-streams-' + module.module">{{ module.label }}</label>
                 </div>
             </div>
+            <!-- The social feeds (Facebook, X) may not work any more. -->
+            <p class="activity-streams-settings-note">{{ label('LBL_SOCIAL_FEEDS_NOTE') }}</p>
             <div class="activity-streams-settings-option activity-streams-settings-user">
                 <input type="checkbox" id="activity-streams-user" name="userFeed" [disabled]="!enabled" [(ngModel)]="userFeed">
                 <label for="activity-streams-user">{{ label('LBL_ENABLE_USER_FEED') }}</label>

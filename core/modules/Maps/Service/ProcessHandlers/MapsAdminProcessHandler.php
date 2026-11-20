@@ -38,7 +38,8 @@ use Psr\Log\LoggerInterface;
  *
  * Options, by action:
  * - counts;
- * - geocode: module (empty for all the modules);
+ * - geocode: module (empty for all the modules), limit (the addresses geocoded at most, a step of
+ *   the page);
  * - reset: module;
  * - deleteCache;
  * - export: module (the CSV of its addresses to geocode);
@@ -91,7 +92,7 @@ class MapsAdminProcessHandler implements ProcessHandlerInterface
 
         try {
             $data = match ($options['action']) {
-                'geocode' => $this->admin->geocode($module),
+                'geocode' => $this->admin->geocode($module, max(0, (int)($options['limit'] ?? 0))),
                 'reset' => $this->admin->reset($module),
                 'deleteCache' => $this->admin->deleteCache(),
                 'export' => $this->admin->export($module),

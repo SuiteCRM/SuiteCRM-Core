@@ -26,7 +26,8 @@
 */
 -->
 <div class="maps-page maps-admin">
-    <ng-container *ngIf="mode === 'test'; else counts">
+    <p *ngIf="!ready" class="maps-page-muted">…</p>
+    <ng-container *ngIf="ready && mode === 'test'">
         <h2 class="maps-page-title">{{ label('LBL_MAP_ADDRESS_TEST') }}</h2>
         <form class="maps-page-panel" (ngSubmit)="test()">
             <div class="maps-page-row">
@@ -41,19 +42,24 @@
         <pre *ngIf="result !== null" class="maps-admin-result">{{ result }}</pre>
     </ng-container>
 
-    <ng-template #counts>
+    <ng-container *ngIf="ready && mode !== 'test'">
         <h2 class="maps-page-title">{{ label('LBL_GEOCODED_COUNTS') }}</h2>
-        <p *ngIf="loading && !data" class="maps-page-muted">…</p>
         <ng-container *ngIf="data">
             <p class="maps-page-intro">{{ label('LBL_GEOCODED_COUNTS_DESCRIPTION') }}</p>
             <p *ngIf="data.provider">{{ label('LBL_MAPS_VIEW_PROVIDER') }}:
                 <strong>{{ label(data.provider === 'osm' ? 'LBL_MAPS_VIEW_PROVIDER_OSM' : 'LBL_MAPS_VIEW_PROVIDER_GOOGLE') }}</strong>
                 <ng-container *ngIf="data.provider === 'osm'"> — {{ label('LBL_MAPS_VIEW_OSM_MODULES') }}: {{ data.geocodeModules?.join(', ') }}</ng-container>
             </p>
-            <p *ngIf="data.lastStatus"><strong>{{ label('LBL_MAP_LAST_STATUS') }}: {{ data.lastStatus }}</strong></p>
+            <p *ngIf="lastStatus"><strong>{{ label('LBL_MAP_LAST_STATUS') }}: {{ lastStatus }}</strong></p>
             <div class="maps-page-buttons maps-admin-actions">
-                <button type="button" class="btn btn-sm btn-main" [disabled]="loading" (click)="geocode('')">{{ label('LBL_MAPS_VIEW_GEOCODE_ALL') }}</button>
+                <button type="button" class="btn btn-sm btn-main" [disabled]="loading || !!progress" (click)="geocode('')">{{ label('LBL_MAPS_VIEW_GEOCODE_ALL') }}</button>
+                <span class="maps-page-muted">{{ data.limitNote }}</span>
             </div>
+            <!-- The geocoding run, by steps of a few addresses. -->
+            <p *ngIf="progress" class="maps-admin-progress" role="status">
+                <span>{{ label('LBL_MAPS_VIEW_GEOCODING') }} {{ progress.label }} — {{ progress.step }} / {{ progress.steps }}</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="stopped" (click)="stop()">{{ label('LBL_MAPS_VIEW_STOP') }}</button>
+            </p>
             <div class="maps-page-scroll">
                 <table class="maps-page-table" [class.is-loading]="loading">
                     <thead>
@@ -70,9 +76,9 @@
                         <td *ngFor="let heading of data.headings">{{ module.counts[heading.key] ?? '' }}</td>
                         <td class="maps-page-name">{{ module.total }}</td>
                         <td class="maps-admin-row-actions">
-                            <button *ngIf="canGeocode(module.module)" type="button" class="btn btn-sm btn-link" [disabled]="loading"
+                            <button *ngIf="canGeocode(module.module)" type="button" class="btn btn-sm btn-link" [disabled]="loading || !!progress"
                                     (click)="geocode(module.module)">{{ label('LBL_MAPS_VIEW_GEOCODE') }}</button>
-                            <button type="button" class="btn btn-sm btn-link" [disabled]="loading" (click)="reset(module)">{{ label('LBL_MODULE_RESET_HEADING') }}</button>
+                            <button type="button" class="btn btn-sm btn-link" [disabled]="loading || !!progress" (click)="reset(module)">{{ label('LBL_MODULE_RESET_HEADING') }}</button>
                         </td>
                     </tr>
                     </tbody>
@@ -101,8 +107,8 @@
             </div>
 
             <div class="maps-page-buttons">
-                <button type="button" class="btn btn-sm btn-outline-danger" [disabled]="loading" (click)="deleteCache()">{{ label('LBL_MAPS_VIEW_DELETE_CACHE') }}</button>
+                <button type="button" class="btn btn-sm btn-outline-danger" [disabled]="loading || !!progress" (click)="deleteCache()">{{ label('LBL_MAPS_VIEW_DELETE_CACHE') }}</button>
             </div>
         </ng-container>
-    </ng-template>
+    </ng-container>
 </div>

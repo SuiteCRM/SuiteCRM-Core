@@ -51,7 +51,14 @@ class MapsAdminHandler extends LegacyHandler
         'LBL_MAPS_VIEW_GEOCODE', 'LBL_MAPS_VIEW_GEOCODE_ALL', 'LBL_MAPS_VIEW_EXPORT',
         'LBL_MAPS_VIEW_DELETE_CACHE', 'LBL_MAPS_VIEW_RESET_CONFIRM', 'LBL_MAPS_VIEW_DELETE_CACHE_CONFIRM',
         'LBL_MAPS_VIEW_PROVIDER', 'LBL_MAPS_VIEW_PROVIDER_GOOGLE', 'LBL_MAPS_VIEW_PROVIDER_OSM', 'LBL_MAPS_VIEW_OSM_MODULES',
+        'LBL_MAPS_VIEW_GEOCODING', 'LBL_MAPS_VIEW_STOP',
     ];
+
+    /**
+     * The records a step of the page looks at, at most: the legacy action waits a second every
+     * ten records, with or without an address to geocode.
+     */
+    protected const STEP_RECORDS = 9;
 
     protected MapsGeocoding $geocoding;
 
@@ -78,11 +85,13 @@ class MapsAdminHandler extends LegacyHandler
     /**
      * Geocodes the addresses of a module, or of all the modules (legacy geocode_addresses, run as
      * the cron does: within the geocoding limits of the settings), then the counts.
+     * With a limit, a step of the page: at most that many addresses are geocoded, among a few
+     * records, as OpenStreetMap takes one request per second and a whole run lasts minutes.
      */
-    public function geocode(string $module): array
+    public function geocode(string $module, int $limit = 0): array
     {
-        return $this->inLegacy(function () use ($module) {
-            return $this->countsData($this->geocodeModules($module === '' ? [] : [$module]));
+        return $this->inLegacy(function () use ($module, $limit) {
+            return $this->countsData($this->geocodeModules($module === '' ? [] : [$module], $limit));
         });
     }
 
@@ -113,10 +122,18 @@ class MapsAdminHandler extends LegacyHandler
      * it, one after the other. Returns the last geocoding status.
      *
      * @param string[] $modules
+     * @param int $limit the geocoding requests of a step of the page (0: the limits of the settings)
      */
-    protected function geocodeModules(array $modules): string
+    protected function geocodeModules(array $modules, int $limit = 0): string
     {
         $controller = $this->controller();
+        if ($limit > 0) {
+            $controller->settings['google_geocoding_limit'] = min($limit, (int)($controller->settings['google_geocoding_limit'] ?? $limit));
+            // The records of the step: selected by the bean, counted by the action.
+            $records = min(max($limit, self::STEP_RECORDS), (int)($controller->settings['geocoding_limit'] ?? self::STEP_RECORDS));
+            $controller->settings['geocoding_limit'] = $records;
+            $controller->bean->settings['geocoding_limit'] = $records;
+        }
         if (!MapsGeocoding::isOsm($controller->settings)) {
             $this->withRequest(['display_module' => $modules[0] ?? '', 'cron' => '1'], fn () => $controller->action_geocode_addresses());
 
@@ -230,6 +247,7 @@ class MapsAdminHandler extends LegacyHandler
                 'total' => (int)($bean->geocoded_module_totals[$module] ?? 0),
             ];
         }
+        $requestsLimit = max(0, (int)($controller->settings['google_geocoding_limit'] ?? 0));
 
         return [
             'headings' => $headings,
@@ -243,6 +261,12 @@ class MapsAdminHandler extends LegacyHandler
                 ? MapsGeocoding::osmModules($controller->settings)
                 : array_values($controller->settings['valid_geocode_modules'] ?? []),
             'osmScheduler' => $this->schedulerText($controller->settings),
+            // The geocoding requests of a run of the page, which geocodes by steps.
+            'requestsLimit' => $requestsLimit,
+            'limitNote' => $this->decode(strtr(
+                (string)($strings['LBL_MAPS_VIEW_GEOCODE_LIMIT'] ?? ''),
+                ['{limit}' => (string)$requestsLimit]
+            )),
             'labels' => $this->labels(),
         ];
     }

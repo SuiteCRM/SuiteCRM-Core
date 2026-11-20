@@ -98,7 +98,8 @@
 }
 
 .maps-admin {
-    .maps-admin-actions { margin: 0 0 8px; }
+    .maps-admin-actions { margin: 0 0 8px; align-items: center; }
+    .maps-admin-progress { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 8px; font-weight: 700; }
     .maps-admin-row-actions { white-space: nowrap; }
     .maps-admin-panel { margin-top: 12px; p { margin: 8px 0; } code { word-break: break-all; } }
     .maps-admin-result { padding: 12px; background: $white; border: 1px solid $border-color; white-space: pre-wrap; }

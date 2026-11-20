@@ -121,4 +121,6 @@ $mod_strings = array(
     'LBL_VIEW' => 'View',
     'LBL_POST_TITLE' => 'Post Status Update for ',
     'LBL_URL_LINK_TITLE' => 'URL Link to use',
+    'LBL_SOCIAL_FEED_TWITTER' => 'X (Twitter)',
+    'LBL_SOCIAL_FEEDS_NOTE' => 'Facebook and X (Twitter) also need their connector, set up in Admin > Connectors with a developer application of the platform. These feeds use old versions of the Facebook and X APIs, which the platforms have deprecated or restricted since: they may show nothing.',
 );

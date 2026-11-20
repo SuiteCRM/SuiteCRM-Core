@@ -49,7 +49,8 @@ import {
     LogoutComponent,
     TwoFactorAuthGuard,
     AdminPanelComponent,
-    TwoFactorComponent
+    TwoFactorComponent,
+    ActivityStreamsSettingsComponent
 } from 'core';
 import {take} from 'rxjs/operators';
 
@@ -182,6 +183,22 @@ export class AppInit {
                                 preferences: false,
                                 languageStrings: ['appStrings']
                             }
+                        }
+                    });
+
+                    // Activity Streams settings view (admin panel link), before the generic classic view routes.
+                    routes.push({
+                        path: 'sugar-feed/AdminSettings',
+                        component: ActivityStreamsSettingsComponent,
+                        canActivate: [AuthGuard],
+                        runGuardsAndResolvers: 'always',
+                        resolve: {
+                            metadata: BaseModuleResolver
+                        },
+                        data: {
+                            reuseRoute: false,
+                            checkSession: true,
+                            module: 'sugar-feed'
                         }
                     });
                     routes.push(loggedOutConfig);

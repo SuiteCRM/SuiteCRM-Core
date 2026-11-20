@@ -46,11 +46,28 @@ if (!defined('sugarEntry') || !sugarEntry) {
 
 $module_name = 'AOBH_BusinessHours';
 $listViewDefs[$module_name] = array(
-    'NAME' => array(
-        'width' => '32',
-        'label' => 'LBL_NAME',
+    // The day and its hours (the Business Hours page of the administration saves no name).
+    'DAY' => array(
+        'width' => '20',
+        'label' => 'LBL_DAY',
         'default' => true,
         'link' => true),
+    'OPEN_STATUS' => array(
+        'width' => '10',
+        'label' => 'LBL_OPEN',
+        'default' => true),
+    'OPENING_HOURS' => array(
+        'width' => '15',
+        'label' => 'LBL_OPENING_HOURS',
+        'default' => true),
+    'CLOSING_HOURS' => array(
+        'width' => '15',
+        'label' => 'LBL_CLOSING_HOURS',
+        'default' => true),
+    'NAME' => array(
+        'width' => '20',
+        'label' => 'LBL_NAME',
+        'default' => true),
     'ASSIGNED_USER_NAME' => array(
         'width' => '9',
         'label' => 'LBL_ASSIGNED_TO_NAME',

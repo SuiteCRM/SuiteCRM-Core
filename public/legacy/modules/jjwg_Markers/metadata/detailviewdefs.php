@@ -33,6 +33,16 @@ array(
       ),
       'useTabs' => false,
     ),
+    // SuiteCRM 8 record view: the map under the details.
+    'bottomWidgets' =>
+    array(
+      0 =>
+      array(
+        'type' => 'marker-map',
+        'modes' => array('detail', 'edit', 'create'),
+        'options' => array(),
+      ),
+    ),
     'panels' =>
     array(
       'default' =>

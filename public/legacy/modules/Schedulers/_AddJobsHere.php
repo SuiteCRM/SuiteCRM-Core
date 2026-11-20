@@ -87,7 +87,8 @@ $jobStrings = [
     0 => 'send-from-queue',
     1 => 'email-to-queue',
     2 => 'clean-up-temporary-files',
-    3 => 'prune-database'
+    3 => 'prune-database',
+    4 => 'maps-geocode'
 ];
 /**
  * Job 0 refreshes all job schedulers at midnight

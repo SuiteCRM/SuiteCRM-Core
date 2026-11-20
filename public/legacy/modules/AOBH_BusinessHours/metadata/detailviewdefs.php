@@ -40,6 +40,11 @@
 
 $module_name = 'AOBH_BusinessHours';
 $viewdefs[$module_name]['DetailView'] = array(
+// Title of the record: its day.
+'summaryTemplates' => array(
+    'edit' => 'LBL_SUMMARY_BUSINESS_HOURS',
+    'detail' => 'LBL_SUMMARY_BUSINESS_HOURS',
+),
 'templateMeta' => array('form' => array('buttons'=>array('EDIT', 'DUPLICATE', 'DELETE', 'FIND_DUPLICATES',
                                                          )),
                         'maxColumns' => '2',
@@ -50,27 +55,40 @@ $viewdefs[$module_name]['DetailView'] = array(
                         ),
 
 'panels' =>array(
+  // One panel (the SuiteCRM 8 record view needs a named panel).
+  'default' => array(
 
-  array(
-    'name',
-    'assigned_user_name',
-  ),
-
-  array(
     array(
-      'name' => 'date_entered',
-      'customCode' => '{$fields.date_entered.value} {$APP.LBL_BY} {$fields.created_by_name.value}',
-      'label' => 'LBL_DATE_ENTERED',
+      'day',
+      'open_status',
     ),
-    array(
-      'name' => 'date_modified',
-      'customCode' => '{$fields.date_modified.value} {$APP.LBL_BY} {$fields.modified_by_name.value}',
-      'label' => 'LBL_DATE_MODIFIED',
-    ),
-  ),
 
-  array(
-    'description',
+    array(
+      'opening_hours',
+      'closing_hours',
+    ),
+
+    array(
+      'name',
+      'assigned_user_name',
+    ),
+
+    array(
+      array(
+        'name' => 'date_entered',
+        'customCode' => '{$fields.date_entered.value} {$APP.LBL_BY} {$fields.created_by_name.value}',
+        'label' => 'LBL_DATE_ENTERED',
+      ),
+      array(
+        'name' => 'date_modified',
+        'customCode' => '{$fields.date_modified.value} {$APP.LBL_BY} {$fields.modified_by_name.value}',
+        'label' => 'LBL_DATE_MODIFIED',
+      ),
+    ),
+
+    array(
+      'description',
+    ),
   ),
 )
 );

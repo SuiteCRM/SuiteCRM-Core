@@ -172,6 +172,7 @@ $mod_strings = array(
     'LBL_SENDFROMQUEUE' => 'Send Emails from Email Queue',
     'LBL_CLEANUPTEMPORARYFILES' => 'Clean Up Temporary Files',
     'LBL_EMAILTOQUEUE' => 'Send Scheduled Emails to Email Queue',
+    'LBL_MAPSGEOCODE' => 'Geocode Addresses (OpenStreetMap)',
 
     'LBL_SCHEDULER_TIMES' => 'Scheduler Times',
     'LBL_SYNCGOOGLECALENDAR' => 'Sync Google Calendars',

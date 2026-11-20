@@ -97,6 +97,46 @@ class jjwg_Maps extends jjwg_Maps_sugar
          */
         'geocoding_api_secret' => '',
         /**
+         * 'map_provider' sets the map and geocoding service of the SuiteCRM 8 maps views: 'google'
+         * (Google Maps, with the API key) or 'osm' (OpenStreetMap map tiles and Nominatim
+         * geocoding, no key needed).
+         * @var string
+         */
+        'map_provider' => 'google',
+        /**
+         * 'osm_tile_url' sets the URL template of the OpenStreetMap map tiles ({z}, {x}, {y}, optional {s}).
+         * @var string
+         */
+        'osm_tile_url' => 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        /**
+         * 'osm_attribution' sets the attribution shown on the OpenStreetMap maps (text).
+         * @var string
+         */
+        'osm_attribution' => '© OpenStreetMap contributors',
+        /**
+         * 'osm_geocoding_url' sets the Nominatim search URL used to geocode with OpenStreetMap.
+         * @var string
+         */
+        'osm_geocoding_url' => 'https://nominatim.openstreetmap.org/search',
+        /**
+         * 'osm_geocode_modules' sets the modules geocoded with OpenStreetMap (their addresses are
+         * sent to the geocoding service). Empty: all the valid geocode modules.
+         * @var array
+         */
+        'osm_geocode_modules' => array(),
+        /**
+         * 'geocoding_hour_from' and 'geocoding_hour_to' set the hours (0-23, in 'geocoding_timezone')
+         * when the "Geocode Addresses (OpenStreetMap)" scheduler geocodes; the same hour: at any time.
+         * @var integer
+         */
+        'geocoding_hour_from' => 0,
+        'geocoding_hour_to' => 0,
+        /**
+         * 'geocoding_timezone' sets the time zone of the geocoding hours.
+         * @var string
+         */
+        'geocoding_timezone' => 'UTC',
+        /**
          * 'geocoding_limit' sets the query limit when selecting records to geocode.
          * @var integer
          */
@@ -376,6 +416,29 @@ class jjwg_Maps extends jjwg_Maps_sugar
             if (isset($rev['geocoding_api_secret'])) {
                 $this->settings['geocoding_api_secret'] = $rev['geocoding_api_secret'];
             }
+            // Map provider and OpenStreetMap settings
+            if (isset($rev['map_provider']) && in_array($rev['map_provider'], array('google', 'osm'), true)) {
+                $this->settings['map_provider'] = $rev['map_provider'];
+            }
+            foreach (array('osm_tile_url', 'osm_geocoding_url') as $setting) {
+                if (!empty($rev[$setting]) && preg_match('#^https?://#i', (string) $rev[$setting])) {
+                    $this->settings[$setting] = $rev[$setting];
+                }
+            }
+            if (!empty($rev['osm_attribution'])) {
+                $this->settings['osm_attribution'] = $rev['osm_attribution'];
+            }
+            if (isset($rev['osm_geocode_modules']) && !is_array($rev['osm_geocode_modules'])) {
+                $this->settings['osm_geocode_modules'] = preg_split('/[\s,]+/', (string) $rev['osm_geocode_modules'], -1, PREG_SPLIT_NO_EMPTY);
+            }
+            foreach (array('geocoding_hour_from', 'geocoding_hour_to') as $setting) {
+                if (isset($rev[$setting]) && is_numeric($rev[$setting]) && (int) $rev[$setting] >= 0 && (int) $rev[$setting] <= 23) {
+                    $this->settings[$setting] = (int) $rev[$setting];
+                }
+            }
+            if (!empty($rev['geocoding_timezone']) && in_array($rev['geocoding_timezone'], DateTimeZone::listIdentifiers(), true)) {
+                $this->settings['geocoding_timezone'] = $rev['geocoding_timezone'];
+            }
             // Set Google Maps API Key
             if (!isset($rev['google_maps_api_key'])) {
                 $GLOBALS['log']->warn('Undefined index: google_maps_api_key');
@@ -521,6 +584,33 @@ class jjwg_Maps extends jjwg_Maps_sugar
             }
             if (isset($data['geocoding_api_secret'])) {
                 $admin->saveSetting($category, 'geocoding_api_secret', trim($data['geocoding_api_secret']));
+            }
+
+            // Map provider and OpenStreetMap settings
+            if (isset($data['map_provider']) && in_array(trim($data['map_provider']), array('google', 'osm'), true)) {
+                $admin->saveSetting($category, 'map_provider', trim($data['map_provider']));
+            }
+            foreach (array('osm_tile_url', 'osm_geocoding_url') as $setting) {
+                if (isset($data[$setting]) && (trim($data[$setting]) === '' || preg_match('#^https?://#i', trim($data[$setting])))) {
+                    $admin->saveSetting($category, $setting, trim($data[$setting]));
+                }
+            }
+            if (isset($data['osm_attribution'])) {
+                $admin->saveSetting($category, 'osm_attribution', trim($data['osm_attribution']));
+            }
+            if (isset($data['osm_geocode_modules'])) {
+                if (is_array($data['osm_geocode_modules'])) {
+                    $data['osm_geocode_modules'] = implode(', ', $data['osm_geocode_modules']);
+                }
+                $admin->saveSetting($category, 'osm_geocode_modules', trim($data['osm_geocode_modules']));
+            }
+            foreach (array('geocoding_hour_from', 'geocoding_hour_to') as $setting) {
+                if (isset($data[$setting]) && is_numeric(trim($data[$setting])) && (int) trim($data[$setting]) >= 0 && (int) trim($data[$setting]) <= 23) {
+                    $admin->saveSetting($category, $setting, (int) trim($data[$setting]));
+                }
+            }
+            if (isset($data['geocoding_timezone']) && in_array(trim($data['geocoding_timezone']), DateTimeZone::listIdentifiers(), true)) {
+                $admin->saveSetting($category, 'geocoding_timezone', trim($data['geocoding_timezone']));
             }
 
             return true;
@@ -884,6 +974,14 @@ class jjwg_Maps extends jjwg_Maps_sugar
     }
 
     /**
+     * An other geocoding service than Google Maps (the SuiteCRM 8 maps module sets it to
+     * OpenStreetMap): callable(string $address): array, answering as the Google geocoding API
+     * (status, results[0].geometry.location and location_type).
+     * @var callable|null
+     */
+    public $geocoder = null;
+
+    /**
      * getGoogleMapsGeocode - Get Lng/Lat using Google Maps V3
      * @var $address
      * @var $return_full_array boolean
@@ -899,6 +997,64 @@ class jjwg_Maps extends jjwg_Maps_sugar
             $allow_approximate = true;
         }
 
+        if (is_callable($this->geocoder)) {
+            $googlemaps = call_user_func($this->geocoder, (string) $address);
+        } else {
+            $googlemaps = $this->getGoogleMapsGeocodeResponse($address);
+        }
+
+        /**
+         * https://developers.google.com/maps/documentation/geocoding/#Results
+         * Status: "OK" : geocoding was successful
+         * "ZERO_RESULTS" : indicates that the geocode was successful but returned no results
+         * "OVER_QUERY_LIMIT" : indicates that you are over your quota
+         * "REQUEST_DENIED" : lack of sensor parameter
+         * "INVALID_REQUEST" generally indicates that the query (address or lat/lng) is missing.
+         * Limit to location_type = 'ROOFTOP', 'RANGE_INTERPOLATED' or 'GEOMETRIC_CENTER' but not 'APPROXIMATE'
+         */
+        $aInfo = array('address' => $address);
+        if (!empty($googlemaps) && isset($googlemaps['status'])) {
+            $resultsGeography = $googlemaps['results'][0]['geometry'] ?? [];
+            if ($googlemaps['status'] == 'OVER_QUERY_LIMIT') {
+                // Debug: Log Over Limit
+                $GLOBALS['log']->warn(__METHOD__.' Google Maps API Status of OVER_QUERY_LIMIT: Over Your Quota');
+                // With its status, so that a batch geocoding stops (geocode_addresses)
+                $aInfo['status'] = 'OVER_QUERY_LIMIT';
+            } elseif (!$allow_approximate && ($resultsGeography['location_type'] ?? '') == 'APPROXIMATE') {
+                // Consider 'APPROXIMATE' to be similar to 'ZERO_RESULTS'
+                @$aInfo = array(
+                    'address' => $address,
+                    'status' => 'APPROXIMATE',
+                    'lat' => $resultsGeography['location']['lat'] ?? null,
+                    'lng' => $resultsGeography['location']['lng'] ?? null
+                );
+            } else {
+                // Return address info
+                @$aInfo = array(
+                    'address' => $address,
+                    'status' => $googlemaps['status'],
+                    'lat' => $resultsGeography['location']['lat'] ?? null,
+                    'lng' => $resultsGeography['location']['lng'] ?? null
+                );
+            }
+        }
+
+        if ($return_full_array) {
+            $GLOBALS['log']->debug(__METHOD__.' $googlemaps: '.print_r($googlemaps, true));
+            return $googlemaps;
+        } else {
+            $GLOBALS['log']->debug(__METHOD__.' $aInfo: '.print_r($aInfo, true));
+            return $aInfo;
+        }
+    }
+
+    /**
+     * The answer of the Google geocoding API (or of the proxy of 'geocoding_api_url') for an address.
+     * @var $address
+     * @return mixed
+     */
+    protected function getGoogleMapsGeocodeResponse($address)
+    {
         /**
          * Google Maps API v3 - The new v3 Google Maps API no longer requires a Maps API Key!
          * Old Default: https://maps.google.com/maps/api/geocode/json?sensor=false
@@ -953,47 +1109,7 @@ class jjwg_Maps extends jjwg_Maps_sugar
         $googlemaps = json_decode($json_contents, true);
         $GLOBALS['log']->debug(__METHOD__.' $googlemaps: '. (is_array($googlemaps) ? '[Array]' : $googlemaps));
 
-        /**
-         * https://developers.google.com/maps/documentation/geocoding/#Results
-         * Status: "OK" : geocoding was successful
-         * "ZERO_RESULTS" : indicates that the geocode was successful but returned no results
-         * "OVER_QUERY_LIMIT" : indicates that you are over your quota
-         * "REQUEST_DENIED" : lack of sensor parameter
-         * "INVALID_REQUEST" generally indicates that the query (address or lat/lng) is missing.
-         * Limit to location_type = 'ROOFTOP', 'RANGE_INTERPOLATED' or 'GEOMETRIC_CENTER' but not 'APPROXIMATE'
-         */
-        $aInfo = array('address' => $address);
-        if (!empty($googlemaps) && isset($googlemaps['status'])) {
-            $resultsGeography = $googlemaps['results'][0]['geometry'] ?? [];
-            if ($googlemaps['status'] == 'OVER_QUERY_LIMIT') {
-                // Debug: Log Over Limit
-                $GLOBALS['log']->warn(__METHOD__.' Google Maps API Status of OVER_QUERY_LIMIT: Over Your Quota');
-            } elseif (!$allow_approximate && ($resultsGeography['location_type'] ?? '') == 'APPROXIMATE') {
-                // Consider 'APPROXIMATE' to be similar to 'ZERO_RESULTS'
-                @$aInfo = array(
-                    'address' => $address,
-                    'status' => 'APPROXIMATE',
-                    'lat' => $resultsGeography['location']['lat'] ?? null,
-                    'lng' => $resultsGeography['location']['lng'] ?? null
-                );
-            } else {
-                // Return address info
-                @$aInfo = array(
-                    'address' => $address,
-                    'status' => $googlemaps['status'],
-                    'lat' => $resultsGeography['location']['lat'] ?? null,
-                    'lng' => $resultsGeography['location']['lng'] ?? null
-                );
-            }
-        }
-
-        if ($return_full_array) {
-            $GLOBALS['log']->debug(__METHOD__.' $googlemaps: '.print_r($googlemaps, true));
-            return $googlemaps;
-        } else {
-            $GLOBALS['log']->debug(__METHOD__.' $aInfo: '.print_r($aInfo, true));
-            return $aInfo;
-        }
+        return $googlemaps;
     }
 
     /**

@@ -929,3 +929,15 @@ export * from './views/record/store/record-pagination/record-pagination.service'
 export * from './views/record/store/record-pagination/record-pagination.store';
 export * from './views/record/store/record-view/record-view.store.model';
 export * from './views/record/store/record-view/record-view.store';
+export * from './fields/coordinate/coordinate.component';
+export * from './containers/sidebar-widget/components/maps-widgets/google-maps.loader';
+export * from './containers/sidebar-widget/components/maps-widgets/leaflet.loader';
+export * from './containers/sidebar-widget/components/maps-widgets/map-record-widget.component';
+export * from './containers/sidebar-widget/components/maps-widgets/marker-map-widget.component';
+export * from './containers/sidebar-widget/components/maps-widgets/area-map-widget.component';
+export * from './views/maps/components/map-display/map-display.component';
+export * from './views/maps/components/maps-admin/maps-admin.component';
+export * from './views/maps/components/quick-radius/quick-radius.component';
+export * from './views/admin-settings/components/admin-settings/admin-settings.model';
+export * from './views/admin-settings/components/admin-settings/admin-settings.component';
+export * from './views/admin-settings/components/admin-settings/admin-settings.module';

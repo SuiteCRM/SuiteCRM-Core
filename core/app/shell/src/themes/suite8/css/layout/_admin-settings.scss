@@ -1,0 +1,199 @@
+/**
+ * SuiteCRM is a customer relationship management program developed by SuiteCRM Ltd.
+ * Copyright (C) 2026 SuiteCRM Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by the
+ * Free Software Foundation with the addition of the following permission added
+ * to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED WORK
+ * IN WHICH THE COPYRIGHT IS OWNED BY SUITECRM, SUITECRM DISCLAIMS THE
+ * WARRANTY OF NON INFRINGEMENT OF THIRD PARTY RIGHTS.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Supercharged by SuiteCRM" logo. If the display of the logos is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Supercharged by SuiteCRM".
+ */
+
+// Settings pages of the administration (admin settings view).
+.admin-settings {
+    // Below the fixed navbar, like the list view (padding-top: 3em).
+    padding: calc(3rem + 16px) 24px 48px;
+    color: $median-grey;
+
+    .admin-settings-title { margin: 0 0 8px; font-size: 22px; font-weight: 400; }
+    .admin-settings-muted { color: $midnight-grey; }
+    .admin-settings-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+    .admin-settings-toolbar { margin: 0 0 12px; }
+
+    // The panels of the legacy page, across the width of the screen, with as many columns of
+    // fields as it holds (two at least, as the legacy page, one on a phone).
+    .admin-settings-panel {
+        margin: 0 0 12px;
+        padding: 12px 16px 16px;
+        background: $white;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+
+        legend {
+            float: left;
+            width: 100%;
+            margin: 0 0 12px;
+            color: $dusky-blue;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+    }
+
+    .admin-settings-grid {
+        clear: both;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+        align-items: start;
+        gap: 12px 32px;
+
+        @media (min-width: 769px) and (max-width: 1100px) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        @media (max-width: 768px) {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    .admin-settings-field {
+        min-width: 0;
+
+        > label, .admin-settings-label {
+            display: block;
+            margin: 0 0 4px;
+            font-weight: 600;
+        }
+
+        .admin-settings-option { padding: 0; }
+        .form-control { max-width: 360px; }
+        .form-text { margin-top: 2px; }
+    }
+
+    .admin-settings-required { margin-left: 2px; color: $coral-pink; }
+
+    .admin-settings-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+
+        input[type=checkbox] { margin-top: 4px; }
+        label { margin: 0; font-weight: 600; }
+    }
+
+    .admin-settings-intro { clear: both; margin: 0 0 12px; }
+
+    .admin-settings-wide { grid-column: 1 / -1; }
+
+    .admin-settings-input {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .admin-settings-suffix { white-space: nowrap; }
+
+    .admin-settings-clear { margin-top: 4px; }
+
+    // The legacy help texts (long words, non-breaking spaces) wrapped on small screens.
+    .form-text { overflow-wrap: anywhere; }
+
+    .admin-settings-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 12px;
+        margin-top: 4px;
+    }
+
+    .admin-settings-actions { clear: both; margin-top: 12px; }
+
+    .admin-settings-result { margin-top: 12px; }
+
+    .admin-settings-lists {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 360px));
+        gap: 16px 32px;
+
+        @media (max-width: 768px) {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    .admin-settings-list {
+        h4 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
+
+        ul {
+            max-height: 420px;
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+            list-style: none;
+            border: 1px solid $border-color;
+            border-radius: 4px;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 8px;
+            border-bottom: 1px solid $light-grey;
+
+            &:last-child { border-bottom: 0; }
+        }
+
+        li[cdkDrag], li.cdk-drag { cursor: move; background: $white; }
+        ul { min-height: 38px; }
+
+        .admin-settings-handle { color: $highlight-grey; }
+        .admin-settings-item { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+        .admin-settings-item-buttons { display: flex; gap: 4px; }
+        .btn { padding: 0 8px; line-height: 1.6; }
+    }
+
+    .admin-settings-pair {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 8px;
+
+        label { margin: 0; font-weight: 600; }
+        select { width: auto; min-width: 160px; max-width: 100%; }
+    }
+
+    // The item being dragged (out of the page layout) and its place in the list.
+    .cdk-drag-placeholder { opacity: .4; }
+}
+
+// The item being dragged, shown outside the page (in the body).
+.admin-settings-drag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+    list-style: none;
+
+    .admin-settings-item { flex: 1 1 auto; }
+    .admin-settings-item-buttons { display: none; }
+}

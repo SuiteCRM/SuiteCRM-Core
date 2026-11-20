@@ -29,7 +29,8 @@
               "node_modules/bootstrap-css-only/css/bootstrap.min.css",
               "core/app/shell/src/themes/suite8/css/style.scss",
               "node_modules/primeng/resources/themes/bootstrap4-light-blue/theme.css",
-              "node_modules/primeng/resources/primeng.min.css"
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/leaflet/dist/leaflet.css"
             ],
             "stylePreprocessorOptions": {
               "includePaths": [

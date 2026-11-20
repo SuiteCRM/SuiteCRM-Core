@@ -879,8 +879,8 @@ $mod_strings = array(
     'LBL_GOOGLE_SUITE_ADMIN_HEADER' => 'Google Suite',
     'LBL_GOOGLE_SUITE_ADMIN_DESC' => 'Manage your Google Suite Integration.',
 
-    'LBL_JJWG_MAPS_ADMIN_CONFIG_TITLE' => 'Google Maps Settings',
-    'LBL_JJWG_MAPS_ADMIN_CONFIG_DESC' => 'Configuration settings to adjust your Google Maps',
+    'LBL_JJWG_MAPS_ADMIN_CONFIG_TITLE' => 'Maps Settings',
+    'LBL_JJWG_MAPS_ADMIN_CONFIG_DESC' => 'The map provider (Google Maps or OpenStreetMap), the geocoding and the map settings',
     'LBL_JJWG_MAPS_ADMIN_GEOCODED_COUNTS_TITLE' => 'Geocoded Counts',
     'LBL_JJWG_MAPS_ADMIN_GEOCODED_COUNTS_DESC' => 'Shows the number of module objects geocoded, grouped by geocoding response',
     'LBL_JJWG_MAPS_ADMIN_GEOCODE_ADDRESSES_TITLE' => 'Geocode Addresses',

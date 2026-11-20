@@ -134,6 +134,7 @@ $dictionary['jjwg_Maps'] = array(
                 'name' => 'parent_type',
                 'vname' => 'LBL_PARENT_TYPE',
                 'type' => 'parent_type',
+                'options' => 'map_relate_type_list',
                 'massupdate' => 0,
                 'comments' => '',
                 'help' => '',

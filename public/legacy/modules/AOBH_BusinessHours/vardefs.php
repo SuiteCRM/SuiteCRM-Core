@@ -49,7 +49,7 @@ $dictionary['AOBH_BusinessHours'] = array(
             'vname' => 'LBL_OPENING_HOURS',
             'type' => 'enum',
             'massupdate' => 0,
-            'default' => '1',
+            'default' => '9',
             'no_default' => false,
             'comments' => '',
             'help' => '',
@@ -72,7 +72,7 @@ $dictionary['AOBH_BusinessHours'] = array(
             'vname' => 'LBL_CLOSING_HOURS',
             'type' => 'enum',
             'massupdate' => 0,
-            'default' => '1',
+            'default' => '17',
             'no_default' => false,
             'comments' => '',
             'help' => '',
@@ -96,12 +96,12 @@ $dictionary['AOBH_BusinessHours'] = array(
             'type' => 'bool',
         ),
         'day' => array(
-            'required' => false,
+            'required' => true,
             'name' => 'day',
             'vname' => 'LBL_DAY',
             'type' => 'enum',
             'massupdate' => 0,
-            'default' => 'monday',
+            'default' => 'Monday',
             'no_default' => false,
             'comments' => '',
             'help' => '',
@@ -127,3 +127,5 @@ if (!class_exists('VardefManager')) {
     require_once 'include/SugarObjects/VardefManager.php';
 }
 VardefManager::createVardef('AOBH_BusinessHours', 'AOBH_BusinessHours', array('basic'));
+// The Business Hours page of the administration saves the days without a name.
+$dictionary['AOBH_BusinessHours']['fields']['name']['required'] = false;

@@ -40,6 +40,10 @@ import {ThemeImagesStore} from '../../store/theme-images/theme-images.store';
 import {SortDirectionDataSource} from './sort-button.model';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
+import {LanguageStore} from '../../store/language/language.store';
+import {languageStoreMock} from '../../store/language/language.store.spec.mock';
+import {registerTestIcons} from '../image/svg-icons.spec.mock';
+
 const sortDirectionSubject = new BehaviorSubject<SortDirection>(SortDirection.NONE);
 let lastDirection = SortDirection.NONE;
 const sortDirectionState: SortDirectionDataSource = {
@@ -71,6 +75,7 @@ describe('SortButtonComponent', () => {
     imports: [ImageModule,
         AngularSvgIconModule.forRoot()],
     providers: [
+        {provide: LanguageStore, useValue: languageStoreMock},
         {
             provide: ThemeImagesStore, useValue: {
                 images$: of(themeImagesMockData).pipe(take(1))
@@ -81,6 +86,7 @@ describe('SortButtonComponent', () => {
     ]
 }).compileComponents();
 
+        registerTestIcons('sort', 'sort_ascend', 'sort_descend');
         testHostFixture = TestBed.createComponent(SortButtonTestHostComponent);
         testHostComponent = testHostFixture.componentInstance;
         testHostFixture.detectChanges();

@@ -24,7 +24,11 @@
  * the words "Supercharged by SuiteCRM".
  */
 
+import {Subject} from 'rxjs';
+import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
+import {themeImagesStoreMock} from '../../../../store/theme-images/theme-images.store.spec.mock';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component, ViewChild} from '@angular/core';
 import {Field} from '../../../../common/record/field.model';
 import {Record} from '../../../../common/record/record.model';
@@ -62,6 +66,7 @@ class RelateFilterFieldTestHostComponent {
     field: Field = {
         type: 'relate',
         value: 'Related Account',
+        valueChanges$: new Subject(),
         valueObject: {
             id: '123',
             name: 'Related Account',
@@ -73,6 +78,7 @@ class RelateFilterFieldTestHostComponent {
             rname: 'name'
         },
         criteria: {
+            valueObjectArray: [{id: '123', name: 'Related Account'}],
             operator: '=',
             values: [
                 'Related Account'
@@ -103,7 +109,7 @@ describe('RelateRecordFilterFieldComponent', () => {
             declarations: [
                 RelateFilterFieldTestHostComponent,
             ],
-            imports: [
+            imports: [ApolloTestingModule,
                 RouterTestingModule,
                 RelateFilterFieldModule,
                 BrowserDynamicTestingModule,
@@ -111,6 +117,7 @@ describe('RelateRecordFilterFieldComponent', () => {
                 RecordListModalModule
             ],
             providers: [
+                {provide: ThemeImagesStore, useValue: themeImagesStoreMock},
                 {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
                 {provide: NumberFormatter, useValue: numberFormatterMock},
                 {provide: DatetimeFormatter, useValue: datetimeFormatterMock},
@@ -133,68 +140,29 @@ describe('RelateRecordFilterFieldComponent', () => {
     });
 
     it('should have value', async () => {
-        expect(testHostComponent).toBeTruthy();
-
+        await testHostFixture.whenStable();
         testHostFixture.detectChanges();
-        await testHostFixture.whenRenderingDone();
 
-        const field = testHostFixture.nativeElement.getElementsByTagName('scrm-relate-filter')[0];
-
-        const tagInput = field.getElementsByTagName('tag-input').item(0);
-
-        expect(field).toBeTruthy();
-
-        expect(tagInput).toBeTruthy();
-
-        const tag = tagInput.getElementsByTagName('tag').item(0);
-
-        expect(tag).toBeTruthy();
-
-        const tagText = tag.getElementsByClassName('tag__text').item(0);
-
-        expect(tagText.textContent).toContain('Related Account');
-
-        const deleteIcon = tagInput.getElementsByTagName('delete-icon').item(0);
-
-        expect(deleteIcon).toBeTruthy();
+        const root = testHostFixture.nativeElement;
+        expect(root.querySelector('.p-multiselect-label').textContent).toContain('Related Account');
+        expect(root.querySelector('[data-pc-section="clearicon"]')).not.toBeNull();
     });
 
     it('should remove value', async () => {
-        expect(testHostComponent).toBeTruthy();
-
+        await testHostFixture.whenStable();
         testHostFixture.detectChanges();
-        await testHostFixture.whenRenderingDone();
 
-        const field = testHostFixture.nativeElement.getElementsByTagName('scrm-relate-filter')[0];
-
-        const tagInput = field.getElementsByTagName('tag-input').item(0);
-
-        expect(field).toBeTruthy();
-
-        expect(tagInput).toBeTruthy();
-
-        let tag = tagInput.getElementsByTagName('tag').item(0);
-
-        expect(tag).toBeTruthy();
-
-        const tagText = tag.getElementsByClassName('tag__text').item(0);
-
-        expect(tagText.textContent).toContain('Related Account');
-
-        const deleteIcon = tagInput.getElementsByTagName('delete-icon').item(0);
-
-        expect(deleteIcon).toBeTruthy();
-
-        deleteIcon.click();
-
+        const root = testHostFixture.nativeElement;
+        expect(root.querySelector('.p-multiselect-label').textContent).toContain('Related Account');
+        const clear = root.querySelector('[data-pc-section="clearicon"]');
+        expect(clear).not.toBeNull();
+        clear.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+        await testHostFixture.whenStable();
         testHostFixture.detectChanges();
-        await testHostFixture.whenRenderingDone();
 
-        tag = tagInput.getElementsByTagName('tag').item(0);
-
-        expect(tag).toBeFalsy();
+        expect(root.textContent).not.toContain('Related Account');
+        expect(testHostComponent.field.criteria.valueObjectArray).toEqual([]);
     });
-
 
     it('should have select button', async () => {
         expect(testHostComponent).toBeTruthy();
@@ -205,7 +173,7 @@ describe('RelateRecordFilterFieldComponent', () => {
 
         const field = testHostFixture.nativeElement.getElementsByTagName('scrm-relate-filter')[0];
 
-        const select = field.getElementsByClassName('select-button').item(0);
+        const select = field.querySelector('scrm-button button');
 
         expect(select).toBeTruthy();
     });

@@ -29,6 +29,8 @@ import {AuthService} from './auth.service';
 import {HttpHeaders, HttpParams} from '@angular/common/http';
 import {of} from 'rxjs';
 import {localStorageServiceMock} from '../local-storage/local-storage.service.spec.mock';
+import {BaseRouteService} from '../base-route/base-route.service';
+import {SystemConfigStore} from '../../store/system-config/system-config.store';
 
 describe('Auth Service', () => {
     let httpMock = null;
@@ -37,7 +39,6 @@ describe('Auth Service', () => {
     let stateManagerMock = null;
     let languageMock = null;
     let service = null;
-    let IdleMock = null;
     let appStateMock = null;
 
     beforeEach(() => {
@@ -72,8 +73,10 @@ describe('Auth Service', () => {
         languageMock = jasmine.createSpyObj('LanguageStore', ['getAppString']);
         languageMock.getAppString.and.callFake((key: string) => key);
 
-        IdleMock = jasmine.createSpyObj('bnIdle', ['doLogin']);
-        appStateMock = jasmine.createSpyObj('AppStateStore', ['updateLoading']);
+        appStateMock = jasmine.createSpyObj('AppStateStore', ['updateLoading', 'updateInitialAppLoading', 'setCurrentUser', 'getActiveRequests']);
+        appStateMock.getActiveRequests.and.returnValue(0);
+        const config = jasmine.createSpyObj<SystemConfigStore>('SystemConfigStore', ['getConfigValue', 'clear']);
+        config.getConfigValue.and.returnValue({after_logout_path: '#signed-out'});
 
         service = new AuthService(
             httpMock,
@@ -81,15 +84,31 @@ describe('Auth Service', () => {
             messageMock,
             stateManagerMock,
             languageMock,
-            IdleMock,
             appStateMock,
-            localStorageServiceMock
+            localStorageServiceMock,
+            config,
+            new BaseRouteService(),
+            null,
+            null,
+            null
         );
 
     });
 
-    it('#logout', () => {
+    it('uses the configured destination for logout redirects', () => {
+        const callLogout = spyOn(service, 'callLogout');
+
         service.logout();
+
+        expect(callLogout).toHaveBeenCalledOnceWith(
+            'logout', jasmine.any(HttpParams), jasmine.any(HttpHeaders), true, 'LBL_LOGOUT_SUCCESS', false, '#signed-out'
+        );
+    });
+
+    it('posts and clears the session when logout does not redirect', () => {
+        const initialLocation = window.location.href;
+        service.logout('LBL_LOGOUT_SUCCESS', false);
+        expect(window.location.href).toBe(initialLocation);
 
         const body = new HttpParams();
         const headers = new HttpHeaders().set('Content-Type', 'text/plain; charset=utf-8');
@@ -99,7 +118,6 @@ describe('Auth Service', () => {
         expect(stateManagerMock.clearAuthBased).toHaveBeenCalledWith();
         expect(messageMock.addSuccessMessageByKey).toHaveBeenCalledWith('LBL_LOGOUT_SUCCESS');
         expect(messageMock.log).toHaveBeenCalledWith('Logout success');
-        expect(routerMock.navigate).toHaveBeenCalledWith(['/Login']);
     });
 });
 

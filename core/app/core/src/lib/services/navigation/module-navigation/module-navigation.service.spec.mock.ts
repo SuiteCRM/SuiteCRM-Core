@@ -26,9 +26,12 @@
 
 import {ModuleNavigation} from './module-navigation.service';
 import {NavigationExtras, Router} from '@angular/router';
+import {navigationMock} from '../../../store/navigation/navigation.store.spec.mock';
+import {actionNameMapperMock} from '../action-name-mapper/action-name-mapper.service.spec.mock';
+import {moduleNameMapperMock} from '../module-name-mapper/module-name-mapper.service.spec.mock';
 
 export const mockRouter = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     navigate: (commands: any[], extras?: NavigationExtras) => null
 } as Router;
-export const mockModuleNavigation = new ModuleNavigation(mockRouter);
+export const mockModuleNavigation = new ModuleNavigation(mockRouter, moduleNameMapperMock, actionNameMapperMock, navigationMock);

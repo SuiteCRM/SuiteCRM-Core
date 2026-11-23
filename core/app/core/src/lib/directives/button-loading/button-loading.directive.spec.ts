@@ -26,6 +26,7 @@
 
 import {ButtonLoadingDirective} from './button-loading.directive';
 import {AppStateStore} from '../../store/app-state/app-state.store';
+import {createAppStateStoreMock} from '../../store/app-state/app-state.store.spec.mock';
 import {Component} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
@@ -44,7 +45,7 @@ class TestHostComponent {
 describe('ButtonLoadingDirective', () => {
     let testHostComponent: TestHostComponent;
     let testHostFixture: ComponentFixture<TestHostComponent>;
-    const appState = new AppStateStore();
+    const appState = createAppStateStoreMock();
 
     beforeEach(() => {
 
@@ -72,14 +73,14 @@ describe('ButtonLoadingDirective', () => {
     it('button should get disabled when app loading is active', () => {
 
         expect(testHostComponent).toBeTruthy();
-        appState.updateLoading('button-loading',true);
+        appState.updateLoading('button-loading', true, false);
         testHostFixture.detectChanges();
         let button = testHostFixture.nativeElement.querySelector('button');
 
         expect(button).toBeTruthy();
         expect(button.disabled).toEqual(true);
 
-        appState.updateLoading('button-loading',false);
+        appState.updateLoading('button-loading', false, false);
 
         testHostFixture.detectChanges();
         button = testHostFixture.nativeElement.querySelector('button');
@@ -91,7 +92,7 @@ describe('ButtonLoadingDirective', () => {
     it('button should get disabled when loading input is active', () => {
 
         expect(testHostComponent).toBeTruthy();
-        appState.updateLoading('button-loading',false);
+        appState.updateLoading('button-loading', false, false);
         testHostComponent.setLoading(true);
         testHostFixture.detectChanges();
         let button = testHostFixture.nativeElement.querySelector('button');

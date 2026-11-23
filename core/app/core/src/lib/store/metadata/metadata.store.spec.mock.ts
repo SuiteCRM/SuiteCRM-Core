@@ -39,6 +39,7 @@ export const metadataMockData = {
                     name: 'name',
                     label: 'LBL_NAME',
                     fieldType: 'name',
+                    type: 'name',
                     default: true,
                     width: '10%'
                 },
@@ -60,6 +61,7 @@ export const metadataMockData = {
                     name: 'name',
                     label: 'LBL_NAME',
                     fieldType: 'name',
+                    type: 'name',
                     default: true,
                     width: '10%'
                 },
@@ -283,6 +285,8 @@ export const metadataMockData = {
         ]
     },
     recordView: {
+        vardefs: {},
+        topWidget: {},
         templateMeta: {
             maxColumns: 2,
             useTabs: false,
@@ -705,6 +709,7 @@ export const metadataMockData = {
     },
     subPanel: {
         activities: {
+            name: 'activities',
             order: 10,
             sort_order: 'desc',
             sort_by: 'date_due',
@@ -739,6 +744,7 @@ export const metadataMockData = {
             icon: 'graph'
         },
         history: {
+            name: 'history',
             order: 20,
             sort_order: 'desc',
             sort_by: 'date_entered',
@@ -822,6 +828,7 @@ export const metadataMockData = {
             icon: 'clock'
         },
         documents: {
+            name: 'documents',
             order: 25,
             module: 'Documents',
             subpanel_name: 'default',
@@ -838,6 +845,7 @@ export const metadataMockData = {
             icon: 'download'
         },
         contacts: {
+            name: 'contacts',
             order: 30,
             module: 'Contacts',
             sort_order: 'asc',
@@ -871,7 +879,7 @@ class MetadataRecordGQLSpy extends EntityGQL {
 
         return of({
             data: {
-                viewDefinition: metadataMockData
+                moduleMetadata: metadataMockData
             }
         }).pipe(shareReplay(1));
     }

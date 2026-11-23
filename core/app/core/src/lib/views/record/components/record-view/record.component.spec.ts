@@ -33,7 +33,7 @@ import {ApolloTestingModule} from 'apollo-angular/testing';
 import {DynamicModule} from 'ng-dynamic-component';
 import {of} from 'rxjs';
 import {take} from 'rxjs/operators';
-import {AngularSvgIconModule} from 'angular-svg-icon';
+import {AngularSvgIconModule, SvgIconRegistryService} from 'angular-svg-icon';
 import {DropdownButtonModule} from '../../../../components/dropdown-button/dropdown-button.module';
 import {RecordViewStore} from '../../store/record-view/record-view.store';
 import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
@@ -48,11 +48,11 @@ import {appStateStoreMock} from '../../../../store/app-state/app-state.store.spe
 import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
 import {FieldModule} from '../../../../fields/field.module';
 import {RecordContainerModule} from '../record-container/record-container.module';
-import {RecordHeaderModule} from '../record-header/record-header.module';
+import {BaseRecordHeaderModule} from '../record-header/base-record-header/base-record-header.module';
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
 import {NavigationStore} from '../../../../store/navigation/navigation.store';
 import {recordviewStoreMock} from '../../store/record-view/record-view.store.spec.mock';
-import {themeImagesMockData} from '../../../../store/theme-images/theme-images.store.spec.mock';
+import {registerThemeSvgFixtures, themeImagesMockData} from '../../../../store/theme-images/theme-images.store.spec.mock';
 import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {MetadataStore} from '../../../../store/metadata/metadata.store.service';
@@ -84,7 +84,7 @@ describe('RecordComponent', () => {
         FieldModule,
         DropdownButtonModule,
         RecordContainerModule,
-        RecordHeaderModule,
+        BaseRecordHeaderModule,
         StatusBarModule,
         AngularSvgIconModule.forRoot()],
     providers: [
@@ -111,6 +111,7 @@ describe('RecordComponent', () => {
     }));
 
     beforeEach(() => {
+        registerThemeSvgFixtures(TestBed.inject(SvgIconRegistryService));
         testHostFixture = TestBed.createComponent(RecordTestHostComponent);
         testHostComponent = testHostFixture.componentInstance;
         testHostFixture.detectChanges();

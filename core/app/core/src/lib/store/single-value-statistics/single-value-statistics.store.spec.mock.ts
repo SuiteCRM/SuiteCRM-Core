@@ -30,6 +30,7 @@ import {StatisticsMap, StatisticsQueryMap} from '../../common/statistics/statist
 import {Observable, of} from 'rxjs';
 import {shareReplay} from 'rxjs/operators';
 import {fieldManagerMock} from '../../services/record/field/field.manager.spec.mock';
+import {languageStoreMock} from '../../store/language/language.store.spec.mock';
 
 class StatisticsFetchGQLSpy extends StatisticsFetchGQL {
     constructor() {
@@ -56,5 +57,6 @@ class StatisticsFetchGQLSpy extends StatisticsFetchGQL {
 
 export const subpanelStatisticsFactoryMock = new SingleValueStatisticsStoreFactory(
     new StatisticsFetchGQLSpy(),
-    fieldManagerMock
+    fieldManagerMock,
+    languageStoreMock
 );

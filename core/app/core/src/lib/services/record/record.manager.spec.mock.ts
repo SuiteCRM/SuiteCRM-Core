@@ -28,4 +28,25 @@ import {RecordManager} from './record.manager';
 import {fieldManagerMock} from './field/field.manager.spec.mock';
 import {languageStoreMock} from '../../store/language/language.store.spec.mock';
 
-export const recordManagerMock = new RecordManager(fieldManagerMock, languageStoreMock);
+import {FieldHandlerRegistry} from './field/handler/field-handler.registry';
+import {DefaultFieldHandler} from './field/handler/handlers/default.field-handler';
+import {DateFieldHandler} from './field/handler/handlers/date.field-handler';
+import {MultiEnumFieldHandler} from './field/handler/handlers/multienum.field-handler';
+import {RelateFieldHandler} from './field/handler/handlers/relate.field-handler';
+import {preferenceProcessMock} from '../process/process.service.spec.mock';
+import {messageServiceMock} from '../message/message.service.spec.mock';
+import {fieldMapper} from './field/field.mapper.spec.mock';
+
+class TestFieldHandlerRegistry extends FieldHandlerRegistry {
+    constructor() {
+        super(
+            new DefaultFieldHandler(preferenceProcessMock, messageServiceMock),
+            new DateFieldHandler(preferenceProcessMock, messageServiceMock),
+            new MultiEnumFieldHandler(preferenceProcessMock, messageServiceMock),
+            new RelateFieldHandler(preferenceProcessMock, messageServiceMock)
+        );
+    }
+}
+
+export const fieldHandlerRegistry = new TestFieldHandlerRegistry();
+export const recordManagerMock = new RecordManager(fieldManagerMock, languageStoreMock, fieldHandlerRegistry, fieldMapper);

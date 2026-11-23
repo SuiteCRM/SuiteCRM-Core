@@ -25,20 +25,9 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {configureNavbarItemTest} from '../navbar-item.spec.mock';
 
-import {HomeMenuItemComponent} from './home-menu-item.component';
-import {AngularSvgIconModule} from 'angular-svg-icon';
-import {RouterTestingModule} from '@angular/router/testing';
-import {provideHttpClientTesting} from '@angular/common/http/testing';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {of} from 'rxjs';
-import {take} from 'rxjs/operators';
 import {Component} from '@angular/core';
-import {MenuItemLinkComponent} from '../menu-item-link/menu-item-link.component';
-import {themeImagesMockData} from '../../../store/theme-images/theme-images.store.spec.mock';
-import {ImageModule} from '../../image/image.module';
-import {ThemeImagesStore} from '../../../store/theme-images/theme-images.store';
-import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 @Component({
     selector: 'home-menu-item-test-host-component',
@@ -61,25 +50,7 @@ describe('HomeMenuItemComponent', () => {
     let testHostComponent: HomeMenuItemTestHostComponent;
     let testHostFixture: ComponentFixture<HomeMenuItemTestHostComponent>;
 
-    beforeEach(waitForAsync(() => {
-
-        TestBed.configureTestingModule({
-    declarations: [HomeMenuItemComponent, MenuItemLinkComponent, HomeMenuItemTestHostComponent],
-    imports: [AngularSvgIconModule.forRoot(),
-        RouterTestingModule,
-        ImageModule,
-        NgbModule],
-    providers: [
-        {
-            provide: ThemeImagesStore, useValue: {
-                images$: of(themeImagesMockData).pipe(take(1))
-            }
-        },
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-    ]
-}).compileComponents();
-    }));
+    beforeEach(waitForAsync(() => configureNavbarItemTest(HomeMenuItemTestHostComponent)));
 
     beforeEach(() => {
         testHostFixture = TestBed.createComponent(HomeMenuItemTestHostComponent);

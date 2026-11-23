@@ -36,6 +36,11 @@ import {exportBulkActionMock} from './actions/export/export.async-action.spec.mo
 import {EntityMutationGQL} from '../../../api/graphql-api/api.record.create';
 import {noopActionMock} from './actions/noop/noop.async-action.spec.mock';
 import {changelogAsyncActionMock} from './actions/changelog/changelog.async-action.spec.mock';
+import {RecordModalAsyncAction} from './actions/record-modal/record-modal.async-action';
+import {RecordThreadModalAsyncAction} from './actions/record-thread-modal/record-thread-modal.async-action';
+import {EmitEventAsyncAction} from './actions/emit-event/emit-event.async-action';
+import {UpdateFieldsAsyncAction} from './actions/update-fields/update-fields.async-action';
+import {mockRouter} from '../../../navigation/module-navigation/module-navigation.service.spec.mock';
 
 export const bulkActionMockData = {
     'bulk-merge': {
@@ -84,5 +89,9 @@ export const asyncActionServiceMock = new AsyncActionService(
     redirectBulkActionMock,
     exportBulkActionMock,
     noopActionMock,
-    changelogAsyncActionMock
+    changelogAsyncActionMock,
+    new UpdateFieldsAsyncAction(mockRouter, messageServiceMock),
+    new RecordModalAsyncAction(appStateStoreMock),
+    new RecordThreadModalAsyncAction(appStateStoreMock),
+    new EmitEventAsyncAction(appStateStoreMock)
 );

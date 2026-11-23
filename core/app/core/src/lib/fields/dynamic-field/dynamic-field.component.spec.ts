@@ -25,6 +25,8 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {signal} from '@angular/core';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 
 import {DynamicFieldComponent} from './dynamic-field.component';
 import {UntypedFormControl, FormsModule} from '@angular/forms';
@@ -58,7 +60,7 @@ describe('DynamicFieldComponent', () => {
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [DynamicFieldComponent],
-            imports: [
+            imports: [ApolloTestingModule,
                 ...fieldModules,
                 CommonModule,
                 RouterTestingModule,
@@ -86,6 +88,10 @@ describe('DynamicFieldComponent', () => {
         component.field = {
             type: 'varchar',
             value: 'My Varchar',
+            loading: signal(false),
+            readonly: signal(false),
+            display: signal('default'),
+            valueSignal: signal('My Varchar'),
             formControl: new UntypedFormControl('My Varchar')
         };
         component.klass = {'test-class': true};

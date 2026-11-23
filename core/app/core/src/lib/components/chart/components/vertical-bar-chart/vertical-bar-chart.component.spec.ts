@@ -24,25 +24,42 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-
+import {of} from 'rxjs';
+import {LanguageStore} from '../../../../store/language/language.store';
 import {VerticalBarChartComponent} from './vertical-bar-chart.component';
 
 describe('VerticalBarChartComponent', () => {
     let component: VerticalBarChartComponent;
-    let fixture: ComponentFixture<VerticalBarChartComponent>;
-
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-            declarations: [VerticalBarChartComponent]
-        })
-            .compileComponents();
-    }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(VerticalBarChartComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
+        const language = jasmine.createSpyObj<LanguageStore>('LanguageStore', ['getFieldLabel']);
+        language.getFieldLabel.and.returnValue('');
+        language.getFieldLabel.withArgs('LBL_LEGEND').and.returnValue('Legend');
+        component = new VerticalBarChartComponent(null, null, language);
     });
 
+    it('uses chart defaults when no options are set', () => {
+        component.dataSource = {options: {}, getResults: () => of({}), tooltipFormatting: undefined};
+
+        expect(component.scheme).toBe('picnic');
+        expect(component.xAxis).toBeFalse();
+        expect(component.yAxis).toBeTrue();
+        expect(component.legendTitle).toBe('Legend');
+        expect(component.formatTooltipValue(25)).toBe(25);
+    });
+
+    it('applies configured axis and formatting options', () => {
+        component.dataSource = {
+            options: {xAxis: 'true', yAxis: 'false', maxXAxisTickLength: '8', yAxisTickFormatting: true},
+            getResults: () => of({}),
+            tickFormatting: (value: number) => `$${value}`,
+            tooltipFormatting: value => `Total: ${value}`
+        };
+
+        expect(component.xAxis).toBeTrue();
+        expect(component.yAxis).toBeFalse();
+        expect(component.maxXAxisTickLength).toBe(8);
+        expect(component.yAxisTickFormatting(25)).toBe('$25');
+        expect(component.formatTooltipValue(25)).toBe('Total: 25');
+    });
 });

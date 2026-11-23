@@ -24,54 +24,50 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {Component} from '@angular/core';
-import {provideHttpClientTesting} from '@angular/common/http/testing';
-import {ApolloTestingModule} from 'apollo-angular/testing';
-import {SubpanelContainerComponent} from './subpanel-container.component';
-import {RouterTestingModule} from '@angular/router/testing';
-import {ButtonModule} from '../../../../components/button/button.module';
-import {ListFilterModule} from '../../../list-filter/components/list-filter/list-filter.module';
-import {ActionMenuModule} from '../../../../views/list/components/action-menu/action-menu.module';
-import {ImageModule} from '../../../../components/image/image.module';
-import {ModuleTitleModule} from '../../../../components/module-title/module-title.module';
-import {SettingsMenuModule} from '../../../../views/list/components/settings-menu/settings-menu.module';
-import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
-@Component({
-    selector: 'subpanel-test-host-component',
-    template: '<scrm-subpanel></scrm-subpanel>'
-})
-class SubpanelContainerComponentTestHostComponent {
-}
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
+import {AngularSvgIconModule} from 'angular-svg-icon';
+import {of} from 'rxjs';
+import {SubpanelContainerComponent} from './subpanel-container.component';
+import {SubpanelContainerModule} from './subpanel-container.module';
+import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
+import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
+import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
+import {LanguageStore} from '../../../../store/language/language.store';
+import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
+import {recordviewStoreMock} from '../../../../views/record/store/record-view/record-view.store.spec.mock';
+import {provideHttpClient} from '@angular/common/http';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
+import {RouterTestingModule} from '@angular/router/testing';
 
 describe('SubpanelContainerComponent', () => {
-    let testHostComponent: SubpanelContainerComponentTestHostComponent;
-    let testHostFixture: ComponentFixture<SubpanelContainerComponentTestHostComponent>;
+    let fixture: ComponentFixture<SubpanelContainerComponent>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-    declarations: [SubpanelContainerComponent, SubpanelContainerComponentTestHostComponent],
-    imports: [ModuleTitleModule,
-        ActionMenuModule,
-        ButtonModule,
-        SettingsMenuModule,
-        ApolloTestingModule,
-        ImageModule,
-        ListFilterModule,
-        RouterTestingModule],
-    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
-})
-            .compileComponents();
+            imports: [SubpanelContainerModule, AngularSvgIconModule.forRoot(), ApolloTestingModule, RouterTestingModule],
+            providers: [
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock},
+                {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
+                {provide: LanguageStore, useValue: languageStoreMock},
+                provideHttpClient(),
+                provideHttpClientTesting(),
+            ]
+        });
+        fixture = TestBed.createComponent(SubpanelContainerComponent);
+        fixture.componentRef.setInput('config', {
+            parentModule: 'accounts',
+            subpanels$: of(recordviewStoreMock.getSubpanels()),
+            sidebarActive$: of(false)
+        });
+        fixture.detectChanges();
     });
 
-    beforeEach(() => {
-        testHostFixture = TestBed.createComponent(SubpanelContainerComponentTestHostComponent);
-        testHostComponent = testHostFixture.componentInstance;
-        testHostFixture.detectChanges();
-    });
-
-    it('should create', () => {
-        expect(testHostComponent).toBeTruthy();
+    it('should render a header for configured subpanels', () => {
+        expect(fixture.componentInstance).toBeTruthy();
+        expect(fixture.nativeElement.querySelector('.sub-panel-banner-header')).not.toBeNull();
+        expect(fixture.componentInstance.headerSubpanels()).toContain('activities');
     });
 });

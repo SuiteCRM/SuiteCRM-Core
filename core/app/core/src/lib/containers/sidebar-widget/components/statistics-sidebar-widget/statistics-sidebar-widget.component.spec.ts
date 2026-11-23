@@ -55,6 +55,7 @@ class StatisticsSidebarWidgetHostComponent {
     };
 
     config: WidgetMetadata = {
+        key: 'statistics',
         type: 'statistics',
         labelKey: 'LBL_SIZE_ANALYSIS',
         options: {

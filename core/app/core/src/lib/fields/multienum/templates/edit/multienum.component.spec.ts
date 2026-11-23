@@ -25,10 +25,14 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component} from '@angular/core';
+import {Subject} from 'rxjs';
 import {Field} from '../../../../common/record/field.model';
-import {TagInputModule} from 'ngx-chips';
-import {UntypedFormControl, FormsModule} from '@angular/forms';
+import {MultiEnumEditFieldModule} from './multienum.module';
+import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
+import {themeImagesStoreMock} from '../../../../store/theme-images/theme-images.store.spec.mock';
+import {UntypedFormControl} from '@angular/forms';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
@@ -37,13 +41,13 @@ import {DateFormatter} from '../../../../services/formatters/datetime/date-forma
 import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
 import {datetimeFormatterMock} from '../../../../services/formatters/datetime/datetime-formatter.service.spec.mock';
 import {CurrencyFormatter} from '../../../../services/formatters/currency/currency-formatter.service';
-import {MultiEnumEditFieldComponent} from './multienum.component';
+import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {DatetimeFormatter} from '../../../../services/formatters/datetime/datetime-formatter.service';
 import {numberFormatterMock} from '../../../../services/formatters/number/number-formatter.spec.mock';
 import {NumberFormatter} from '../../../../services/formatters/number/number-formatter.service';
-import {waitUntil} from '../../../../../testing/utils.spec';
 
 @Component({
     selector: 'multienum-edit-field-test-host-component',
@@ -53,6 +57,7 @@ class MultiEnumEditFieldTestHostComponent {
     field: Field = {
         type: 'multienum',
         value: null,
+        valueChanges$: new Subject(),
         valueList: [
             '_customer',
             '_reseller'
@@ -76,15 +81,15 @@ describe('MultiEnumEditFieldComponent', () => {
         TestBed.configureTestingModule({
             declarations: [
                 MultiEnumEditFieldTestHostComponent,
-                MultiEnumEditFieldComponent,
             ],
-            imports: [
-                TagInputModule,
-                FormsModule,
+            imports: [ApolloTestingModule,
+                MultiEnumEditFieldModule,
                 BrowserDynamicTestingModule,
                 NoopAnimationsModule
             ],
             providers: [
+                {provide: ThemeImagesStore, useValue: themeImagesStoreMock},
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock},
                 {provide: LanguageStore, useValue: languageStoreMock},
                 {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
                 {provide: NumberFormatter, useValue: numberFormatterMock},
@@ -92,7 +97,7 @@ describe('MultiEnumEditFieldComponent', () => {
                 {provide: DateFormatter, useValue: dateFormatterMock},
                 {
                     provide: CurrencyFormatter,
-                    useValue: new CurrencyFormatter(userPreferenceStoreMock, numberFormatterMock, 'en_us')
+                    useValue: new CurrencyFormatter(userPreferenceStoreMock, systemConfigStoreMock, numberFormatterMock, 'en_us')
                 },
             ],
         }).compileComponents();
@@ -106,69 +111,50 @@ describe('MultiEnumEditFieldComponent', () => {
         expect(testHostComponent).toBeTruthy();
     });
 
-    it('should have value', async () => {
-        expect(testHostComponent).toBeTruthy();
-
+    it('renders selected values as translated labels', async () => {
+        await testHostFixture.whenStable();
         testHostFixture.detectChanges();
-        await testHostFixture.whenRenderingDone();
 
-        const field = testHostFixture.nativeElement.getElementsByTagName('scrm-multienum-edit')[0];
-
-        expect(field).toBeTruthy();
-
-        const tagInput = field.getElementsByTagName('tag-input').item(0);
-
-        expect(tagInput).toBeTruthy();
-
-        const tag1 = tagInput.getElementsByTagName('tag').item(0);
-
-        expect(tag1).toBeTruthy();
-
-        const tagText1 = tag1.getElementsByClassName('tag__text').item(0);
-
-        expect(tagText1.textContent).toContain('Customer');
-        expect(tagText1.textContent).not.toContain('_customer');
-
-        const deleteIcon1 = tag1.getElementsByTagName('delete-icon').item(0);
-
-        expect(deleteIcon1).toBeTruthy();
-
-        const tag2 = tagInput.getElementsByTagName('tag').item(1);
-
-        expect(tag2).toBeTruthy();
-
-        const tagText2 = tag2.getElementsByClassName('tag__text').item(0);
-
-        expect(tagText2.textContent).toContain('Reseller');
-        expect(tagText2.textContent).not.toContain('_reseller');
-
-        const deleteIcon2 = tag1.getElementsByTagName('delete-icon').item(0);
-
-        expect(deleteIcon2).toBeTruthy();
+        const label = testHostFixture.nativeElement.querySelector('.p-multiselect-label');
+        expect(label).not.toBeNull();
+        expect(label.textContent).toContain('Customer');
+        expect(label.textContent).not.toContain('_customer');
+        expect(label.textContent).toContain('Reseller');
+        expect(label.textContent).not.toContain('_reseller');
+        expect(testHostFixture.nativeElement.querySelector('[data-pc-section="clearicon"]')).not.toBeNull();
     });
 
-    it('should allow removing value', async () => {
-        expect(testHostComponent).toBeTruthy();
-
+    it('removes one selection without changing the others', async () => {
+        await testHostFixture.whenStable();
         testHostFixture.detectChanges();
-        await testHostFixture.whenRenderingDone();
+        const root = testHostFixture.nativeElement;
 
-        const element = testHostFixture.nativeElement;
-
-        await waitUntil(() => element.getElementsByTagName('delete-icon').item(0));
-
-        const deleteIcon = element.getElementsByTagName('delete-icon').item(0);
-
-        expect(deleteIcon).toBeTruthy();
-
-        deleteIcon.click();
-
+        root.querySelector('.p-multiselect-trigger').click();
         testHostFixture.detectChanges();
-        await testHostFixture.whenRenderingDone();
+        await testHostFixture.whenStable();
+        testHostFixture.detectChanges();
 
-        const tag = element.getElementsByTagName('tag');
+        const customer = [...root.querySelectorAll('[role="option"]')]
+            .find((option: HTMLElement) => option.textContent.trim() === 'Customer') as HTMLElement;
+        expect(customer).toBeDefined();
+        customer.click();
+        testHostFixture.detectChanges();
 
-        expect(tag).toBeTruthy();
-        expect(tag.length).toEqual(1);
+        expect(testHostComponent.field.formControl.value).toEqual(['_reseller']);
+        expect(root.querySelector('.p-multiselect-label').textContent).toContain('Reseller');
+    });
+
+    it('clears the selected values through the multiselect clear control', async () => {
+        await testHostFixture.whenStable();
+        testHostFixture.detectChanges();
+
+        const clear = testHostFixture.nativeElement.querySelector('[data-pc-section="clearicon"]');
+        expect(clear).not.toBeNull();
+        clear.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+        await testHostFixture.whenStable();
+        testHostFixture.detectChanges();
+
+        expect(testHostComponent.field.formControl.value).toEqual([]);
+        expect(testHostFixture.nativeElement.querySelector('.p-multiselect-label').textContent).not.toContain('Customer');
     });
 });

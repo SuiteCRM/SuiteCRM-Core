@@ -25,7 +25,12 @@
  */
 
 import {AppStateStore} from './app-state.store';
+import {LoadingBufferFactory} from '../../services/ui/loading-buffer/loading-buffer.factory';
+import {systemConfigStoreMock} from '../system-config/system-config.store.spec.mock';
 
+export function createAppStateStoreMock(): AppStateStore {
+    return new AppStateStore(new LoadingBufferFactory(systemConfigStoreMock), systemConfigStoreMock);
+}
 
-export const appStateStoreMock = new AppStateStore();
+export const appStateStoreMock = createAppStateStoreMock();
 appStateStoreMock.setModule('accounts');

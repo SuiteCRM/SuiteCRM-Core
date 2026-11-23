@@ -24,21 +24,21 @@
  * the words "Supercharged by SuiteCRM".
  */
 
+import {provideHttpClient} from '@angular/common/http';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
+import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
+
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {RecordListModalComponent} from './record-list-modal.component';
-import {Component, OnInit} from '@angular/core';
-import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {interval} from 'rxjs';
-import {take} from 'rxjs/operators';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {RouterTestingModule} from '@angular/router/testing';
-import {Router} from '@angular/router';
-import {themeImagesStoreMock} from '../../../../store/theme-images/theme-images.store.spec.mock';
-import {
-    mockModuleNavigation,
-    mockRouter
-} from '../../../../services/navigation/module-navigation/module-navigation.service.spec.mock';
+import {registerThemeSvgFixtures, themeImagesStoreMock} from '../../../../store/theme-images/theme-images.store.spec.mock';
+import {AngularSvgIconModule, SvgIconRegistryService} from 'angular-svg-icon';
+import {mockModuleNavigation} from '../../../../services/navigation/module-navigation/module-navigation.service.spec.mock';
 import {RecordListModalStoreFactory} from '../../store/record-list-modal/record-list-modal.store.factory';
 import {recordlistModalStoreFactoryMock} from '../../store/record-list-modal/record-list-modal.store.spec.mock';
 import {RecordListModalModule} from './record-list-modal.module';
@@ -47,83 +47,38 @@ import {LanguageStore} from '../../../../store/language/language.store';
 import {ModuleNavigation} from '../../../../services/navigation/module-navigation/module-navigation.service';
 import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
 
-@Component({
-    selector: 'record-list-modal-test-host-component',
-    template: '<div></div>'
-})
-class RecordListModalTestHostComponent implements OnInit {
-    modal: NgbModalRef;
-
-    constructor(public modalService: NgbModal) {
-    }
-
-    ngOnInit(): void {
-        this.modal = this.modalService.open(RecordListModalComponent, {size: 'xl', scrollable: true});
-
-        this.modal.componentInstance.module = 'accounts';
-    }
-}
-
 describe('RecordListModalComponent', () => {
-    let component: RecordListModalTestHostComponent;
-    let fixture: ComponentFixture<RecordListModalTestHostComponent>;
+    let fixture: ComponentFixture<RecordListModalComponent>;
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            declarations: [RecordListModalTestHostComponent],
-            imports: [
-                RecordListModalModule,
-            ],
+            imports: [ApolloTestingModule, AngularSvgIconModule.forRoot(), RecordListModalModule,
+                NoopAnimationsModule, RouterTestingModule],
             providers: [
+                provideHttpClient(),
+                provideHttpClientTesting(),
+                NgbActiveModal,
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock},
                 {provide: LanguageStore, useValue: languageStoreMock},
                 {provide: RecordListModalStoreFactory, useValue: recordlistModalStoreFactoryMock},
                 {provide: ThemeImagesStore, useValue: themeImagesStoreMock},
                 {provide: ModuleNavigation, useValue: mockModuleNavigation},
-                {provide: Router, useValue: mockRouter},
-                RouterTestingModule
             ],
-        })
-            .compileComponents();
+        }).compileComponents();
 
-        fixture = TestBed.createComponent(RecordListModalTestHostComponent);
-        component = fixture.componentInstance;
+        registerThemeSvgFixtures(TestBed.inject(SvgIconRegistryService));
+        fixture = TestBed.createComponent(RecordListModalComponent);
+        fixture.componentRef.setInput('module', 'accounts');
+        // Attach the modal before checking bindings, as NgbModal does.
+        fixture.detectChanges(false);
         fixture.detectChanges();
     }));
 
-    it('should have a table', async () => {
-        expect(component).toBeTruthy();
-
-        fixture.detectChanges();
-        await fixture.whenRenderingDone();
-
-        await interval(1000).pipe(take(1)).toPromise();
-
-        const table = document.getElementsByTagName('scrm-table');
-
-        expect(table).toBeTruthy();
-        expect(table.length).toBeTruthy();
-
-        component.modal.close();
-
-        await interval(1000).pipe(take(1)).toPromise();
+    it('should have a table', () => {
+        expect(fixture.nativeElement.querySelector('scrm-table')).not.toBeNull();
     });
 
-    it('should have a filter panel', async () => {
-        expect(component).toBeTruthy();
-
-        fixture.detectChanges();
-        await fixture.whenRenderingDone();
-
-        await interval(1500).pipe(take(1)).toPromise();
-
-        const table = document.getElementsByTagName('scrm-list-filter');
-
-        expect(table).toBeTruthy();
-        expect(table.length).toBeTruthy();
-
-        component.modal.close();
-
-        await interval(1500).pipe(take(1)).toPromise();
+    it('should have a filter panel', () => {
+        expect(fixture.nativeElement.querySelector('scrm-list-filter')).not.toBeNull();
     });
-
 });

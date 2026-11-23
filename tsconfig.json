@@ -12,9 +12,6 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "typeRoots": [
-      "../../node_modules/@types"
-    ],
     "paths": {
       "@app/*": [
         "core/app/shell/src/app/*"
@@ -29,7 +26,7 @@
       ]
     },
     "lib": [
-      "es2018",
+      "es2022",
       "dom",
       "esnext.asynciterable"
     ],

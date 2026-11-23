@@ -26,13 +26,13 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import {DropdownButtonComponent} from './dropdown-button.component';
 import {Component} from '@angular/core';
 import {DropdownButtonInterface} from '../../common/components/button/dropdown-button.model';
-import {NgbDropdownModule, NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
-import {ButtonModule} from '../button/button.module';
+import {DropdownButtonModule} from './dropdown-button.module';
 import {languageStoreMock} from '../../store/language/language.store.spec.mock';
 import {LanguageStore} from '../../store/language/language.store';
+import {SystemConfigStore} from '../../store/system-config/system-config.store';
+import {systemConfigStoreMock} from '../../store/system-config/system-config.store.spec.mock';
 
 @Component({
     selector: 'dropdown-button-test-host-component',
@@ -73,15 +73,13 @@ describe('DropdownButtonComponent', () => {
         TestBed.configureTestingModule({
             declarations: [
                 DropdownButtonTestHostComponent,
-                DropdownButtonComponent,
             ],
             imports: [
-                ButtonModule,
-                NgbDropdownModule,
-                NgbTooltipModule
+                DropdownButtonModule
             ],
             providers: [
-                {provide: LanguageStore, useValue: languageStoreMock}
+                {provide: LanguageStore, useValue: languageStoreMock},
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock}
             ],
         }).compileComponents();
 

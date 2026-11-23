@@ -26,5 +26,6 @@
 
 import {EmailFormatter} from '../../../services/formatters/email/email-formatter.service';
 import {FormControlUtils} from '../../../services/record/field/form-control.utils';
+import {systemConfigStoreMock} from '../../../store/system-config/system-config.store.spec.mock';
 
-export const emailFormatterMock = new EmailFormatter(new FormControlUtils());
+export const emailFormatterMock = new EmailFormatter(new FormControlUtils(), systemConfigStoreMock);

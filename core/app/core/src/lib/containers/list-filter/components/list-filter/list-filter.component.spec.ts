@@ -24,20 +24,27 @@
  * the words "Supercharged by SuiteCRM".
  */
 
+import {provideHttpClient} from '@angular/common/http';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
+
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
+import {AngularSvgIconModule, SvgIconRegistryService} from 'angular-svg-icon';
+import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
+import {registerThemeSvgFixtures, themeImagesStoreMock} from '../../../../store/theme-images/theme-images.store.spec.mock';
 import {RouterTestingModule} from '@angular/router/testing';
 import {ApolloTestingModule} from 'apollo-angular/testing';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {SearchMetaFieldMap} from '../../../../common/metadata/list.metadata.model';
-import {map} from 'rxjs/operators';
+import {of} from 'rxjs';
+import {take} from 'rxjs/operators';
 import {DropdownButtonModule} from '../../../../components/dropdown-button/dropdown-button.module';
 import {ButtonModule} from '../../../../components/button/button.module';
 import {CloseButtonModule} from '../../../../components/close-button/close-button.module';
-import {Metadata, MetadataStore} from '../../../../store/metadata/metadata.store.service';
+import {MetadataStore} from '../../../../store/metadata/metadata.store.service';
 import {PanelModule} from '../../../../components/panel/panel.module';
 import {LanguageStore} from '../../../../store/language/language.store';
-import {metadataStoreMock} from '../../../../store/metadata/metadata.store.spec.mock';
+import {metadataMockData, metadataStoreMock} from '../../../../store/metadata/metadata.store.spec.mock';
 import {FieldGridModule} from '../../../../components/field-grid/field-grid.module';
 import {ListViewStore} from '../../../../views/list/store/list-view/list-view.store';
 import {ListFilterComponent} from './list-filter.component';
@@ -60,11 +67,10 @@ describe('ListFilterComponent', () => {
     let testHostFixture: ComponentFixture<ListFilterComponent>;
 
     beforeEach(waitForAsync(() => {
+        listviewStoreMock.resetFilters(false);
         TestBed.configureTestingModule({
-            declarations: [
-                ListFilterComponent,
-            ],
             imports: [
+                AngularSvgIconModule.forRoot(),
                 CloseButtonModule,
                 ButtonModule,
                 PanelModule,
@@ -76,6 +82,9 @@ describe('ListFilterComponent', () => {
                 ListFilterModule
             ],
             providers: [
+                provideHttpClient(),
+                provideHttpClientTesting(),
+                {provide: ThemeImagesStore, useValue: themeImagesStoreMock},
                 {provide: ListViewStore, useValue: listviewStoreMock},
                 {provide: MetadataStore, useValue: metadataStoreMock},
                 {provide: LanguageStore, useValue: languageStoreMock},
@@ -86,32 +95,22 @@ describe('ListFilterComponent', () => {
             ],
         }).compileComponents();
 
+        registerThemeSvgFixtures(TestBed.inject(SvgIconRegistryService));
+        // MetadataStore keeps a module-level cache shared by every instance, so a spec that
+        // ran earlier with a real (Apollo testing) MetadataStore can leave a 'saved-search'
+        // entry that never emits. Re-fetch through the mock so the filter staging record initialises.
+        metadataStoreMock.getMetadata('saved-search', ['recordView'], false).pipe(take(1)).subscribe();
         testHostFixture = TestBed.createComponent(ListFilterComponent);
         testHostComponent = testHostFixture.componentInstance;
 
         testHostComponent.config = {
+            displayHeader: true,
 
-            module: listviewStoreMock.getModuleName(),
+            module: 'accounts',
             filter$: listviewStoreMock.openFilter$,
-            savedFilters$: listviewStoreMock.filterList.records$,
-            listFields: listviewStoreMock.metadata.listView.fields,
-            searchFields$: listviewStoreMock.metadata$.pipe(
-                map((meta: Metadata) => {
-
-                    if (!meta || !meta.search) {
-                        return {} as SearchMetaFieldMap;
-                    }
-
-                    const searchMeta = meta.search;
-
-                    let type = 'advanced';
-                    if (!searchMeta.layout.advanced) {
-                        type = 'basic';
-                    }
-
-                    return searchMeta.layout[type];
-                })
-            ),
+            savedFilters$: of([{key: 'my-accounts', attributes: {name: 'My accounts'}}] as SavedFilter[]),
+            listFields: [],
+            searchFields$: of(metadataMockData.search.layout.advanced as SearchMetaFieldMap),
 
             onClose: (): void => {
                 listviewStoreMock.showFilters = false;
@@ -195,7 +194,7 @@ describe('ListFilterComponent', () => {
 
         expect(testHostFixture.debugElement.query(By.css('scrm-field-grid')).nativeElement).toBeTruthy();
 
-        const input = testHostFixture.debugElement.query(By.css('input')).nativeElement;
+        const input = testHostFixture.debugElement.query(By.css('scrm-field-grid input')).nativeElement;
         input.value = 'test';
         input.dispatchEvent(new Event('input'));
 
@@ -216,7 +215,7 @@ describe('ListFilterComponent', () => {
 
         expect(testHostFixture.debugElement.query(By.css('scrm-field-grid')).nativeElement).toBeTruthy();
 
-        const input = testHostFixture.debugElement.query(By.css('input')).nativeElement;
+        const input = testHostFixture.debugElement.query(By.css('scrm-field-grid input')).nativeElement;
         const filterButton = testHostFixture.debugElement.query(By.css('.filter-button')).nativeElement;
 
         input.value = 'test';
@@ -249,7 +248,7 @@ describe('ListFilterComponent', () => {
 
         expect(testHostFixture.debugElement.query(By.css('scrm-field-grid')).nativeElement).toBeTruthy();
 
-        const input = testHostFixture.debugElement.query(By.css('input')).nativeElement;
+        const input = testHostFixture.debugElement.query(By.css('scrm-field-grid input')).nativeElement;
         const filterButton = testHostFixture.debugElement.query(By.css('.filter-button')).nativeElement;
         const clearButton = testHostFixture.debugElement.query(By.css('.clear-filters-button')).nativeElement;
 
@@ -273,7 +272,7 @@ describe('ListFilterComponent', () => {
                 expect(currentFilter.criteria.filters.name.operator).toEqual('');
                 expect(currentFilter.criteria.filters.name.values).toEqual([]);
 
-                expect(listviewStoreMock.recordList.criteria).toEqual({name: 'default', filters: {}});
+                expect(listviewStoreMock.recordList.criteria).toEqual({});
             });
         });
     }));

@@ -28,6 +28,9 @@ import {BehaviorSubject, Observable, of} from 'rxjs';
 import {distinctUntilChanged, shareReplay, take} from 'rxjs/operators';
 import {CollectionGQL} from '../../services/api/graphql-api/api.collection.get';
 import {UserPreferenceStore} from './user-preference.store';
+import {systemConfigStoreMock} from '../system-config/system-config.store.spec.mock';
+import {preferenceProcessMock} from '../../services/process/process.service.spec.mock';
+import {localStorageServiceMock} from '../../services/local-storage/local-storage.service.spec.mock';
 
 /* eslint-disable camelcase, @typescript-eslint/camelcase */
 export const userPreferenceMockData = {
@@ -109,7 +112,9 @@ class UserPreferenceRecordGQLSpy extends CollectionGQL {
     }
 }
 
-export const userPreferenceStoreMock = new UserPreferenceStore(new UserPreferenceRecordGQLSpy());
+export const userPreferenceStoreMock = new UserPreferenceStore(
+    new UserPreferenceRecordGQLSpy(), systemConfigStoreMock, preferenceProcessMock, localStorageServiceMock
+);
 userPreferenceStoreMock.load().pipe(take(1)).subscribe();
 
 export class UserPreferenceMockStore extends UserPreferenceStore {
@@ -117,7 +122,7 @@ export class UserPreferenceMockStore extends UserPreferenceStore {
     constructor(
         protected mockData: BehaviorSubject<any>
     ) {
-        super(new UserPreferenceRecordGQLSpy());
+        super(new UserPreferenceRecordGQLSpy(), systemConfigStoreMock, preferenceProcessMock, localStorageServiceMock);
 
         this.userPreferences$ = this.mockData.asObservable().pipe(distinctUntilChanged());
     }

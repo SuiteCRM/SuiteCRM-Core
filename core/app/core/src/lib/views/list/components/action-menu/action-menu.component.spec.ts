@@ -24,6 +24,7 @@
  * the words "Supercharged by SuiteCRM".
  */
 
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {Component} from '@angular/core';
 import {ActionMenuComponent} from './action-menu.component';
@@ -57,6 +58,7 @@ describe('ActionMenuComponent', () => {
                 ActionMenuTestHostComponent,
             ],
             imports: [
+                ApolloTestingModule,
                 RouterTestingModule,
                 ButtonModule,
                 ButtonGroupModule

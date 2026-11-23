@@ -75,6 +75,7 @@ describe('Module Navigation Service', () => {
                 tabs: [],
                 groupedTabs: [],
                 userActionMenu: [],
+                quickActions: [],
                 maxTabs: 0,
                 modules: {
                     accounts: {
@@ -108,7 +109,7 @@ describe('Module Navigation Service', () => {
 
         expect(route.url).toEqual(null);
         expect(route.route).toEqual('/accounts/list');
-        expect(route.params).toEqual(null);
+        expect(route.params).toEqual({});
     });
 
     it('#getActionLabel', () => {

@@ -26,16 +26,15 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import {ButtonGroupComponent} from './button-group.component';
 import {Component} from '@angular/core';
-import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
 import {ButtonGroupInterface} from '../../common/components/button/button-group.model';
 import {shareReplay} from 'rxjs/operators';
 import {Observable, of} from 'rxjs';
-import {DropdownButtonModule} from '../dropdown-button/dropdown-button.module';
-import {ButtonModule} from '../button/button.module';
+import {ButtonGroupModule} from './button-group.module';
 import {languageStoreMock} from '../../store/language/language.store.spec.mock';
 import {LanguageStore} from '../../store/language/language.store';
+import {SystemConfigStore} from '../../store/system-config/system-config.store';
+import {systemConfigStoreMock} from '../../store/system-config/system-config.store.spec.mock';
 
 @Component({
     selector: 'dropdown-group-test-host-component',
@@ -100,17 +99,11 @@ describe('ButtonGroupComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            declarations: [
-                ButtonGroupTestHostComponent,
-                ButtonGroupComponent,
-            ],
-            imports: [
-                ButtonModule,
-                NgbDropdownModule,
-                DropdownButtonModule
-            ],
+            declarations: [ButtonGroupTestHostComponent],
+            imports: [ButtonGroupModule],
             providers: [
-                {provide: LanguageStore, useValue: languageStoreMock}
+                {provide: LanguageStore, useValue: languageStoreMock},
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock}
             ],
         }).compileComponents();
 

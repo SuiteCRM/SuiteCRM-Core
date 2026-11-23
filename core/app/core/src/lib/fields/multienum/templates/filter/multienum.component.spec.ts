@@ -25,17 +25,21 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component} from '@angular/core';
-import {MultiEnumFilterFieldComponent} from './multienum.component';
-import {UntypedFormControl, FormsModule} from '@angular/forms';
+import {UntypedFormControl} from '@angular/forms';
 import {Field} from '../../../../common/record/field.model';
-import {TagInputModule} from 'ngx-chips';
+import {MultiEnumFilterFieldModule} from './multienum.module';
+import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
+import {themeImagesStoreMock} from '../../../../store/theme-images/theme-images.store.spec.mock';
 import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {DataTypeFormatter} from '../../../../services/formatters/data-type.formatter.service';
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
 import {datetimeFormatterMock} from '../../../../services/formatters/datetime/datetime-formatter.service.spec.mock';
 import {CurrencyFormatter} from '../../../../services/formatters/currency/currency-formatter.service';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
+import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {numberFormatterMock} from '../../../../services/formatters/number/number-formatter.spec.mock';
@@ -77,15 +81,15 @@ describe('MultiEnumFilterFieldComponent', () => {
         TestBed.configureTestingModule({
             declarations: [
                 MultiEnumFilterFieldTestHostComponent,
-                MultiEnumFilterFieldComponent,
             ],
-            imports: [
-                TagInputModule,
-                FormsModule,
+            imports: [ApolloTestingModule,
+                MultiEnumFilterFieldModule,
                 BrowserDynamicTestingModule,
                 NoopAnimationsModule
             ],
             providers: [
+                {provide: ThemeImagesStore, useValue: themeImagesStoreMock},
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock},
                 {provide: LanguageStore, useValue: languageStoreMock},
                 {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
                 {provide: NumberFormatter, useValue: numberFormatterMock},
@@ -94,7 +98,7 @@ describe('MultiEnumFilterFieldComponent', () => {
                 {provide: DateFormatter, useValue: dateFormatterMock},
                 {
                     provide: CurrencyFormatter,
-                    useValue: new CurrencyFormatter(userPreferenceStoreMock, numberFormatterMock, 'en_us')
+                    useValue: new CurrencyFormatter(userPreferenceStoreMock, systemConfigStoreMock, numberFormatterMock, 'en_us')
                 },
             ],
         }).compileComponents();
@@ -108,33 +112,15 @@ describe('MultiEnumFilterFieldComponent', () => {
         expect(testHostComponent).toBeTruthy();
     });
 
-    it('should have value', async () => {
-        expect(testHostComponent).toBeTruthy();
-
+    it('renders selected values as translated labels', async () => {
+        await testHostFixture.whenStable();
         testHostFixture.detectChanges();
-        await testHostFixture.whenRenderingDone();
 
-        const field = testHostFixture.nativeElement.getElementsByTagName('scrm-multienum-filter')[0];
-
-        expect(field).toBeTruthy();
-
-        const tagInput = field.getElementsByTagName('tag-input').item(0);
-
-        expect(tagInput).toBeTruthy();
-
-        const tag = tagInput.getElementsByTagName('tag').item(0);
-
-        expect(tag).toBeTruthy();
-
-        const tagText = tag.getElementsByClassName('tag__text').item(0);
-
-        expect(tagText.textContent).toContain('Customer');
-        expect(tagText.textContent).not.toContain('_customer');
-
-        const deleteIcon = tagInput.getElementsByTagName('delete-icon').item(0);
-
-        expect(deleteIcon).toBeTruthy();
+        const label = testHostFixture.nativeElement.querySelector('.p-multiselect-label');
+        expect(label).not.toBeNull();
+        expect(label.textContent).toContain('Customer');
+        expect(label.textContent).not.toContain('_customer');
+        expect(testHostFixture.nativeElement.querySelector('[data-pc-section="clearicon"]')).not.toBeNull();
     });
-
 });
 

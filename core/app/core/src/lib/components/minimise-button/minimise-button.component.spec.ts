@@ -28,11 +28,17 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {Component} from '@angular/core';
 import {MinimiseButtonComponent} from './minimise-button.component';
 import {ButtonInterface} from '../../common/components/button/button.model';
-import {themeImagesStoreMock} from '../../store/theme-images/theme-images.store.spec.mock';
 import {ButtonModule} from '../button/button.module';
 import {languageStoreMock} from '../../store/language/language.store.spec.mock';
 import {LanguageStore} from '../../store/language/language.store';
 import {ThemeImagesStore} from '../../store/theme-images/theme-images.store';
+
+import {provideHttpClient} from '@angular/common/http';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
+import {AngularSvgIconModule} from 'angular-svg-icon';
+import {of} from 'rxjs';
+import {themeImagesMockData} from '../../store/theme-images/theme-images.store.spec.mock';
+import {registerTestIcons} from '../image/svg-icons.spec.mock';
 
 @Component({
     selector: 'minimise-button-test-host-component',
@@ -59,16 +65,23 @@ describe('MinimiseButtonComponent', () => {
                 MinimiseButtonComponent,
             ],
             imports: [
-                ButtonModule
+                ButtonModule,
+                AngularSvgIconModule.forRoot()
             ],
             providers: [
+                provideHttpClient(),
+                provideHttpClientTesting(),
                 {
-                    provide: ThemeImagesStore, useValue: themeImagesStoreMock
+                    provide: ThemeImagesStore, useValue: {images$: of({
+                        ...themeImagesMockData,
+                        plus_thin: {name: 'plus_thin', type: 'svg', path: ''}
+                    })}
                 },
                 {provide: LanguageStore, useValue: languageStoreMock}
             ],
         }).compileComponents();
 
+        registerTestIcons('minimise', 'plus_thin');
         testHostFixture = TestBed.createComponent(MinimiseButtonTestHostComponent);
         testHostComponent = testHostFixture.componentInstance;
         testHostFixture.detectChanges();

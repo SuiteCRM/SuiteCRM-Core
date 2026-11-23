@@ -24,19 +24,23 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {TableBodyComponent} from './table-body.component';
-import {CdkTableModule} from '@angular/cdk/table';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component} from '@angular/core';
 import {RouterTestingModule} from '@angular/router/testing';
-import {FieldModule} from '../../../fields/field.module';
-import {SortButtonModule} from '../../sort-button/sort-button.module';
 import {themeImagesStoreMock} from '../../../store/theme-images/theme-images.store.spec.mock';
 import {tableConfigMock} from '../table.component.spec.mock';
 import {languageStoreMock} from '../../../store/language/language.store.spec.mock';
 import {LanguageStore} from '../../../store/language/language.store';
 import {ThemeImagesStore} from '../../../store/theme-images/theme-images.store';
+
+import {provideHttpClient} from '@angular/common/http';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
+import {AngularSvgIconModule} from 'angular-svg-icon';
+import {TableBodyModule} from './table-body.module';
+import {registerTestIcons} from '../../image/svg-icons.spec.mock';
+import {SystemConfigStore} from '../../../store/system-config/system-config.store';
+import {systemConfigStoreMock} from '../../../store/system-config/system-config.store.spec.mock';
 
 @Component({
     selector: 'table-body-test-host-component',
@@ -53,14 +57,16 @@ describe('TableBodyComponent', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                CdkTableModule,
+                TableBodyModule,
+                AngularSvgIconModule.forRoot(),
                 ApolloTestingModule,
-                FieldModule,
-                SortButtonModule,
                 RouterTestingModule
             ],
-            declarations: [TableBodyComponent, TableBodyTestHostComponent],
+            declarations: [TableBodyTestHostComponent],
             providers: [
+                provideHttpClient(),
+                provideHttpClientTesting(),
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock},
                 {provide: LanguageStore, useValue: languageStoreMock},
                 {provide: ThemeImagesStore, useValue: themeImagesStoreMock},
             ],
@@ -68,26 +74,25 @@ describe('TableBodyComponent', () => {
             .compileComponents();
     });
 
-    beforeEach(waitForAsync(() => {
+    beforeEach(async () => {
+        registerTestIcons('sort', 'sort_ascend', 'sort_descend');
         testHostFixture = TestBed.createComponent(TableBodyTestHostComponent);
         testHostComponent = testHostFixture.componentInstance;
         testHostFixture.detectChanges();
-    }));
+        await testHostFixture.whenStable();
+        testHostFixture.detectChanges();
+    });
 
-    it('should create', waitForAsync(() => {
-        testHostFixture.whenStable().then(() => {
-            expect(testHostComponent).toBeTruthy();
-        });
-    }));
+    afterEach(() => testHostFixture?.destroy());
 
-    it('should have table body', waitForAsync(() => {
+    it('should create', () => {
+        expect(testHostComponent).toBeTruthy();
+    });
 
-        testHostFixture.whenStable().then(() => {
-            const tableBodyElement = testHostFixture.nativeElement.querySelector('table');
-
-            expect(testHostComponent).toBeTruthy();
-            expect(tableBodyElement).toBeTruthy();
-            expect(tableBodyElement.outerHTML).toContain('aria-describedby="table-body"');
-        });
-    }));
+    it('should have table body', () => {
+        const table = testHostFixture.nativeElement.querySelector('table');
+        expect(testHostComponent).toBeTruthy();
+        expect(table).toBeTruthy();
+        expect(table.outerHTML).toContain('aria-describedby="table-body"');
+    });
 });

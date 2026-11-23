@@ -30,33 +30,28 @@ import {take} from 'rxjs/operators';
 import {of} from 'rxjs';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {ApolloTestingModule} from 'apollo-angular/testing';
-import {ListHeaderComponent} from './list-header.component';
+import {ListHeaderModule} from './list-header.module';
+import {QuickFiltersService} from '../../services/quick-filters.service';
 import {RouterTestingModule} from '@angular/router/testing';
-import {AngularSvgIconModule} from 'angular-svg-icon';
-import {ButtonModule} from '../../../../components/button/button.module';
+import {AngularSvgIconModule, SvgIconRegistryService} from 'angular-svg-icon';
 import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
 import {NavigationStore} from '../../../../store/navigation/navigation.store';
-import {themeImagesMockData} from '../../../../store/theme-images/theme-images.store.spec.mock';
+import {registerThemeSvgFixtures, themeImagesMockData} from '../../../../store/theme-images/theme-images.store.spec.mock';
 import {ModuleNavigation} from '../../../../services/navigation/module-navigation/module-navigation.service';
 import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {LanguageStore} from '../../../../store/language/language.store';
-import {ActionMenuModule} from '../action-menu/action-menu.module';
 import {metadataStoreMock} from '../../../../store/metadata/metadata.store.spec.mock';
-import {ImageModule} from '../../../../components/image/image.module';
-import {ModuleTitleModule} from '../../../../components/module-title/module-title.module';
 import {MetadataStore} from '../../../../store/metadata/metadata.store.service';
 import {navigationMock} from '../../../../store/navigation/navigation.store.spec.mock';
 import {AppStateStore} from '../../../../store/app-state/app-state.store';
 import {ListViewStore} from '../../store/list-view/list-view.store';
 import {mockModuleNavigation} from '../../../../services/navigation/module-navigation/module-navigation.service.spec.mock';
 import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
-import {ListFilterModule} from '../../../../containers/list-filter/components/list-filter/list-filter.module';
 import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {appStateStoreMock} from '../../../../store/app-state/app-state.store.spec.mock';
 import {listviewStoreMock} from '../../store/list-view/list-view.store.spec.mock';
 import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
-import {SettingsMenuModule} from '../settings-menu/settings-menu.module';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 @Component({
@@ -72,17 +67,20 @@ describe('ListHeaderComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-    declarations: [ListHeaderComponent, ListHeaderTestHostComponent],
-    imports: [ModuleTitleModule,
-        ActionMenuModule,
-        ButtonModule,
-        SettingsMenuModule,
+    declarations: [ListHeaderTestHostComponent],
+    imports: [ListHeaderModule,
         ApolloTestingModule,
-        ImageModule,
-        ListFilterModule,
         RouterTestingModule,
         AngularSvgIconModule.forRoot()],
     providers: [
+        {provide: QuickFiltersService, useValue: {
+            breakdown$: of(true),
+            enabled$: of(true),
+            init: () => {},
+            getBreakpoint: () => 2,
+            areConfigEnabled: () => true,
+            config$: of({buttons: [{label: 'My accounts'}]})
+        }},
         { provide: ListViewStore, useValue: listviewStoreMock },
         {
             provide: ThemeImagesStore, useValue: {
@@ -121,6 +119,7 @@ describe('ListHeaderComponent', () => {
     });
 
     beforeEach(() => {
+        registerThemeSvgFixtures(TestBed.inject(SvgIconRegistryService));
         testHostFixture = TestBed.createComponent(ListHeaderTestHostComponent);
         testHostComponent = testHostFixture.componentInstance;
         testHostFixture.detectChanges();
@@ -130,15 +129,10 @@ describe('ListHeaderComponent', () => {
         expect(testHostComponent).toBeTruthy();
     });
 
-    it('should have action menu', () => {
-
-        const actionMenuElement = testHostFixture.nativeElement.querySelector('scrm-action-menu');
-        const actionButtons = actionMenuElement.getElementsByClassName('action-button');
-
-        expect(testHostComponent).toBeTruthy();
-        expect(actionMenuElement).toBeTruthy();
-        expect(actionButtons).toBeTruthy();
-        expect(actionButtons.length).toBeGreaterThan(0);
+    it('should render configured quick filter buttons', () => {
+        const filters = testHostFixture.nativeElement.querySelector('scrm-button-group .quick-filter-button');
+        expect(filters).not.toBeNull();
+        expect(filters.querySelector('button').textContent).toContain('My accounts');
     });
 
     it('should have title', () => {

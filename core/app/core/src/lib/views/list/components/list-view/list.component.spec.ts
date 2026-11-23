@@ -54,7 +54,7 @@ import {ListHeaderModule} from '../list-header/list-header.module';
 import {RecordListStoreFactory} from '../../../../store/record-list/record-list.store.factory';
 import {MetadataStore} from '../../../../store/metadata/metadata.store.service';
 import {SortButtonModule} from '../../../../components/sort-button/sort-button.module';
-import {themeImagesStoreMock} from '../../../../store/theme-images/theme-images.store.spec.mock';
+import {registerThemeSvgFixtures, themeImagesStoreMock} from '../../../../store/theme-images/theme-images.store.spec.mock';
 import {mockModuleNavigation} from '../../../../services/navigation/module-navigation/module-navigation.service.spec.mock';
 import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
 import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
@@ -62,6 +62,7 @@ import {listviewStoreMock} from '../../store/list-view/list-view.store.spec.mock
 import {ModuleNameMapper} from '../../../../services/navigation/module-name-mapper/module-name-mapper.service';
 import {moduleNameMapperMock} from '../../../../services/navigation/module-name-mapper/module-name-mapper.service.spec.mock';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+import {AngularSvgIconModule, SvgIconRegistryService} from 'angular-svg-icon';
 
 @Component({
     selector: 'list-test-host-component',
@@ -78,7 +79,7 @@ describe('ListComponent', () => {
         /* eslint-disable camelcase, @typescript-eslint/camelcase */
         TestBed.configureTestingModule({
     declarations: [ListComponent, ListTestHostComponent],
-    imports: [ListHeaderModule,
+    imports: [AngularSvgIconModule.forRoot(), ListHeaderModule,
         ListContainerModule,
         RouterTestingModule,
         NoopAnimationsModule,
@@ -109,6 +110,7 @@ describe('ListComponent', () => {
             .compileComponents();
         /* eslint-enable camelcase, @typescript-eslint/camelcase */
 
+        registerThemeSvgFixtures(TestBed.inject(SvgIconRegistryService));
         testHostFixture = TestBed.createComponent(ListTestHostComponent);
         testHostComponent = testHostFixture.componentInstance;
         testHostFixture.detectChanges();

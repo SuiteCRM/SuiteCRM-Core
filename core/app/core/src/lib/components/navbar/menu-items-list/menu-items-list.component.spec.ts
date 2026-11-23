@@ -25,23 +25,8 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {of} from 'rxjs';
-import {take} from 'rxjs/operators';
+import {configureNavbarItemTest} from '../navbar-item.spec.mock';
 import {Component} from '@angular/core';
-import {RouterTestingModule} from '@angular/router/testing';
-import {provideHttpClientTesting} from '@angular/common/http/testing';
-
-import {AngularSvgIconModule} from 'angular-svg-icon';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {MenuItemsListComponent} from './menu-items-list.component';
-import {MenuItemLinkComponent} from '../menu-item-link/menu-item-link.component';
-import {MenuRecentlyViewedComponent} from '../menu-recently-viewed/menu-recently-viewed.component';
-import {themeImagesMockData} from '../../../store/theme-images/theme-images.store.spec.mock';
-import {MenuItemComponent} from '../menu-item/menu-item.component';
-import {ImageModule} from '../../image/image.module';
-import {ThemeImagesStore} from '../../../store/theme-images/theme-images.store';
-import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
-
 
 const mockMenuItems = [
     {
@@ -72,37 +57,14 @@ const mockMenuItems = [
 })
 class MenuItemListTestHostComponent {
     items = mockMenuItems;
-    label = 'More';
+    label = 'LBL_MORE';
 }
 
 describe('MenuItemsListComponent', () => {
     let testHostComponent: MenuItemListTestHostComponent;
     let testHostFixture: ComponentFixture<MenuItemListTestHostComponent>;
 
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-    declarations: [
-        MenuItemComponent,
-        MenuItemLinkComponent,
-        MenuItemsListComponent,
-        MenuRecentlyViewedComponent,
-        MenuItemListTestHostComponent
-    ],
-    imports: [AngularSvgIconModule.forRoot(),
-        RouterTestingModule,
-        ImageModule,
-        NgbModule],
-    providers: [
-        {
-            provide: ThemeImagesStore, useValue: {
-                images$: of(themeImagesMockData).pipe(take(1))
-            }
-        },
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-    ]
-}).compileComponents();
-    }));
+    beforeEach(waitForAsync(() => configureNavbarItemTest(MenuItemListTestHostComponent)));
 
     beforeEach(() => {
         testHostFixture = TestBed.createComponent(MenuItemListTestHostComponent);

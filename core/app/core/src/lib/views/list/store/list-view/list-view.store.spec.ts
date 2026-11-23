@@ -30,13 +30,16 @@ import {SearchCriteriaFieldFilter} from '../../../../common/views/list/search-cr
 import {take} from 'rxjs/operators';
 import {ListViewStore} from './list-view.store';
 import {listviewMockData, listviewStoreMock} from './list-view.store.spec.mock';
-import {localStorageServiceMock} from '../../../../services/local-storage/local-storage.service.spec.mock';
+import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {SavedFilter} from '../../../../store/saved-filters/saved-filter.model';
 
 describe('Listview Store', () => {
     const service: ListViewStore = listviewStoreMock;
 
     beforeEach(() => {
+        userPreferenceStoreMock.setUi('accounts', 'listview-current-filters', {});
+        service.init('accounts').pipe(take(1)).subscribe();
+        service.recordList.updateSelection(SelectionStatus.NONE);
     });
 
     it('#load', (done: DoneFn) => {
@@ -83,17 +86,17 @@ describe('Listview Store', () => {
 
     it('#updateSelection toggleSelection', () => {
         service.recordList.updateSelection(SelectionStatus.NONE);
-        service.recordList.toggleSelection('ac319818-dc26-f57d-03e1-5ed77dedd691');
+        service.recordList.toggleSelection('29319818-dc26-f57d-03e1-5ed77dedd691');
 
         service.selection$.pipe(take(1)).subscribe(data => {
             expect(data.status).toEqual(SelectionStatus.SOME);
             expect(data.selected).toEqual({
-                'ac319818-dc26-f57d-03e1-5ed77dedd691': 'ac319818-dc26-f57d-03e1-5ed77dedd691',
+                '29319818-dc26-f57d-03e1-5ed77dedd691': '29319818-dc26-f57d-03e1-5ed77dedd691',
             });
 
             expect(data.count).toEqual(1);
 
-            service.recordList.toggleSelection('ac319818-dc26-f57d-03e1-5ed77dedd691');
+            service.recordList.toggleSelection('29319818-dc26-f57d-03e1-5ed77dedd691');
             service.selection$.pipe(take(1)).subscribe(newData => {
                 expect(newData.status).toEqual(SelectionStatus.NONE);
                 expect(newData.selected).toEqual({});
@@ -148,30 +151,35 @@ describe('Listview Store', () => {
 
             service.setFilters(filters);
             const savedCriteria = service.recordList.criteria;
-            const localStorageCriteria = localStorageServiceMock.get('active-filters').accounts;
+            const savedFilters = userPreferenceStoreMock.getUi('accounts', 'listview-current-filters');
 
             expect(criteria).toEqual(savedCriteria);
-            expect(criteria).toEqual(localStorageCriteria.default.criteria);
+            expect(criteria).toEqual(savedFilters.default.criteria);
         });
     });
 
     it('#updateCriteria without reload', () => {
         service.init('accounts').pipe(take(1)).subscribe(() => {
 
-            const filters = service.activeFilters;
-            filters.default.criteria.filters.name = {
-                operator: '=',
-                values: ['test 2']
+            const filters = {
+                default: {
+                    key: 'default',
+                    module: 'saved-search',
+                    attributes: {},
+                    criteria: {filters: {name: {operator: '=', values: ['test 2']} as SearchCriteriaFieldFilter}}
+                } as SavedFilter
             };
+            const load = spyOn(service.recordList, 'load').and.callThrough();
 
             const criteria = filters.default.criteria;
 
             service.setFilters(filters, false);
             const savedCriteria = service.recordList.criteria;
-            const localStorageCriteria = localStorageServiceMock.get('active-filters').accounts;
+            const savedFilters = userPreferenceStoreMock.getUi('accounts', 'listview-current-filters');
 
             expect(criteria).toEqual(savedCriteria);
-            expect(criteria).not.toEqual(localStorageCriteria.criteria);
+            expect(criteria).toEqual(savedFilters.default.criteria);
+            expect(load).not.toHaveBeenCalled();
         });
     });
 });

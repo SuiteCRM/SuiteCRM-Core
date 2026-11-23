@@ -32,6 +32,7 @@ import {NumberFormatter} from '../../services/formatters/number/number-formatter
 import {BehaviorSubject} from 'rxjs';
 import {UserPreferenceMockStore} from '../../store/user-preference/user-preference.store.spec.mock';
 import {CurrencyFormatter} from '../../services/formatters/currency/currency-formatter.service';
+import {systemConfigStoreMock} from '../../store/system-config/system-config.store.spec.mock';
 import {FormControlUtils} from '../../services/record/field/form-control.utils';
 
 @Component({
@@ -73,7 +74,7 @@ describe('FormatCurrencyPipe', () => {
                     provide: NumberFormatter, useValue: mockNumberFormatter
                 },
                 {
-                    provide: CurrencyFormatter, useValue: new CurrencyFormatter(mockStore, mockNumberFormatter, 'en_us')
+                    provide: CurrencyFormatter, useValue: new CurrencyFormatter(mockStore, systemConfigStoreMock, mockNumberFormatter, 'en_us')
                 }
             ],
         }).compileComponents();

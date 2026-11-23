@@ -27,23 +27,25 @@
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {ApolloTestingModule} from 'apollo-angular/testing';
-import {AngularSvgIconModule} from 'angular-svg-icon';
+import {AngularSvgIconModule, SvgIconRegistryService} from 'angular-svg-icon';
 import {ListContainerComponent} from './list-container.component';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {of} from 'rxjs';
 import {take} from 'rxjs/operators';
 import {RouterTestingModule} from '@angular/router/testing';
-import {WidgetPanelModule} from '../../../../components/widget-panel/widget-panel.module';
+import {ListContainerModule} from './list-container.module';
+import {ListViewSidebarWidgetService} from '../../services/list-view-sidebar-widget.service';
+import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {MetadataStore} from '../../../../store/metadata/metadata.store.service';
 import {ListViewStore} from '../../store/list-view/list-view.store';
 import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
-import {themeImagesMockData} from '../../../../store/theme-images/theme-images.store.spec.mock';
+import {registerThemeSvgFixtures, themeImagesMockData} from '../../../../store/theme-images/theme-images.store.spec.mock';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {metadataStoreMock} from '../../../../store/metadata/metadata.store.spec.mock';
 import {listviewStoreMock} from '../../store/list-view/list-view.store.spec.mock';
 import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
-import {TableModule} from '../../../../components/table/table.module';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 describe('ListcontainerUiComponent', () => {
@@ -52,14 +54,14 @@ describe('ListcontainerUiComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-    declarations: [ListContainerComponent],
-    imports: [TableModule,
-        WidgetPanelModule,
+    imports: [ListContainerModule,
         AngularSvgIconModule.forRoot(),
         NoopAnimationsModule,
         ApolloTestingModule,
         RouterTestingModule],
     providers: [
+        ListViewSidebarWidgetService,
+        {provide: SystemConfigStore, useValue: systemConfigStoreMock},
         {
             provide: ListViewStore, useValue: listviewStoreMock
         },
@@ -80,6 +82,7 @@ describe('ListcontainerUiComponent', () => {
     }));
 
     beforeEach(() => {
+        registerThemeSvgFixtures(TestBed.inject(SvgIconRegistryService));
         fixture = TestBed.createComponent(ListContainerComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

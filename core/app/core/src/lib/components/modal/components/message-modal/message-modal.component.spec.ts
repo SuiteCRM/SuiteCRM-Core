@@ -27,17 +27,18 @@
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {MessageModalComponent} from './message-modal.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {Component, OnInit} from '@angular/core';
+import {ApplicationRef, Component, ElementRef, OnInit} from '@angular/core';
 import {ModalButtonInterface} from '../../../../common/components/modal/modal.model';
 import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
-import {interval} from 'rxjs';
-import {take} from 'rxjs/operators';
 import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
 import {MessageModalModule} from './message-modal.module';
 import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
+
+import {DynamicLabelService} from '../../../../services/language/dynamic-label.service';
+import {dynamicLabelsMock} from '../../../../services/language/dynamic-label.service.spec.mock';
 
 @Component({
     selector: 'messages-modal-test-host-component',
@@ -48,11 +49,11 @@ class MessageModalTestHostComponent implements OnInit {
     cancelClicked = 0;
     okClicked = 0;
 
-    constructor(public modalService: NgbModal) {
+    constructor(public modalService: NgbModal, private element: ElementRef<HTMLElement>) {
     }
 
     ngOnInit(): void {
-        this.modal = this.modalService.open(MessageModalComponent);
+        this.modal = this.modalService.open(MessageModalComponent, {animation: false, container: this.element.nativeElement});
 
         this.modal.componentInstance.textKey = 'WARN_UNSAVED_CHANGES';
         this.modal.componentInstance.buttons = [
@@ -88,6 +89,7 @@ describe('MessageModalComponent', () => {
                 NoopAnimationsModule
             ],
             providers: [
+                {provide: DynamicLabelService, useValue: dynamicLabelsMock},
                 {provide: LanguageStore, useValue: languageStoreMock},
                 {provide: SystemConfigStore, useValue: systemConfigStoreMock}
             ],
@@ -99,12 +101,18 @@ describe('MessageModalComponent', () => {
         fixture = TestBed.createComponent(MessageModalTestHostComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        TestBed.inject(ApplicationRef).tick();
+    });
+
+    afterEach(() => {
+        component?.modal?.close();
+        fixture?.destroy();
     });
 
     it('should have modal', () => {
         expect(component).toBeTruthy();
 
-        const modal = document.getElementsByClassName('message-modal');
+        const modal = fixture.nativeElement.getElementsByClassName('message-modal');
 
         expect(modal).toBeTruthy();
         expect(modal.length).toBeTruthy();
@@ -117,9 +125,8 @@ describe('MessageModalComponent', () => {
         fixture.detectChanges();
         await fixture.whenRenderingDone();
 
-        await interval(1000).pipe(take(1)).toPromise();
 
-        const modal = document.getElementsByClassName('message-modal');
+        const modal = fixture.nativeElement.getElementsByClassName('message-modal');
 
         expect(modal).toBeTruthy();
         expect(modal.length).toBeTruthy();
@@ -140,9 +147,8 @@ describe('MessageModalComponent', () => {
         fixture.detectChanges();
         await fixture.whenRenderingDone();
 
-        await interval(1000).pipe(take(1)).toPromise();
 
-        const modal = document.getElementsByClassName('message-modal');
+        const modal = fixture.nativeElement.getElementsByClassName('message-modal');
 
         expect(modal).toBeTruthy();
         expect(modal.length).toBeTruthy();
@@ -167,7 +173,6 @@ describe('MessageModalComponent', () => {
         fixture.detectChanges();
         await fixture.whenRenderingDone();
 
-        await interval(1000).pipe(take(1)).toPromise();
 
         expect(component.cancelClicked).toEqual(1);
     });
@@ -178,9 +183,8 @@ describe('MessageModalComponent', () => {
         fixture.detectChanges();
         await fixture.whenRenderingDone();
 
-        await interval(1000).pipe(take(1)).toPromise();
 
-        const modal = document.getElementsByClassName('message-modal');
+        const modal = fixture.nativeElement.getElementsByClassName('message-modal');
 
         expect(modal).toBeTruthy();
         expect(modal.length).toBeTruthy();
@@ -207,7 +211,6 @@ describe('MessageModalComponent', () => {
         fixture.detectChanges();
         await fixture.whenRenderingDone();
 
-        await interval(1000).pipe(take(1)).toPromise();
     });
 
 });

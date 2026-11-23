@@ -25,22 +25,33 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
-import {FormsModule} from '@angular/forms';
 import {RouterTestingModule} from '@angular/router/testing';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {LoginUiComponent} from './login.component';
+import {LoginUiModule} from './login.module';
 import {By} from '@angular/platform-browser';
+import {AngularSvgIconModule} from 'angular-svg-icon';
 import {ApolloTestingModule} from 'apollo-angular/testing';
-import {ButtonLoadingUiModule} from '../../../../directives/button-loading/button-loading.module';
 import {RecoverPasswordService} from '../../../../services/process/processes/recover-password/recover-password';
 import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
 import {recoverPasswordMock} from '../../../../services/process/processes/recover-password/recover-password.spec.mock';
 import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
-import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+import {HttpErrorResponse, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+import {MessageService} from '../../../../services/message/message.service';
+
+import {map} from 'rxjs/operators';
+
+const loginConfig = {
+    getConfigValue: (key: string) => systemConfigStoreMock.getConfigValue(key),
+    getUi: (key: string) => systemConfigStoreMock.getUi(key),
+    configs$: systemConfigStoreMock.configs$.pipe(map(configs => ({
+        ...configs,
+        passwordsetting: {...configs.passwordsetting, items: {forgotpasswordON: true}}
+    })))
+};
 
 describe('LoginComponent', () => {
     let component: LoginUiComponent;
@@ -49,15 +60,13 @@ describe('LoginComponent', () => {
     beforeEach(waitForAsync(() => {
 
         TestBed.configureTestingModule({
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    declarations: [LoginUiComponent],
     imports: [RouterTestingModule,
-        FormsModule,
+        AngularSvgIconModule.forRoot(),
+        LoginUiModule,
         NoopAnimationsModule,
-        ApolloTestingModule,
-        ButtonLoadingUiModule],
+        ApolloTestingModule],
     providers: [
-        { provide: SystemConfigStore, useValue: systemConfigStoreMock },
+        { provide: SystemConfigStore, useValue: loginConfig },
         { provide: LanguageStore, useValue: languageStoreMock },
         { provide: RecoverPasswordService, useValue: recoverPasswordMock },
         provideHttpClient(withInterceptorsFromDi()),
@@ -87,7 +96,9 @@ describe('LoginComponent', () => {
 
         expect(fixture.debugElement.query(By.css('[name="password"]'))).toBeTruthy();
         expect(fixture.debugElement.query(By.css('#login-button'))).toBeTruthy();
-        component.flipCard();
+        const forgotPassword = fixture.debugElement.query(By.css('.forgotten-password-link'));
+        expect(forgotPassword).not.toBeNull();
+        forgotPassword.nativeElement.click();
 
         fixture.detectChanges();
 
@@ -102,9 +113,12 @@ describe('LoginComponent', () => {
 
     it('should output login fail status', () => {
         expect(component).toBeTruthy();
-        console.log = jasmine.createSpy('log');
-        component.onLoginError();
+        const message = TestBed.inject(MessageService);
+        spyOn(message, 'log');
+        const dangerMessage = spyOn(message, 'addDangerMessage');
+        component.onLoginError(new HttpErrorResponse({status: 401}));
 
-        expect(console.log).toHaveBeenCalledWith('Login failed');
+        expect(message.log).toHaveBeenCalledWith('Login failed');
+        expect(dangerMessage).toHaveBeenCalled();
     });
 });

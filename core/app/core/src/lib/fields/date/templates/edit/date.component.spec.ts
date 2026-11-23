@@ -24,68 +24,42 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {Component} from '@angular/core';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {BehaviorSubject, of} from 'rxjs';
-import {CommonModule} from '@angular/common';
-import {Field} from '../../../../common/record/field.model';
+import {UntypedFormControl} from '@angular/forms';
+import {Injector, runInInjectionContext} from '@angular/core';
+import {FieldHandlerRegistry} from '../../../../services/record/field/handler/field-handler.registry';
+import {fieldHandlerRegistry} from '../../../../services/record/record.manager.spec.mock';
+import {DateAdapter} from '../../../base/datetime/date/date-adapter.service';
+import {DateParserFormatter} from '../../../base/datetime/date/date-parser-formatter.service';
+import {dateFormatterMock} from '../../../../services/formatters/datetime/date-formatter.service.spec.mock';
+import {dataTypeFormatterMock} from '../../../../services/formatters/data-type.formatter.spec.mock';
 import {DateEditFieldComponent} from './date.component';
-import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
-import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
-import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
-
-@Component({
-    selector: 'date-edit-field-test-host-component',
-    template: '<scrm-date-edit></scrm-date-edit>'
-})
-class DateEditFieldTestHostComponent {
-    field: Field = {
-        type: 'data',
-        value: '2020-05-01'
-    };
-}
 
 describe('DateEditFieldComponent', () => {
-    let testHostComponent: DateEditFieldTestHostComponent;
-    let testHostFixture: ComponentFixture<DateEditFieldTestHostComponent>;
+    it('loads the date and stores changes in the internal format', () => {
+        const injector = Injector.create({providers: [{provide: FieldHandlerRegistry, useValue: fieldHandlerRegistry}]});
+        const component = runInInjectionContext(injector, () => new DateEditFieldComponent(
+            dateFormatterMock,
+            new DateAdapter(dateFormatterMock),
+            new DateParserFormatter(dateFormatterMock),
+            dataTypeFormatterMock,
+            null,
+            null
+        ));
+        component.field = {
+            type: 'date',
+            value: '2020-05-01',
+            metadata: {date_time_format: 'dd.MM.yyyy'},
+            formControl: new UntypedFormControl()
+        };
 
-    const preferences = new BehaviorSubject({
-        // eslint-disable-next-line camelcase, @typescript-eslint/camelcase
-        date_format: 'yyyy-MM-dd',
+        component.ngOnInit();
+        try {
+            expect(component.dateModel).toEqual({year: 2020, month: 5, day: 1});
+            expect(component.field.formControl.value).toBe('01.05.2020');
+            component.field.formControl.setValue('02.05.2020');
+            expect(component.field.value).toBe('2020-05-02');
+        } finally {
+            component.ngOnDestroy();
+        }
     });
-
-
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-            declarations: [
-                DateEditFieldTestHostComponent,
-                DateEditFieldComponent,
-            ],
-            imports: [
-                CommonModule,
-                NgbModule
-            ],
-            providers: [
-                {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
-                {
-                    provide: SystemConfigStore, useValue: {
-                        configs$: of({
-                            // eslint-disable-next-line camelcase, @typescript-eslint/camelcase
-                            date_format: {
-                                id: '/docroot/api/system-configs/date_format',
-                                _id: 'date_format',
-                                value: 'dd.MM.yyyy',
-                                items: []
-                            }
-                        })
-                    }
-                }
-            ],
-        }).compileComponents();
-
-        testHostFixture = TestBed.createComponent(DateEditFieldTestHostComponent);
-        testHostComponent = testHostFixture.componentInstance;
-        testHostFixture.detectChanges();
-    }));
 });

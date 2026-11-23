@@ -25,7 +25,8 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {Component, ViewChild} from '@angular/core';
+import {ApolloTestingModule} from 'apollo-angular/testing';
+import {Component, signal, ViewChild} from '@angular/core';
 import {Field} from '../../../../common/record/field.model';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
@@ -35,6 +36,7 @@ import {DateFormatter} from '../../../../services/formatters/datetime/date-forma
 import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
 import {datetimeFormatterMock} from '../../../../services/formatters/datetime/datetime-formatter.service.spec.mock';
 import {CurrencyFormatter} from '../../../../services/formatters/currency/currency-formatter.service';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {DatetimeFormatter} from '../../../../services/formatters/datetime/datetime-formatter.service';
@@ -54,6 +56,7 @@ class DropdownEnumEditFieldTestHostComponent {
         name: 'test',
         type: 'enum',
         value: '_customer',
+        valueSignal: signal('_customer'),
         metadata: null,
         definition: {
             options: 'account_type_dom'
@@ -71,7 +74,7 @@ describe('DropdownEnumEditFieldComponent', () => {
             declarations: [
                 DropdownEnumEditFieldTestHostComponent,
             ],
-            imports: [
+            imports: [ApolloTestingModule,
                 BrowserDynamicTestingModule,
                 BrowserAnimationsModule,
                 DropdownEnumEditFieldModule
@@ -84,7 +87,7 @@ describe('DropdownEnumEditFieldComponent', () => {
                 {provide: DateFormatter, useValue: dateFormatterMock},
                 {
                     provide: CurrencyFormatter,
-                    useValue: new CurrencyFormatter(userPreferenceStoreMock, numberFormatterMock, 'en_us')
+                    useValue: new CurrencyFormatter(userPreferenceStoreMock, systemConfigStoreMock, numberFormatterMock, 'en_us')
                 },
             ],
         }).compileComponents();

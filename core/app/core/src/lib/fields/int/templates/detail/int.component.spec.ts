@@ -25,14 +25,16 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {IntDetailFieldComponent} from './int.component';
 import {Component} from '@angular/core';
-import {BehaviorSubject, of} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {Field} from '../../../../common/record/field.model';
 import {UserPreferenceMockStore} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
 import {CurrencyFormatter} from '../../../../services/formatters/currency/currency-formatter.service';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {FormControlUtils} from '../../../../services/record/field/form-control.utils';
 import {FormatNumberPipe} from '../../../../pipes/format-number/format-number.pipe';
 import {NumberFormatter} from '../../../../services/formatters/number/number-formatter.service';
@@ -69,31 +71,14 @@ describe('IntDetailFieldComponent', () => {
                 IntDetailFieldComponent,
                 FormatNumberPipe
             ],
-            imports: [],
+            imports: [ApolloTestingModule,],
             providers: [
                 {provide: UserPreferenceStore, useValue: mockStore},
                 {
                     provide: CurrencyFormatter,
-                    useValue: new CurrencyFormatter(mockStore, mockNumberFormatter, 'en_us')
+                    useValue: new CurrencyFormatter(mockStore, systemConfigStoreMock, mockNumberFormatter, 'en_us')
                 },
-                {
-                    provide: SystemConfigStore, useValue: {
-                        configs$: of({
-                            default_number_grouping_seperator: {
-                                id: '/docroot/api/system-configs/default_number_grouping_seperator',
-                                _id: 'default_number_grouping_seperator',
-                                value: ';',
-                                items: []
-                            },
-                            default_decimal_seperator: {
-                                id: '/docroot/api/system-configs/default_decimal_seperator',
-                                _id: 'default_decimal_seperator',
-                                value: ',',
-                                items: []
-                            }
-                        })
-                    }
-                },
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock},
                 {provide: NumberFormatter, useValue: mockNumberFormatter}
             ],
         }).compileComponents();

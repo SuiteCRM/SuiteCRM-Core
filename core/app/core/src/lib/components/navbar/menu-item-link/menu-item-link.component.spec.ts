@@ -26,18 +26,8 @@
 
 import {Component} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {provideHttpClientTesting} from '@angular/common/http/testing';
-import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
-import {RouterTestingModule} from '@angular/router/testing';
-import {of} from 'rxjs';
-import {take} from 'rxjs/operators';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {AngularSvgIconModule} from 'angular-svg-icon';
-import {MenuItemLinkComponent} from './menu-item-link.component';
+import {configureNavbarItemTest} from '../navbar-item.spec.mock';
 import {MenuItemLink} from '../../../common/menu/menu.model';
-import {themeImagesMockData} from '../../../store/theme-images/theme-images.store.spec.mock';
-import {ImageModule} from '../../image/image.module';
-import {ThemeImagesStore} from '../../../store/theme-images/theme-images.store';
 
 const mockLink = {
     label: 'Test Link Label',
@@ -76,24 +66,7 @@ describe('MenuItemActionLinkComponent', () => {
     let testHostComponent: MenuItemLinkTestHostComponent;
     let testHostFixture: ComponentFixture<MenuItemLinkTestHostComponent>;
 
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-    declarations: [MenuItemLinkComponent, MenuItemLinkTestHostComponent],
-    imports: [AngularSvgIconModule.forRoot(),
-        RouterTestingModule,
-        ImageModule,
-        NgbModule],
-    providers: [
-        {
-            provide: ThemeImagesStore, useValue: {
-                images$: of(themeImagesMockData).pipe(take(1))
-            }
-        },
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-    ]
-}).compileComponents();
-    }));
+    beforeEach(waitForAsync(() => configureNavbarItemTest(MenuItemLinkTestHostComponent)));
 
     beforeEach(() => {
         testHostFixture = TestBed.createComponent(MenuItemLinkTestHostComponent);
@@ -116,7 +89,7 @@ describe('MenuItemActionLinkComponent', () => {
         testHostComponent.setIcon('plus');
         testHostFixture.detectChanges();
 
-        expect(testHostFixture.nativeElement.querySelector('svg-icon')).toBeTruthy();
+        expect(testHostFixture.nativeElement.querySelector('svg-icon svg')).toBeTruthy();
     });
 
     it('should use route', () => {

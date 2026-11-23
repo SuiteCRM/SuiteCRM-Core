@@ -2,6 +2,8 @@
 {
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
+    // Angular emits its own DI metadata; TypeScript's runtime metadata causes circular imports in Karma.
+    "emitDecoratorMetadata": false,
     "outDir": "../../../out-tsc/spec",
     "types": [
       "jasmine"

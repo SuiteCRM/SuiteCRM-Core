@@ -28,6 +28,7 @@ import {SelectModalService} from './select-modal.service';
 import {languageStoreMock} from '../../store/language/language.store.spec.mock';
 import {messageServiceMock} from '../message/message.service.spec.mock';
 import {ngbModalMock} from './confirmation-modal.spec.mock';
+import {EventBus} from '../event-bus/event-bus.service';
 
 
-export const selectModalServiceMock = new SelectModalService(languageStoreMock, messageServiceMock, ngbModalMock);
+export const selectModalServiceMock = new SelectModalService(languageStoreMock, messageServiceMock, ngbModalMock, new EventBus());

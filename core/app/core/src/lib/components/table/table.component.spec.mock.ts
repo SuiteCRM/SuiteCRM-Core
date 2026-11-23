@@ -117,6 +117,7 @@ export const tableConfigMock: TableConfig = {
             module: '',
             id: '',
             sortable: true,
+            sortReadOnly: false,
             type: 'name',
             fieldDefinition: {
                 name: 'name',
@@ -167,6 +168,7 @@ export const tableConfigMock: TableConfig = {
         }
     } as BulkActionDataSource,
     pagination: {
+        pagination$: of({pageSize: 20, current: 0, previous: 0, next: 0, last: 0, pageFirst: 0, pageLast: 20, total: 20}),
         getPaginationCount: (): Observable<PaginationCount> => of({
             pageFirst: 0,
             pageLast: 20,

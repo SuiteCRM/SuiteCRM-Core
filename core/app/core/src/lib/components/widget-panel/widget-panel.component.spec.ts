@@ -41,19 +41,24 @@ import {listviewStoreMock} from '../../views/list/store/list-view/list-view.stor
 import {ThemeImagesStore} from '../../store/theme-images/theme-images.store';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
+import {WidgetPanelModule} from './widget-panel.module';
+import {UserPreferenceStore} from '../../store/user-preference/user-preference.store';
+import {userPreferenceStoreMock} from '../../store/user-preference/user-preference.store.spec.mock';
+
 describe('WidgetPanelComponent', () => {
     let component: WidgetPanelComponent;
     let fixture: ComponentFixture<WidgetPanelComponent>;
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-    declarations: [WidgetPanelComponent],
     imports: [AngularSvgIconModule.forRoot(),
         ChartModule,
+        WidgetPanelModule,
         NoopAnimationsModule,
         ApolloTestingModule,
         ImageModule],
     providers: [
+        {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
         { provide: ListViewStore, useValue: listviewStoreMock },
         { provide: ThemeImagesStore, useValue: { images$: of(themeImagesMockData).pipe(take(1)) } },
         provideHttpClient(withInterceptorsFromDi()),

@@ -24,25 +24,32 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-
+import {fakeAsync, tick} from '@angular/core/testing';
+import {Subject} from 'rxjs';
+import {SeriesResult} from '../../../../common/containers/chart/chart.model';
 import {PieGridChartComponent} from './pie-grid-chart.component';
 
 describe('PieGridChartComponent', () => {
-    let component: PieGridChartComponent;
-    let fixture: ComponentFixture<PieGridChartComponent>;
-
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-            declarations: [PieGridChartComponent]
-        })
-            .compileComponents();
+    it('converts numeric string values and clears results on an empty update', fakeAsync(() => {
+        const results = new Subject<SeriesResult>();
+        const component = new PieGridChartComponent(null, null, null);
+        component.dataSource = {
+            options: {minWidth: 200},
+            getResults: () => results,
+            tooltipFormatting: value => value
+        };
+        component.ngOnInit();
+        try {
+            expect(component.minWidth).toBe(200);
+            results.next({singleSeries: [{name: 'New', value: '12.5'}, {name: 'Closed', value: 0}]});
+            tick(500);
+            expect(component.results).toEqual([{name: 'New', value: 12.5}, {name: 'Closed', value: 0}]);
+            results.next({singleSeries: []});
+            tick(500);
+            expect(component.results).toEqual([]);
+            expect(component.height).toBe(50);
+        } finally {
+            component.ngOnDestroy();
+        }
     }));
-
-    beforeEach(() => {
-        fixture = TestBed.createComponent(PieGridChartComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
-    });
-
 });

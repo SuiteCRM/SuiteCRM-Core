@@ -41,9 +41,12 @@ import {currencyFormatterMock} from '../../services/formatters/currency/currency
 import {DatetimeFormatter} from '../../services/formatters/datetime/datetime-formatter.service';
 import {NumberFormatter} from '../../services/formatters/number/number-formatter.service';
 
+import {DynamicLabelService} from '../../services/language/dynamic-label.service';
+import {dynamicLabelsMock} from '../../services/language/dynamic-label.service.spec.mock';
+
 @Component({
     selector: 'dynamic-label-test-host-component',
-    template: '<scrm-dynamic-label [template]="template" [fields]="fields" [context]="context"></scrm-dynamic-label>'
+    template: '<scrm-dynamic-label labelKey="LBL_TEST_TEMPLATE" [fields]="fields" [context]="context"></scrm-dynamic-label>'
 })
 class DynamicLabelTestHostComponent {
     template = '{{fields.name.label}} {{fields.name.value}} | {{fields.amount.label}}: {{fields.amount.value}} | Min: {{context.min|int}}';
@@ -84,12 +87,15 @@ describe('DynamicLabelComponent', () => {
                 {provide: DatetimeFormatter, useValue: datetimeFormatterMock},
                 {provide: DateFormatter, useValue: dateFormatterMock},
                 {provide: CurrencyFormatter, useValue: currencyFormatterMock},
+                {provide: DynamicLabelService, useValue: dynamicLabelsMock},
                 {provide: LanguageStore, useValue: languageStoreMock},
             ],
         }).compileComponents();
 
         testHostFixture = TestBed.createComponent(DynamicLabelTestHostComponent);
         testHostComponent = testHostFixture.componentInstance;
+        const getFieldLabel = spyOn(languageStoreMock, 'getFieldLabel').and.callThrough();
+        getFieldLabel.withArgs('LBL_TEST_TEMPLATE', null).and.returnValue(testHostComponent.template);
         testHostFixture.detectChanges();
     }));
 

@@ -29,12 +29,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 
 
-export class MockNgbModal extends NgbModal {
-
-    constructor() {
-        super(null, null, null, null);
-    }
-
+const modalStub: Pick<NgbModal, 'open'> = {
     open(): NgbModalRef {
         return {
             componentInstance: {
@@ -43,8 +38,7 @@ export class MockNgbModal extends NgbModal {
             }
         } as NgbModalRef;
     }
-}
+};
 
-
-export const ngbModalMock = new MockNgbModal();
-export const confirmationModalServiceMock = new ConfirmationModalService(new MockNgbModal());
+export const ngbModalMock = modalStub as NgbModal;
+export const confirmationModalServiceMock = new ConfirmationModalService(ngbModalMock);

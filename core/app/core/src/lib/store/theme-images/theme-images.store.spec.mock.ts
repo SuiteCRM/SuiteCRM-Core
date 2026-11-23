@@ -25,7 +25,8 @@
  */
 
 import {BehaviorSubject, Observable, of} from 'rxjs';
-import {shareReplay} from 'rxjs/operators';
+import {SvgIconRegistryService} from 'angular-svg-icon';
+import {map, shareReplay} from 'rxjs/operators';
 import {ThemeImages, ThemeImagesStore} from './theme-images.store';
 import {EntityGQL} from '../../services/api/graphql-api/api.entity.get';
 import {appStateStoreMock} from '../app-state/app-state.store.spec.mock';
@@ -66,6 +67,11 @@ export const themeImagesMockData = {
     paginate_next: {
         path: 'core/app/themes/suite8/images/paginate_next.svg',
         name: 'paginate_next',
+        type: 'svg'
+    },
+    'dots-vertical': {
+        path: 'core/app/shell/src/themes/suite8/images/dots-vertical.svg',
+        name: 'dots-vertical',
         type: 'svg'
     },
     filter: {
@@ -184,8 +190,17 @@ class MockThemeImagesStore extends ThemeImagesStore {
     });
 
     constructor(protected recordGQL: EntityGQL, protected appStateStore: AppStateStore) {
-        super(recordGQL, appStateStore);
+        super(recordGQL, appStateStore, null);
+        this.images$ = this.store.asObservable().pipe(map(state => state.images));
     }
 }
 
 export const themeImagesStoreMock = new MockThemeImagesStore(new ThemeImagesRecordGQLSpy(), appStateStoreMock);
+
+export function registerThemeSvgFixtures(registry: SvgIconRegistryService): void {
+    for (const image of Object.values(themeImagesMockData)) {
+        if (image.type === 'svg') {
+            registry.addSvg(image.name, '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v1z"/></svg>');
+        }
+    }
+}

@@ -25,6 +25,7 @@
  */
 
 import {Observable, of} from 'rxjs';
+import {Injector, runInInjectionContext, ɵINJECTOR_SCOPE} from '@angular/core';
 import {shareReplay, take} from 'rxjs/operators';
 import {deepClone} from '../../../../common/utils/object-utils';
 import {Record} from '../../../../common/record/record.model';
@@ -45,7 +46,11 @@ import {messageServiceMock} from '../../../../services/message/message.service.s
 import {StatisticsBatch} from '../../../../store/statistics/statistics-batch.service';
 import {StatisticsFetchGQL} from '../../../../store/statistics/graphql/api.statistics.get';
 import {RecordStoreFactory} from '../../../../store/record/record.store.factory';
-import {BaseSaveRecordMapper} from '../../../../store/record/record-mappers/base-save.record-mapper';
+import {baseSaveRecordMapper} from '../../../../services/record/field/field.mapper.spec.mock';
+import {RecordValidationHandler} from '../../../../services/record/validation/record-validation.handler';
+import {RecordConvertService} from '../../../../services/record/record-convert.service';
+import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 
 /* eslint-disable camelcase, @typescript-eslint/camelcase */
 export const recordViewMockData = {
@@ -1209,10 +1214,18 @@ const mockRecordStoreFactory = new RecordStoreFactory(
     messageServiceMock,
     recordManagerMock,
     new RecordMapperRegistry(),
-    new BaseSaveRecordMapper()
+    baseSaveRecordMapper
 );
 
-export const recordviewStoreMock = new RecordViewStore(
+const injector = Injector.create({
+    providers: [
+        // The shared fixture initializes before TestBed and uses root-scoped signal effects.
+        {provide: ɵINJECTOR_SCOPE, useValue: 'root'},
+        {provide: RecordValidationHandler, useValue: new RecordValidationHandler()}
+    ]
+});
+
+export const recordviewStoreMock = runInInjectionContext(injector, () => new RecordViewStore(
     new RecordViewGQLSpy(),
     new RecordSaveGQLSpy(),
     appStateStoreMock,
@@ -1225,8 +1238,11 @@ export const recordviewStoreMock = new RecordViewStore(
     subpanelFactoryMock,
     recordManagerMock,
     new StatisticsBatch(new StatisticsFetchGQLSpy()),
-    mockRecordStoreFactory
-);
+    mockRecordStoreFactory,
+    userPreferenceStoreMock,
+    new RecordConvertService(systemConfigStoreMock),
+    null
+));
 
 recordviewStoreMock.init('accounts', 'c4da5f04-2d4a-7a14-35ff-5f242b8f8a52').pipe(take(1)).subscribe();
 recordviewStoreMock.module$.pipe(take(1)).subscribe();

@@ -38,3 +38,22 @@ To check the workspace generator itself after installing dependencies, run:
 ```powershell
 node.exe --test core/yarn/plugins/merge-angular-json.test.cjs
 ```
+
+## Angular unit tests
+
+After building core, install Google Chrome and run both complete suites:
+
+```powershell
+corepack.cmd yarn ng test core --watch=false --browsers=ChromeHeadless
+corepack.cmd yarn ng test shell --watch=false --browsers=ChromeHeadless
+```
+
+The Chrome launcher detects standard Windows installations. For a nonstandard
+installation, set `$env:CHROME_BIN` to the full path of `chrome.exe` first.
+Do not add `--include` when verifying the complete suite. Check the final
+executed count, failures, and skipped count, not just successful compilation.
+
+Angular's test builder discovers the specs. The core test bootstrap enables
+fixture teardown and errors for unknown elements and properties. Its spec-only
+TypeScript configuration leaves DI metadata emission to Angular, avoiding
+runtime decorator import cycles without changing the production compiler.

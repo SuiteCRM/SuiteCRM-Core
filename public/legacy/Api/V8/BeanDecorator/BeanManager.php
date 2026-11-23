@@ -32,6 +32,29 @@ class BeanManager
     }
 
     /**
+     * Resolves a bean alias, e.g. 'Contracts', to the real module name, e.g. 'AOS_Contracts'.
+     *
+     * A name that already belongs to a real module is returned untouched, so an alias can
+     * never shadow an existing module.
+     *
+     * @param string $module
+     *
+     * @return string
+     */
+    public function resolveModuleAlias($module)
+    {
+        if (\BeanFactory::getObjectName($module)) {
+            return $module;
+        }
+
+        if (array_key_exists($module, $this->beanAliases)) {
+            return $this->beanAliases[$module];
+        }
+
+        return $module;
+    }
+
+    /**
      * @param string $module
      *
      * @return \SugarBean

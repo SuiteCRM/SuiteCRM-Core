@@ -24,24 +24,33 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {of} from 'rxjs';
+import {LanguageStore} from '../../../../store/language/language.store';
 import {LineChartComponent} from './line-chart.component';
 
 describe('LineChartComponent', () => {
-    let component: LineChartComponent;
-    let fixture: ComponentFixture<LineChartComponent>;
-
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-            declarations: [LineChartComponent]
-        })
-            .compileComponents();
-    }));
-
-    beforeEach(() => {
-        fixture = TestBed.createComponent(LineChartComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
+    it('loads series and applies axis and formatting options', () => {
+        const language = jasmine.createSpyObj<LanguageStore>('LanguageStore', ['getFieldLabel']);
+        language.getFieldLabel.and.returnValue('');
+        language.getFieldLabel.withArgs('LBL_LEGEND').and.returnValue('Legend');
+        const component = new LineChartComponent(null, null, language);
+        const multiSeries = [{name: 'Sales', series: [{name: 'January', value: 25}]}];
+        component.dataSource = {
+            options: {height: 400, xAxis: 'false', yAxisTickFormatting: true},
+            getResults: () => of({multiSeries}),
+            tickFormatting: (value: number) => `$${value}`,
+            tooltipFormatting: value => value
+        };
+        component.ngOnInit();
+        try {
+            expect(component.results).toEqual(multiSeries);
+            expect(component.view()[1]).toBe(400);
+            expect(component.xAxis).toBeFalse();
+            expect(component.yAxis).toBeTrue();
+            expect(component.yAxisTickFormatting(25)).toBe('$25');
+            expect(component.legendTitle).toBe('Legend');
+        } finally {
+            component.ngOnDestroy();
+        }
     });
-
 });

@@ -37,6 +37,9 @@ import {ImageModule} from '../image/image.module';
 import {SettingsMenuModule} from '../../views/list/components/settings-menu/settings-menu.module';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
+import {ModuleNavigation} from '../../services/navigation/module-navigation/module-navigation.service';
+import {mockModuleNavigation} from '../../services/navigation/module-navigation/module-navigation.service.spec.mock';
+
 @Component({
     selector: 'status-bar-test-host-component',
     template: '<scrm-status-bar></scrm-status-bar>'
@@ -58,7 +61,8 @@ describe('StatusBarComponent', () => {
         ImageModule,
         RouterTestingModule],
     providers: [
-        { provide: RecordViewStore },
+        {provide: RecordViewStore, useValue: {}},
+        {provide: ModuleNavigation, useValue: mockModuleNavigation},
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
     ]

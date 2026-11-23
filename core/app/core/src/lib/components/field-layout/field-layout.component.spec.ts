@@ -29,15 +29,15 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FieldLayoutComponent} from './field-layout.component';
 import {Component} from '@angular/core';
 import {Panel} from '../../common/metadata/metadata.model';
-import {FieldMap} from '../../common/record/field.model';
+import {BaseField, FieldMap} from '../../common/record/field.model';
 import {Record} from '../../common/record/record.model';
 import {deepClone} from '../../common/utils/object-utils';
 import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
-import {LayoutModule} from '@angular/cdk/layout';
+import {BreakpointObserver, LayoutModule} from '@angular/cdk/layout';
 import {CommonModule} from '@angular/common';
 import {RouterTestingModule} from '@angular/router/testing';
 import {By} from '@angular/platform-browser';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {FieldModule} from '../../fields/field.module';
 import {DropdownButtonModule} from '../dropdown-button/dropdown-button.module';
 import {ButtonModule} from '../button/button.module';
@@ -57,10 +57,23 @@ import {currencyFormatterMock} from '../../services/formatters/currency/currency
 import {DatetimeFormatter} from '../../services/formatters/datetime/datetime-formatter.service';
 import {NumberFormatter} from '../../services/formatters/number/number-formatter.service';
 
+import {ModuleNavigation} from '../../services/navigation/module-navigation/module-navigation.service';
+import {mockModuleNavigation} from '../../services/navigation/module-navigation/module-navigation.service.spec.mock';
+
+import {DynamicLabelService} from '../../services/language/dynamic-label.service';
+import {dynamicLabelsMock} from '../../services/language/dynamic-label.service.spec.mock';
+import {LinkActionsAdapter} from '../../fields/link-actions/link-actions.adapter';
+import {FieldLogicManager} from '../../fields/field-logic/field-logic.manager';
+import {FieldLogicDisplayManager} from '../../fields/field-logic-display/field-logic-display.manager';
+import {DataTypeFormatter} from '../../services/formatters/data-type.formatter.service';
+import {dataTypeFormatterMock} from '../../services/formatters/data-type.formatter.spec.mock';
+import {FieldHandlerRegistry} from '../../services/record/field/handler/field-handler.registry';
+
 /* eslint-disable camelcase, @typescript-eslint/camelcase */
 const mockConfigData: FieldLayoutConfig = {
     mode: 'detail',
-    maxColumns: 2
+    maxColumns: 2,
+    colClasses: []
 } as FieldLayoutConfig;
 const mockPanelData: Panel = {
     label: 'OVERVIEW',
@@ -948,7 +961,9 @@ const mockRecord = {
 
 const displayConfigSubject = new BehaviorSubject<FieldLayoutConfig>(mockConfigData);
 const panelSubject = new BehaviorSubject<Panel>(mockPanelData);
-const fieldSubject = new BehaviorSubject<FieldMap>(deepClone(mockFieldsData));
+const fieldSubject = new BehaviorSubject<FieldMap>(Object.fromEntries(
+    Object.entries(mockFieldsData).map(([key, data]) => [key, Object.assign(new BaseField(), data)])
+));
 const recordSubject = new BehaviorSubject<Record>(deepClone(mockRecord));
 const dataSource: FieldLayoutDataSource = {
     getConfig: (): Observable<FieldLayoutConfig> => displayConfigSubject.asObservable(),
@@ -1004,6 +1019,14 @@ describe('FieldLayoutComponent', () => {
                 RouterTestingModule
             ],
             providers: [
+                {provide: BreakpointObserver, useValue: {observe: () => of({matches: false})}},
+                {provide: DynamicLabelService, useValue: dynamicLabelsMock},
+                {provide: DataTypeFormatter, useValue: dataTypeFormatterMock},
+                {provide: LinkActionsAdapter, useValue: jasmine.createSpyObj('LinkActionsAdapter', ['runAction'])},
+                {provide: FieldLogicManager, useValue: jasmine.createSpyObj('FieldLogicManager', ['runLogic'])},
+                {provide: FieldLogicDisplayManager, useValue: jasmine.createSpyObj('FieldLogicDisplayManager', ['runAll'])},
+                {provide: FieldHandlerRegistry, useValue: jasmine.createSpyObj('FieldHandlerRegistry', ['get'])},
+                {provide: ModuleNavigation, useValue: mockModuleNavigation},
                 {provide: ModuleNameMapper, useValue: moduleNameMapperMock},
                 {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
                 {provide: NumberFormatter, useValue: numberFormatterMock},
@@ -1044,21 +1067,20 @@ describe('FieldLayoutComponent', () => {
 
         expect(fieldLayout).toBeTruthy();
 
-        const rows = testHostFixture.nativeElement.getElementsByClassName('form-row');
+        const layout: HTMLElement = testHostFixture.nativeElement.querySelector('.field-layout');
+        const rows = layout.querySelectorAll('.field-layout-row');
 
         expect(rows).toBeTruthy();
-        expect(rows.length).toEqual(2);
+        expect(rows.length).toEqual(3);
 
-        const cols = testHostFixture.nativeElement.getElementsByClassName('col');
-
-        expect(cols).toBeTruthy();
-        expect(cols.length).toEqual(4);
+        expect(Array.from(rows, row => row.querySelectorAll('.field-layout-col').length)).toEqual([2, 1, 2]);
 
         const firstRow = rows.item(0);
         const secondRow = rows.item(1);
+        const actionsRow = rows.item(2);
 
-        const nameCol = firstRow.getElementsByClassName('col').item(0);
-        const descriptionCol = firstRow.getElementsByClassName('col').item(1);
+        const nameCol = firstRow.querySelectorAll('.field-layout-col').item(0);
+        const descriptionCol = firstRow.querySelectorAll('.field-layout-col').item(1);
 
         expect(nameCol).toBeTruthy();
         expect(nameCol.textContent).toContain('OPPORTUNITY NAME');
@@ -1068,8 +1090,8 @@ describe('FieldLayoutComponent', () => {
         expect(descriptionCol.textContent).toContain('DESCRIPTION');
         expect(descriptionCol.textContent).toContain('desc 1');
 
-        const assignedToCol = secondRow.getElementsByClassName('col').item(0);
-        const buttonsCol = secondRow.getElementsByClassName('col').item(1);
+        const assignedToCol = secondRow.querySelector('.field-layout-col');
+        const buttonsCol = actionsRow.querySelectorAll('.field-layout-col').item(1);
 
         expect(assignedToCol).toBeTruthy();
         expect(assignedToCol.textContent).toContain('ASSIGNED TO');
@@ -1078,8 +1100,8 @@ describe('FieldLayoutComponent', () => {
         expect(buttonsCol.textContent).toContain('Clear');
         expect(buttonsCol.textContent).toContain('Some Button');
 
-        const clearButton = secondRow.getElementsByClassName('btn').item(0);
-        const someButton = secondRow.getElementsByClassName('btn').item(1);
+        const clearButton = buttonsCol.querySelector('.clear-button');
+        const someButton = buttonsCol.querySelector('.some-button');
 
         expect(clearButton).toBeTruthy();
         expect(clearButton.textContent).toContain('Clear');

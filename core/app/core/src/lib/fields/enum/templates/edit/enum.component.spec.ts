@@ -25,6 +25,7 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component} from '@angular/core';
 import {EnumEditFieldComponent} from './enum.component';
 import {Field} from '../../../../common/record/field.model';
@@ -38,6 +39,7 @@ import {DateFormatter} from '../../../../services/formatters/datetime/date-forma
 import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
 import {datetimeFormatterMock} from '../../../../services/formatters/datetime/datetime-formatter.service.spec.mock';
 import {CurrencyFormatter} from '../../../../services/formatters/currency/currency-formatter.service';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {DatetimeFormatter} from '../../../../services/formatters/datetime/datetime-formatter.service';
@@ -71,7 +73,7 @@ describe('EnumEditFieldComponent', () => {
                 EnumEditFieldTestHostComponent,
                 EnumEditFieldComponent,
             ],
-            imports: [
+            imports: [ApolloTestingModule,
                 TagInputModule,
                 FormsModule,
                 BrowserDynamicTestingModule,
@@ -85,7 +87,7 @@ describe('EnumEditFieldComponent', () => {
                 {provide: DateFormatter, useValue: dateFormatterMock},
                 {
                     provide: CurrencyFormatter,
-                    useValue: new CurrencyFormatter(userPreferenceStoreMock, numberFormatterMock, 'en_us')
+                    useValue: new CurrencyFormatter(userPreferenceStoreMock, systemConfigStoreMock, numberFormatterMock, 'en_us')
                 },
             ],
         }).compileComponents();

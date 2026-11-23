@@ -26,7 +26,8 @@
 
 import {RecordListStoreFactory} from './record-list.store.factory';
 import {ListGQL} from './graphql/api.list.get';
-import {appStateStoreMock} from '../app-state/app-state.store.spec.mock';
+import {recordManagerMock} from '../../services/record/record.manager.spec.mock';
+import {localStorageServiceMock} from '../../services/local-storage/local-storage.service.spec.mock';
 import {languageStoreMock} from '../language/language.store.spec.mock';
 import {messageServiceMock} from '../../services/message/message.service.spec.mock';
 import {systemConfigStoreMock} from '../system-config/system-config.store.spec.mock';
@@ -165,14 +166,14 @@ class ListGQLSpy extends ListGQL {
 
         const data = {
             data: {
-                getRecordList: deepClone(recordListMockData.recordList)
+                recordList: deepClone(recordListMockData.recordList)
             }
         };
 
         data.data.recordList.meta.offsets = {
             current: offset,
             next: (offset + limit) || 0,
-            prev: (offset - limit) || 0,
+            prev: Math.max(0, offset - limit),
             total: 200,
             end: 180
         };
@@ -185,7 +186,8 @@ export const listStoreFactoryMock = new RecordListStoreFactory(
     new ListGQLSpy(),
     systemConfigStoreMock,
     userPreferenceStoreMock,
-    appStateStoreMock,
     languageStoreMock,
     messageServiceMock,
+    localStorageServiceMock,
+    recordManagerMock,
 );

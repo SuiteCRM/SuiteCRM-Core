@@ -27,9 +27,11 @@
 import {userPreferenceStoreMock} from '../../../store/user-preference/user-preference.store.spec.mock';
 import {numberFormatterMock} from '../number/number-formatter.spec.mock';
 import {CurrencyFormatter} from './currency-formatter.service';
+import {systemConfigStoreMock} from '../../../store/system-config/system-config.store.spec.mock';
 
 export const currencyFormatterMock = new CurrencyFormatter(
     userPreferenceStoreMock,
+    systemConfigStoreMock,
     numberFormatterMock,
     'en-US'
 );

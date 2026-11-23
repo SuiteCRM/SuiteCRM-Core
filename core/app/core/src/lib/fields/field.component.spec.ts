@@ -25,10 +25,11 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {FieldComponent} from './field.component';
 import {CommonModule} from '@angular/common';
-import {Component} from '@angular/core';
-import {BehaviorSubject, of} from 'rxjs';
+import {Component, signal} from '@angular/core';
+import {BehaviorSubject} from 'rxjs';
 import {By} from '@angular/platform-browser';
 import {RouterTestingModule} from '@angular/router/testing';
 import {TagInputModule} from 'ngx-chips';
@@ -44,13 +45,20 @@ import {fieldModules} from './field.manifest';
 import {languageStoreMock} from '../store/language/language.store.spec.mock';
 import {datetimeFormatterMock} from '../services/formatters/datetime/datetime-formatter.service.spec.mock';
 import {CurrencyFormatter} from '../services/formatters/currency/currency-formatter.service';
+import {systemConfigStoreMock} from '../store/system-config/system-config.store.spec.mock';
 import {LanguageStore} from '../store/language/language.store';
 import {DatetimeFormatter} from '../services/formatters/datetime/datetime-formatter.service';
 import {FormControlUtils} from '../services/record/field/form-control.utils';
 import {NumberFormatter} from '../services/formatters/number/number-formatter.service';
+import {ModuleNavigation} from '../services/navigation/module-navigation/module-navigation.service';
+import {mockModuleNavigation} from '../services/navigation/module-navigation/module-navigation.service.spec.mock';
 
 const buildField = (field: Field): Field => {
     field.formControl = new UntypedFormControl(field.value);
+    field.display = signal('default');
+    field.readonly = signal(false);
+    field.valueSignal = signal(field.value);
+    field.loading = signal(false);
     return field;
 };
 
@@ -104,8 +112,8 @@ class FieldTestHostComponent {
             mode: 'list',
             expected: 'https://suitecrm.com/'
         },
-        {field: buildField({type: 'currency', value: '1000.5'}), mode: 'detail', expected: '£1,000.5'},
-        {field: buildField({type: 'currency', value: '1000.5'}), mode: 'list', expected: '£1,000.5'},
+        {field: buildField({type: 'currency', value: '1000.5'}), mode: 'detail', expected: '$1,000.50'},
+        {field: buildField({type: 'currency', value: '1000.5'}), mode: 'list', expected: '$1,000.50'},
         {field: buildField({type: 'text', value: 'My Text'}), mode: 'detail', expected: 'My Text'},
         {
             field: buildField({
@@ -172,9 +180,9 @@ describe('FieldComponent', () => {
     const preferences = new BehaviorSubject({
         num_grp_sep: ',',
         dec_sep: '.',
-        date_format: 'yyyy-MM-dd',
+        date_format: 'dd.MM.yyyy',
         time_format: 'HH:mm:ss',
-        currency: {id: '1', name: 'Stirling Pound', symbol: '£', iso4217: 'GBP'},
+        currency: {id: '1', name: 'US Dollar', symbol: '$', iso4217: 'USD'},
         default_currency_significant_digits: 2
     });
     const mockStore = new UserPreferenceMockStore(preferences);
@@ -186,6 +194,7 @@ describe('FieldComponent', () => {
         TestBed.configureTestingModule({
             declarations: [FieldComponent, FieldTestHostComponent],
             imports: [
+                ApolloTestingModule,
                 ...fieldModules,
                 CommonModule,
                 RouterTestingModule,
@@ -196,6 +205,7 @@ describe('FieldComponent', () => {
                 DynamicFieldModule
             ],
             providers: [
+                {provide: ModuleNavigation, useValue: mockModuleNavigation},
                 {provide: LanguageStore, useValue: languageStoreMock},
                 {
                     provide: UserPreferenceStore, useValue: mockStore
@@ -207,55 +217,9 @@ describe('FieldComponent', () => {
                     provide: DatetimeFormatter, useValue: datetimeFormatterMock
                 },
                 {
-                    provide: CurrencyFormatter, useValue: new CurrencyFormatter(mockStore, mockNumberFormatter, 'en_us')
+                    provide: CurrencyFormatter, useValue: new CurrencyFormatter(mockStore, systemConfigStoreMock, mockNumberFormatter, 'en_us')
                 },
-                {
-                    provide: SystemConfigStore, useValue: {
-                        configs$: of({
-                            default_number_grouping_seperator: {
-                                id: '/docroot/api/system-configs/default_number_grouping_seperator',
-                                _id: 'default_number_grouping_seperator',
-                                value: ';',
-                                items: []
-                            },
-                            default_decimal_seperator: {
-                                id: '/docroot/api/system-configs/default_decimal_seperator',
-                                _id: 'default_decimal_seperator',
-                                value: ',',
-                                items: []
-                            },
-                            date_format: {
-                                id: '/docroot/api/system-configs/date_format',
-                                _id: 'date_format',
-                                value: 'dd.MM.yyyy',
-                                items: []
-                            },
-                            time_format: {
-                                id: '/docroot/api/system-configs/time_format',
-                                _id: 'time_format',
-                                value: 'HH.mm.ss',
-                                items: []
-                            },
-                            currency: {
-                                id: '/docroot/api/system-configs/currency',
-                                _id: 'currency',
-                                value: null,
-                                items: {
-                                    id: '-99',
-                                    name: 'US Dollars',
-                                    symbol: '$',
-                                    iso4217: 'USD'
-                                }
-                            },
-                            default_currency_significant_digits: {
-                                id: '/docroot/api/system-configs/default_currency_significant_digits',
-                                _id: 'default_currency_significant_digits',
-                                value: 3,
-                                items: []
-                            }
-                        })
-                    }
-                }
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock}
             ],
         })
             .compileComponents();

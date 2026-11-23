@@ -24,7 +24,11 @@
  * the words "Supercharged by SuiteCRM".
  */
 
+import {Subject} from 'rxjs';
+import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
+import {themeImagesStoreMock} from '../../../../store/theme-images/theme-images.store.spec.mock';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component, ViewChild} from '@angular/core';
 import {Field} from '../../../../common/record/field.model';
 import {Record} from '../../../../common/record/record.model';
@@ -50,7 +54,6 @@ import {languageStoreMock} from '../../../../store/language/language.store.spec.
 import {currencyFormatterMock} from '../../../../services/formatters/currency/currency-formatter.service.spec.mock';
 import {DatetimeFormatter} from '../../../../services/formatters/datetime/datetime-formatter.service';
 import {NumberFormatter} from '../../../../services/formatters/number/number-formatter.service';
-import {waitUntil} from '../../../../../testing/utils.spec';
 import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
 import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {UntypedFormControl} from '@angular/forms';
@@ -64,6 +67,7 @@ class RelateEditFieldTestHostComponent {
     field: Field = {
         type: 'relate',
         value: 'Related Account',
+        valueChanges$: new Subject(),
         valueObject: {
             id: '123',
             name: 'Related Account',
@@ -99,7 +103,7 @@ describe('RelateRecordEditFieldComponent', () => {
             declarations: [
                 RelateEditFieldTestHostComponent,
             ],
-            imports: [
+            imports: [ApolloTestingModule,
                 RouterTestingModule,
                 RelateEditFieldModule,
                 BrowserDynamicTestingModule,
@@ -107,6 +111,7 @@ describe('RelateRecordEditFieldComponent', () => {
                 RecordListModalModule
             ],
             providers: [
+                {provide: ThemeImagesStore, useValue: themeImagesStoreMock},
                 {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
                 {provide: NumberFormatter, useValue: numberFormatterMock},
                 {provide: DatetimeFormatter, useValue: datetimeFormatterMock},
@@ -130,73 +135,28 @@ describe('RelateRecordEditFieldComponent', () => {
     });
 
     it('should have value', async () => {
-        expect(testHostComponent).toBeTruthy();
-
+        await testHostFixture.whenStable();
         testHostFixture.detectChanges();
 
-        const field = testHostFixture.nativeElement.getElementsByTagName('scrm-relate-edit')[0];
-
-
-        await waitUntil(() => field.getElementsByTagName('tag-input').item(0));
-
-        const tagInput = field.getElementsByTagName('tag-input').item(0);
-
-        expect(field).toBeTruthy();
-
-        expect(tagInput).toBeTruthy();
-
-        const tag = tagInput.getElementsByTagName('tag').item(0);
-
-        expect(tag).toBeTruthy();
-
-        const tagText = tag.getElementsByClassName('tag__text').item(0);
-
-        expect(tagText.textContent).toContain('Related Account');
-
-        const deleteIcon = tagInput.getElementsByTagName('delete-icon').item(0);
-
-        expect(deleteIcon).toBeTruthy();
+        const root = testHostFixture.nativeElement;
+        expect(root.querySelector('.selected-item-label').textContent).toContain('Related Account');
+        expect(root.querySelector('[data-pc-section="clearicon"]')).not.toBeNull();
     });
 
     it('should remove value', async () => {
-        expect(testHostComponent).toBeTruthy();
-
-        testHostFixture.detectChanges();
-
-        const field = testHostFixture.nativeElement.getElementsByTagName('scrm-relate-edit')[0];
-
         await testHostFixture.whenStable();
-        await waitUntil(() => field.getElementsByTagName('tag-input').item(0));
-
-        const tagInput = field.getElementsByTagName('tag-input').item(0);
-
-        expect(field).toBeTruthy();
-
-        expect(tagInput).toBeTruthy();
-
-        let tag = tagInput.getElementsByTagName('tag').item(0);
-
-        expect(tag).toBeTruthy();
-
-        const tagText = tag.getElementsByClassName('tag__text').item(0);
-
-        expect(tagText.textContent).toContain('Related Account');
-
-        const deleteIcon = tagInput.getElementsByTagName('delete-icon').item(0);
-
-        expect(deleteIcon).toBeTruthy();
-
-        deleteIcon.click();
-
         testHostFixture.detectChanges();
 
-        await waitUntil(() => !(tagInput.getElementsByTagName('tag').item(0)));
+        const root = testHostFixture.nativeElement;
+        expect(root.querySelector('.selected-item-label').textContent).toContain('Related Account');
+        const clear = root.querySelector('[data-pc-section="clearicon"]');
+        expect(clear).not.toBeNull();
+        clear.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+        await testHostFixture.whenStable();
+        testHostFixture.detectChanges();
 
-        tag = tagInput.getElementsByTagName('tag').item(0);
-
-        expect(tag).toBeFalsy();
+        expect(root.textContent).not.toContain('Related Account');
     });
-
 
     it('should have select button', async () => {
         expect(testHostComponent).toBeTruthy();
@@ -207,7 +167,7 @@ describe('RelateRecordEditFieldComponent', () => {
 
         const field = testHostFixture.nativeElement.getElementsByTagName('scrm-relate-edit')[0];
 
-        const select = field.getElementsByClassName('select-button').item(0);
+        const select = field.querySelector('scrm-button button');
 
         expect(select).toBeTruthy();
     });

@@ -29,6 +29,7 @@ import {shareReplay} from 'rxjs/operators';
 import {StatisticsMap, StatisticsQueryMap} from '../../../../common/statistics/statistics.model';
 import {SingleValueStatisticsStoreFactory} from '../../../../store/single-value-statistics/single-value-statistics.store.factory';
 import {fieldManagerMock} from '../../../../services/record/field/field.manager.spec.mock';
+import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
 import {StatisticsFetchGQL} from '../../../../store/statistics/graphql/api.statistics.get';
 
 class StatisticsFetchGQLSpy extends StatisticsFetchGQL {
@@ -78,5 +79,6 @@ class StatisticsFetchGQLSpy extends StatisticsFetchGQL {
 
 export const sidebarWidgetStatisticsFactoryMock = new SingleValueStatisticsStoreFactory(
     new StatisticsFetchGQLSpy(),
-    fieldManagerMock
+    fieldManagerMock,
+    languageStoreMock
 );

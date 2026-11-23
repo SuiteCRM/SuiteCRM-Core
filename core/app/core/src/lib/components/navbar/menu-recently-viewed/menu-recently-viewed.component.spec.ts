@@ -25,72 +25,30 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {of} from 'rxjs';
-import {take} from 'rxjs/operators';
+import {configureNavbarItemTest} from '../navbar-item.spec.mock';
 import {Component} from '@angular/core';
-import {RouterTestingModule} from '@angular/router/testing';
-import {provideHttpClientTesting} from '@angular/common/http/testing';
-import {AngularSvgIconModule} from 'angular-svg-icon';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-
-import {MenuRecentlyViewedComponent} from './menu-recently-viewed.component';
-import {MenuItemLinkComponent} from '../menu-item-link/menu-item-link.component';
-import {LanguageStrings} from '../../../store/language/language.store';
-import {languageMockData} from '../../../store/language/language.store.spec.mock';
-import {themeImagesMockData} from '../../../store/theme-images/theme-images.store.spec.mock';
-import {ImageModule} from '../../image/image.module';
-import {ThemeImagesStore} from '../../../store/theme-images/theme-images.store';
-import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 const recentRecords = [
     {
-        summary: 'Module 1',
-        url: '/fake-module-1'
+        attributes: {item_summary: 'Module 1', module_name: 'Accounts', item_id: '1'}
     },
     {
-        summary: 'Module 2',
-        url: '/fake-module-2'
+        attributes: {item_summary: 'Module 2', module_name: 'Accounts', item_id: '2'}
     }
 ];
 
 @Component({
     selector: 'menu-recently-viewed-test-host-component',
-    template: '<scrm-menu-recently-viewed [records]="records"></scrm-menu-recently-viewed>'
+    template: '<scrm-menu-recently-viewed module="accounts"></scrm-menu-recently-viewed>'
 })
 class MenuRecentlyViewedTestHostComponent {
-    records = recentRecords;
-    languages: LanguageStrings = {
-        ...languageMockData,
-        languageKey: 'en_us'
-    };
 }
 
 describe('MenuRecentlyViewedComponent', () => {
     let testHostComponent: MenuRecentlyViewedTestHostComponent;
     let testHostFixture: ComponentFixture<MenuRecentlyViewedTestHostComponent>;
 
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-    declarations: [
-        MenuItemLinkComponent,
-        MenuRecentlyViewedComponent,
-        MenuRecentlyViewedTestHostComponent
-    ],
-    imports: [AngularSvgIconModule.forRoot(),
-        RouterTestingModule,
-        ImageModule,
-        NgbModule],
-    providers: [
-        {
-            provide: ThemeImagesStore, useValue: {
-                images$: of(themeImagesMockData).pipe(take(1))
-            }
-        },
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-    ]
-}).compileComponents();
-    }));
+    beforeEach(waitForAsync(() => configureNavbarItemTest(MenuRecentlyViewedTestHostComponent, {accounts: {recentlyViewed: recentRecords}})));
 
     beforeEach(() => {
         testHostFixture = TestBed.createComponent(MenuRecentlyViewedTestHostComponent);
@@ -118,12 +76,12 @@ describe('MenuRecentlyViewedComponent', () => {
 
         expect(links.length).toEqual(1);
         expect(links[0].textContent).toContain('Module 1');
-        expect(links[0].attributes.getNamedItem('href').value).toContain('/fake-module-1');
+        expect(links[0].attributes.getNamedItem('href').value).toContain('/accounts/record/1');
 
         links = navItemLinks[1].getElementsByClassName('nav-link');
 
         expect(links.length).toEqual(1);
         expect(links[0].textContent).toContain('Module 2');
-        expect(links[0].attributes.getNamedItem('href').value).toContain('/fake-module-2');
+        expect(links[0].attributes.getNamedItem('href').value).toContain('/accounts/record/2');
     });
 });

@@ -28,9 +28,15 @@ import {listStoreFactoryMock} from '../../../../store/record-list/record-list.st
 import {subpanelStatisticsFactoryMock} from '../../../../store/single-value-statistics/single-value-statistics.store.spec.mock';
 import {SubpanelStoreFactory} from './subpanel.store.factory';
 import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
+import {filterListStoreFactoryMock} from '../../../../store/saved-filters/filter-list.store.spec.mock';
+import {metadataStoreMock} from '../../../../store/metadata/metadata.store.spec.mock';
+import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
 
 export const subpanelFactoryMock = new SubpanelStoreFactory(
     listStoreFactoryMock,
     languageStoreMock,
-    subpanelStatisticsFactoryMock
+    subpanelStatisticsFactoryMock,
+    filterListStoreFactoryMock,
+    metadataStoreMock,
+    userPreferenceStoreMock
 );

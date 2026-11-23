@@ -25,8 +25,9 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component} from '@angular/core';
-import {BehaviorSubject, of} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {FloatDetailFieldComponent} from './float.component';
 import {Field} from '../../../../common/record/field.model';
 import {UserPreferenceMockStore} from '../../../../store/user-preference/user-preference.store.spec.mock';
@@ -36,6 +37,7 @@ import {dateFormatterMock} from '../../../../services/formatters/datetime/date-f
 import {DateFormatter} from '../../../../services/formatters/datetime/date-formatter.service';
 import {datetimeFormatterMock} from '../../../../services/formatters/datetime/datetime-formatter.service.spec.mock';
 import {CurrencyFormatter} from '../../../../services/formatters/currency/currency-formatter.service';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {DatetimeFormatter} from '../../../../services/formatters/datetime/datetime-formatter.service';
 import {FormControlUtils} from '../../../../services/record/field/form-control.utils';
 import {FormatNumberPipe} from '../../../../pipes/format-number/format-number.pipe';
@@ -76,35 +78,18 @@ describe('FloatDetailFieldComponent', () => {
                 FloatDetailFieldComponent,
                 FormatNumberPipe,
             ],
-            imports: [],
+            imports: [ApolloTestingModule,],
             providers: [
                 {
                     provide: UserPreferenceStore, useValue: mockStore
                 },
-                {
-                    provide: SystemConfigStore, useValue: {
-                        configs$: of({
-                            default_number_grouping_seperator: {
-                                id: '/docroot/api/system-configs/default_number_grouping_seperator',
-                                _id: 'default_number_grouping_seperator',
-                                value: ';',
-                                items: []
-                            },
-                            default_decimal_seperator: {
-                                id: '/docroot/api/system-configs/default_decimal_seperator',
-                                _id: 'default_decimal_seperator',
-                                value: ',',
-                                items: []
-                            }
-                        })
-                    }
-                },
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock},
                 {provide: NumberFormatter, useValue: mockNumberFormatter},
                 {provide: DatetimeFormatter, useValue: datetimeFormatterMock},
                 {provide: DateFormatter, useValue: dateFormatterMock},
                 {
                     provide: CurrencyFormatter,
-                    useValue: new CurrencyFormatter(mockStore, mockNumberFormatter, 'en_us')
+                    useValue: new CurrencyFormatter(mockStore, systemConfigStoreMock, mockNumberFormatter, 'en_us')
                 },
             ],
         }).compileComponents();

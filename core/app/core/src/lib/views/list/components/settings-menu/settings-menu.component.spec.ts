@@ -26,15 +26,17 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {SettingsMenuComponent} from './settings-menu.component';
+import {SettingsMenuModule} from './settings-menu.module';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {ApolloTestingModule} from 'apollo-angular/testing';
 import {of} from 'rxjs';
 import {take} from 'rxjs/operators';
-import {ButtonModule} from '../../../../components/button/button.module';
 import {ListViewStore} from '../../store/list-view/list-view.store';
-import {ColumnChooserModule} from '../../../../components/columnchooser/columnchooser.module';
-import {themeImagesMockData} from '../../../../store/theme-images/theme-images.store.spec.mock';
-import {ImageModule} from '../../../../components/image/image.module';
+import {registerThemeSvgFixtures, themeImagesMockData} from '../../../../store/theme-images/theme-images.store.spec.mock';
+import {AngularSvgIconModule, SvgIconRegistryService} from 'angular-svg-icon';
+import {QuickFiltersService} from '../../services/quick-filters.service';
+import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {listviewStoreMock} from '../../store/list-view/list-view.store.spec.mock';
 import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
@@ -45,12 +47,12 @@ describe('SettingsmenuUiComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-    declarations: [SettingsMenuComponent],
-    imports: [ColumnChooserModule,
-        ApolloTestingModule,
-        ImageModule,
-        ButtonModule],
+    imports: [SettingsMenuModule,
+        AngularSvgIconModule.forRoot(),
+        ApolloTestingModule],
     providers: [
+        QuickFiltersService,
+        {provide: SystemConfigStore, useValue: systemConfigStoreMock},
         { provide: ListViewStore, useValue: listviewStoreMock },
         {
             provide: ThemeImagesStore, useValue: {
@@ -65,6 +67,7 @@ describe('SettingsmenuUiComponent', () => {
     }));
 
     beforeEach(() => {
+        registerThemeSvgFixtures(TestBed.inject(SvgIconRegistryService));
         fixture = TestBed.createComponent(SettingsMenuComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

@@ -25,6 +25,7 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component} from '@angular/core';
 import {BooleanEditFieldComponent} from './boolean.component';
 import {Field} from '../../../../common/record/field.model';
@@ -62,7 +63,7 @@ describe('BooleanEditFieldComponent', () => {
                 BooleanEditFieldTestHostComponent,
                 BooleanEditFieldComponent,
             ],
-            imports: [],
+            imports: [ApolloTestingModule,],
             providers: [
                 {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
                 {provide: NumberFormatter, useValue: numberFormatterMock},
@@ -81,13 +82,13 @@ describe('BooleanEditFieldComponent', () => {
         expect(testHostComponent).toBeTruthy();
     });
 
-    it('should have checkbox', () => {
+    it('should have checkbox', async () => {
         expect(testHostComponent).toBeTruthy();
 
         testHostComponent.field.value = 'true';
 
         testHostFixture.detectChanges();
-        testHostFixture.whenStable().then(() => {
+        return testHostFixture.whenStable().then(() => {
             const container = testHostFixture.nativeElement.querySelector('.checkbox-container');
             const input = testHostFixture.nativeElement.querySelector('input');
 
@@ -100,13 +101,13 @@ describe('BooleanEditFieldComponent', () => {
         });
     });
 
-    it('should have updated input when field changes', () => {
+    it('should have updated input when field changes', async () => {
         expect(testHostComponent).toBeTruthy();
 
         testHostComponent.field.value = 'false';
 
         testHostFixture.detectChanges();
-        testHostFixture.whenStable().then(() => {
+        return testHostFixture.whenStable().then(() => {
             const input = testHostFixture.nativeElement.querySelector('input');
 
             expect(input.checked).toBeFalsy();
@@ -114,25 +115,25 @@ describe('BooleanEditFieldComponent', () => {
             testHostComponent.field.value = 'true';
 
             testHostFixture.detectChanges();
-            testHostFixture.whenStable().then(() => {
+            return testHostFixture.whenStable().then(() => {
                 expect(input.checked).toBeTruthy();
             });
         });
 
     });
 
-    it('should have update field when input changes', () => {
+    it('should have update field when input changes', async () => {
         expect(testHostComponent).toBeTruthy();
 
         testHostComponent.field.value = 'false';
 
         testHostFixture.detectChanges();
-        testHostFixture.whenStable().then(() => {
+        return testHostFixture.whenStable().then(() => {
             const input = testHostFixture.nativeElement.querySelector('input');
             input.click();
 
             testHostFixture.detectChanges();
-            testHostFixture.whenStable().then(() => {
+            return testHostFixture.whenStable().then(() => {
                 expect(testHostComponent.field.value).toContain('true');
             });
         });

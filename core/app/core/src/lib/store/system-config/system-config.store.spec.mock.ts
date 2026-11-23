@@ -38,6 +38,12 @@ export const systemConfigMockData = {
             value: '20',
             items: []
         },
+        login_language: {
+            id: '/docroot/api/system-configs/login_language',
+            _id: 'login_language',
+            value: true,
+            items: []
+        },
         default_language: {
             id: '/docroot/api/system-configs/default_language',
             _id: 'default_language',
@@ -137,6 +143,20 @@ export const systemConfigMockData = {
             items: {
                 alert_timeout: 3,
                 modal_buttons_collapse_breakpoint: 4,
+                widget_swap_screen_sizes: {},
+                multiselect_max_number: {},
+                quick_filters_breakdown_screen_sizes: {},
+                displayed_quick_filters: {},
+                quick_filters_breakdown_threshold: {},
+            }
+        },
+        currencies: {
+            id: '/api/system-configs/currencies',
+            _id: 'currencies',
+            value: null,
+            items: {
+                '1': {iso4217: 'USD', symbol: '$', conversion_rate: '1'},
+                '2': {iso4217: 'GBP', symbol: '£', conversion_rate: '1'}
             }
         },
         date_format: {

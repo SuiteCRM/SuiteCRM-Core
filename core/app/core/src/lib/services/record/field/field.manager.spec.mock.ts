@@ -34,13 +34,21 @@ import {GroupFieldBuilder} from './group-field.builder';
 import {FilterAttributeBuilder} from './filter-attribute.builder';
 import {LineItemBuilder} from './line-item.builder';
 import {languageStoreMock} from '../../../store/language/language.store.spec.mock';
+import {FieldObjectRegistry} from './field-object-type.registry';
 
-export const fieldBuilderMock = new FieldBuilder(validationManagerMock, dataTypeFormatterMock);
-export const attributeBuilderMock = new AttributeBuilder(validationManagerMock, dataTypeFormatterMock);
-export const groupFieldBuilderMock = new GroupFieldBuilder(validationManagerMock, dataTypeFormatterMock);
-export const filterFieldBuilderMock = new FilterFieldBuilder(validationManagerMock, dataTypeFormatterMock);
-export const filterAttributeBuilderMock = new FilterAttributeBuilder(validationManagerMock, dataTypeFormatterMock);
-export const lineItemBuilderMock = new LineItemBuilder(validationManagerMock, dataTypeFormatterMock);
+class TestFieldObjectRegistry extends FieldObjectRegistry {
+    constructor() {
+        super();
+    }
+}
+
+const fieldObjectRegistry = new TestFieldObjectRegistry();
+export const fieldBuilderMock = new FieldBuilder(validationManagerMock, dataTypeFormatterMock, fieldObjectRegistry);
+export const attributeBuilderMock = new AttributeBuilder(validationManagerMock, dataTypeFormatterMock, fieldObjectRegistry);
+export const groupFieldBuilderMock = new GroupFieldBuilder(validationManagerMock, dataTypeFormatterMock, fieldObjectRegistry);
+export const filterFieldBuilderMock = new FilterFieldBuilder(validationManagerMock, dataTypeFormatterMock, fieldObjectRegistry);
+export const filterAttributeBuilderMock = new FilterAttributeBuilder(validationManagerMock, dataTypeFormatterMock, fieldObjectRegistry);
+export const lineItemBuilderMock = new LineItemBuilder(validationManagerMock, dataTypeFormatterMock, fieldObjectRegistry);
 export const fieldManagerMock = new FieldManager(
     fieldBuilderMock,
     groupFieldBuilderMock,

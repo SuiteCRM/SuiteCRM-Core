@@ -25,24 +25,10 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {configureNavbarItemTest} from '../navbar-item.spec.mock';
 
-import {MenuItemComponent} from './menu-item.component';
 import {Component} from '@angular/core';
-import {AngularSvgIconModule} from 'angular-svg-icon';
-import {RouterTestingModule} from '@angular/router/testing';
-import {provideHttpClientTesting} from '@angular/common/http/testing';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {of} from 'rxjs';
-import {take} from 'rxjs/operators';
 import {MenuItem} from '../../../common/menu/menu.model';
-import {MenuItemLinkComponent} from '../menu-item-link/menu-item-link.component';
-import {LanguageStrings} from '../../../store/language/language.store';
-import {MenuRecentlyViewedComponent} from '../menu-recently-viewed/menu-recently-viewed.component';
-import {languageMockData} from '../../../store/language/language.store.spec.mock';
-import {themeImagesMockData} from '../../../store/theme-images/theme-images.store.spec.mock';
-import {ImageModule} from '../../image/image.module';
-import {ThemeImagesStore} from '../../../store/theme-images/theme-images.store';
-import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 const mockMenuItem = {
     link: {
@@ -80,17 +66,9 @@ const mockMenuItem = {
 })
 class MenuItemTestHostComponent {
     item: MenuItem = mockMenuItem;
-    languages: LanguageStrings = {
-        ...languageMockData,
-        languageKey: 'en_us'
-    };
 
     setItem(value: MenuItem): void {
         this.item = value;
-    }
-
-    setLanguages(value: LanguageStrings): void {
-        this.languages = value;
     }
 }
 
@@ -98,29 +76,7 @@ describe('ModuleMenuItemComponent', () => {
     let testHostComponent: MenuItemTestHostComponent;
     let testHostFixture: ComponentFixture<MenuItemTestHostComponent>;
 
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-    declarations: [
-        MenuItemComponent,
-        MenuItemLinkComponent,
-        MenuItemTestHostComponent,
-        MenuRecentlyViewedComponent
-    ],
-    imports: [AngularSvgIconModule.forRoot(),
-        RouterTestingModule,
-        ImageModule,
-        NgbModule],
-    providers: [
-        {
-            provide: ThemeImagesStore, useValue: {
-                images$: of(themeImagesMockData).pipe(take(1))
-            }
-        },
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-    ]
-}).compileComponents();
-    }));
+    beforeEach(waitForAsync(() => configureNavbarItemTest(MenuItemTestHostComponent)));
 
     beforeEach(() => {
         testHostFixture = TestBed.createComponent(MenuItemTestHostComponent);

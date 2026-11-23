@@ -768,8 +768,11 @@ export class RecordViewStore extends ViewStore implements StateStore, BaseRecord
     protected getViewFieldsObservable(): Observable<ViewFieldDefinition[]> {
         return this.metadataStore.recordViewMetadata$.pipe(map((recordMetadata: RecordViewMetadata) => {
             const fieldsMap: ViewFieldDefinitionMap = {};
+            // MetadataStore emits `recordView: {}` before the first load and again when cleared on logout.
+            const panels = recordMetadata?.panels ?? [];
+            const vardefs = recordMetadata?.vardefs ?? {};
 
-            recordMetadata.panels.forEach(panel => {
+            panels.forEach(panel => {
                 panel.rows.forEach(row => {
                     row.cols.forEach(col => {
                         const fieldName = col.name ?? col.fieldDefinition.name ?? '';
@@ -778,8 +781,8 @@ export class RecordViewStore extends ViewStore implements StateStore, BaseRecord
                 });
             });
 
-            Object.keys(recordMetadata.vardefs).forEach(fieldKey => {
-                const vardef = recordMetadata.vardefs[fieldKey] ?? null;
+            Object.keys(vardefs).forEach(fieldKey => {
+                const vardef = vardefs[fieldKey] ?? null;
                 if (!vardef || isEmpty(vardef)) {
                     return;
                 }

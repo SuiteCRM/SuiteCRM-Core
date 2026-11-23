@@ -33,6 +33,10 @@ import {metadataStoreMock} from '../../../store/metadata/metadata.store.spec.moc
 import {messageServiceMock} from '../../../services/message/message.service.spec.mock';
 import {confirmationModalServiceMock} from '../../../services/modals/confirmation-modal.spec.mock';
 import {selectModalServiceMock} from '../../../services/modals/select-modal.spec.mock';
+import {RecordActionDisplayTypeLogic} from '../action-logic/display-type/display-type.logic';
+import {activeFieldsChecker} from '../../../services/condition-operators/condition-operator.manager.spec.mock';
+import {RecordMapperRegistry} from '../../../common/record/record-mappers/record-mapper.registry';
+import {recordManagerMock} from '../../../services/record/record.manager.spec.mock';
 
 export const recordActionsMock = new RecordActionsAdapter(
     recordviewStoreMock,
@@ -42,5 +46,11 @@ export const recordActionsMock = new RecordActionsAdapter(
     asyncActionServiceMock,
     messageServiceMock,
     confirmationModalServiceMock,
-    selectModalServiceMock
+    selectModalServiceMock,
+    null,
+    new RecordActionDisplayTypeLogic(activeFieldsChecker),
+    null,
+    new RecordMapperRegistry(),
+    null,
+    recordManagerMock
 );

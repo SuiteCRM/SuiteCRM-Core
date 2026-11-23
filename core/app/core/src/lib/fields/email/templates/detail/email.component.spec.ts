@@ -26,6 +26,7 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {EmailDetailFieldsComponent} from './email.component';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component} from '@angular/core';
 import {Field} from '../../../../common/record/field.model';
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
@@ -33,6 +34,7 @@ import {dateFormatterMock} from '../../../../services/formatters/datetime/date-f
 import {DateFormatter} from '../../../../services/formatters/datetime/date-formatter.service';
 import {datetimeFormatterMock} from '../../../../services/formatters/datetime/datetime-formatter.service.spec.mock';
 import {CurrencyFormatter} from '../../../../services/formatters/currency/currency-formatter.service';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {DatetimeFormatter} from '../../../../services/formatters/datetime/datetime-formatter.service';
 import {numberFormatterMock} from '../../../../services/formatters/number/number-formatter.spec.mock';
@@ -59,6 +61,7 @@ describe('EmailDetailFieldsComponent', () => {
                 EmailDetailFieldsComponent,
                 EmailDetailFieldsTestHostComponent
             ],
+            imports: [ApolloTestingModule],
             providers: [
                 {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
                 {provide: NumberFormatter, useValue: numberFormatterMock},
@@ -66,7 +69,7 @@ describe('EmailDetailFieldsComponent', () => {
                 {provide: DateFormatter, useValue: dateFormatterMock},
                 {
                     provide: CurrencyFormatter,
-                    useValue: new CurrencyFormatter(userPreferenceStoreMock, numberFormatterMock, 'en_us')
+                    useValue: new CurrencyFormatter(userPreferenceStoreMock, systemConfigStoreMock, numberFormatterMock, 'en_us')
                 },
             ]
         }).compileComponents();

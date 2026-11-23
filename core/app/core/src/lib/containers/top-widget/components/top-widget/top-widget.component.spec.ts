@@ -37,6 +37,8 @@ import {FieldModule} from '../../../../fields/field.module';
 import {SingleValueStatisticsStoreFactory} from '../../../../store/single-value-statistics/single-value-statistics.store.factory';
 import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
 import {LanguageStore} from '../../../../store/language/language.store';
+import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {TopWidgetModule} from './top-widget.module';
 
 
@@ -53,6 +55,7 @@ class TopWidgetHostComponent {
     };
 
     config: WidgetMetadata = {
+        key: 'statistics',
         type: 'statistics',
         options: {
             statistics: [
@@ -88,6 +91,7 @@ describe('TopWidgetComponent', () => {
             ],
             providers: [
                 {provide: LanguageStore, useValue: languageStoreMock},
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock},
                 {provide: SingleValueStatisticsStoreFactory, useValue: topWidgetStatisticsFactoryMock},
             ],
         }).compileComponents();

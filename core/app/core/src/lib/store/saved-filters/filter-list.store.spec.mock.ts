@@ -25,7 +25,8 @@
  */
 
 import {FiltersListGQL} from './graphql/api.list.get';
-import {appStateStoreMock} from '../app-state/app-state.store.spec.mock';
+import {recordManagerMock} from '../../services/record/record.manager.spec.mock';
+import {localStorageServiceMock} from '../../services/local-storage/local-storage.service.spec.mock';
 import {languageStoreMock} from '../language/language.store.spec.mock';
 import {messageServiceMock} from '../../services/message/message.service.spec.mock';
 import {systemConfigStoreMock} from '../system-config/system-config.store.spec.mock';
@@ -75,6 +76,7 @@ export const filterListMockData = {
 class FilterListGQLSpy extends FiltersListGQL {
 
     constructor() {
+        // Only getCurrentUser is used by the filter list fixture.
         super(null);
     }
 
@@ -120,6 +122,10 @@ class AuthServiceMock extends AuthService {
             null,
             null,
             null,
+            null,
+            null,
+            null,
+            null,
             null
         )
     }
@@ -140,9 +146,10 @@ export const filterListStoreFactoryMock = new FilterListStoreFactory(
     new FilterListGQLSpy(),
     systemConfigStoreMock,
     userPreferenceStoreMock,
-    appStateStoreMock,
     languageStoreMock,
     messageServiceMock,
     authServiceMock,
-    moduleNameMapperMock
+    moduleNameMapperMock,
+    localStorageServiceMock,
+    recordManagerMock
 );

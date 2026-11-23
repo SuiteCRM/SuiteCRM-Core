@@ -26,5 +26,6 @@
 
 import {PhoneFormatter} from './phone-formatter.service';
 import {FormControlUtils} from '../../record/field/form-control.utils';
+import {systemConfigStoreMock} from '../../../store/system-config/system-config.store.spec.mock';
 
-export const phoneFormatterMock = new PhoneFormatter(new FormControlUtils());
+export const phoneFormatterMock = new PhoneFormatter(new FormControlUtils(), systemConfigStoreMock);

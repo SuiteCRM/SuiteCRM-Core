@@ -32,11 +32,14 @@ import {LayoutModule} from '@angular/cdk/layout';
 import {By} from '@angular/platform-browser';
 import {CommonModule} from '@angular/common';
 import {RouterTestingModule} from '@angular/router/testing';
-import {Field} from '../../common/record/field.model';
+import {BaseField, Field} from '../../common/record/field.model';
 import {ApolloTestingModule} from 'apollo-angular/testing';
 import {FieldModule} from '../../fields/field.module';
 import {DropdownButtonModule} from '../dropdown-button/dropdown-button.module';
 import {ButtonModule} from '../button/button.module';
+
+import {LanguageStore} from '../../store/language/language.store';
+import {languageStoreMock} from '../../store/language/language.store.spec.mock';
 
 @Component({
     selector: 'field-grid-host-component',
@@ -57,7 +60,7 @@ import {ButtonModule} from '../button/button.module';
     `
 })
 class FieldGridTestHostComponent {
-    mode: 'edit';
+    mode = 'detail';
     fields = [
         {
             name: 'first_name',
@@ -77,7 +80,7 @@ class FieldGridTestHostComponent {
             type: 'varchar',
             value: '',
         },
-    ];
+    ].map(field => Object.assign(new BaseField(), field));
     special = [
         {
             name: 'my_filters_only',
@@ -122,7 +125,7 @@ describe('FieldGridComponent', () => {
                 RouterTestingModule,
                 ApolloTestingModule
             ],
-            providers: [],
+            providers: [{provide: LanguageStore, useValue: languageStoreMock}],
         }).compileComponents();
 
         testHostFixture = TestBed.createComponent(FieldGridTestHostComponent);

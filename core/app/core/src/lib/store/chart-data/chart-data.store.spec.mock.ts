@@ -30,6 +30,14 @@ import {Observable, of} from 'rxjs';
 import {shareReplay} from 'rxjs/operators';
 import {ChartDataStoreFactory} from './chart-data.store.factory';
 import {dataTypeFormatterMock} from '../../services/formatters/data-type.formatter.spec.mock';
+import {SeriesMapper} from '../../services/statistics/series/mapper/series-mapper.service';
+import {SeriesTraverser} from '../../services/statistics/series/mapper/series-traverser.service';
+import {DataTypeSeriesMapper} from '../../services/statistics/series/mapper/data-type-mapper/data-type.series-mapper';
+import {DataTypeUnitConverter} from '../../services/unit-converters/data-type.unit-converter.service';
+import {CurrencyUnitConverter} from '../../services/unit-converters/currency/currency.unit-converter';
+import {CurrencyService} from '../../services/currency/currency.service';
+import {systemConfigStoreMock} from '../system-config/system-config.store.spec.mock';
+import {userPreferenceStoreMock} from '../user-preference/user-preference.store.spec.mock';
 
 class StatisticsFetchGQLSpy extends StatisticsFetchGQL {
     constructor() {
@@ -127,7 +135,11 @@ class StatisticsFetchGQLSpy extends StatisticsFetchGQL {
     }
 }
 
+const currency = new CurrencyService(systemConfigStoreMock, userPreferenceStoreMock);
+const unitConverter = new DataTypeUnitConverter(new CurrencyUnitConverter(currency, userPreferenceStoreMock));
+
 export const chartDataStoreFactoryMock = new ChartDataStoreFactory(
     new StatisticsFetchGQLSpy(),
-    dataTypeFormatterMock
+    dataTypeFormatterMock,
+    new SeriesMapper(new SeriesTraverser(), new DataTypeSeriesMapper(unitConverter, dataTypeFormatterMock))
 );

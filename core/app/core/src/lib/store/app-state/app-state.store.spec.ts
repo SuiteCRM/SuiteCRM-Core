@@ -40,7 +40,7 @@ describe('AppState Store', () => {
     });
 
     it('#updateLoading', () => {
-        service.updateLoading('test', true);
+        service.updateLoading('test', true, false);
         service.loading$.pipe(take(1)).subscribe(loading => {
             expect(loading).toEqual(true);
         });

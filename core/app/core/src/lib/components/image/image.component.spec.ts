@@ -36,6 +36,10 @@ import {themeImagesMockData} from '../../store/theme-images/theme-images.store.s
 import {ThemeImagesStore} from '../../store/theme-images/theme-images.store';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
+import {LanguageStore} from '../../store/language/language.store';
+import {languageStoreMock} from '../../store/language/language.store.spec.mock';
+import {registerTestIcons} from './svg-icons.spec.mock';
+
 @Component({
     selector: 'host-component',
     template: '<scrm-image [image]="image"></scrm-image>'
@@ -58,6 +62,7 @@ describe('ImageComponent', () => {
     declarations: [ImageComponent, TestHostComponent],
     imports: [AngularSvgIconModule.forRoot()],
     providers: [
+        {provide: LanguageStore, useValue: languageStoreMock},
         {
             provide: ThemeImagesStore, useValue: {
                 images$: of(themeImagesMockData).pipe(take(1))
@@ -73,6 +78,7 @@ describe('ImageComponent', () => {
     });
 
     beforeEach(() => {
+        registerTestIcons('download');
         testHostFixture = TestBed.createComponent(TestHostComponent);
         testHostComponent = testHostFixture.componentInstance;
         testHostFixture.detectChanges();
@@ -94,6 +100,6 @@ describe('ImageComponent', () => {
         testHostComponent.setImage('download');
         testHostFixture.detectChanges();
 
-        expect(testHostFixture.nativeElement.querySelector('svg-icon')).toBeTruthy();
+        expect(testHostFixture.nativeElement.querySelector('svg-icon svg')).toBeTruthy();
     });
 });

@@ -25,6 +25,8 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {EmailListFieldsComponent} from './email.component';
 import {Component} from '@angular/core';
 import {Field} from '../../../../common/record/field.model';
@@ -33,7 +35,9 @@ import {dateFormatterMock} from '../../../../services/formatters/datetime/date-f
 import {DateFormatter} from '../../../../services/formatters/datetime/date-formatter.service';
 import {datetimeFormatterMock} from '../../../../services/formatters/datetime/datetime-formatter.service.spec.mock';
 import {CurrencyFormatter} from '../../../../services/formatters/currency/currency-formatter.service';
-import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
+import {UserPreferenceMockStore, userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
+import {BehaviorSubject} from 'rxjs';
 import {DatetimeFormatter} from '../../../../services/formatters/datetime/datetime-formatter.service';
 import {numberFormatterMock} from '../../../../services/formatters/number/number-formatter.spec.mock';
 import {NumberFormatter} from '../../../../services/formatters/number/number-formatter.service';
@@ -52,6 +56,7 @@ class EmailListFieldsTestHostComponent {
 describe('EmailListFieldsComponent', () => {
     let testHostComponent: EmailListFieldsTestHostComponent;
     let testHostFixture: ComponentFixture<EmailListFieldsTestHostComponent>;
+    const mailtoPreferences = new UserPreferenceMockStore(new BehaviorSubject({email_link_type: 'mailto'}));
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
@@ -59,14 +64,16 @@ describe('EmailListFieldsComponent', () => {
                 EmailListFieldsComponent,
                 EmailListFieldsTestHostComponent
             ],
+            imports: [ApolloTestingModule],
             providers: [
-                {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock},
+                {provide: UserPreferenceStore, useValue: mailtoPreferences},
                 {provide: NumberFormatter, useValue: numberFormatterMock},
                 {provide: DatetimeFormatter, useValue: datetimeFormatterMock},
                 {provide: DateFormatter, useValue: dateFormatterMock},
                 {
                     provide: CurrencyFormatter,
-                    useValue: new CurrencyFormatter(userPreferenceStoreMock, numberFormatterMock, 'en_us')
+                    useValue: new CurrencyFormatter(userPreferenceStoreMock, systemConfigStoreMock, numberFormatterMock, 'en_us')
                 },
             ]
         }).compileComponents();

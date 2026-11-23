@@ -25,22 +25,21 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {BehaviorSubject, Observable, of} from 'rxjs';
-import {take} from 'rxjs/operators';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {Component} from '@angular/core';
+import {provideHttpClient} from '@angular/common/http';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
 
-import {PaginationComponent} from './pagination.component';
 import {PaginationDataSource} from '../../common/components/pagination/pagination.model';
 import {PageSelection, PaginationCount} from '../../common/views/list/list-navigation.model';
 import {By} from '@angular/platform-browser';
 import {AngularSvgIconModule} from 'angular-svg-icon';
-import {provideHttpClientTesting} from '@angular/common/http/testing';
+import {registerTestIcons} from '../image/svg-icons.spec.mock';
 import {LanguageStore} from '../../store/language/language.store';
-import {languageMockData} from '../../store/language/language.store.spec.mock';
-import {themeImagesMockData} from '../../store/theme-images/theme-images.store.spec.mock';
-import {ImageModule} from '../image/image.module';
+import {languageStoreMock} from '../../store/language/language.store.spec.mock';
+import {themeImagesStoreMock} from '../../store/theme-images/theme-images.store.spec.mock';
+import {PaginationModule} from './pagination.module';
 import {ThemeImagesStore} from '../../store/theme-images/theme-images.store';
-import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 const pageSubject = new BehaviorSubject<PageSelection>(PageSelection.LAST);
 const countSubject = new BehaviorSubject<PaginationCount>({
@@ -70,29 +69,20 @@ describe('PaginationComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-    declarations: [
-        PaginationTestHostComponent,
-        PaginationComponent,
-    ],
-    imports: [ImageModule,
-        AngularSvgIconModule.forRoot()],
-    providers: [
-        {
-            provide: LanguageStore, useValue: {
-                appListStrings$: of(languageMockData.appListStrings).pipe(take(1)),
-                appStrings$: of(languageMockData.appStrings).pipe(take(1))
-            }
-        },
-        {
-            provide: ThemeImagesStore, useValue: {
-                images$: of(themeImagesMockData).pipe(take(1))
-            }
-        },
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-    ]
-}).compileComponents();
+            declarations: [PaginationTestHostComponent],
+            imports: [
+                PaginationModule,
+                AngularSvgIconModule.forRoot()
+            ],
+            providers: [
+                {provide: LanguageStore, useValue: languageStoreMock},
+                {provide: ThemeImagesStore, useValue: themeImagesStoreMock},
+                provideHttpClient(),
+                provideHttpClientTesting()
+            ]
+        }).compileComponents();
 
+        registerTestIcons('paginate_first', 'paginate_previous', 'paginate_next', 'paginate_last');
         testHostFixture = TestBed.createComponent(PaginationTestHostComponent);
         testHostComponent = testHostFixture.componentInstance;
         testHostFixture.detectChanges();
@@ -119,7 +109,11 @@ describe('PaginationComponent', () => {
     });
 
     it('should have page count', () => {
-        expect(testHostFixture.debugElement.query(By.css('.pagination-count'))).toBeTruthy();
+        countSubject.next({pageFirst: 1, pageLast: 20, total: 40});
+        testHostFixture.detectChanges();
+        const count = testHostFixture.debugElement.query(By.css('.pagination-count'));
+        expect(count).toBeTruthy();
+        expect(count.nativeElement.textContent).toContain('40');
     });
 
     it('should trigger page change to previous page', waitForAsync(() => {

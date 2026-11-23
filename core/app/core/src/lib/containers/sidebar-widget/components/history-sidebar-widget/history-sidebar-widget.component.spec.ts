@@ -24,116 +24,62 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {HistorySidebarWidgetComponent} from './history-sidebar-widget.component';
-import {CollectionViewer, ListRange} from '@angular/cdk/collections';
-import {of} from 'rxjs';
-import {CommonModule} from '@angular/common';
-import {ScrollingModule} from '@angular/cdk/scrolling';
-import {Router} from '@angular/router';
-import {RouterTestingModule} from '@angular/router/testing';
-import {take} from 'rxjs/operators';
-import {ApolloTestingModule} from 'apollo-angular/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {provideRouter} from '@angular/router';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
-import {FieldModule} from '../../../../fields/field.module';
-import {themeImagesStoreMock} from '../../../../store/theme-images/theme-images.store.spec.mock';
-import {RecordViewStore} from '../../../../views/record/store/record-view/record-view.store';
-import {mockRouter} from '../../../../services/navigation/module-navigation/module-navigation.service.spec.mock';
-import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
-import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
-import {recordviewStoreMock} from '../../../../views/record/store/record-view/record-view.store.spec.mock';
-import {LanguageStore} from '../../../../store/language/language.store';
-import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
-import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
-import {ImageModule} from '../../../../components/image/image.module';
-/*
-
+import {of} from 'rxjs';
+import {HistorySidebarWidgetComponent} from './history-sidebar-widget.component';
+import {HistorySidebarWidgetModule} from './history-sidebar-widget.module';
+import {HistoryTimelineAdapter} from './history-timeline.adapter.service';
 import {HistoryTimelineAdapterFactory} from './history-timeline.adapter.factory';
-import {timelineStoreFactoryMock} from '../../store/history-timeline/history-timeline.store.spec.mock';
-
-const timelineAdapterFactoryMock = new HistoryTimelineAdapterFactory(
-    timelineStoreFactoryMock
-);
-*/
-
-/* eslint-enable camelcase, @typescript-eslint/camelcase */
+import {LanguageStore} from '../../../../store/language/language.store';
+import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
+import {ModuleNavigation} from '../../../../services/navigation/module-navigation/module-navigation.service';
+import {mockModuleNavigation} from '../../../../services/navigation/module-navigation/module-navigation.service.spec.mock';
+import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
+import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
 
 describe('HistoryTimelineWidgetComponent', () => {
-    let component: HistorySidebarWidgetComponent;
     let fixture: ComponentFixture<HistorySidebarWidgetComponent>;
+    let adapter: HistoryTimelineAdapter;
+    const context = {module: 'accounts', id: 'test-record'};
 
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-            declarations: [
-                HistorySidebarWidgetComponent
-            ],
+    beforeEach(async () => {
+        adapter = new HistoryTimelineAdapter(null, mockModuleNavigation);
+        spyOn(adapter, 'init');
+        spyOn(adapter, 'fetchTimelineEntries').and.returnValue(adapter.dataStream$);
+        await TestBed.configureTestingModule({
+            imports: [HistorySidebarWidgetModule, NoopAnimationsModule],
             providers: [
-                {provide: RecordViewStore, useValue: recordviewStoreMock},
-                {provide: ThemeImagesStore, useValue: themeImagesStoreMock},
-                {provide: SystemConfigStore, useValue: systemConfigStoreMock},
+                provideRouter([]),
+                {provide: HistoryTimelineAdapterFactory, useValue: {create: () => adapter}},
                 {provide: LanguageStore, useValue: languageStoreMock},
-                {provide: Router, useValue: mockRouter},
-            ],
-            imports: [
-                CommonModule,
-                ScrollingModule,
-                ImageModule,
-                FieldModule,
-                ApolloTestingModule,
-                RouterTestingModule,
-                NoopAnimationsModule
-            ],
+                {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
+                {provide: ModuleNavigation, useValue: mockModuleNavigation}
+            ]
         }).compileComponents();
 
         fixture = TestBed.createComponent(HistorySidebarWidgetComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
-        component.adapter.connect({
-            viewChange: of({start: 1, end: 5} as ListRange)
-        } as CollectionViewer).pipe(take(1)).subscribe();
-        fixture.detectChanges();
-    }));
-    /*
-    it('should create', () => {
-        expect(component).toBeTruthy();
-
-        const timeline = fixture.nativeElement.getElementsByClassName('history-timeline');
-
-        expect(timeline).toBeTruthy();
-        expect(timeline.length).toEqual(1);
-
-        const infiniteScroll = timeline.item(0).getElementsByTagName('cdk-virtual-scroll-viewport');
-
-        expect(infiniteScroll).toBeTruthy();
-        expect(infiniteScroll.length).toEqual(1);
-
+        fixture.componentRef.setInput('context', context);
+        fixture.componentRef.setInput('config', {
+            key: 'history',
+            type: 'history',
+            reload$: of(false),
+            subpanelReload$: of({})
+        });
     });
 
-        it('should fetch records in range 1-5', () => {
-            expect(component).toBeTruthy();
+    it('initializes the timeline for the active record', () => {
+        fixture.detectChanges();
 
-            const timeline = fixture.nativeElement.getElementsByClassName('history-timeline');
+        expect(adapter.init).toHaveBeenCalledOnceWith(context);
+        expect(fixture.nativeElement.querySelector('.history-timeline')).not.toBeNull();
+    });
 
-            expect(timeline).toBeTruthy();
-            expect(timeline.length).toEqual(1);
+    it('requests the next page without resetting the timeline', () => {
+        fixture.detectChanges();
+        fixture.componentInstance.getLoadMoreButton().onClick();
 
-            const infiniteScroll = timeline.item(0).getElementsByTagName('cdk-virtual-scroll-viewport');
-
-            expect(infiniteScroll).toBeTruthy();
-            expect(infiniteScroll.length).toEqual(1);
-
-            const context = {
-                module: 'accounts',
-                id: '2fde31e3-ba6a-c29a-96f3-5f4e61c51bd6'
-            } as ViewContext;
-
-            // initialize the timeline adapter
-            timelineAdapterFactoryMock.create().init(context);
-
-            fixture.detectChanges();
-            fixture.whenStable().then(() => {
-                // check expected timeline-data length
-            });
-
-        });*/
+        expect(adapter.fetchTimelineEntries).toHaveBeenCalledOnceWith(false);
+    });
 });

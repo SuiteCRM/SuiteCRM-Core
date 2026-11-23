@@ -25,6 +25,7 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component} from '@angular/core';
 import {VarcharEditFieldComponent} from './varchar.component';
 import {UntypedFormControl, FormsModule} from '@angular/forms';
@@ -35,6 +36,7 @@ import {DateFormatter} from '../../../../services/formatters/datetime/date-forma
 import {VarcharEditFieldModule} from './varchar.module';
 import {datetimeFormatterMock} from '../../../../services/formatters/datetime/datetime-formatter.service.spec.mock';
 import {CurrencyFormatter} from '../../../../services/formatters/currency/currency-formatter.service';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {DatetimeFormatter} from '../../../../services/formatters/datetime/datetime-formatter.service';
 import {numberFormatterMock} from '../../../../services/formatters/number/number-formatter.spec.mock';
@@ -62,7 +64,7 @@ describe('VarcharEditFieldComponent', () => {
                 VarcharEditFieldTestHostComponent,
                 VarcharEditFieldComponent,
             ],
-            imports: [
+            imports: [ApolloTestingModule,
                 FormsModule,
                 VarcharEditFieldModule
             ],
@@ -73,7 +75,7 @@ describe('VarcharEditFieldComponent', () => {
                 {provide: DateFormatter, useValue: dateFormatterMock},
                 {
                     provide: CurrencyFormatter,
-                    useValue: new CurrencyFormatter(userPreferenceStoreMock, numberFormatterMock, 'en_us')
+                    useValue: new CurrencyFormatter(userPreferenceStoreMock, systemConfigStoreMock, numberFormatterMock, 'en_us')
                 },
             ],
         }).compileComponents();

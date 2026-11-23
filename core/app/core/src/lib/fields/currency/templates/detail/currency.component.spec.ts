@@ -25,14 +25,16 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component} from '@angular/core';
-import {BehaviorSubject, of} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {CurrencyDetailFieldComponent} from './currency.component';
 import {Field} from '../../../../common/record/field.model';
 import {UserPreferenceMockStore} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
 import {CurrencyFormatter} from '../../../../services/formatters/currency/currency-formatter.service';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {FormControlUtils} from '../../../../services/record/field/form-control.utils';
 import {NumberFormatter} from '../../../../services/formatters/number/number-formatter.service';
 import {FormatCurrencyPipe} from '../../../../pipes/format-currency/format-currency.pipe';
@@ -61,7 +63,7 @@ describe('CurrencyDetailFieldComponent', () => {
     });
     const mockStore = new UserPreferenceMockStore(preferences);
     const mockNumberFormatter = new NumberFormatter(mockStore, new FormControlUtils(), 'en_us');
-    const mockCurrencyFormatter = new CurrencyFormatter(mockStore, mockNumberFormatter, 'en_us');
+    const mockCurrencyFormatter = new CurrencyFormatter(mockStore, systemConfigStoreMock, mockNumberFormatter, 'en_us');
     /* eslint-enable camelcase, @typescript-eslint/camelcase */
 
     beforeEach(waitForAsync(() => {
@@ -71,7 +73,7 @@ describe('CurrencyDetailFieldComponent', () => {
                 CurrencyDetailFieldComponent,
                 FormatCurrencyPipe
             ],
-            imports: [],
+            imports: [ApolloTestingModule,],
             providers: [
                 {
                     provide: CurrencyFormatter, useValue: mockCurrencyFormatter
@@ -82,43 +84,7 @@ describe('CurrencyDetailFieldComponent', () => {
                 {
                     provide: UserPreferenceStore, useValue: mockStore
                 },
-                {
-                    /* eslint-disable camelcase, @typescript-eslint/camelcase */
-                    provide: SystemConfigStore, useValue: {
-                        configs$: of({
-                            default_number_grouping_seperator: {
-                                id: '/docroot/api/system-configs/default_number_grouping_seperator',
-                                _id: 'default_number_grouping_seperator',
-                                value: ';',
-                                items: []
-                            },
-                            default_decimal_seperator: {
-                                id: '/docroot/api/system-configs/default_decimal_seperator',
-                                _id: 'default_decimal_seperator',
-                                value: ',',
-                                items: []
-                            },
-                            currency: {
-                                id: '/docroot/api/system-configs/currency',
-                                _id: 'currency',
-                                value: null,
-                                items: {
-                                    id: '-99',
-                                    name: 'US Dollars',
-                                    symbol: '$',
-                                    iso4217: 'USD'
-                                }
-                            },
-                            default_currency_significant_digits: {
-                                id: '/docroot/api/system-configs/default_currency_significant_digits',
-                                _id: 'default_currency_significant_digits',
-                                value: 3,
-                                items: []
-                            }
-                        })
-                    }
-                }
-                /* eslint-enable camelcase, @typescript-eslint/camelcase */
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock}
             ],
         }).compileComponents();
 
@@ -165,7 +131,7 @@ describe('CurrencyDetailFieldComponent', () => {
         preferences.next({
             num_grp_sep: '.',
             dec_sep: ',',
-            currency: {id: '1', name: 'Stirling Pound', symbol: '£', iso4217: 'GBP'},
+            currency: {id: '2', name: 'Pound Sterling', symbol: '£', iso4217: 'GBP'},
             default_currency_significant_digits: 2
         });
         /* eslint-enable camelcase, @typescript-eslint/camelcase */

@@ -26,8 +26,8 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {RecordContentComponent} from './record-content.component';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {Component} from '@angular/core';
+import {BehaviorSubject, Observable, of} from 'rxjs';
+import {Component, Input} from '@angular/core';
 import {NgbDropdownModule, NgbModule, NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
 import {Panel, TabDefinitions} from '../../common/metadata/metadata.model';
 import {Record} from '../../common/record/record.model';
@@ -43,6 +43,18 @@ import {themeImagesStoreMock} from '../../store/theme-images/theme-images.store.
 import {MinimiseButtonModule} from '../minimise-button/minimise-button.module';
 import {languageStoreMock} from '../../store/language/language.store.spec.mock';
 import {ThemeImagesStore} from '../../store/theme-images/theme-images.store';
+
+import {provideHttpClient} from '@angular/common/http';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {AngularSvgIconModule} from 'angular-svg-icon';
+import {FieldLogicManager} from '../../fields/field-logic/field-logic.manager';
+import {ToObservableModule} from '../../pipes/toObservable/toObservable.module';
+import {UserPreferenceStore} from '../../store/user-preference/user-preference.store';
+import {userPreferenceStoreMock} from '../../store/user-preference/user-preference.store.spec.mock';
+import {FieldLayoutDataSource} from '../field-layout/field-layout.model';
+import {registerTestIcons} from '../image/svg-icons.spec.mock';
+import {RecordLogicDependencyService} from './record-logic/record-logic-dependency.service';
 
 /* eslint-disable camelcase, @typescript-eslint/camelcase */
 const mockDisplayConfigData: RecordContentConfig = {
@@ -937,15 +949,23 @@ class RecordContentComponentTestHostComponent {
     state = dataSource;
 }
 
+@Component({selector: 'scrm-field-layout', template: ''})
+class FieldLayoutStub {
+    @Input() dataSource: FieldLayoutDataSource;
+}
+
 describe('RecordContentComponent', () => {
     let testHostComponent: RecordContentComponentTestHostComponent;
     let testHostFixture: ComponentFixture<RecordContentComponentTestHostComponent>;
 
     beforeEach(waitForAsync(() => {
+        displayConfigSubject.next({...mockDisplayConfigData});
+        panelsSubject.next(mockPanelsData.map(panel => ({...panel, display$: of(true)})));
         TestBed.configureTestingModule({
             declarations: [
                 RecordContentComponentTestHostComponent,
                 RecordContentComponent,
+                FieldLayoutStub,
             ],
             imports: [
                 DropdownButtonModule,
@@ -955,19 +975,34 @@ describe('RecordContentComponent', () => {
                 CloseButtonModule,
                 MinimiseButtonModule,
                 NgbModule,
-                NgbNavModule
+                NgbNavModule,
+                ToObservableModule,
+                NoopAnimationsModule,
+                AngularSvgIconModule.forRoot()
             ],
             providers: [
+                provideHttpClient(),
+                provideHttpClientTesting(),
+                {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
+                {provide: FieldLogicManager, useValue: jasmine.createSpyObj('FieldLogicManager', ['runInitLogicForAllFields'])},
                 {provide: LanguageStore, useValue: languageStoreMock},
                 {provide: ThemeImagesStore, useValue: themeImagesStoreMock},
                 {provide: MetadataStore, useValue: metadataStoreMock},
             ],
+        }).overrideComponent(RecordContentComponent, {
+            set: {providers: [{
+                provide: RecordLogicDependencyService,
+                useValue: jasmine.createSpyObj('RecordLogicDependencyService', ['init', 'clear'])
+            }]}
         }).compileComponents();
+        registerTestIcons('minimise', 'plus_thin');
 
         testHostFixture = TestBed.createComponent(RecordContentComponentTestHostComponent);
         testHostComponent = testHostFixture.componentInstance;
         testHostFixture.detectChanges();
     }));
+
+    afterEach(() => testHostFixture?.destroy());
 
     it('should create', () => {
         expect(testHostComponent).toBeTruthy();

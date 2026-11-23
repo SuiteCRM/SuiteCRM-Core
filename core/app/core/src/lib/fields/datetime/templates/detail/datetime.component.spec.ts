@@ -25,6 +25,9 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
+import {themeImagesStoreMock} from '../../../../store/theme-images/theme-images.store.spec.mock';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component} from '@angular/core';
 import {DateTimeDetailFieldComponent} from './datetime.component';
 import {CommonModule} from '@angular/common';
@@ -58,7 +61,7 @@ describe('DatetimeDetailFieldComponent', () => {
     /* eslint-enable camelcase, @typescript-eslint/camelcase */
 
     const mockStore = new UserPreferenceMockStore(preferences);
-    const mockDatetimeFormatter = new DatetimeFormatter(mockStore, new FormControlUtils(), 'en_us');
+    const mockDatetimeFormatter = new DatetimeFormatter(mockStore, new FormControlUtils(), 'en-US');
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
@@ -66,10 +69,11 @@ describe('DatetimeDetailFieldComponent', () => {
                 DateTimeDetailFieldTestHostComponent,
                 DateTimeDetailFieldComponent,
             ],
-            imports: [
+            imports: [ApolloTestingModule,
                 CommonModule
             ],
             providers: [
+                {provide: ThemeImagesStore, useValue: themeImagesStoreMock},
                 {provide: UserPreferenceStore, useValue: mockStore},
                 {provide: DatetimeFormatter, useValue: mockDatetimeFormatter},
 
@@ -85,7 +89,7 @@ describe('DatetimeDetailFieldComponent', () => {
         expect(testHostComponent).toBeTruthy();
     });
 
-    it('should have user preferences based formatted datetime', () => {
+    it('should have user preferences based formatted datetime', async () => {
 
         expect(testHostComponent).toBeTruthy();
 
@@ -99,12 +103,12 @@ describe('DatetimeDetailFieldComponent', () => {
         testHostComponent.field.value = '2020-04-14 21:11:01';
         testHostFixture.detectChanges();
 
-        testHostFixture.whenStable().then(() => {
+        return testHostFixture.whenStable().then(() => {
             expect(testHostFixture.nativeElement.textContent).toContain('2020-04-14 21:11:01');
         });
     });
 
-    it('should have user preferences based formatted datetime(MM.dd.yyyy HH.mm.ss)', () => {
+    it('should have user preferences based formatted datetime(MM.dd.yyyy HH.mm.ss)', async () => {
 
         expect(testHostComponent).toBeTruthy();
 
@@ -117,12 +121,12 @@ describe('DatetimeDetailFieldComponent', () => {
 
         testHostComponent.field.value = '2021-05-16 10:12:15';
         testHostFixture.detectChanges();
-        testHostFixture.whenStable().then(() => {
+        return testHostFixture.whenStable().then(() => {
             expect(testHostFixture.nativeElement.textContent).toContain('05.16.2021 10.12.15');
         });
     });
 
-    it('should have user preferences based formatted datetime(MM-dd-yyyy hh.mm aaaaaa)', () => {
+    it('should have user preferences based formatted datetime(MM-dd-yyyy hh.mm aaaaaa)', async () => {
 
         expect(testHostComponent).toBeTruthy();
 
@@ -135,7 +139,7 @@ describe('DatetimeDetailFieldComponent', () => {
 
         testHostComponent.field.value = '2021-06-04 00:00:00';
         testHostFixture.detectChanges();
-        testHostFixture.whenStable().then(() => {
+        return testHostFixture.whenStable().then(() => {
             expect(testHostFixture.nativeElement.textContent).toContain('06-04-2021 12.00 am');
 
         });

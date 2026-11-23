@@ -45,7 +45,7 @@ describe('Language Store', () => {
 
     it('#load', (done: DoneFn) => {
         service.load('en_us', languageStoreMock.getAvailableStringsTypes()).subscribe(data => {
-            expect(data).toEqual(jasmine.objectContaining(languageMockData));
+            expect(data).toEqual([languageMockData.appStrings, languageMockData.appListStrings, languageMockData.modStrings]);
             done();
         });
     });

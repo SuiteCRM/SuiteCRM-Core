@@ -27,17 +27,17 @@
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {Component} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
-import {BulkActionDataSource, BulkActionMenuComponent} from './bulk-action-menu.component';
+import {BulkActionDataSource} from './bulk-action-menu.component';
 import {BulkActionsMap} from '../../common/actions/bulk-action.model';
 import {SelectionStatus} from '../../common/views/list/record-selection.model';
 import {SelectionDataSource} from '../../common/views/list/selection.model';
 import {By} from '@angular/platform-browser';
-import {shareReplay, take} from 'rxjs/operators';
-import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
-import {DropdownButtonModule} from '../dropdown-button/dropdown-button.module';
-import {ButtonModule} from '../button/button.module';
+import {shareReplay} from 'rxjs/operators';
+import {BulkActionMenuModule} from './bulk-action-menu.module';
 import {LanguageStore} from '../../store/language/language.store';
-import {languageMockData} from '../../store/language/language.store.spec.mock';
+import {languageStoreMock} from '../../store/language/language.store.spec.mock';
+import {SystemConfigStore} from '../../store/system-config/system-config.store';
+import {systemConfigStoreMock} from '../../store/system-config/system-config.store.spec.mock';
 
 
 const selectionSubject = new BehaviorSubject<SelectionStatus>(SelectionStatus.NONE);
@@ -120,23 +120,16 @@ describe('BulkActionMenuComponent', () => {
     let testHostFixture: ComponentFixture<BulkActionMenuTestHostComponent>;
 
     beforeEach(waitForAsync(() => {
+        selectionSubject.next(SelectionStatus.NONE);
+        countSubject.next(0);
+        lastAction = '';
+        lastStatus = SelectionStatus.NONE;
         TestBed.configureTestingModule({
-            declarations: [
-                BulkActionMenuTestHostComponent,
-                BulkActionMenuComponent,
-            ],
-            imports: [
-                DropdownButtonModule,
-                ButtonModule,
-                NgbDropdownModule
-            ],
+            declarations: [BulkActionMenuTestHostComponent],
+            imports: [BulkActionMenuModule],
             providers: [
-                {
-                    provide: LanguageStore, useValue: {
-                        appListStrings$: of(languageMockData.appListStrings).pipe(take(1)),
-                        appStrings$: of(languageMockData.appStrings).pipe(take(1))
-                    }
-                },
+                {provide: LanguageStore, useValue: languageStoreMock},
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock},
             ],
         }).compileComponents();
 
@@ -154,7 +147,10 @@ describe('BulkActionMenuComponent', () => {
     });
 
     it('should have number of selected items', () => {
-        expect(testHostFixture.debugElement.query(By.css('.bulk-action-selected-number'))).toBeTruthy();
+        countSubject.next(3);
+        testHostFixture.detectChanges();
+        expect(testHostFixture.debugElement.query(By.css('.bulk-action-selected-number')).nativeElement.textContent)
+            .toContain('3');
     });
 
     it('should have selection dropdown button', () => {
@@ -169,11 +165,11 @@ describe('BulkActionMenuComponent', () => {
         const deSelectAll = el.query(By.css('.select-action-group .dropdown-menu .deselect-all'));
 
         expect(selectAll).toBeTruthy();
-        expect(selectAll.nativeElement.text).toContain('Select All');
+        expect(selectAll.nativeElement.textContent).toContain('Select All');
         expect(selectPage).toBeTruthy();
-        expect(selectPage.nativeElement.text).toContain('Select This page');
+        expect(selectPage.nativeElement.textContent).toContain('Select This page');
         expect(deSelectAll).toBeTruthy();
-        expect(deSelectAll.nativeElement.text).toContain('Deselect All');
+        expect(deSelectAll.nativeElement.textContent).toContain('Deselect All');
     });
 
     it('should select all', waitForAsync(() => {

@@ -25,9 +25,11 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 
 import {GroupFieldComponent} from './group-field.component';
 import {CommonModule} from '@angular/common';
+import {signal} from '@angular/core';
 import {RouterTestingModule} from '@angular/router/testing';
 import {TagInputModule} from 'ngx-chips';
 import {UntypedFormControl, FormsModule} from '@angular/forms';
@@ -56,7 +58,7 @@ describe('GroupFieldComponent', () => {
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [GroupFieldComponent],
-            imports: [
+            imports: [ApolloTestingModule,
                 ...baseFieldModules,
                 CommonModule,
                 RouterTestingModule,
@@ -132,6 +134,10 @@ describe('GroupFieldComponent', () => {
                     name: 'billing_address_street',
                     type: 'varchar',
                     value: 'Sample Street',
+                    display: signal('default'),
+                    readonly: signal(false),
+                    loading: signal(false),
+                    valueSignal: signal('Sample Street'),
                     definition: {
                         name: 'billing_address_street',
                         vname: 'LBL_BILLING_ADDRESS_STREET',
@@ -148,6 +154,10 @@ describe('GroupFieldComponent', () => {
                     name: 'billing_address_city',
                     type: 'varchar',
                     value: 'Sample City',
+                    display: signal('default'),
+                    readonly: signal(false),
+                    loading: signal(false),
+                    valueSignal: signal('Sample City'),
                     definition: {
                         name: 'billing_address_city',
                         vname: 'LBL_BILLING_ADDRESS_CITY',

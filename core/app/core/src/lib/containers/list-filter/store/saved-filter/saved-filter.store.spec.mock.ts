@@ -30,7 +30,7 @@ import {RecordFetchGQL} from '../../../../store/record/graphql/api.record.get';
 import {deepClone} from '../../../../common/utils/object-utils';
 import {Record} from '../../../../common/record/record.model';
 import {RecordMapperRegistry} from '../../../../common/record/record-mappers/record-mapper.registry';
-import {BaseSaveRecordMapper} from '../../../../store/record/record-mappers/base-save.record-mapper';
+import {baseSaveRecordMapper as mockBaseRecordMapper} from '../../../../services/record/field/field.mapper.spec.mock';
 import {SavedSearchRecordMapper} from './record-mappers/saved-search.record-mapper';
 import {Observable, of} from 'rxjs';
 import {recordManagerMock} from '../../../../services/record/record.manager.spec.mock';
@@ -101,7 +101,6 @@ class SavedFilterSaveGQLSpy extends SavedFilterSaveGQL {
 }
 
 const mockFilterMapperRegistry = new RecordMapperRegistry();
-const mockBaseRecordMapper = new BaseSaveRecordMapper();
 const mockSavedFilterRecordMapper = new SavedSearchRecordMapper();
 
 export const savedFilterStoreFactoryMock = new SaveFilterStoreFactory(

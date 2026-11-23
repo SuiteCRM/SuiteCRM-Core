@@ -61,14 +61,14 @@ class MockLocalStorage implements Storage {
 }
 
 export class MockLocalStorageService extends LocalStorageService {
-    store = new MockLocalStorage();
+    private storage = new MockLocalStorage();
 
     getStore(): MockLocalStorage {
-        return this.store;
+        return this.storage;
     }
 
     protected getLocalStorage(): Storage {
-        return this.store;
+        return this.storage;
     }
 }
 

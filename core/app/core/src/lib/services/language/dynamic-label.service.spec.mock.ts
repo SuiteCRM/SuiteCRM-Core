@@ -27,5 +27,9 @@
 import {languageStoreMock} from '../../store/language/language.store.spec.mock';
 import {DynamicLabelService} from './dynamic-label.service';
 import {dataTypeFormatterMock} from '../formatters/data-type.formatter.spec.mock';
+import {systemConfigStoreMock} from '../../store/system-config/system-config.store.spec.mock';
+import {userPreferenceStoreMock} from '../../store/user-preference/user-preference.store.spec.mock';
 
-export const dynamicLabelsMock = new DynamicLabelService(dataTypeFormatterMock, languageStoreMock);
+export const dynamicLabelsMock = new DynamicLabelService(
+    dataTypeFormatterMock, languageStoreMock, systemConfigStoreMock, userPreferenceStoreMock
+);

@@ -25,6 +25,11 @@
  */
 
 import {take} from 'rxjs/operators';
+import {ActivatedRoute} from '@angular/router';
+import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
+import {dataTypeFormatterMock} from '../../../../services/formatters/data-type.formatter.spec.mock';
+import {ListViewUrlQueryService} from '../../services/list-view-url-query.service';
 import {navigationMock} from '../../../../store/navigation/navigation.store.spec.mock';
 import {listStoreFactoryMock} from '../../../../store/record-list/record-list.store.spec.mock';
 import {ListViewStore} from './list-view.store';
@@ -156,12 +161,17 @@ export const listviewStoreMock = new ListViewStore(
     navigationMock,
     mockModuleNavigation,
     metadataStoreMock,
-    localStorageServiceMock,
     messageServiceMock,
     listStoreFactoryMock,
     ngbModalMock,
     filterListStoreFactoryMock,
-    confirmationModalServiceMock
+    confirmationModalServiceMock,
+    userPreferenceStoreMock,
+    new ActivatedRoute(),
+    new ListViewUrlQueryService(systemConfigStoreMock, metadataStoreMock, dataTypeFormatterMock),
+    localStorageServiceMock,
+    systemConfigStoreMock,
+    userPreferenceStoreMock
 );
 
 listviewStoreMock.init('accounts').pipe(take(1)).subscribe();

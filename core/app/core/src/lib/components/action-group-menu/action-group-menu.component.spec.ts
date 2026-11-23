@@ -25,45 +25,22 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {ActionGroupMenuComponent} from './action-group-menu.component';
-import {provideHttpClientTesting} from '@angular/common/http/testing';
-import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Observable, of} from 'rxjs';
-import {shareReplay, take} from 'rxjs/operators';
+import {shareReplay} from 'rxjs/operators';
 import {Component} from '@angular/core';
-import {RouterTestingModule} from '@angular/router/testing';
-import {ButtonModule} from '../button/button.module';
 import {ActionGroupMenuModule} from './action-group-menu.module';
-import {RecordViewStore} from '../../views/record/store/record-view/record-view.store';
-import {recordviewStoreMock} from '../../views/record/store/record-view/record-view.store.spec.mock';
-import {ThemeImagesStore} from '../../store/theme-images/theme-images.store';
-import {themeImagesMockData} from '../../store/theme-images/theme-images.store.spec.mock';
-import {ModuleNavigation} from '../../services/navigation/module-navigation/module-navigation.service';
-import {mockModuleNavigation} from '../../services/navigation/module-navigation/module-navigation.service.spec.mock';
 import {SystemConfigStore} from '../../store/system-config/system-config.store';
 import {systemConfigStoreMock} from '../../store/system-config/system-config.store.spec.mock';
-import {userPreferenceStoreMock} from '../../store/user-preference/user-preference.store.spec.mock';
-import {UserPreferenceStore} from '../../store/user-preference/user-preference.store';
-import {navigationMock} from '../../store/navigation/navigation.store.spec.mock';
-import {NavigationStore} from '../../store/navigation/navigation.store';
 import {LanguageStore} from '../../store/language/language.store';
 import {languageStoreMock} from '../../store/language/language.store.spec.mock';
-import {metadataStoreMock} from '../../store/metadata/metadata.store.spec.mock';
-import {appStateStoreMock} from '../../store/app-state/app-state.store.spec.mock';
-import {MetadataStore} from '../../store/metadata/metadata.store.service';
-import {AppStateStore} from '../../store/app-state/app-state.store';
-import {recordActionsMock} from '../../views/record/adapters/actions.adapter.spec.mock';
-import {RecordActionsAdapter} from '../../views/record/adapters/actions.adapter';
-import {ImageModule} from '../image/image.module';
 import {Action, ActionDataSource} from '../../common/actions/action.model';
-import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 @Component({
     selector: 'action-group-menu-test-host-component',
     template: '<scrm-action-group-menu [config]="config"></scrm-action-group-menu>'
 })
 class ActionGroupMenuTestHostComponent {
-    config = {
+    config: ActionDataSource = {
 
         getActions: (): Observable<Action[]> => {
             return of([
@@ -75,7 +52,7 @@ class ActionGroupMenuTestHostComponent {
                 } as Action,
                 {
                     key: 'edit',
-                    labelKey: 'LBL_Edit',
+                    labelKey: 'LBL_EDIT',
                     label: 'Edit',
                     klass: ['settings-button']
                 } as Action
@@ -83,9 +60,9 @@ class ActionGroupMenuTestHostComponent {
         },
 
         runAction: (): void => {
-        }
-
-    } as ActionDataSource;
+        },
+        isActive: (): boolean => true,
+    };
 }
 
 describe('ActionGroupMenuComponent', () => {
@@ -95,32 +72,13 @@ describe('ActionGroupMenuComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-    declarations: [ActionGroupMenuComponent, ActionGroupMenuTestHostComponent],
-    imports: [ApolloTestingModule,
-        ImageModule,
-        ButtonModule,
-        ActionGroupMenuModule,
-        RouterTestingModule],
-    providers: [
-        { provide: RecordViewStore, useValue: recordviewStoreMock },
-        {
-            provide: ThemeImagesStore, useValue: {
-                images$: of(themeImagesMockData).pipe(take(1))
-            }
-        },
-        { provide: ModuleNavigation, useValue: mockModuleNavigation },
-        { provide: SystemConfigStore, useValue: systemConfigStoreMock },
-        { provide: UserPreferenceStore, useValue: userPreferenceStoreMock },
-        { provide: NavigationStore, useValue: navigationMock },
-        { provide: ModuleNavigation, useValue: mockModuleNavigation },
-        { provide: LanguageStore, useValue: languageStoreMock },
-        { provide: MetadataStore, useValue: metadataStoreMock },
-        { provide: AppStateStore, useValue: appStateStoreMock },
-        { provide: RecordActionsAdapter, useValue: recordActionsMock },
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-    ]
-})
+            declarations: [ActionGroupMenuTestHostComponent],
+            imports: [ActionGroupMenuModule],
+            providers: [
+                {provide: LanguageStore, useValue: languageStoreMock},
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock}
+            ]
+        })
             .compileComponents();
 
         testHostFixture = TestBed.createComponent(ActionGroupMenuTestHostComponent);

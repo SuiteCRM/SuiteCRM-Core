@@ -32,6 +32,8 @@ SuiteCRM 8 is compatible with most Linux servers. Test and development servers c
 
 Please see our [Compatibility Matrix](https://docs.suitecrm.com/8.x/admin/compatibility-matrix/) and [Installation Guide](https://docs.suitecrm.com/8.x/admin/installation-guide/) for more detail.
 
+To compile the Angular frontend from a checkout on Windows, see the [frontend source build guide](docs/frontend-source-build.md).
+
 SuiteCRM Ltd, the authors and maintainers of SuiteCRM offer a range of [fully managed hosting](https://suitecrm.com/suitecrmhosted/) services. These are ideal for organisations who don't have the in house knowledge or experience to host and maintain the application and are a great way to support the future development of the project.
 
 ### Demo

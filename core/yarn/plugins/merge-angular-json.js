@@ -45,8 +45,8 @@ module.exports = {
       async execute() {
 
         if (!Merger || !glob) {
-          this.context.stdout.write('merge-angular-json: dependencies are missing, please run \'yarn install\' \n');
-          return;
+          this.context.stderr.write('merge-angular-json: dependencies are missing, please run \'yarn install\'\n');
+          return 1;
         }
 
         const extensionFiles = await glob('extensions/**/app/angular.json');

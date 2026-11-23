@@ -28,7 +28,9 @@ import {EntityGQL} from '../../services/api/graphql-api/api.entity.get';
 import {Observable, of} from 'rxjs';
 import {shareReplay, take} from 'rxjs/operators';
 import {LanguageStore} from './language.store';
-import {appStateStoreMock} from '../app-state/app-state.store.spec.mock';
+import {systemConfigStoreMock} from '../system-config/system-config.store.spec.mock';
+import {moduleNameMapperMock} from '../../services/navigation/module-name-mapper/module-name-mapper.service.spec.mock';
+import {preferenceProcessMock} from '../../services/process/process.service.spec.mock';
 import {localStorageServiceMock} from '../../services/local-storage/local-storage.service.spec.mock';
 
 export const languageMockData = {
@@ -210,6 +212,8 @@ class LanguageRecordGQLSpy extends EntityGQL {
     }
 }
 
-export const languageStoreMock = new LanguageStore(new LanguageRecordGQLSpy(), appStateStoreMock, localStorageServiceMock);
+export const languageStoreMock = new LanguageStore(
+    new LanguageRecordGQLSpy(), localStorageServiceMock, preferenceProcessMock, systemConfigStoreMock, moduleNameMapperMock
+);
 languageStoreMock.load('en_us', languageStoreMock.getAvailableStringsTypes()).pipe(take(1)).subscribe();
 

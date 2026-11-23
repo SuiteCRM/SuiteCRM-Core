@@ -25,6 +25,9 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ThemeImagesStore} from '../../../../store/theme-images/theme-images.store';
+import {themeImagesStoreMock} from '../../../../store/theme-images/theme-images.store.spec.mock';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component} from '@angular/core';
 import {DateTimeEditFieldComponent} from './datetime.component';
 import {Field} from '../../../../common/record/field.model';
@@ -64,7 +67,7 @@ describe('DateTimeEditFieldComponent', () => {
     /* eslint-enable camelcase, @typescript-eslint/camelcase */
 
     const mockStore = new UserPreferenceMockStore(preferences);
-    const mockDatetimeFormatter = new DatetimeFormatter(mockStore, new FormControlUtils(), 'en_us');
+    const mockDatetimeFormatter = new DatetimeFormatter(mockStore, new FormControlUtils(), 'en-US');
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
@@ -72,13 +75,14 @@ describe('DateTimeEditFieldComponent', () => {
                 DatetimeEditFieldTestHostComponent,
                 DateTimeEditFieldComponent,
             ],
-            imports: [
+            imports: [ApolloTestingModule,
                 FormsModule,
                 NgbModule,
                 ButtonModule,
                 DateTimeEditFieldModule
             ],
             providers: [
+                {provide: ThemeImagesStore, useValue: themeImagesStoreMock},
                 {provide: LanguageStore, useValue: languageStoreMock},
                 {provide: UserPreferenceStore, useValue: mockStore},
                 {provide: DatetimeFormatter, useValue: mockDatetimeFormatter},

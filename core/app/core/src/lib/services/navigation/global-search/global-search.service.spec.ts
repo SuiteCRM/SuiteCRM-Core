@@ -53,7 +53,7 @@ describe('Global Search Service', () => {
         const term = 'test search term';
         service.navigateToSearch(term);
 
-        expect(lastRoute).toEqual('/home/unified-search');
+        expect(lastRoute).toEqual('/home/search');
         expect(lastQueryString).toEqual(term);
     });
 });

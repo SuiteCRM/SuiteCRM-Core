@@ -24,24 +24,51 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-
+import {CdkDragDrop, CdkDropList} from '@angular/cdk/drag-drop';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ColumnDefinition} from '../../common/metadata/list.metadata.model';
 import {ColumnChooserComponent} from './columnchooser.component';
 
-describe('ColumnChooserUiComponent', () => {
+describe('ColumnChooserComponent', () => {
     let component: ColumnChooserComponent;
-    let fixture: ComponentFixture<ColumnChooserComponent>;
-
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-            declarations: [ColumnChooserComponent]
-        })
-            .compileComponents();
-    }));
+    let modal: NgbActiveModal;
+    const name = {name: 'name', label: 'LBL_NAME'} as ColumnDefinition;
+    const phone = {name: 'phone', label: 'LBL_PHONE'} as ColumnDefinition;
+    const email = {name: 'email', label: 'LBL_EMAIL'} as ColumnDefinition;
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(ColumnChooserComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
+        modal = new NgbActiveModal();
+        spyOn(modal, 'close');
+        component = new ColumnChooserComponent(null, null, modal);
+        component.displayed = [name, phone];
+        component.hidden = [email];
+        component.ngOnInit();
+    });
+
+    it('reorders a column within the displayed list', () => {
+        const displayed = {data: component.displayed} as CdkDropList<ColumnDefinition[]>;
+        component.drop({
+            container: displayed, previousContainer: displayed, previousIndex: 1, currentIndex: 0
+        } as CdkDragDrop<ColumnDefinition[]>);
+
+        expect(component.displayed).toEqual([phone, name]);
+        expect(component.hidden).toEqual([email]);
+    });
+
+    it('saves a column moved from the hidden list into the displayed list', () => {
+        component.drop({
+            container: {data: component.displayed}, previousContainer: {data: component.hidden},
+            previousIndex: 0, currentIndex: 1
+        } as CdkDragDrop<ColumnDefinition[]>);
+        component.saveButton.onClick();
+
+        expect(modal.close).toHaveBeenCalledOnceWith({
+            type: 'close-button', displayed: [name, email, phone], hidden: []
+        });
+    });
+
+    it('closes without submitting a selection when cancelled', () => {
+        component.closeButton.onClick();
+        expect(modal.close).toHaveBeenCalledOnceWith({type: 'close-button'});
     });
 });

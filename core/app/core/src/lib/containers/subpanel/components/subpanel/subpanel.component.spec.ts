@@ -24,24 +24,19 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {CommonModule} from '@angular/common';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {Component} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {RouterModule} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {ApolloTestingModule} from 'apollo-angular/testing';
-import {SubpanelComponent} from './subpanel.component';
+import {SubpanelModule} from './subpanel.module';
+import {AngularSvgIconModule} from 'angular-svg-icon';
 import {MetadataStore} from '../../../../store/metadata/metadata.store.service';
-import {ButtonGroupModule} from '../../../../components/button-group/button-group.module';
 import {RecordViewStore} from '../../../../views/record/store/record-view/record-view.store';
 import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
 import {recordviewStoreMock} from '../../../../views/record/store/record-view/record-view.store.spec.mock';
-import {PanelModule} from '../../../../components/panel/panel.module';
 import {LanguageStore} from '../../../../store/language/language.store';
 import {metadataStoreMock} from '../../../../store/metadata/metadata.store.spec.mock';
-import {ImageModule} from '../../../../components/image/image.module';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 const store = recordviewStoreMock.getSubpanels().contacts;
@@ -60,13 +55,9 @@ describe('SubpanelComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-    declarations: [SubpanelComponent, SubpanelComponentTestHostComponent],
-    imports: [CommonModule,
-        NgbModule,
-        ImageModule,
-        PanelModule,
-        RouterModule,
-        ButtonGroupModule,
+    declarations: [SubpanelComponentTestHostComponent],
+    imports: [SubpanelModule,
+        AngularSvgIconModule.forRoot(),
         ApolloTestingModule,
         RouterTestingModule],
     providers: [

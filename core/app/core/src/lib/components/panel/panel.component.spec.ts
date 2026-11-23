@@ -26,17 +26,20 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {Component} from '@angular/core';
-import {PanelComponent} from './panel.component';
+import {PanelModule} from './panel.module';
 import {By} from '@angular/platform-browser';
 import {DropdownButtonInterface} from '../../common/components/button/dropdown-button.model';
 import {DropdownButtonModule} from '../dropdown-button/dropdown-button.module';
 import {ButtonModule} from '../button/button.module';
 import {ListViewStore} from '../../views/list/store/list-view/list-view.store';
-import {CloseButtonModule} from '../close-button/close-button.module';
-import {MinimiseButtonModule} from '../minimise-button/minimise-button.module';
 import {languageStoreMock} from '../../store/language/language.store.spec.mock';
 import {LanguageStore} from '../../store/language/language.store';
 import {listviewStoreMock} from '../../views/list/store/list-view/list-view.store.spec.mock';
+
+import {UserPreferenceStore} from '../../store/user-preference/user-preference.store';
+import {userPreferenceStoreMock} from '../../store/user-preference/user-preference.store.spec.mock';
+import {SystemConfigStore} from '../../store/system-config/system-config.store';
+import {systemConfigStoreMock} from '../../store/system-config/system-config.store.spec.mock';
 
 @Component({
     selector: 'panel-test-host-component',
@@ -91,15 +94,15 @@ describe('PanelComponent', () => {
         TestBed.configureTestingModule({
             declarations: [
                 PanelTestHostComponent,
-                PanelComponent,
             ],
             imports: [
-                CloseButtonModule,
+                PanelModule,
                 ButtonModule,
-                DropdownButtonModule,
-                MinimiseButtonModule
+                DropdownButtonModule
             ],
             providers: [
+                {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
+                {provide: SystemConfigStore, useValue: systemConfigStoreMock},
                 {provide: ListViewStore, useValue: listviewStoreMock},
                 {provide: LanguageStore, useValue: languageStoreMock}
             ],

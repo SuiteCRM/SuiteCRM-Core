@@ -27,13 +27,15 @@
 import {TestBed} from '@angular/core/testing';
 
 import {LocalStorageService} from './local-storage.service';
-import {
-    localStorageServiceMock,
-    MockLocalStorageService
-} from './local-storage.service.spec.mock';
+import {MockLocalStorageService} from './local-storage.service.spec.mock';
 
 describe('LocalStorageService', () => {
-    beforeEach(() => TestBed.configureTestingModule({}));
+    let mockService: MockLocalStorageService;
+
+    beforeEach(() => {
+        TestBed.configureTestingModule({});
+        mockService = new MockLocalStorageService();
+    });
 
     it('should be created', () => {
         const service: LocalStorageService = TestBed.inject(LocalStorageService);
@@ -42,8 +44,6 @@ describe('LocalStorageService', () => {
     });
 
     it('should store items', () => {
-        const mockService: MockLocalStorageService = localStorageServiceMock;
-
         expect(mockService).toBeTruthy();
 
         const criteria = {filters: {name: {values: ['test']}}};
@@ -62,8 +62,6 @@ describe('LocalStorageService', () => {
     });
 
     it('should allow to remove items', () => {
-        const mockService: MockLocalStorageService = localStorageServiceMock;
-
         expect(mockService).toBeTruthy();
 
         const criteria = {filters: {name: {values: ['test']}}};
@@ -81,5 +79,17 @@ describe('LocalStorageService', () => {
         internalItem = store.getItem('scrm-session-storage');
 
         expect(internalItem).not.toBeTruthy();
+    });
+
+    it('preserves sticky items when clearing ordinary items', () => {
+        mockService.set('selected_language', 'en_us', true);
+        mockService.set('criteria', {filters: {name: {values: ['test']}}});
+
+        mockService.clear();
+
+        expect(mockService.get('selected_language')).toBe('en_us');
+        expect(mockService.get('criteria')).toEqual({});
+        expect(JSON.parse(mockService.getStore().getItem('scrm-session-storage')))
+            .toEqual({selected_language: 'en_us'});
     });
 });

@@ -55,6 +55,7 @@ class SidebarWidgetHostComponent {
     };
 
     config: WidgetMetadata = {
+        key: 'chart',
         type: 'chart',
         options: {
             toggle: false,

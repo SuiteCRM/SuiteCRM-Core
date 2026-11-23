@@ -42,14 +42,15 @@ import {ThemeImagesStore} from '../../../store/theme-images/theme-images.store';
 import {listviewStoreMock} from '../../../views/list/store/list-view/list-view.store.spec.mock';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
+import {TableFooterModule} from './table-footer.module';
+
 describe('TablefooterUiComponent', () => {
     let component: TableFooterComponent;
     let fixture: ComponentFixture<TableFooterComponent>;
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-    declarations: [TableFooterComponent],
-    imports: [PaginationModule,
+    imports: [TableFooterModule, PaginationModule,
         BulkActionMenuModule,
         AngularSvgIconModule.forRoot(),
         ApolloTestingModule,

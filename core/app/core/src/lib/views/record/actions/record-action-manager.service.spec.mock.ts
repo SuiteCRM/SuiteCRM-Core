@@ -24,9 +24,9 @@
  * the words "Supercharged by SuiteCRM".
  */
 
-import {NavigationExtras, Router} from '@angular/router';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
+import {ActivatedRoute, NavigationExtras, Router} from '@angular/router';
+import {Injector, runInInjectionContext} from '@angular/core';
+import {ngbModalMock} from '../../../services/modals/confirmation-modal.spec.mock';
 import {moduleNameMapperMock} from '../../../services/navigation/module-name-mapper/module-name-mapper.service.spec.mock';
 import {RecordCancelAction} from './cancel/record-cancel.action';
 import {RecordActionManager} from './record-action-manager.service';
@@ -38,6 +38,23 @@ import {RecordCreateAction} from './create/record-create.action';
 import {CancelCreateAction} from './cancel-create/cancel-create.action';
 import {RecordSaveNewAction} from './save-new/record-save-new.action';
 import {actionNameMapperMock} from '../../../services/navigation/action-name-mapper/action-name-mapper.service.spec.mock';
+import {mockModuleNavigation} from '../../../services/navigation/module-navigation/module-navigation.service.spec.mock';
+import {RecordSaveContinueAction} from './save-continue/record-save-continue.action';
+import {RecordSaveScheduleAction} from './save-schedule/record-save-schedule.action';
+import {AsyncProcessRecordAction} from './async-process/async-process.service';
+import {ModalEditAction} from './modal-edit/modal-edit.action';
+import {ModalCreateAction} from './modal-create/modal-create.action';
+import {RecordPaginationService} from '../store/record-pagination/record-pagination.service';
+import {localStorageServiceMock} from '../../../services/local-storage/local-storage.service.spec.mock';
+import {userPreferenceStoreMock} from '../../../store/user-preference/user-preference.store.spec.mock';
+import {appStateStoreMock} from '../../../store/app-state/app-state.store.spec.mock';
+import {systemConfigStoreMock} from '../../../store/system-config/system-config.store.spec.mock';
+import {ValidationManager} from '../../../services/record/validation/validation.manager';
+import {validationManagerMock} from '../../../services/record/validation/validation.manager.spec.mock';
+import {MetadataStore} from '../../../store/metadata/metadata.store.service';
+import {metadataStoreMock} from '../../../store/metadata/metadata.store.spec.mock';
+import {ValidationMessageService} from '../../../services/record/validation/validation-message.service';
+import {languageStoreMock} from '../../../store/language/language.store.spec.mock';
 
 const mockRouter = {
     navigate: (commands: any[], extras?: NavigationExtras) => {
@@ -49,29 +66,28 @@ const mockRouter = {
     }
 } as Router;
 
-export class MockModal extends NgbModal {
+const route = new ActivatedRoute();
+const pagination = new RecordPaginationService(localStorageServiceMock, userPreferenceStoreMock, appStateStoreMock, route);
 
-    constructor() {
-        super(null, null, null, null);
-    }
+const injector = Injector.create({
+    providers: [
+        {provide: ValidationManager, useValue: validationManagerMock},
+        {provide: MetadataStore, useValue: metadataStoreMock},
+        {provide: ValidationMessageService, useValue: new ValidationMessageService(messageServiceMock, languageStoreMock)}
+    ]
+});
 
-    open(): NgbModalRef {
-        return {
-            componentInstance: {
-                textKey: '',
-                buttons: []
-            }
-        } as NgbModalRef;
-    }
-}
-
-
-export const recordActionsManagerMock = new RecordActionManager(
-    new RecordEditAction(),
+export const recordActionsManagerMock = runInInjectionContext(injector, () => new RecordActionManager(
+    new RecordEditAction(messageServiceMock),
     new RecordCreateAction(moduleNameMapperMock, mockRouter),
     new RecordToggleWidgetsAction(),
-    new RecordCancelAction(new MockModal()),
-    new CancelCreateAction(new MockModal(), mockRouter, moduleNameMapperMock, actionNameMapperMock),
-    new RecordSaveAction(messageServiceMock),
-    new RecordSaveNewAction(messageServiceMock, mockRouter, moduleNameMapperMock, actionNameMapperMock)
-);
+    new RecordCancelAction(ngbModalMock, mockModuleNavigation, mockRouter, pagination),
+    new CancelCreateAction(ngbModalMock, mockRouter, moduleNameMapperMock, actionNameMapperMock),
+    new RecordSaveAction(mockRouter, messageServiceMock, mockModuleNavigation, null, null, pagination),
+    new RecordSaveNewAction(messageServiceMock, mockModuleNavigation),
+    new RecordSaveContinueAction(messageServiceMock, mockModuleNavigation, null, systemConfigStoreMock, null, pagination),
+    new RecordSaveScheduleAction(messageServiceMock, mockRouter, mockModuleNavigation, null, systemConfigStoreMock, pagination),
+    new AsyncProcessRecordAction(),
+    new ModalEditAction(ngbModalMock, route),
+    new ModalCreateAction(ngbModalMock, appStateStoreMock)
+));

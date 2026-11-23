@@ -41,10 +41,22 @@ import {phoneFormatterMock} from '../../formatters/phone/phone-formatter.spec.mo
 import {emailFormatterMock} from '../../formatters/email/email-formatter.spec.mock';
 import {FormControlUtils} from '../field/form-control.utils';
 import {PrimaryEmailValidator} from './validators/primary-email.validator';
+import {DuplicateEmailValidator} from './validators/duplicate-email.validator';
+import {LineItemsRequiredValidator} from './validators/line-items-required.validator';
+import {AttachmentValidator} from './validators/attachment.validator';
+import {SemanticVersionValidator} from './validators/semantic-version.validator';
+import {AsyncProcessValidator} from './async-validators/async-process.validator';
+import {ValidationDefinitionManager} from './validation-definition.manager';
+import {confirmationModalServiceMock} from '../../modals/confirmation-modal.spec.mock';
+import {preferenceProcessMock} from '../../process/process.service.spec.mock';
+import {dataTypeFormatterMock} from '../../formatters/data-type.formatter.spec.mock';
+import {fieldMapper} from '../field/field.mapper.spec.mock';
 
+const validationDefinitions = new ValidationDefinitionManager();
 export const validationManagerMock = new ValidationManager(
+    new AsyncProcessValidator(preferenceProcessMock, confirmationModalServiceMock, fieldMapper, dataTypeFormatterMock),
     new RequiredValidator(new FormControlUtils()),
-    new RangeValidator(),
+    new RangeValidator(validationDefinitions),
     new CurrencyValidator(numberFormatterMock),
     new DateValidator(dateFormatterMock, new FormControlUtils()),
     new DateTimeValidator(datetimeFormatterMock),
@@ -52,5 +64,9 @@ export const validationManagerMock = new ValidationManager(
     new FloatValidator(numberFormatterMock),
     new IntValidator(numberFormatterMock),
     new PhoneValidator(phoneFormatterMock),
-    new PrimaryEmailValidator()
+    new PrimaryEmailValidator(),
+    new DuplicateEmailValidator(),
+    new LineItemsRequiredValidator(new FormControlUtils()),
+    new AttachmentValidator(new FormControlUtils()),
+    new SemanticVersionValidator(validationDefinitions)
 );

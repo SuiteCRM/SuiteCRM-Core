@@ -26,6 +26,8 @@
 
 import {TestBed} from '@angular/core/testing';
 
+import {SystemConfigStore} from '../../store/system-config/system-config.store';
+import {systemConfigStoreMock} from '../../store/system-config/system-config.store.spec.mock';
 import {MessageService} from './message.service';
 import {LanguageStore} from '../../store/language/language.store';
 import {languageStoreMock} from '../../store/language/language.store.spec.mock';
@@ -33,6 +35,7 @@ import {languageStoreMock} from '../../store/language/language.store.spec.mock';
 describe('MessageService', () => {
     beforeEach(() => TestBed.configureTestingModule({
         providers: [
+            {provide: SystemConfigStore, useValue: systemConfigStoreMock},
             {provide: LanguageStore, useValue: languageStoreMock},
         ],
     }));

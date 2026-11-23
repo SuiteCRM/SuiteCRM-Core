@@ -26,31 +26,33 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {ApolloTestingModule} from 'apollo-angular/testing';
-import {AngularSvgIconModule} from 'angular-svg-icon';
+import {AngularSvgIconModule, SvgIconRegistryService} from 'angular-svg-icon';
 import {RecordContainerComponent} from './record-container.component';
 import {provideHttpClientTesting} from '@angular/common/http/testing';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {of} from 'rxjs';
 import {take} from 'rxjs/operators';
-import {Router} from '@angular/router';
-import {WidgetPanelModule} from '../../../../components/widget-panel/widget-panel.module';
+import {RouterTestingModule} from '@angular/router/testing';
+import {RecordActionsAdapter} from '../../adapters/actions.adapter';
+import {recordActionsMock} from '../../adapters/actions.adapter.spec.mock';
+import {RecordViewSidebarWidgetService} from '../../services/record-view-sidebar-widget.service';
+import {RecordPaginationStore} from '../../store/record-pagination/record-pagination.store';
+import {RecordContainerModule} from './record-container.module';
 import {RecordViewStore} from '../../store/record-view/record-view.store';
 import {SystemConfigStore} from '../../../../store/system-config/system-config.store';
 import {UserPreferenceStore} from '../../../../store/user-preference/user-preference.store';
 import {NavigationStore} from '../../../../store/navigation/navigation.store';
 import {recordviewStoreMock} from '../../store/record-view/record-view.store.spec.mock';
-import {themeImagesMockData} from '../../../../store/theme-images/theme-images.store.spec.mock';
+import {registerThemeSvgFixtures, themeImagesMockData} from '../../../../store/theme-images/theme-images.store.spec.mock';
 import {ModuleNavigation} from '../../../../services/navigation/module-navigation/module-navigation.service';
 import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {LanguageStore} from '../../../../store/language/language.store';
-import {SubpanelModule} from '../../../../containers/subpanel/components/subpanel/subpanel.module';
 import {metadataStoreMock} from '../../../../store/metadata/metadata.store.spec.mock';
 import {MetadataStore} from '../../../../store/metadata/metadata.store.service';
 import {navigationMock} from '../../../../store/navigation/navigation.store.spec.mock';
 import {AppStateStore} from '../../../../store/app-state/app-state.store';
 import {
-    mockModuleNavigation,
-    mockRouter
+    mockModuleNavigation
 } from '../../../../services/navigation/module-navigation/module-navigation.service.spec.mock';
 import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
 import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
@@ -64,13 +66,15 @@ describe('RecordContainerComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-    declarations: [RecordContainerComponent],
-    imports: [WidgetPanelModule,
+    imports: [RecordContainerModule,
         AngularSvgIconModule.forRoot(),
         NoopAnimationsModule,
         ApolloTestingModule,
-        SubpanelModule],
+        RouterTestingModule],
     providers: [
+        RecordPaginationStore,
+        RecordViewSidebarWidgetService,
+        {provide: RecordActionsAdapter, useValue: recordActionsMock},
         { provide: RecordViewStore, useValue: recordviewStoreMock },
         {
             provide: ThemeImagesStore, useValue: {
@@ -85,7 +89,6 @@ describe('RecordContainerComponent', () => {
         { provide: LanguageStore, useValue: languageStoreMock },
         { provide: MetadataStore, useValue: metadataStoreMock },
         { provide: AppStateStore, useValue: appStateStoreMock },
-        { provide: Router, useValue: mockRouter },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
     ]
@@ -94,6 +97,7 @@ describe('RecordContainerComponent', () => {
     }));
 
     beforeEach(() => {
+        registerThemeSvgFixtures(TestBed.inject(SvgIconRegistryService));
         fixture = TestBed.createComponent(RecordContainerComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

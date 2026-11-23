@@ -25,7 +25,6 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import {RouterTestingModule} from '@angular/router/testing';
 
 import {ClassicViewUiComponent} from './classic-view.component';
@@ -37,7 +36,7 @@ import {IframePageChangeObserver} from '../../services/iframe-page-change-observ
 
 class ClassicViewUiComponentMock extends ClassicViewUiComponent {
     protected buildIframePageChangeObserver(): IframePageChangeObserver {
-        return null;
+        return jasmine.createSpyObj<IframePageChangeObserver>('IframePageChangeObserver', ['init', 'destroy']);
     }
 
     protected buildIframeResizeHandlerHandler(): IframeResizeHandlerHandler {
@@ -60,7 +59,6 @@ describe('ClassicViewUiComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            schemas: [CUSTOM_ELEMENTS_SCHEMA],
             imports: [
                 RouterTestingModule,
                 ApolloTestingModule

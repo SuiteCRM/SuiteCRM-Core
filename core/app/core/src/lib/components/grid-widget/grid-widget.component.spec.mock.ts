@@ -28,6 +28,7 @@ import {Observable, of} from 'rxjs';
 import {shareReplay} from 'rxjs/operators';
 import {SingleValueStatisticsStoreFactory} from '../../store/single-value-statistics/single-value-statistics.store.factory';
 import {fieldManagerMock} from '../../services/record/field/field.manager.spec.mock';
+import {languageStoreMock} from '../../store/language/language.store.spec.mock';
 import {StatisticsFetchGQL} from '../../store/statistics/graphql/api.statistics.get';
 import {StatisticsMap, StatisticsQueryMap} from '../../common/statistics/statistics.model';
 
@@ -78,5 +79,6 @@ class StatisticsFetchGQLSpy extends StatisticsFetchGQL {
 
 export const gridWidgetFactoryMock = new SingleValueStatisticsStoreFactory(
     new StatisticsFetchGQLSpy(),
-    fieldManagerMock
+    fieldManagerMock,
+    languageStoreMock
 );

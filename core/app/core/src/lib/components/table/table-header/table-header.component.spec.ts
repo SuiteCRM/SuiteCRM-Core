@@ -42,6 +42,8 @@ import {ThemeImagesStore} from '../../../store/theme-images/theme-images.store';
 import {listviewStoreMock} from '../../../views/list/store/list-view/list-view.store.spec.mock';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
+import {ActionGroupMenuModule} from '../../action-group-menu/action-group-menu.module';
+
 describe('TableheaderUiComponent', () => {
     let component: TableHeaderComponent;
     let fixture: ComponentFixture<TableHeaderComponent>;
@@ -50,6 +52,7 @@ describe('TableheaderUiComponent', () => {
         TestBed.configureTestingModule({
     declarations: [TableHeaderComponent],
     imports: [PaginationModule,
+        ActionGroupMenuModule,
         BulkActionMenuModule,
         AngularSvgIconModule.forRoot(),
         ApolloTestingModule,

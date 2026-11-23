@@ -25,6 +25,7 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {Component} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {CommonModule} from '@angular/common';
@@ -34,6 +35,7 @@ import {dateFormatterMock} from '../../../../services/formatters/datetime/date-f
 import {DateFormatter} from '../../../../services/formatters/datetime/date-formatter.service';
 import {datetimeFormatterMock} from '../../../../services/formatters/datetime/datetime-formatter.service.spec.mock';
 import {CurrencyFormatter} from '../../../../services/formatters/currency/currency-formatter.service';
+import {systemConfigStoreMock} from '../../../../store/system-config/system-config.store.spec.mock';
 import {userPreferenceStoreMock} from '../../../../store/user-preference/user-preference.store.spec.mock';
 import {DateDetailFieldComponent} from './date.component';
 import {DatetimeFormatter} from '../../../../services/formatters/datetime/datetime-formatter.service';
@@ -67,7 +69,7 @@ describe('DateDetailFieldComponent', () => {
                 DateDetailFieldTestHostComponent,
                 DateDetailFieldComponent,
             ],
-            imports: [
+            imports: [ApolloTestingModule,
                 CommonModule
             ],
             providers: [
@@ -77,7 +79,7 @@ describe('DateDetailFieldComponent', () => {
                 {provide: DateFormatter, useValue: dateFormatterMock},
                 {
                     provide: CurrencyFormatter,
-                    useValue: new CurrencyFormatter(userPreferenceStoreMock, numberFormatterMock, 'en_us')
+                    useValue: new CurrencyFormatter(userPreferenceStoreMock, systemConfigStoreMock, numberFormatterMock, 'en_us')
                 },
             ],
         }).compileComponents();

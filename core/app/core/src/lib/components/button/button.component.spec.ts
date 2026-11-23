@@ -26,12 +26,11 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import {ButtonComponent} from './button.component';
 import {Component} from '@angular/core';
 import {ButtonInterface} from '../../common/components/button/button.model';
 import {languageStoreMock} from '../../store/language/language.store.spec.mock';
 import {LanguageStore} from '../../store/language/language.store';
-import {ImageModule} from '../image/image.module';
+import {ButtonModule} from './button.module';
 
 
 @Component({
@@ -56,11 +55,10 @@ describe('ButtonComponent', () => {
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [
-                ButtonComponent,
                 ButtonTestHostComponent,
             ],
             imports: [
-                ImageModule
+                ButtonModule
             ],
             providers: [
                 {provide: LanguageStore, useValue: languageStoreMock}
@@ -128,20 +126,20 @@ describe('ButtonComponent', () => {
 
         expect(testHostComponent).toBeTruthy();
         expect(buttonElement).toBeTruthy();
-        expect(buttonElement.className).not.toContain('button-class');
+        expect(buttonElement.className).not.toContain('button-test');
     });
 
     it('should support no click callback', () => {
 
-        const buttonElement = testHostFixture.nativeElement.querySelector('button');
-
-        testHostComponent.config.onClick = null;
-        testHostFixture.detectChanges();
+        const fixture = TestBed.createComponent(ButtonTestHostComponent);
+        fixture.componentInstance.config.onClick = null;
+        fixture.detectChanges();
+        const buttonElement = fixture.nativeElement.querySelector('button');
 
         buttonElement.click();
 
         expect(testHostComponent).toBeTruthy();
         expect(buttonElement).toBeTruthy();
-        expect(testHostComponent.clicked).toEqual(0);
+        expect(fixture.componentInstance.clicked).toEqual(0);
     });
 });

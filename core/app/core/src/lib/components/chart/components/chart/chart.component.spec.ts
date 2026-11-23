@@ -26,7 +26,11 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
+import {ChartModule} from './chart.module';
 import {ChartComponent} from './chart.component';
+
+import {LanguageStore} from '../../../../store/language/language.store';
+import {languageStoreMock} from '../../../../store/language/language.store.spec.mock';
 
 describe('ChartComponent', () => {
     let component: ChartComponent;
@@ -34,7 +38,8 @@ describe('ChartComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            declarations: [ChartComponent]
+            imports: [ChartModule],
+            providers: [{provide: LanguageStore, useValue: languageStoreMock}]
         })
             .compileComponents();
     }));

@@ -25,6 +25,7 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ApolloTestingModule} from 'apollo-angular/testing';
 import {RelateDetailFieldComponent} from './relate.component';
 import {Component} from '@angular/core';
 import {Field} from '../../../../common/record/field.model';
@@ -76,7 +77,7 @@ describe('RelateRecordFieldsComponent', () => {
                 RelateDetailFieldTestHostComponent,
                 RelateDetailFieldComponent,
             ],
-            imports: [RouterTestingModule],
+            imports: [ApolloTestingModule,RouterTestingModule],
             providers: [
                 {provide: UserPreferenceStore, useValue: userPreferenceStoreMock},
                 {provide: NumberFormatter, useValue: numberFormatterMock},

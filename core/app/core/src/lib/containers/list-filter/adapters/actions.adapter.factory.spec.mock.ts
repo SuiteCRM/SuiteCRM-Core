@@ -32,6 +32,8 @@ import {confirmationModalServiceMock} from '../../../services/modals/confirmatio
 import {messageServiceMock} from '../../../services/message/message.service.spec.mock';
 import {selectModalServiceMock} from '../../../services/modals/select-modal.spec.mock';
 import {metadataStoreMock} from '../../../store/metadata/metadata.store.spec.mock';
+import {RecordMapperRegistry} from '../../../common/record/record-mappers/record-mapper.registry';
+import {recordManagerMock} from '../../../services/record/record.manager.spec.mock';
 
 export const savedFilterActionAdapterFactoryMock = new SavedFilterActionAdapterFactory(
     languageStoreMock,
@@ -40,5 +42,10 @@ export const savedFilterActionAdapterFactoryMock = new SavedFilterActionAdapterF
     messageServiceMock,
     confirmationModalServiceMock,
     selectModalServiceMock,
-    metadataStoreMock
+    null,
+    metadataStoreMock,
+    null,
+    new RecordMapperRegistry(),
+    null,
+    recordManagerMock
 );

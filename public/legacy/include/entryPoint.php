@@ -134,10 +134,10 @@ require_once 'include/utils/autoloader.php';
 spl_autoload_register(array('SugarAutoLoader', 'autoload'));
 require_once 'data/SugarBean.php';
 require_once 'include/utils/mvc_utils.php';
-require 'include/SugarObjects/LanguageManager.php';
-require 'include/SugarObjects/VardefManager.php';
+require_once 'include/SugarObjects/LanguageManager.php';
+require_once 'include/SugarObjects/VardefManager.php';
 
-require 'modules/DynamicFields/templates/Fields/TemplateText.php';
+require_once 'modules/DynamicFields/templates/Fields/TemplateText.php';
 
 require_once 'include/utils/file_utils.php';
 require_once 'include/SugarEmailAddress/SugarEmailAddress.php';
@@ -153,7 +153,7 @@ require_once 'include/utils/LogicHook.php';
 require_once 'include/SugarTheme/SugarTheme.php';
 require_once 'include/MVC/SugarModule.php';
 require_once 'include/SugarCache/SugarCache.php';
-require 'modules/Currencies/Currency.php';
+require_once 'modules/Currencies/Currency.php';
 require_once 'include/MVC/SugarApplication.php';
 
 require_once 'include/upload_file.php';

@@ -164,7 +164,13 @@ class OutboundEmailAccountsController extends SugarController
         $outbound_id = empty($_REQUEST['record']) ? "" : $_REQUEST['record'];
         $oe = BeanFactory::newBean('OutboundEmailAccounts');
 
-        $ownerId = $this->bean->created_by ?? '';
+        $ownerId = '';
+        if (($this->bean->type ?? '') === 'user') {
+            $ownerId = $this->bean->user_id ?? '';
+        }
+        if (empty($ownerId)) {
+            $ownerId = $this->bean->created_by ?? '';
+        }
         if (empty($ownerId)) {
             $ownerId = $current_user->id;
         }

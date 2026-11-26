@@ -5,7 +5,7 @@
  * SugarCRM, Inc. Copyright (C) 2004-2013 SugarCRM Inc.
  *
  * SuiteCRM is an extension to SugarCRM Community Edition developed by SalesAgility Ltd.
- * Copyright (C) 2011 - 2021 SalesAgility Ltd.
+ * Copyright (C) 2011 - 2026 SalesAgility Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -601,7 +601,7 @@ function generateSearchWhere($module, $query)
      }
 
      //include the file that defines $sugar_demodata
-     include('install/demoData.en_us.php');
+     include('install/seed_data/demoData.en_us.php');
 
      $person_bean = false;
      if (isset($focus->first_name)) {

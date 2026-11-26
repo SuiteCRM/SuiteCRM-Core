@@ -370,7 +370,7 @@ export class LanguageStore implements StateStore {
 
         const storedLanguage = this.localStorage.get('selected_language');
 
-        if (storedLanguage) {
+        if (typeof storedLanguage === 'string' && storedLanguage !== '') {
             return storedLanguage;
         }
 
@@ -393,7 +393,8 @@ export class LanguageStore implements StateStore {
      * @returns {string} selected language key
      */
     public getSelectedLanguage(): string {
-        return this.localStorage.get('selected_language') ?? '';
+        const storedLanguage = this.localStorage.get('selected_language');
+        return (typeof storedLanguage === 'string' && storedLanguage !== '') ? storedLanguage : '';
     }
 
     /**

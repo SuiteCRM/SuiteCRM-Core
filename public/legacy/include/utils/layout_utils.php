@@ -283,7 +283,6 @@ EOHTML;
     }
 
     echo "<title>{$app_strings['LBL_BROWSER_TITLE']}</title>";
-    echo '<link href="themes/'.SugarThemeRegistry::current().'/css/bootstrap.min.css" rel="stylesheet">';
     echo $themeCSS;
     if ($includeJS) {
         $charset = isset($app_strings['LBL_CHARSET']) ? $app_strings['LBL_CHARSET'] : $sugar_config['default_charset'];
